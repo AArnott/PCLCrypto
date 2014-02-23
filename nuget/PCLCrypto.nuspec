@@ -17,7 +17,7 @@
 			</group>
 			<group targetFramework="wp8">
 			</group>
-			<group targetFramework="win8">
+			<group targetFramework="win81">
 			</group>
 			<group targetFramework="monoandroid">
 			</group>
@@ -32,7 +32,7 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file target="lib\portable-net403+sl50+wp80+win+MonoAndroid10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.*" />
+		<file target="lib\portable-net403+sl50+wp80+win81+MonoAndroid10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.*" />
 
 		<file target="lib\net45" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.*" />
 
@@ -40,7 +40,7 @@
 
 		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.*" />
 
-		<file target="lib\win8" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.WinRT\*.pri" />
+		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.WinRT\*.pri" />
 
 		<file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
 
