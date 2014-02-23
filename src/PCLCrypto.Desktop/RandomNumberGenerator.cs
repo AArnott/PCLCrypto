@@ -17,7 +17,7 @@ namespace PCLCrypto
     /// <summary>
     /// Exposes the .NET Framework implementation of <see cref="IRandomNumberGenerator"/>.
     /// </summary>
-    internal class RandomNumberGenerator : IRandomNumberGenerator
+    internal class RandomNumberGenerator : System.Security.Cryptography.RandomNumberGenerator, IRandomNumberGenerator
     {
         /// <summary>
         /// The thread-safe source for random numbers.
@@ -25,11 +25,17 @@ namespace PCLCrypto
         private static readonly RNGCryptoServiceProvider RandomSource = new RNGCryptoServiceProvider();
 
         /// <inheritdoc/>
-        public void GetBytes(byte[] buffer)
+        public override void GetBytes(byte[] buffer)
         {
-            Requires.NotNull(buffer, "buffer");
-
             RandomSource.GetBytes(buffer);
         }
+
+#if !WINDOWS_PHONE && !SILVERLIGHT
+        /// <inheritdoc/>
+        public override void GetNonZeroBytes(byte[] data)
+        {
+            RandomSource.GetNonZeroBytes(data);
+        }
+#endif
     }
 }

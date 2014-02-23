@@ -37,5 +37,13 @@
             // Verify that the two randomly filled buffers are not equal.
             Assert.IsTrue(BitConverter.ToInt32(buffer1, 0) != BitConverter.ToInt32(buffer2, 0));
         }
+
+#if !WinRT && !PCL
+        [TestMethod]
+        public void DesktopBaseClass()
+        {
+            Assert.IsTrue(Crypto.RandomNumberGenerator is System.Security.Cryptography.RandomNumberGenerator);
+        }
+#endif
     }
 }
