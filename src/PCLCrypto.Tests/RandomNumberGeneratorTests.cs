@@ -4,9 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using PCLTesting;
     using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using PCLTesting;
 
     [TestClass]
     public class RandomNumberGeneratorTests

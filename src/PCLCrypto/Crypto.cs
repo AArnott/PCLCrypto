@@ -11,8 +11,14 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
 
+    /// <summary>
+    /// Offers access to platform-specific cryptographic functionality.
+    /// </summary>
     public static class Crypto
     {
+        /// <summary>
+        /// Gets a cryptographically strong random number generator.
+        /// </summary>
         public static IRandomNumberGenerator RandomNumberGenerator
         {
             get

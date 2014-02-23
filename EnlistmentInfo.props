@@ -37,4 +37,12 @@
 		<Optimize>true</Optimize>
 		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
+
+	<Target Name="ExcludeGeneratedFilesFromStyleCop" BeforeTargets="StyleCop">
+		<ItemGroup>
+			<Compile Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FileName)', '^TemporaryGeneratedFile')) ">
+				<ExcludeFromStyleCop>true</ExcludeFromStyleCop>
+			</Compile>
+		</ItemGroup>
+	</Target>
 </Project>
