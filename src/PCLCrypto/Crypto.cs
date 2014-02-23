@@ -16,6 +16,14 @@ namespace PCLCrypto
     /// </summary>
     public static class Crypto
     {
+#if !PCL
+        /// <summary>
+        /// Backing field storing a shareable, thread-safe implementation
+        /// of <see cref="IRandomNumberGenerator"/>.
+        /// </summary>
+        private static IRandomNumberGenerator randomNumberGenerator;
+#endif
+
         /// <summary>
         /// Gets a cryptographically strong random number generator.
         /// </summary>
@@ -26,7 +34,12 @@ namespace PCLCrypto
 #if PCL
                 throw new NotImplementedException("Not implemented in reference assembly.");
 #else
-                return new RandomNumberGenerator();
+                if (randomNumberGenerator == null)
+                {
+                    randomNumberGenerator = new RandomNumberGenerator();
+                }
+
+                return randomNumberGenerator;
 #endif
             }
         }
