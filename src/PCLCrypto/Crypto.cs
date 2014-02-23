@@ -23,10 +23,10 @@ namespace PCLCrypto
         {
             get
             {
-#if DESKTOP
-                return new RandomNumberGenerator();
-#else
+#if PCL
                 throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                return new RandomNumberGenerator();
 #endif
             }
         }

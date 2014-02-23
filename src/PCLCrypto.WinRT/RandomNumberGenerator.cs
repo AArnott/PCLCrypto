@@ -9,9 +9,9 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using Windows.Security.Cryptography;
 
     /// <summary>
     /// Exposes the .NET Framework implementation of <see cref="IRandomNumberGenerator"/>.
@@ -21,8 +21,8 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public void GetBytes(byte[] buffer)
         {
-            var rng = new RNGCryptoServiceProvider();
-            rng.GetBytes(buffer);
+            var windowsBuffer = CryptographicBuffer.GenerateRandom((uint)buffer.Length);
+            Array.Copy(windowsBuffer.ToArray(), buffer, buffer.Length);
         }
     }
 }
