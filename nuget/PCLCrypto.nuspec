@@ -32,10 +32,10 @@
         </dependencies>
     </metadata>
     <files>
-      <file src="$OutputPath$PCLCrypto\PCLCrypto.dll" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.dll" />
-      <file src="$OutputPath$PCLCrypto\PCLCrypto.xml" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.xml" />
-      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.dll" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.Abstractions.dll" />
-      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.xml" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.Abstractions.xml" />
+      <file src="$OutputPath$PCLCrypto\PCLCrypto.dll" target="lib\portable-net403+sl50+wp80+win+MonoAndroid10+MonoTouch10\PCLCrypto.dll" />
+      <file src="$OutputPath$PCLCrypto\PCLCrypto.xml" target="lib\portable-net403+sl50+wp80+win+MonoAndroid10+MonoTouch10\PCLCrypto.xml" />
+      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.dll" target="lib\portable-net403+sl50+wp80+win+MonoAndroid10+MonoTouch10\PCLCrypto.Abstractions.dll" />
+      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.xml" target="lib\portable-net403+sl50+wp80+win+MonoAndroid10+MonoTouch10\PCLCrypto.Abstractions.xml" />
 
       <!--<file src="..\src\PCLCrypto.NoSL\bin\Release\PCLCrypto.dll" target="lib\portable-net45+wp8+win8+monoandroid+monotouch\PCLCrypto.dll" />
       <file src="..\src\PCLCrypto.NoSL\bin\Release\PCLCrypto.xml" target="lib\portable-net45+wp8+win8+monoandroid+monotouch\PCLCrypto.xml" />
