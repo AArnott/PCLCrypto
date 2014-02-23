@@ -38,6 +38,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CollectionAssertEx.cs" />
+    <Compile Include="DeriveBytesTests.cs" />
     <Compile Include="RandomNumberGeneratorTests.cs" />
   </ItemGroup>
   <ItemGroup>

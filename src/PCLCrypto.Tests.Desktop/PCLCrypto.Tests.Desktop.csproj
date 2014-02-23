@@ -65,11 +65,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
-      <Link>RandomNumberGeneratorTests.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -81,9 +76,21 @@
       <Project>{7c7e2d50-036f-4e08-b4e0-f09889501cfd}</Project>
       <Name>PCLCrypto.Desktop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PCLCrypto.Tests\PCLCrypto.Tests.csproj">
+      <Project>{4c9991d2-526e-476a-b81d-cfec533e2f24}</Project>
+      <Name>PCLCrypto.Tests</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\PCLCrypto.Tests\DeriveBytesTests.cs">
+      <Link>DeriveBytesTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
+      <Link>RandomNumberGeneratorTests.cs</Link>
+    </Compile>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

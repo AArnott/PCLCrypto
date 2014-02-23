@@ -30,5 +30,20 @@ namespace PCLCrypto
 #endif
             }
         }
+
+        /// <summary>
+        /// Gets tools to derive a key from a password for buffer.
+        /// </summary>
+        public static IDeriveBytes DeriveBytes
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                return new DeriveBytes();
+#endif
+            }
+        }
     }
 }
