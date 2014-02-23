@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+	<PropertyGroup>
+		<MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<ProjectRoot>$(MSBuildThisFileDirectory)</ProjectRoot>
+		<SolutionDir>$(ProjectRoot)src\</SolutionDir>
+		<RestorePackages>true</RestorePackages>
+
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<BaseIntermediateOutputPath>$(ProjectRoot)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+		<IntermediatePath>$(BaseIntermediateOutputPath)</IntermediatePath>
+		<OutputPath>$(ProjectRoot)bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+
+		<!-- Release builds should break when StyleCop warnings exist. -->
+		<StyleCopTreatErrorsAsWarnings Condition=" '$(StyleCopTreatErrorsAsWarnings)' == '' and '$(Configuration)' == 'Release' ">false</StyleCopTreatErrorsAsWarnings>
+		<StyleCopTreatErrorsAsWarnings Condition=" '$(StyleCopTreatErrorsAsWarnings)' == '' ">true</StyleCopTreatErrorsAsWarnings>
+
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>$(SolutionDir)opensource.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DebugType>pdbonly</DebugType>
+		<Optimize>true</Optimize>
+		<DefineConstants>TRACE</DefineConstants>
+	</PropertyGroup>
+</Project>

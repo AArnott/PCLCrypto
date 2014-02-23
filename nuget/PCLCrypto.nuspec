@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata minClientVersion="2.7.2">
+        <id>PCLCrypto</id>
+        <version>0.0.1</version>
+        <title>PCL Crypto - Portable Crypto APIs</title>
+        <authors>Andrew Arnott</authors>
+        <owners>Andrew Arnott</owners>
+        <licenseUrl>https://github.com/AArnott/PCLCrypto/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/AArnott/PCLCrypto</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>PCL Crypto provides a consistent, portable set of crypto APIs for .NET, Windows Phone, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.  This makes it easier to create cross-platform .NET libraries and apps.</description>
+        <summary>PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
+        <tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
+        <dependencies>
+          <group targetFramework="net45">
+          </group>
+          <group targetFramework="wp8">
+          </group>
+          <group targetFramework="win8">
+          </group>
+          <group targetFramework="monoandroid">
+          </group>
+          <group targetFramework="monotouch">
+          </group>
+          <group targetFramework="portable-net45+wp8+win8+monoandroid+monotouch">
+          </group>
+          <group>
+            <dependency id="Microsoft.Bcl.Async" version="1.0.165" />
+            <dependency id="Microsoft.Bcl" version="1.1.6" />
+          </group>
+        </dependencies>
+    </metadata>
+    <files>
+      <file src="$OutputPath$PCLCrypto\PCLCrypto.dll" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.dll" />
+      <file src="$OutputPath$PCLCrypto\PCLCrypto.xml" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.xml" />
+      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.dll" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.Abstractions.dll" />
+      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.xml" target="lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLCrypto.Abstractions.xml" />
+
+      <!--<file src="..\src\PCLCrypto.NoSL\bin\Release\PCLCrypto.dll" target="lib\portable-net45+wp8+win8+monoandroid+monotouch\PCLCrypto.dll" />
+      <file src="..\src\PCLCrypto.NoSL\bin\Release\PCLCrypto.xml" target="lib\portable-net45+wp8+win8+monoandroid+monotouch\PCLCrypto.xml" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.dll" target="lib\portable-net45+wp8+win8+monoandroid+monotouch\PCLCrypto.Abstractions.dll" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.xml" target="lib\portable-net45+wp8+win8+monoandroid+monotouch\PCLCrypto.Abstractions.xml" />-->
+      
+      <file src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.dll" target="lib\net45\PCLCrypto.dll" />
+      <file src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.xml" target="lib\net45\PCLCrypto.xml" />
+      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.dll" target="lib\net45\PCLCrypto.Abstractions.dll" />
+      <file src="$OutputPath$PCLCrypto.Abstractions\PCLCrypto.Abstractions.xml" target="lib\net45\PCLCrypto.Abstractions.xml" />
+
+      <!--<file src="..\src\PCLCrypto.IsoStore.SL\bin\Release\PCLCrypto.dll" target="lib\sl5\PCLCrypto.dll" />
+      <file src="..\src\PCLCrypto.IsoStore.SL\bin\Release\PCLCrypto.xml" target="lib\sl5\PCLCrypto.xml" />
+      <file src="..\src\PCLCrypto.Abstractions\bin\Release\PCLCrypto.Abstractions.dll" target="lib\sl5\PCLCrypto.Abstractions.dll" />
+      <file src="..\src\PCLCrypto.Abstractions\bin\Release\PCLCrypto.Abstractions.xml" target="lib\sl5\PCLCrypto.Abstractions.xml" />
+
+      <file src="..\src\PCLCrypto.WindowsPhone\bin\Release\PCLCrypto.dll" target="lib\wp8\PCLCrypto.dll" />
+      <file src="..\src\PCLCrypto.WindowsPhone\bin\Release\PCLCrypto.xml" target="lib\wp8\PCLCrypto.xml" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.dll" target="lib\wp8\PCLCrypto.Abstractions.dll" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.xml" target="lib\wp8\PCLCrypto.Abstractions.xml" />
+
+      <file src="..\src\PCLCrypto.WinRT\bin\Release\PCLCrypto.dll" target="lib\win8\PCLCrypto.dll" />
+      <file src="..\src\PCLCrypto.WinRT\bin\Release\PCLCrypto.xml" target="lib\win8\PCLCrypto.xml" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.dll" target="lib\win8\PCLCrypto.Abstractions.dll" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.xml" target="lib\win8\PCLCrypto.Abstractions.xml" />
+
+      <file src="..\src\PCLCrypto.Android\bin\Release\PCLCrypto.dll" target="lib\monoandroid\PCLCrypto.dll" />
+      <file src="..\src\PCLCrypto.Android\bin\Release\PCLCrypto.xml" target="lib\monoandroid\PCLCrypto.xml" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.dll" target="lib\monoandroid\PCLCrypto.Abstractions.dll" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.xml" target="lib\monoandroid\PCLCrypto.Abstractions.xml" />
+
+      <file src="..\src\PCLCrypto.iOS\bin\iPhone\Release\PCLCrypto.dll" target="lib\monotouch\PCLCrypto.dll" />
+      <file src="..\src\PCLCrypto.iOS\bin\iPhone\Release\PCLCrypto.xml" target="lib\monotouch\PCLCrypto.xml" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.dll" target="lib\monotouch\PCLCrypto.Abstractions.dll" />
+      <file src="..\src\PCLCrypto.Abstractions.NoSL\bin\Release\PCLCrypto.Abstractions.xml" target="lib\monotouch\PCLCrypto.Abstractions.xml" />-->
+    </files>
+</package>

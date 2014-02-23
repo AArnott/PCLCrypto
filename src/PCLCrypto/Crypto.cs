@@ -1,4 +1,10 @@
-﻿namespace PCLCrypto
+﻿//-----------------------------------------------------------------------
+// <copyright file="Crypto.cs" company="Andrew Arnott">
+//     Copyright (c) Andrew Arnott. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
