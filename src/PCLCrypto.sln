@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{9701D978-72F1-4CF6-B695-2447651A6F96}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90F9B46D-96A3-4165-9513-89566E4C5682}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto", "PCLCrypto\PCLCrypto.csproj", "{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Abstractions", "PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj", "{7D334182-70A1-4F0A-A6A9-96E40E731240}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Desktop", "PCLCrypto.Desktop\PCLCrypto.Desktop.csproj", "{7C7E2D50-036F-4E08-B4E0-F09889501CFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests", "PCLCrypto.Tests\PCLCrypto.Tests.csproj", "{4C9991D2-526E-476A-B81D-CFEC533E2F24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.Desktop", "PCLCrypto.Tests.Desktop\PCLCrypto.Tests.Desktop.csproj", "{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D334182-70A1-4F0A-A6A9-96E40E731240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D334182-70A1-4F0A-A6A9-96E40E731240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D334182-70A1-4F0A-A6A9-96E40E731240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D334182-70A1-4F0A-A6A9-96E40E731240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C7E2D50-036F-4E08-B4E0-F09889501CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C7E2D50-036F-4E08-B4E0-F09889501CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C7E2D50-036F-4E08-B4E0-F09889501CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C7E2D50-036F-4E08-B4E0-F09889501CFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C9991D2-526E-476A-B81D-CFEC533E2F24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C9991D2-526E-476A-B81D-CFEC533E2F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C9991D2-526E-476A-B81D-CFEC533E2F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C9991D2-526E-476A-B81D-CFEC533E2F24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{7D334182-70A1-4F0A-A6A9-96E40E731240} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{7C7E2D50-036F-4E08-B4E0-F09889501CFD} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{4C9991D2-526E-476A-B81D-CFEC533E2F24} = {90F9B46D-96A3-4165-9513-89566E4C5682}
+		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0} = {90F9B46D-96A3-4165-9513-89566E4C5682}
+	EndGlobalSection
+EndGlobal
