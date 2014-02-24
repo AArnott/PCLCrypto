@@ -11,14 +11,13 @@
     using System.Windows.Media;
     using System.Windows.Media.Animation;
     using System.Windows.Shapes;
-    using System.IO.IsolatedStorage;
     using PCLTesting.Infrastructure;
 
     public partial class MainPage : UserControl
     {
         public MainPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private async void RunTestsButton_Click(object sender, RoutedEventArgs e)

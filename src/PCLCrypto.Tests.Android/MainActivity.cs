@@ -14,42 +14,41 @@
     [Activity(Label = "PCLCrypto.Test.Android", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
-        Button _runTestsButton;
+        private Button runTestsButton;
 
-        TextView _resultsTextView;
+        private TextView resultsTextView;
 
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
             // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
+            this.SetContentView(Resource.Layout.Main);
 
             //// Get our button from the layout resource,
             //// and attach an event to it
-            _runTestsButton = FindViewById<Button>(Resource.Id.RunTests);
-            _runTestsButton.Click += runTestsButton_Click;
+            this.runTestsButton = this.FindViewById<Button>(Resource.Id.RunTests);
+            this.runTestsButton.Click += this.RunTestsButton_Click;
 
-            _resultsTextView = FindViewById<TextView>(Resource.Id.ResultsTextView);
+            this.resultsTextView = this.FindViewById<TextView>(Resource.Id.ResultsTextView);
         }
 
-        private async void runTestsButton_Click(object sender, EventArgs e)
+        private async void RunTestsButton_Click(object sender, EventArgs e)
         {
-            _runTestsButton.Enabled = false;
+            this.runTestsButton.Enabled = false;
 
             try
             {
                 var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
                 await testRunner.RunTestsAsync();
-                _resultsTextView.Text = testRunner.Log;
+                this.resultsTextView.Text = testRunner.Log;
             }
             catch (Exception ex)
             {
-                _resultsTextView.Text = ex.ToString();
+                this.resultsTextView.Text = ex.ToString();
             }
 
-            _runTestsButton.Enabled = true;
+            this.runTestsButton.Enabled = true;
         }
     }
 }
-

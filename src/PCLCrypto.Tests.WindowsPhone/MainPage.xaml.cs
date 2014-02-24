@@ -19,25 +19,25 @@
         // Constructor
         public MainPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private async void RunTestsButton_Click(object sender, RoutedEventArgs e)
         {
-            RunTestsButton.IsEnabled = false;
+            this.RunTestsButton.IsEnabled = false;
 
             try
             {
                 var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
                 await testRunner.RunTestsAsync();
-                ResultsTextBox.Text = testRunner.Log;
+                this.ResultsTextBox.Text = testRunner.Log;
             }
             catch (Exception ex)
             {
-                ResultsTextBox.Text = ex.ToString();
+                this.ResultsTextBox.Text = ex.ToString();
             }
 
-            RunTestsButton.IsEnabled = true;
+            this.RunTestsButton.IsEnabled = true;
         }
     }
 }
