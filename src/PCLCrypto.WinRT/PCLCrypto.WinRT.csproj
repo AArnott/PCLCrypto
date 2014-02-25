@@ -45,9 +45,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
+      <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto\Crypto.cs">
       <Link>Crypto.cs</Link>
     </Compile>
+    <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
     <Compile Include="WinRTUtilities.cs" />

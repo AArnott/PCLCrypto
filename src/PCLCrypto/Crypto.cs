@@ -22,6 +22,12 @@ namespace PCLCrypto
         /// of <see cref="IRandomNumberGenerator"/>.
         /// </summary>
         private static IRandomNumberGenerator randomNumberGenerator;
+
+        /// <summary>
+        /// Backing field storing a shareable, thread-safe implementation
+        /// of <see cref="IAsymmetricKeyAlgorithmProvider"/>.
+        /// </summary>
+        private static IAsymmetricKeyAlgorithmProviderFactory asymmetricKeyAlgorithmProvider;
 #endif
 
         /// <summary>
@@ -55,6 +61,26 @@ namespace PCLCrypto
                 throw new NotImplementedException("Not implemented in reference assembly.");
 #else
                 return new DeriveBytes();
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets the asymmetric key algorithm provider factory.
+        /// </summary>
+        public static IAsymmetricKeyAlgorithmProviderFactory AsymmetricKeyAlgorithmProvider
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                if (asymmetricKeyAlgorithmProvider == null)
+                {
+                    asymmetricKeyAlgorithmProvider = new AsymmetricKeyAlgorithmProviderFactory();
+                }
+
+                return asymmetricKeyAlgorithmProvider;
 #endif
             }
         }

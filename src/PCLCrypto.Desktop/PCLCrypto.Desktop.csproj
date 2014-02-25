@@ -36,6 +36,8 @@
     <Compile Include="..\PCLCrypto\Crypto.cs">
       <Link>Crypto.cs</Link>
     </Compile>
+    <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
+    <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
   </ItemGroup>

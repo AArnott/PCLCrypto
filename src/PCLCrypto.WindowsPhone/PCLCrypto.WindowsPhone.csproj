@@ -50,6 +50,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProvider.cs">
+      <Link>AsymmetricKeyAlgorithmProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
+      <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
       <Link>DeriveBytes.cs</Link>
     </Compile>
