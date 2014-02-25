@@ -34,5 +34,35 @@ namespace PCLCrypto
 
             this.key = key;
         }
+
+        /// <inheritdoc />
+        public int KeySize
+        {
+            get { return (int)this.key.KeySize; }
+        }
+
+        /// <inheritdoc />
+        public byte[] Export()
+        {
+            return this.key.Export().ToArray();
+        }
+
+        /// <inheritdoc />
+        public byte[] Export(CryptographicPrivateKeyBlobType blobType)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public byte[] ExportPublicKey()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

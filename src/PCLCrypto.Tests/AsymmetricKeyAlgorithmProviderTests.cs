@@ -32,8 +32,31 @@
         public void CreateKeyPair()
         {
             var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            var keyPair = rsa.CreateKeyPair(512);
-            Assert.IsNotNull(keyPair);
+            var key = rsa.CreateKeyPair(512);
+            Assert.IsNotNull(key);
+            Assert.AreEqual(512, key.KeySize);
+        }
+
+        [TestMethod]
+        public void ImportKeyPair_Null()
+        {
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => rsa.ImportKeyPair(null));
+        }
+
+        [TestMethod]
+        public void KeyPairRoundTrip()
+        {
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+
+            var key = rsa.CreateKeyPair(512);
+            byte[] keyBlob = key.Export();
+
+            var key2 = rsa.ImportKeyPair(keyBlob);
+            byte[] key2Blob = key2.Export();
+
+            CollectionAssertEx.AreEqual(keyBlob, key2Blob);
         }
     }
 }

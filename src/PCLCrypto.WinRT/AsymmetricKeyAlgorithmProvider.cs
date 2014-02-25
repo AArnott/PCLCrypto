@@ -50,13 +50,17 @@ namespace PCLCrypto
         {
             Requires.Range(keySize > 0, "keySize");
 
-            return new CryptographicKey(this.platform.CreateKeyPair((uint)keySize));
+            var key = this.platform.CreateKeyPair((uint)keySize);
+            return new CryptographicKey(key);
         }
 
         /// <inheritdoc/>
-        public ICryptographicKey ImportKeyPair(byte[] keyPair)
+        public ICryptographicKey ImportKeyPair(byte[] keyBlob)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            var key = this.platform.ImportKeyPair(keyBlob.ToBuffer());
+            return new CryptographicKey(key);
         }
 
         /// <inheritdoc/>
