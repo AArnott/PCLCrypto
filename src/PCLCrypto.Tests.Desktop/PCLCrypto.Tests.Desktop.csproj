@@ -94,6 +94,7 @@
     <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
       <Link>RandomNumberGeneratorTests.cs</Link>
     </Compile>
+    <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
