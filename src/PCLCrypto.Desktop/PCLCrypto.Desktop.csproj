@@ -37,8 +37,10 @@
       <Link>Crypto.cs</Link>
     </Compile>
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
-    <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
-    <Compile Include="CryptographicKey.cs" />
+    <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="RsaCryptographicKey.cs" />
+    <Compile Include="CngCryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
   </ItemGroup>

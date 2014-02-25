@@ -16,7 +16,7 @@ namespace PCLCrypto
     /// <summary>
     /// .NET Framework implementation of the <see cref="IAsymmetricKeyAlgorithmProviderFactory"/> interface.
     /// </summary>
-    public class AsymmetricKeyAlgorithmProviderFactory : IAsymmetricKeyAlgorithmProviderFactory
+    internal class AsymmetricKeyAlgorithmProviderFactory : IAsymmetricKeyAlgorithmProviderFactory
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricKeyAlgorithmProviderFactory"/> class.
@@ -28,7 +28,35 @@ namespace PCLCrypto
         /// <inheritdoc />
         public IAsymmetricKeyAlgorithmProvider OpenAlgorithm(AsymmetricAlgorithm algorithm)
         {
-            return new AsymmetricKeyAlgorithmProvider(algorithm);
+            switch (algorithm)
+            {
+#if DESKTOP
+                case AsymmetricAlgorithm.DsaSha1:
+                case AsymmetricAlgorithm.DsaSha256:
+                case AsymmetricAlgorithm.EcdsaP256Sha256:
+                case AsymmetricAlgorithm.EcdsaP384Sha384:
+                case AsymmetricAlgorithm.EcdsaP521Sha512:
+                    return new CngAsymmetricKeyAlgorithmProvider(algorithm);
+#endif
+#if !SILVERLIGHT
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                case AsymmetricAlgorithm.RsaPkcs1:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                case AsymmetricAlgorithm.RsaSignPssSha1:
+                case AsymmetricAlgorithm.RsaSignPssSha256:
+                case AsymmetricAlgorithm.RsaSignPssSha384:
+                case AsymmetricAlgorithm.RsaSignPssSha512:
+                    return new RsaAsymmetricKeyAlgorithmProvider(algorithm);
+#endif
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

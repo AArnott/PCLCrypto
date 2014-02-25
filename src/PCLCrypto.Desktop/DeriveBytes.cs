@@ -17,7 +17,7 @@ namespace PCLCrypto
     /// <summary>
     /// Exposes the .NET Framework implementation of <see cref="IDeriveBytes"/>.
     /// </summary>
-    public class DeriveBytes : IDeriveBytes
+    internal class DeriveBytes : IDeriveBytes
     {
         /// <inheritdoc/>
         public byte[] GetBytes(string keyMaterial, byte[] salt, int iterations, int countBytes)

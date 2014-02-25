@@ -17,7 +17,7 @@ namespace PCLCrypto
     /// <summary>
     /// WinRT implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    public class AsymmetricKeyAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
+    internal class AsymmetricKeyAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
     {
         /// <summary>
         /// The WinRT platform implementation.

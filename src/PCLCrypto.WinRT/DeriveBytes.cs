@@ -20,7 +20,7 @@ namespace PCLCrypto
     /// <summary>
     /// Exposes the WinRT implementation of <see cref="IDeriveBytes"/>.
     /// </summary>
-    public class DeriveBytes : IDeriveBytes
+    internal class DeriveBytes : IDeriveBytes
     {
         /// <inheritdoc/>
         public byte[] GetBytes(string keyMaterial, byte[] salt, int iterations, int countBytes)

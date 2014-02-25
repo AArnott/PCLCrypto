@@ -52,14 +52,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProvider.cs">
-      <Link>AsymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
       <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicKey.cs">
-      <Link>CryptographicKey.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
       <Link>DeriveBytes.cs</Link>
@@ -68,6 +62,12 @@
       <Link>RandomNumberGenerator.cs</Link>
       <SubType>
       </SubType>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\RsaAsymmetricKeyAlgorithmProvider.cs">
+      <Link>RsaAsymmetricKeyAlgorithmProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\RsaCryptographicKey.cs">
+      <Link>RsaCryptographicKey.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto\Crypto.cs">
       <Link>Crypto.cs</Link>
