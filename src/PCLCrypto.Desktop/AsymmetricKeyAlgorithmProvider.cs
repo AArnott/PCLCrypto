@@ -43,20 +43,9 @@ namespace PCLCrypto
             throw new NotImplementedException();
         }
 
-        /// <inheritdoc/>
-        public ICryptographicKey ImportKeyPair(byte[] keyPair)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <inheritdoc/>
         public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public ICryptographicKey ImportPublicKey(byte[] keyBlob)
         {
             throw new NotImplementedException();
         }

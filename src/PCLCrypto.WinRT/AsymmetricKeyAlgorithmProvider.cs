@@ -55,30 +55,35 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
-        public ICryptographicKey ImportKeyPair(byte[] keyBlob)
+        public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var key = this.platform.ImportKeyPair(keyBlob.ToBuffer());
+            var key = this.platform.ImportKeyPair(keyBlob.ToBuffer(), GetPlatformKeyBlobType(blobType));
             return new CryptographicKey(key);
-        }
-
-        /// <inheritdoc/>
-        public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public ICryptographicKey ImportPublicKey(byte[] keyBlob)
-        {
-            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
         public ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType)
         {
             throw new NotImplementedException();
+        }
+
+        internal static Platform.CryptographicPrivateKeyBlobType GetPlatformKeyBlobType(CryptographicPrivateKeyBlobType blobType)
+        {
+            switch (blobType)
+            {
+                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
+                    return Platform.CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo;
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    return Platform.CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey;
+                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
+                    return Platform.CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
+                    return Platform.CryptographicPrivateKeyBlobType.Capi1PrivateKey;
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         /// <summary>

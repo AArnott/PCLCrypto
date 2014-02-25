@@ -32,8 +32,9 @@ namespace PCLCrypto
         /// Creates a cryptographic key based on the specified key material.
         /// </summary>
         /// <param name="keyBlob">The blob to deserialize.</param>
+        /// <param name="blobType">Type of the blob.</param>
         /// <returns>The cryptographic key.</returns>
-        ICryptographicKey ImportKeyPair(byte[] keyBlob);
+        ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo);
 
         /// <summary>
         /// Creates a cryptographic key based on the specified key material.
@@ -41,21 +42,6 @@ namespace PCLCrypto
         /// <param name="keyBlob">The blob to deserialize.</param>
         /// <param name="blobType">Type of the blob.</param>
         /// <returns>The cryptographic key.</returns>
-        ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType);
-
-        /// <summary>
-        /// Creates a cryptographic key based on the specified key material.
-        /// </summary>
-        /// <param name="keyBlob">The blob to deserialize.</param>
-        /// <returns>The cryptographic key.</returns>
-        ICryptographicKey ImportPublicKey(byte[] keyBlob);
-
-        /// <summary>
-        /// Creates a cryptographic key based on the specified key material.
-        /// </summary>
-        /// <param name="keyBlob">The blob to deserialize.</param>
-        /// <param name="blobType">Type of the blob.</param>
-        /// <returns>The cryptographic key.</returns>
-        ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType);
+        ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType = CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo);
     }
 }

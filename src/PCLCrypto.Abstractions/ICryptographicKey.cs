@@ -25,12 +25,6 @@ namespace PCLCrypto
         int KeySize { get; }
 
         /// <summary>
-        /// Exports the key pair to a buffer.
-        /// </summary>
-        /// <returns>Buffer that contains the key pair.</returns>
-        byte[] Export();
-
-        /// <summary>
         /// Exports the key pair to a buffer given a specified format.
         /// </summary>
         /// <param name="blobType">A CryptographicPrivateKeyBlobType enumeration value that specifies the format
@@ -38,15 +32,7 @@ namespace PCLCrypto
         /// <returns>
         /// Buffer that contains the key pair.
         /// </returns>
-        byte[] Export(CryptographicPrivateKeyBlobType blobType);
-
-        /// <summary>
-        /// Exports a public key to a buffer.
-        /// </summary>
-        /// <returns>
-        /// Buffer that contains the public key.
-        /// </returns>
-        byte[] ExportPublicKey();
+        byte[] Export(CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo);
 
         /// <summary>
         /// Exports a public key to a buffer given a specified format.
@@ -56,6 +42,6 @@ namespace PCLCrypto
         /// <returns>
         /// Buffer that contains the public key.
         /// </returns>
-        byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType);
+        byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType = CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo);
     }
 }

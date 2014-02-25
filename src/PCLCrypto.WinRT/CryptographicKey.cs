@@ -42,21 +42,9 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public byte[] Export()
-        {
-            return this.key.Export().ToArray();
-        }
-
-        /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public byte[] ExportPublicKey()
-        {
-            throw new NotImplementedException();
+            return this.key.Export(AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType)).ToArray();
         }
 
         /// <inheritdoc />

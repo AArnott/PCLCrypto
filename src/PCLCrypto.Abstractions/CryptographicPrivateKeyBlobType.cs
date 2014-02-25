@@ -16,5 +16,9 @@ namespace PCLCrypto
     /// </summary>
     public enum CryptographicPrivateKeyBlobType
     {
+        Pkcs8RawPrivateKeyInfo,
+        Pkcs1RsaPrivateKey ,
+        BCryptPrivateKey ,
+        Capi1PrivateKey ,
     }
 }
