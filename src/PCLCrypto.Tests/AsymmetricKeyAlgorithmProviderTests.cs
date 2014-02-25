@@ -12,17 +12,10 @@
     public class AsymmetricKeyAlgorithmProviderTests
     {
         [TestMethod]
-        public void OpenAlgorithm_Null()
+        public void OpenAlgorithm_GetAlgorithmName()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(
-                () => Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(null));
-        }
-
-        [TestMethod]
-        public void OpenAlgorithm_EmptyString()
-        {
-            ExceptionAssert.Throws<ArgumentException>(
-                () => Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(string.Empty));
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            Assert.AreEqual(AsymmetricAlgorithm.RsaOaepSha1, rsa.Algorithm);
         }
     }
 }

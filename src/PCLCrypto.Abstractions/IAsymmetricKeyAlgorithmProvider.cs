@@ -17,9 +17,9 @@ namespace PCLCrypto
     public interface IAsymmetricKeyAlgorithmProvider
     {
         /// <summary>
-        /// Gets the name of the asymmetric algorithm this provider manages keys for.
+        /// Gets the asymmetric algorithm this provider manages keys for.
         /// </summary>
-        string AlgorithmName { get; }
+        AsymmetricAlgorithm Algorithm { get; }
 
         /// <summary>
         /// Creates a new cryptographic key.

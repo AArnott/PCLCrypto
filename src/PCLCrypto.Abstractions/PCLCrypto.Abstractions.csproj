@@ -25,6 +25,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsymmetricAlgorithm.cs" />
     <Compile Include="CryptographicPublicKeyBlobType.cs" />
     <Compile Include="CryptographicPrivateKeyBlobType.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProvider.cs" />

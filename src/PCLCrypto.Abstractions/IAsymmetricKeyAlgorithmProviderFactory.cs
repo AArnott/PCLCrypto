@@ -22,6 +22,6 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
         /// <returns>An instance of <see cref="IAsymmetricKeyAlgorithmProvider"/>.</returns>
-        IAsymmetricKeyAlgorithmProvider OpenAlgorithm(string algorithm);
+        IAsymmetricKeyAlgorithmProvider OpenAlgorithm(AsymmetricAlgorithm algorithm);
     }
 }

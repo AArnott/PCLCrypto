@@ -18,17 +18,23 @@ namespace PCLCrypto
     public class AsymmetricKeyAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
     {
         /// <summary>
+        /// The algorithm used by this instance.
+        /// </summary>
+        private readonly AsymmetricAlgorithm algorithm;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
-        public AsymmetricKeyAlgorithmProvider(string algorithm)
+        public AsymmetricKeyAlgorithmProvider(AsymmetricAlgorithm algorithm)
         {
+            this.algorithm = algorithm;
         }
 
         /// <inheritdoc/>
-        public string AlgorithmName
+        public AsymmetricAlgorithm Algorithm
         {
-            get { throw new NotImplementedException(); }
+            get { return this.algorithm; }
         }
 
         /// <inheritdoc/>

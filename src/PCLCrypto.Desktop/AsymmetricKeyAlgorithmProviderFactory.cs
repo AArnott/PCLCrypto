@@ -26,9 +26,8 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public IAsymmetricKeyAlgorithmProvider OpenAlgorithm(string algorithm)
+        public IAsymmetricKeyAlgorithmProvider OpenAlgorithm(AsymmetricAlgorithm algorithm)
         {
-            Requires.NotNullOrEmpty(algorithm, "algorithm");
             return new AsymmetricKeyAlgorithmProvider(algorithm);
         }
     }
