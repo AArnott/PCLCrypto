@@ -15,6 +15,7 @@ namespace PCLCrypto
     using Windows.Security.Cryptography;
     using Windows.Security.Cryptography.Core;
     using Windows.Storage.Streams;
+    using Platform = Windows.Security.Cryptography.Core;
 
     /// <summary>
     /// Exposes the WinRT implementation of <see cref="IDeriveBytes"/>.
@@ -65,7 +66,7 @@ namespace PCLCrypto
                 KeyDerivationParameters.BuildForPbkdf2(salt, (uint)iterations);
 
             // create a key based on original key and derivation parameters
-            CryptographicKey keyOriginal = keyDerivationProvider.CreateKey(keyMaterial);
+            var keyOriginal = keyDerivationProvider.CreateKey(keyMaterial);
             IBuffer result = CryptographicEngine.DeriveKeyMaterial(keyOriginal, pbkdf2Parms, (uint)countBytes);
             return result;
         }

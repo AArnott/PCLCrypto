@@ -17,5 +17,23 @@
             var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             Assert.AreEqual(AsymmetricAlgorithm.RsaOaepSha1, rsa.Algorithm);
         }
+
+        [TestMethod]
+        public void CreateKeyPair_InvalidInputs()
+        {
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+                rsa.CreateKeyPair(-1));
+            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+                rsa.CreateKeyPair(0));
+        }
+
+        [TestMethod]
+        public void CreateKeyPair()
+        {
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var keyPair = rsa.CreateKeyPair(512);
+            Assert.IsNotNull(keyPair);
+        }
     }
 }

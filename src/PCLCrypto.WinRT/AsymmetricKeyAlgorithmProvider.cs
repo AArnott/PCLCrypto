@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Validation;
     using Platform = Windows.Security.Cryptography.Core;
 
     /// <summary>
@@ -47,7 +48,9 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
-            throw new NotImplementedException();
+            Requires.Range(keySize > 0, "keySize");
+
+            return new CryptographicKey(this.platform.CreateKeyPair((uint)keySize));
         }
 
         /// <inheritdoc/>
