@@ -46,6 +46,14 @@
         }
 
         [TestMethod]
+        public void ImportPublicKey_Null()
+        {
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => rsa.ImportPublicKey(null));
+        }
+
+        [TestMethod]
         public void KeyPairRoundTrip()
         {
             var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
@@ -55,6 +63,20 @@
 
             var key2 = rsa.ImportKeyPair(keyBlob);
             byte[] key2Blob = key2.Export();
+
+            CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+        }
+
+        [TestMethod]
+        public void PublicKeyRoundTrip()
+        {
+            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+
+            var key = rsa.CreateKeyPair(512);
+            byte[] keyBlob = key.ExportPublicKey();
+
+            var key2 = rsa.ImportPublicKey(keyBlob);
+            byte[] key2Blob = key2.ExportPublicKey();
 
             CollectionAssertEx.AreEqual(keyBlob, key2Blob);
         }

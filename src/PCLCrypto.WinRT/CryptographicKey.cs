@@ -50,7 +50,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            throw new NotImplementedException();
+            return this.key.ExportPublicKey(AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType)).ToArray();
         }
     }
 }

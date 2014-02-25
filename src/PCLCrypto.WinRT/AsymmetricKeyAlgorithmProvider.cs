@@ -66,9 +66,39 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            var key = this.platform.ImportPublicKey(keyBlob.ToBuffer(), GetPlatformKeyBlobType(blobType));
+            return new CryptographicKey(key);
         }
 
+        /// <summary>
+        /// Gets the platform-specific enum value for the given PCL enum value.
+        /// </summary>
+        /// <param name="blobType">The platform independent enum value for the blob type.</param>
+        /// <returns>The platform-specific enum value for the equivalent blob type.</returns>
+        internal static Platform.CryptographicPublicKeyBlobType GetPlatformKeyBlobType(CryptographicPublicKeyBlobType blobType)
+        {
+            switch (blobType)
+            {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    return Platform.CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo;
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                    return Platform.CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey;
+                case CryptographicPublicKeyBlobType.BCryptPublicKey:
+                    return Platform.CryptographicPublicKeyBlobType.BCryptPublicKey;
+                case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                    return Platform.CryptographicPublicKeyBlobType.Capi1PublicKey;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the platform-specific enum value for the given PCL enum value.
+        /// </summary>
+        /// <param name="blobType">The platform independent enum value for the blob type.</param>
+        /// <returns>The platform-specific enum value for the equivalent blob type.</returns>
         internal static Platform.CryptographicPrivateKeyBlobType GetPlatformKeyBlobType(CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)

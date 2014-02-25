@@ -43,7 +43,6 @@ namespace PCLCrypto
             throw new NotImplementedException();
         }
 
-
         /// <inheritdoc/>
         public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
         {
