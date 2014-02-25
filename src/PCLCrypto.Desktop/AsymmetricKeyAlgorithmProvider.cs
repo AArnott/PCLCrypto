@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Validation;
 
     /// <summary>
     /// .NET Framework implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
@@ -40,19 +41,25 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
-            throw new NotImplementedException();
+            Requires.Range(keySize > 0, "keySize");
+
+            return new CryptographicKey();
         }
 
         /// <inheritdoc/>
         public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            return new CryptographicKey();
         }
 
         /// <inheritdoc/>
         public ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            return new CryptographicKey();
         }
     }
 }

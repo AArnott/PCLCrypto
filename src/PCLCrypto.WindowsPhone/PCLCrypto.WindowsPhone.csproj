@@ -56,6 +56,9 @@
     <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
       <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\CryptographicKey.cs">
+      <Link>CryptographicKey.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
       <Link>DeriveBytes.cs</Link>
     </Compile>
