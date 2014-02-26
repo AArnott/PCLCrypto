@@ -11,6 +11,10 @@
     [TestClass]
     public class HashAlgorithmProviderTests
     {
+        private readonly byte[] data = new byte[] { 0x1, 0x2, };
+
+        private readonly string dataHash = @"DKYj4oVfLHXIQq0wL+gg5BtNGX0=";
+
         [TestMethod]
         public void OpenAlgorithm()
         {
@@ -26,6 +30,23 @@
 
             provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
             Assert.AreEqual(HashAlgorithm.Sha256, provider.Algorithm);
+        }
+
+        [TestMethod]
+        public void HashData()
+        {
+            var hasher = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var hash = hasher.HashData(this.data);
+            Assert.IsNotNull(hash);
+            Assert.AreEqual(this.dataHash, Convert.ToBase64String(hash));
+        }
+
+        [TestMethod]
+        public void HashData_InvalidInputs()
+        {
+            var hasher = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => hasher.HashData(null));
         }
     }
 }

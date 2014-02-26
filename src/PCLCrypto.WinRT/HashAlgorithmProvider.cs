@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Validation;
     using Platform = Windows.Security.Cryptography;
 
     /// <summary>
@@ -59,7 +60,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] HashData(byte[] data)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(data, "data");
+
+            return this.platform.HashData(data.ToBuffer()).ToArray();
         }
 
         /// <summary>

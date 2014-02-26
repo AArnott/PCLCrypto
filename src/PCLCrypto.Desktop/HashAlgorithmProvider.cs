@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Platform = System.Security.Cryptography;
 
     /// <summary>
     /// The .NET Framework implementation of <see cref="IHashAlgorithmProvider"/>.
@@ -52,7 +53,35 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] HashData(byte[] data)
         {
-            throw new NotImplementedException();
+            using (var hasher = this.CreateHashAlgorithm())
+            {
+                return hasher.ComputeHash(data);
+            }
+        }
+
+        /// <summary>
+        /// Creates the hash algorithm.
+        /// </summary>
+        /// <returns>A platform-specific hash algorithm.</returns>
+        private Platform.HashAlgorithm CreateHashAlgorithm()
+        {
+            switch (this.algorithm)
+            {
+#if !WINDOWS_PHONE && !SILVERLIGHT
+                case HashAlgorithm.Md5:
+                    return Platform.HashAlgorithm.Create("MD5");
+                case HashAlgorithm.Sha1:
+                    return Platform.HashAlgorithm.Create("SHA1");
+                case HashAlgorithm.Sha256:
+                    return Platform.HashAlgorithm.Create("SHA256");
+                case HashAlgorithm.Sha384:
+                    return Platform.HashAlgorithm.Create("SHA384");
+                case HashAlgorithm.Sha512:
+                    return Platform.HashAlgorithm.Create("SHA512");
+#endif
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }
