@@ -41,7 +41,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public int HashLength
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                using (var hasher = this.CreateHashAlgorithm())
+                {
+                    return hasher.HashSize / 8;
+                }
+            }
         }
 
         /// <inheritdoc />

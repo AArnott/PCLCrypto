@@ -48,7 +48,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public int HashLength
         {
-            get { throw new NotImplementedException(); }
+            get { return (int)this.platform.HashLength; }
         }
 
         /// <inheritdoc />

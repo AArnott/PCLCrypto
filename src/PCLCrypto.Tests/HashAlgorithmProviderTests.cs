@@ -48,5 +48,26 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => hasher.HashData(null));
         }
+
+        [TestMethod]
+        public void HashLength()
+        {
+            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            Assert.AreEqual(20, provider.HashLength);
+
+            provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+            Assert.AreEqual(256 / 8, provider.HashLength);
+        }
+
+        [TestMethod]
+        public void CreateHash()
+        {
+            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var hasher = provider.CreateHash();
+            Assert.IsNotNull(hasher);
+            hasher.Append(this.data);
+            byte[] hash = hasher.GetValueAndReset();
+            Assert.AreEqual(this.dataHash, Convert.ToBase64String(hash));
+        }
     }
 }
