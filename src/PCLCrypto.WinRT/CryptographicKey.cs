@@ -25,7 +25,7 @@ namespace PCLCrypto
         private readonly Platform.CryptographicKey key;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CryptographicKey"/> class.
+        /// Initializes a new instance of the <see cref="CryptographicKey" /> class.
         /// </summary>
         /// <param name="key">The WinRT cryptographic key.</param>
         internal CryptographicKey(Platform.CryptographicKey key)
@@ -52,13 +52,27 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            return this.key.Export(AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType)).ToArray();
+            try
+            {
+                return this.key.Export(AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType)).ToArray();
+            }
+            catch (NotImplementedException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
         }
 
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            return this.key.ExportPublicKey(AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType)).ToArray();
+            try
+            {
+                return this.key.ExportPublicKey(AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType)).ToArray();
+            }
+            catch (NotImplementedException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
         }
     }
 }

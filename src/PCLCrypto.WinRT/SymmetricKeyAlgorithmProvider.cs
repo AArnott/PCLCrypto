@@ -48,13 +48,16 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public int BlockLength
         {
-            get { throw new NotImplementedException(); }
+            get { return (int)this.platform.BlockLength; }
         }
 
         /// <inheritdoc/>
         public ICryptographicKey CreateSymmetricKey(byte[] keyMaterial)
         {
-            throw new NotImplementedException();
+            Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
+
+            var key = this.platform.CreateSymmetricKey(keyMaterial.ToBuffer());
+            return new CryptographicKey(key);
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Validation;
 
     /// <summary>
     /// A .NET Framework implementation of <see cref="ICryptographicEngine"/>.
@@ -32,6 +33,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Sign(ICryptographicKey key, byte[] data)
         {
+            Requires.NotNull(key, "key");
+            Requires.NotNull(data, "data");
+
             throw new NotImplementedException();
         }
 
@@ -44,6 +48,10 @@ namespace PCLCrypto
         /// <inheritdoc />
         public bool VerifySignature(ICryptographicKey key, byte[] data, byte[] signature)
         {
+            Requires.NotNull(key, "key");
+            Requires.NotNull(data, "data");
+            Requires.NotNull(signature, "signature");
+
             throw new NotImplementedException();
         }
 

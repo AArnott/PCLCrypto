@@ -12,7 +12,7 @@ namespace PCLCrypto
     using System.Text;
 
     /// <summary>
-    /// A cryptographic key.
+    /// Represents a symmetric key or an asymmetric key pair.
     /// </summary>
     public interface ICryptographicKey
     {

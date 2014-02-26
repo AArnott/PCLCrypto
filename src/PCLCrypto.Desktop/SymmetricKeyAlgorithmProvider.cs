@@ -48,6 +48,8 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public ICryptographicKey CreateSymmetricKey(byte[] keyMaterial)
         {
+            Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
+
             throw new NotImplementedException();
         }
     }
