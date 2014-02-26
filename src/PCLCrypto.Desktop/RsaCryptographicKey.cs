@@ -26,20 +26,43 @@ namespace PCLCrypto
         private readonly RSACryptoServiceProvider key;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RsaCryptographicKey"/> class.
+        /// The algorithm to use when performing cryptography.
+        /// </summary>
+        private readonly AsymmetricAlgorithm algorithm;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="key">The RSA crypto service provider.</param>
-        internal RsaCryptographicKey(RSACryptoServiceProvider key)
+        /// <param name="algorithm">The algorithm.</param>
+        internal RsaCryptographicKey(RSACryptoServiceProvider key, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(key, "key");
 
             this.key = key;
+            this.algorithm = algorithm;
         }
 
         /// <inheritdoc />
         public int KeySize
         {
             get { return this.key.KeySize; }
+        }
+
+        /// <summary>
+        /// Gets the RSA crypto service provider that contains this key.
+        /// </summary>
+        internal RSACryptoServiceProvider Rsa
+        {
+            get { return this.key; }
+        }
+
+        /// <summary>
+        /// Gets the algorithm to use with this key.
+        /// </summary>
+        internal AsymmetricAlgorithm Algorithm
+        {
+            get { return this.algorithm; }
         }
 
         /// <inheritdoc />

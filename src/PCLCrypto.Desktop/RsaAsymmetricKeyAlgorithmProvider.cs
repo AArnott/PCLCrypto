@@ -45,7 +45,7 @@ namespace PCLCrypto
             Requires.Range(keySize > 0, "keySize");
 
             var rsa = new Platform.RSACryptoServiceProvider(keySize);
-            return new RsaCryptographicKey(rsa);
+            return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -63,7 +63,7 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 
-            return new RsaCryptographicKey(rsa);
+            return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -81,7 +81,7 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 
-            return new RsaCryptographicKey(rsa);
+            return new RsaCryptographicKey(rsa, this.algorithm);
         }
     }
 }

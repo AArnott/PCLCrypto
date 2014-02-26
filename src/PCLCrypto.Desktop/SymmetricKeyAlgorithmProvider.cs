@@ -57,7 +57,19 @@ namespace PCLCrypto
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
             var platform = GetAlgorithm(this.algorithm);
-            platform.Key = keyMaterial;
+            try
+            {
+                platform.Key = keyMaterial;
+            }
+            catch (Platform.CryptographicException ex)
+            {
+#if SILVERLIGHT
+                throw new ArgumentException(ex.Message, ex);
+#else
+                throw new ArgumentException(ex.Message, "keyMaterial", ex);
+#endif
+            }
+
             return new SymmetricCryptographicKey(platform);
         }
 
