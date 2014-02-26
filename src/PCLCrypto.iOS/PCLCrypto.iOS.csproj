@@ -72,6 +72,9 @@
     <Compile Include="..\PCLCrypto.Desktop\RsaCryptographicKey.cs">
       <Link>RsaCryptographicKey.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\SymmetricCryptographicKey.cs">
+      <Link>SymmetricCryptographicKey.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProvider.cs">
       <Link>SymmetricKeyAlgorithmProvider.cs</Link>
     </Compile>

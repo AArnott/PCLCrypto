@@ -44,6 +44,7 @@
     <Compile Include="CngCryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
+    <Compile Include="SymmetricCryptographicKey.cs" />
     <Compile Include="SymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
   </ItemGroup>

@@ -25,18 +25,12 @@ namespace PCLCrypto
         private readonly SymmetricAlgorithm algorithm;
 
         /// <summary>
-        /// The platform's symmetric algorithm.
-        /// </summary>
-        private readonly Platform.SymmetricAlgorithm platform;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
         public SymmetricKeyAlgorithmProvider(SymmetricAlgorithm algorithm)
         {
             this.algorithm = algorithm;
-            this.platform = GetAlgorithm(algorithm);
         }
 
         /// <inheritdoc/>
@@ -48,7 +42,13 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public int BlockLength
         {
-            get { return this.platform.BlockSize / 8; }
+            get
+            {
+                using (var platform = GetAlgorithm(this.algorithm))
+                {
+                    return platform.BlockSize / 8;
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -56,7 +56,9 @@ namespace PCLCrypto
         {
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
-            throw new NotImplementedException();
+            var platform = GetAlgorithm(this.algorithm);
+            platform.Key = keyMaterial;
+            return new SymmetricCryptographicKey(platform);
         }
 
         /// <summary>
