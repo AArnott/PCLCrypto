@@ -81,6 +81,12 @@
     <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
       <Link>RandomNumberGenerator.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProvider.cs">
+      <Link>SymmetricKeyAlgorithmProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProviderFactory.cs">
+      <Link>SymmetricKeyAlgorithmProviderFactory.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto\Crypto.cs">
       <Link>Crypto.cs</Link>
     </Compile>

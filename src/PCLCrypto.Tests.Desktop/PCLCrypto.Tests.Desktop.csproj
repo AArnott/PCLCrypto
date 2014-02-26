@@ -97,6 +97,9 @@
     <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
       <Link>RandomNumberGeneratorTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\SymmetricKeyAlgorithmProviderTests.cs">
+      <Link>SymmetricKeyAlgorithmProviderTests.cs</Link>
+    </Compile>
     <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
   </ItemGroup>
   <Choose>

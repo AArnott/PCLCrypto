@@ -44,6 +44,8 @@
     <Compile Include="CngCryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
+    <Compile Include="SymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">

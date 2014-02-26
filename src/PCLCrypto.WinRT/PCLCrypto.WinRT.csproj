@@ -49,11 +49,13 @@
       <Link>Crypto.cs</Link>
     </Compile>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CryptographicEngine.cs" />
     <Compile Include="CryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
+    <Compile Include="SymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="WinRTUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
