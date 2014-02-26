@@ -88,6 +88,9 @@
     <Compile Include="..\PCLCrypto.Tests\AsymmetricKeyAlgorithmProviderTests.cs">
       <Link>AsymmetricKeyAlgorithmProviderTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\CryptographicEngineTests.cs">
+      <Link>CryptographicEngineTests.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Tests\DeriveBytesTests.cs">
       <Link>DeriveBytesTests.cs</Link>
     </Compile>

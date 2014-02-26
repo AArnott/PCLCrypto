@@ -14,6 +14,9 @@ namespace PCLCrypto
     using Validation;
     using Platform = System.Security.Cryptography;
 
+    /// <summary>
+    /// The .NET Framework implementation of RSA.
+    /// </summary>
     internal class RsaAsymmetricKeyAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
     {
         /// <summary>

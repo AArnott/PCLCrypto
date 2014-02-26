@@ -28,6 +28,7 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="CngCryptographicKey"/> class.
         /// </summary>
+        /// <param name="key">The key.</param>
         internal CngCryptographicKey(CngKey key)
         {
             Requires.NotNull(key, "key");

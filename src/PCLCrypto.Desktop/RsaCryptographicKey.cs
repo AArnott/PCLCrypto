@@ -28,6 +28,7 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="RsaCryptographicKey"/> class.
         /// </summary>
+        /// <param name="key">The RSA crypto service provider.</param>
         internal RsaCryptographicKey(RSACryptoServiceProvider key)
         {
             Requires.NotNull(key, "key");

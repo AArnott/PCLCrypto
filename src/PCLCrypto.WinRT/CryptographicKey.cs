@@ -41,6 +41,14 @@ namespace PCLCrypto
             get { return (int)this.key.KeySize; }
         }
 
+        /// <summary>
+        /// Gets the platform key.
+        /// </summary>
+        internal Platform.CryptographicKey Key
+        {
+            get { return this.key; }
+        }
+
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {

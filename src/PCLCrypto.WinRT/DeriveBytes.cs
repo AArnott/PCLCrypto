@@ -67,7 +67,7 @@ namespace PCLCrypto
 
             // create a key based on original key and derivation parameters
             var keyOriginal = keyDerivationProvider.CreateKey(keyMaterial);
-            IBuffer result = CryptographicEngine.DeriveKeyMaterial(keyOriginal, pbkdf2Parms, (uint)countBytes);
+            IBuffer result = Platform.CryptographicEngine.DeriveKeyMaterial(keyOriginal, pbkdf2Parms, (uint)countBytes);
             return result;
         }
     }

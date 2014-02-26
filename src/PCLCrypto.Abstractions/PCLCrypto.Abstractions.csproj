@@ -30,6 +30,7 @@
     <Compile Include="CryptographicPrivateKeyBlobType.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProviderFactory.cs" />
+    <Compile Include="ICryptographicEngine.cs" />
     <Compile Include="ICryptographicKey.cs" />
     <Compile Include="IDeriveBytes.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />

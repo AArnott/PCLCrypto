@@ -50,6 +50,7 @@
     </Compile>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
+    <Compile Include="CryptographicEngine.cs" />
     <Compile Include="CryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
