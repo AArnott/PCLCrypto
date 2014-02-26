@@ -42,6 +42,7 @@
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicEngine.cs" />
+    <Compile Include="CryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />

@@ -54,7 +54,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public ICryptographicHash CreateHash()
         {
-            throw new NotImplementedException();
+            return new CryptographicHash(this.platform.CreateHash());
         }
 
         /// <inheritdoc />

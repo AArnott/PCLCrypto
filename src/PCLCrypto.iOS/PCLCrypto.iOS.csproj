@@ -59,6 +59,9 @@
     <Compile Include="..\PCLCrypto.Desktop\CryptographicEngine.cs">
       <Link>CryptographicEngine.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\CryptographicHash.cs">
+      <Link>CryptographicHash.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
       <Link>DeriveBytes.cs</Link>
     </Compile>

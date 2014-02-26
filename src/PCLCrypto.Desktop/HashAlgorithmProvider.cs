@@ -43,7 +43,7 @@ namespace PCLCrypto
         {
             get
             {
-                using (var hasher = this.CreateHashAlgorithm())
+                using (var hasher = CreateHashAlgorithm(this.Algorithm))
                 {
                     return hasher.HashSize / 8;
                 }
@@ -53,13 +53,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public ICryptographicHash CreateHash()
         {
-            throw new NotImplementedException();
+            return new CryptographicHash(this.Algorithm);
         }
 
         /// <inheritdoc />
         public byte[] HashData(byte[] data)
         {
-            using (var hasher = this.CreateHashAlgorithm())
+            using (var hasher = CreateHashAlgorithm(this.Algorithm))
             {
                 return hasher.ComputeHash(data);
             }
@@ -68,10 +68,13 @@ namespace PCLCrypto
         /// <summary>
         /// Creates the hash algorithm.
         /// </summary>
-        /// <returns>A platform-specific hash algorithm.</returns>
-        private Platform.HashAlgorithm CreateHashAlgorithm()
+        /// <param name="algorithm">The algorithm.</param>
+        /// <returns>
+        /// A platform-specific hash algorithm.
+        /// </returns>
+        internal static Platform.HashAlgorithm CreateHashAlgorithm(HashAlgorithm algorithm)
         {
-            switch (this.algorithm)
+            switch (algorithm)
             {
 #if !WINDOWS_PHONE && !SILVERLIGHT
                 case HashAlgorithm.Md5:

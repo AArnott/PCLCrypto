@@ -15,6 +15,8 @@
 
         private readonly string dataHash = @"DKYj4oVfLHXIQq0wL+gg5BtNGX0=";
 
+        private readonly string dataHashTwice = @"7/byfLvaIq0efDyE+taJbZ8Y4JA=";
+
         [TestMethod]
         public void OpenAlgorithm()
         {
@@ -65,9 +67,32 @@
             var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             var hasher = provider.CreateHash();
             Assert.IsNotNull(hasher);
+        }
+
+        [TestMethod]
+        public void AppendAndGetValueAndReset()
+        {
+            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var hasher = provider.CreateHash();
             hasher.Append(this.data);
             byte[] hash = hasher.GetValueAndReset();
             Assert.AreEqual(this.dataHash, Convert.ToBase64String(hash));
+
+            // Hash again to verify that everything was properly reset.
+            hasher.Append(this.data);
+            hash = hasher.GetValueAndReset();
+            Assert.AreEqual(this.dataHash, Convert.ToBase64String(hash));
+        }
+
+        [TestMethod]
+        public void AppendTwice()
+        {
+            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var hasher = provider.CreateHash();
+            hasher.Append(this.data);
+            hasher.Append(this.data);
+            byte[] hash = hasher.GetValueAndReset();
+            Assert.AreEqual(this.dataHashTwice, Convert.ToBase64String(hash));
         }
     }
 }
