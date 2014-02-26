@@ -33,12 +33,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto.WinRT\HashAlgorithmProviderFactory.cs">
+      <Link>HashAlgorithmProviderFactory.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto\Crypto.cs">
       <Link>Crypto.cs</Link>
     </Compile>
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicEngine.cs" />
+    <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
     <Compile Include="CngCryptographicKey.cs" />

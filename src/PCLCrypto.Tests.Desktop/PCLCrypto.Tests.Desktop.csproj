@@ -94,6 +94,9 @@
     <Compile Include="..\PCLCrypto.Tests\DeriveBytesTests.cs">
       <Link>DeriveBytesTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\HashAlgorithmProviderTests.cs">
+      <Link>HashAlgorithmProviderTests.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
       <Link>RandomNumberGeneratorTests.cs</Link>
     </Compile>
