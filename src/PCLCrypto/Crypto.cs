@@ -42,6 +42,12 @@ namespace PCLCrypto
         private static IHashAlgorithmProviderFactory hashAlgorithmProvider;
 
         /// <summary>
+        /// Backing field storing a shareable, thread-safe implementation
+        /// of <see cref="IMacAlgorithmProviderFactory"/>.
+        /// </summary>
+        private static IMacAlgorithmProviderFactory macAlgorithmProvider;
+
+        /// <summary>
         /// Backing field for the CryptographicEngine property.
         /// </summary>
         private static ICryptographicEngine cryptographicEngine;
@@ -138,6 +144,26 @@ namespace PCLCrypto
                 }
 
                 return hashAlgorithmProvider;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets the MAC algorithm provider factory.
+        /// </summary>
+        public static IMacAlgorithmProviderFactory MacAlgorithmProvider
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                if (macAlgorithmProvider == null)
+                {
+                    macAlgorithmProvider = new MacAlgorithmProviderFactory();
+                }
+
+                return macAlgorithmProvider;
 #endif
             }
         }

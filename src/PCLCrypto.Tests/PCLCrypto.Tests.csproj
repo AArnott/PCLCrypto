@@ -44,6 +44,7 @@
     <Compile Include="DeriveBytesTests.cs" />
     <Compile Include="HashAlgorithmProviderTests.cs" />
     <Compile Include="RandomNumberGeneratorTests.cs" />
+    <Compile Include="MacAlgorithmProviderTests.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,8 @@
     <Compile Include="ICryptographicHash.cs" />
     <Compile Include="IHashAlgorithmProvider.cs" />
     <Compile Include="IHashAlgorithmProviderFactory.cs" />
+    <Compile Include="IMacAlgorithmProvider.cs" />
+    <Compile Include="IMacAlgorithmProviderFactory.cs" />
     <Compile Include="ISymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="ICryptographicEngine.cs" />
@@ -40,6 +42,7 @@
     <Compile Include="IDeriveBytes.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
     <Compile Include="ISymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="MacAlgorithm.cs" />
     <Compile Include="SymmetricAlgorithm.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

@@ -81,6 +81,12 @@
     <Compile Include="..\PCLCrypto.Desktop\HashAlgorithmProvider.cs">
       <Link>HashAlgorithmProvider.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProvider.cs">
+      <Link>MacAlgorithmProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProviderFactory.cs">
+      <Link>MacAlgorithmProviderFactory.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
       <Link>RandomNumberGenerator.cs</Link>
     </Compile>
