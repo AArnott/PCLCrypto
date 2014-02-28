@@ -48,6 +48,18 @@ namespace PCLCrypto
         private static IMacAlgorithmProviderFactory macAlgorithmProvider;
 
         /// <summary>
+        /// Backing field storing a shareable, thread-safe implementation
+        /// of <see cref="IKeyDerivationAlgorithmProviderFactory"/>.
+        /// </summary>
+        private static IKeyDerivationAlgorithmProviderFactory keyDerivationAlgorithmProvider;
+
+        /// <summary>
+        /// Backing field storing a shareable, thread-safe implementation
+        /// of <see cref="IKeyDerivationParametersFactory"/>.
+        /// </summary>
+        private static IKeyDerivationParametersFactory keyDerivationParametersFactory;
+
+        /// <summary>
         /// Backing field for the CryptographicEngine property.
         /// </summary>
         private static ICryptographicEngine cryptographicEngine;
@@ -164,6 +176,46 @@ namespace PCLCrypto
                 }
 
                 return macAlgorithmProvider;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets the key derivation algorithm provider factory.
+        /// </summary>
+        public static IKeyDerivationAlgorithmProviderFactory KeyDerivationAlgorithmProvider
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                if (keyDerivationAlgorithmProvider == null)
+                {
+                    keyDerivationAlgorithmProvider = new KeyDerivationAlgorithmProviderFactory();
+                }
+
+                return keyDerivationAlgorithmProvider;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets the key derivation parameters factory.
+        /// </summary>
+        public static IKeyDerivationParametersFactory KeyDerivationParameters
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                if (keyDerivationParametersFactory == null)
+                {
+                    keyDerivationParametersFactory = new KeyDerivationParametersFactory();
+                }
+
+                return keyDerivationParametersFactory;
 #endif
             }
         }

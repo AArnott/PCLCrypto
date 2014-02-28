@@ -67,6 +67,14 @@ namespace PCLCrypto
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
+        public byte[] DeriveKeyMaterial(ICryptographicKey key, IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            var platformKey = ((CryptographicKey)key).Key;
+            var platformParameters = ((KeyDerivationParameters)parameters).Parameters;
+            return Platform.Core.CryptographicEngine.DeriveKeyMaterial(platformKey, platformParameters, (uint)desiredKeySize).ToArray();
+        }
+
         /// <summary>
         /// Extracts the platform-specific key from the PCL version.
         /// </summary>

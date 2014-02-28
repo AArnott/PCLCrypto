@@ -60,10 +60,10 @@ namespace PCLCrypto
             Requires.Range(iterations > 0, "iterations");
             Requires.Range(countBytes > 0, "countBytes");
 
-            KeyDerivationAlgorithmProvider keyDerivationProvider =
-                KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithmNames.Pbkdf2Sha1);
-            KeyDerivationParameters pbkdf2Parms =
-                KeyDerivationParameters.BuildForPbkdf2(salt, (uint)iterations);
+            var keyDerivationProvider =
+                Platform.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithmNames.Pbkdf2Sha1);
+            var pbkdf2Parms =
+                Platform.KeyDerivationParameters.BuildForPbkdf2(salt, (uint)iterations);
 
             // create a key based on original key and derivation parameters
             var keyOriginal = keyDerivationProvider.CreateKey(keyMaterial);

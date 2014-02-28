@@ -53,17 +53,5 @@ namespace PCLCrypto
         {
             return this.key.Export(CngAsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType));
         }
-
-        /// <inheritdoc />
-        protected internal override byte[] Sign(byte[] data)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        protected internal override bool VerifySignature(byte[] data, byte[] signature)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

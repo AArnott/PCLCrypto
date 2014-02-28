@@ -43,6 +43,7 @@
     <Compile Include="CryptographicEngineTests.cs" />
     <Compile Include="DeriveBytesTests.cs" />
     <Compile Include="HashAlgorithmProviderTests.cs" />
+    <Compile Include="KeyDerivationAlgorithmProviderTests.cs" />
     <Compile Include="RandomNumberGeneratorTests.cs" />
     <Compile Include="MacAlgorithmProviderTests.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderTests.cs" />

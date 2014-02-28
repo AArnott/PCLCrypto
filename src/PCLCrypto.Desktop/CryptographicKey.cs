@@ -15,14 +15,17 @@ namespace PCLCrypto
     /// <summary>
     /// Base class for implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class CryptographicKey
+    internal class CryptographicKey
     {
         /// <summary>
         /// Signs data with this key.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns>The signature.</returns>
-        protected internal abstract byte[] Sign(byte[] data);
+        protected internal virtual byte[] Sign(byte[] data)
+        {
+            throw new NotSupportedException();
+        }
 
         /// <summary>
         /// Verifies the signature of data with this key.
@@ -32,6 +35,9 @@ namespace PCLCrypto
         /// <returns>
         /// <c>true</c> if the signature is valid.
         /// </returns>
-        protected internal abstract bool VerifySignature(byte[] data, byte[] signature);
+        protected internal virtual bool VerifySignature(byte[] data, byte[] signature)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

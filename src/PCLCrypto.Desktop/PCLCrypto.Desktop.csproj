@@ -48,6 +48,10 @@
     <Compile Include="CryptographicKey.cs" />
     <Compile Include="CryptoUtilities.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
+    <Compile Include="KeyDerivationAlgorithmProvider.cs" />
+    <Compile Include="KeyDerivationAlgorithmProviderFactory.cs" />
+    <Compile Include="KeyDerivationCryptographicKey.cs" />
+    <Compile Include="KeyDerivationParametersFactory.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProviderFactory.cs" />
     <Compile Include="MacCryptographicKey.cs" />

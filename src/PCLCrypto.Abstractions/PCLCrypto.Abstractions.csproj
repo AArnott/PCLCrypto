@@ -33,6 +33,10 @@
     <Compile Include="ICryptographicHash.cs" />
     <Compile Include="IHashAlgorithmProvider.cs" />
     <Compile Include="IHashAlgorithmProviderFactory.cs" />
+    <Compile Include="IKeyDerivationAlgorithmProvider.cs" />
+    <Compile Include="IKeyDerivationAlgorithmProviderFactory.cs" />
+    <Compile Include="IKeyDerivationParameters.cs" />
+    <Compile Include="IKeyDerivationParametersFactory.cs" />
     <Compile Include="IMacAlgorithmProvider.cs" />
     <Compile Include="IMacAlgorithmProviderFactory.cs" />
     <Compile Include="ISymmetricKeyAlgorithmProviderFactory.cs" />
@@ -42,6 +46,7 @@
     <Compile Include="IDeriveBytes.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
     <Compile Include="ISymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="KeyDerivationAlgorithm.cs" />
     <Compile Include="MacAlgorithm.cs" />
     <Compile Include="SymmetricAlgorithm.cs" />
   </ItemGroup>

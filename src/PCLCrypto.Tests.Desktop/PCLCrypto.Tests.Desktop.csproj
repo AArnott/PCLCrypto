@@ -97,6 +97,9 @@
     <Compile Include="..\PCLCrypto.Tests\HashAlgorithmProviderTests.cs">
       <Link>HashAlgorithmProviderTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\KeyDerivationAlgorithmProviderTests.cs">
+      <Link>KeyDerivationAlgorithmProviderTests.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Tests\MacAlgorithmProviderTests.cs">
       <Link>MacAlgorithmProviderTests.cs</Link>
     </Compile>

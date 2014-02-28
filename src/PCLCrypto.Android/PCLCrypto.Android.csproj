@@ -62,6 +62,15 @@
     <Compile Include="..\PCLCrypto.Desktop\HashAlgorithmProvider.cs">
       <Link>HashAlgorithmProvider.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProvider.cs">
+      <Link>KeyDerivationAlgorithmProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProviderFactory.cs">
+      <Link>KeyDerivationAlgorithmProviderFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationParametersFactory.cs">
+      <Link>KeyDerivationParametersFactory.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProvider.cs">
       <Link>MacAlgorithmProvider.cs</Link>
     </Compile>

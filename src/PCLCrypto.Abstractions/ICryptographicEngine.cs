@@ -97,5 +97,17 @@ namespace PCLCrypto
         /// <param name="signature">The known signature to use to verify the signature of the input data.</param>
         /// <returns>True if the signature is verified; otherwise false.</returns>
         bool VerifySignatureWithHashInput(ICryptographicKey key, byte[] data, byte[] signature);
+
+        /// <summary>
+        /// Derives a key from another key by using a key derivation function.
+        /// </summary>
+        /// <param name="key">The symmetric or secret key used for derivation.</param>
+        /// <param name="parameters">Derivation parameters. The parameters vary depending on the type of KDF algorithm
+        /// used.</param>
+        /// <param name="desiredKeySize">Requested size, in bits, of the derived key.</param>
+        /// <returns>
+        /// Buffer that contains the derived key.
+        /// </returns>
+        byte[] DeriveKeyMaterial(ICryptographicKey key, IKeyDerivationParameters parameters, int desiredKeySize);
     }
 }

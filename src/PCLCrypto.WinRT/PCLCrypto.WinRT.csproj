@@ -55,6 +55,10 @@
     <Compile Include="CryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="HashAlgorithmProviderFactory.cs" />
+    <Compile Include="KeyDerivationAlgorithmProvider.cs" />
+    <Compile Include="KeyDerivationAlgorithmProviderFactory.cs" />
+    <Compile Include="KeyDerivationParameters.cs" />
+    <Compile Include="KeyDerivationParametersFactory.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProviderFactory.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />

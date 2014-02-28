@@ -62,6 +62,19 @@ namespace PCLCrypto
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
+        public byte[] DeriveKeyMaterial(ICryptographicKey key, IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            // Right now we're assuming that KdfGenericBinary is directly usable as a salt
+            // in RFC2898. When our KeyDerivationParametersFactory class supports
+            // more parameter types than just BuildForPbkdf2, we might need to adjust this code
+            // to handle each type of parameter.
+            var keyMaterial = ((KeyDerivationCryptographicKey)key).Key;
+            byte[] salt = parameters.KdfGenericBinary;
+            var deriveBytes = new Platform.Rfc2898DeriveBytes(keyMaterial, salt, parameters.IterationCount);
+            return deriveBytes.GetBytes(desiredKeySize);
+        }
+
         /// <summary>
         /// Creates a hash algorithm instance that is appropriate for the given algorithm.T
         /// </summary>
