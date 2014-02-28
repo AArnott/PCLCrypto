@@ -68,6 +68,9 @@
     <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProviderFactory.cs">
       <Link>KeyDerivationAlgorithmProviderFactory.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationCryptographicKey.cs">
+      <Link>KeyDerivationCryptographicKey.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\KeyDerivationParametersFactory.cs">
       <Link>KeyDerivationParametersFactory.cs</Link>
     </Compile>

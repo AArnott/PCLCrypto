@@ -62,6 +62,12 @@ namespace PCLCrypto
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
+        public byte[] DeriveKeyMaterial(ICryptographicKey key, IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Creates a hash algorithm instance that is appropriate for the given algorithm.T
         /// </summary>
