@@ -33,6 +33,7 @@
 		<ItemGroup>
 			<NuGetProperties Include="Version=$(NuGetPackageVersion)" />
 			<NuGetProperties Include="OutputPath=$(ProjectRoot)bin\$(Configuration)\" />
+			<NuGetProperties Include="IntermediatePath=$(ProjectRoot)obj\" />
 		</ItemGroup>
 
 		<ItemGroup>

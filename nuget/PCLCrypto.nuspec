@@ -16,7 +16,7 @@
 			<group>
 				<!--<dependency id="Microsoft.Bcl.Async" version="1.0.165" />
 				<dependency id="Microsoft.Bcl" version="1.0.19" />-->
-				<dependency id="Validation" />
+				<dependency id="Validation" version="[2.0.3.13323,3.0)"/>
 			</group>
 		</dependencies>
 	</metadata>
@@ -24,17 +24,14 @@
 		<!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
 		     the platform-specific lib folder will indicate Windows 8.1 is required. -->
 		<file target="lib\portable-net403+sl50+wp80+win+MonoAndroid10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.*" />
-
 		<file target="lib\net45" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.*" />
-
 		<file target="lib\sl5" src="$OutputPath$PCLCrypto.Silverlight\PCLCrypto.*" />
-
 		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.*" />
-
-		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.WinRT\*.pri" />
-
+		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" />
 		<file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
-
 		<file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
+
+		<file target="src\src" src="..\src\**\*.cs" />
+		<file target="src\obj" src="$IntermediatePath$**\*.cs" />
 	</files>
 </package>
