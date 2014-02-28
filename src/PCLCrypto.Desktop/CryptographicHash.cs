@@ -18,7 +18,7 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of the <see cref="ICryptographicHash"/> interface.
     /// </summary>
-    internal class CryptographicHash : ICryptographicHash
+    internal abstract class CryptographicHash : ICryptographicHash, IDisposable
     {
         /// <summary>
         /// A zero-length byte array.
@@ -26,9 +26,9 @@ namespace PCLCrypto
         private static readonly byte[] EmptyBlock = new byte[0];
 
         /// <summary>
-        /// The algorithm enum.
+        /// The stream that we write to for incremental hashing.
         /// </summary>
-        private HashAlgorithm pclAlgorithm;
+        private Platform.CryptoStream stream;
 
         /// <summary>
         /// The platform-specific hash algorithm.
@@ -36,72 +36,103 @@ namespace PCLCrypto
         private Platform.HashAlgorithm algorithm;
 
         /// <summary>
-        /// The stream that we write to for incremental hashing.
+        /// A flag indicating whether this instance has been initialized.
         /// </summary>
-        private Platform.CryptoStream stream;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CryptographicHash" /> class.
-        /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
-        internal CryptographicHash(HashAlgorithm algorithm)
-        {
-            this.pclAlgorithm = algorithm;
-            this.Initialize();
-        }
+        private bool initialized;
 
         /// <inheritdoc />
         public void Append(byte[] data)
         {
+            this.Initialize();
             this.stream.Write(data, 0, data.Length);
         }
 
         /// <inheritdoc />
         public byte[] GetValueAndReset()
         {
+            this.Initialize();
             this.stream.FlushFinalBlock();
             byte[] hash = this.algorithm.Hash;
 
-            // Reset state.
-            this.Initialize();
+            // Reset state on next invocation.
+            this.initialized = false;
 
             return hash;
         }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            var disposable = this.algorithm as IDisposable;
+            if (disposable != null)
+            {
+                disposable.Dispose();
+                this.algorithm = null;
+            }
+
+            if (this.stream != null)
+            {
+                this.stream.Dispose();
+                this.stream = null;
+            }
+        }
+
+        /// <summary>
+        /// Creates the hash algorithm.
+        /// </summary>
+        /// <returns>The hash algorithm.</returns>
+        protected abstract Platform.HashAlgorithm CreateHashAlgorithm();
 
         /// <summary>
         /// Initializes for a new incremental hash.
         /// </summary>
         private void Initialize()
         {
-            if (this.algorithm != null)
+            if (!this.initialized)
             {
-                if (this.algorithm.CanReuseTransform)
+                if (this.algorithm != null)
                 {
-                    this.algorithm.Initialize();
-                }
-                else
-                {
-                    var disposable = this.algorithm as IDisposable;
-                    if (disposable != null)
+                    if (this.algorithm.CanReuseTransform)
                     {
-                        disposable.Dispose();
+                        this.algorithm.Initialize();
                     }
+                    else
+                    {
+                        var disposable = this.algorithm as IDisposable;
+                        if (disposable != null)
+                        {
+                            disposable.Dispose();
+                        }
 
-                    this.algorithm = null;
+                        this.algorithm = null;
+                    }
                 }
-            }
-            
-            if (this.algorithm == null)
-            {
-                this.algorithm = HashAlgorithmProvider.CreateHashAlgorithm(this.pclAlgorithm);
-            }
 
-            if (this.stream != null)
-            {
-                this.stream.Dispose();
-            }
+                if (this.algorithm == null)
+                {
+                    this.algorithm = this.CreateHashAlgorithm();
+                }
 
-            this.stream = new Platform.CryptoStream(Stream.Null, this.algorithm, Platform.CryptoStreamMode.Write);
+                if (this.stream != null)
+                {
+                    this.stream.Dispose();
+                }
+
+                this.stream = new Platform.CryptoStream(Stream.Null, this.algorithm, Platform.CryptoStreamMode.Write);
+                this.initialized = true;
+            }
         }
     }
 }

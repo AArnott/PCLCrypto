@@ -50,8 +50,6 @@
             var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => algorithm.CreateHash(null));
-            ExceptionAssert.Throws<ArgumentException>(
-                () => algorithm.CreateHash(new byte[0]));
         }
 
         [TestMethod]

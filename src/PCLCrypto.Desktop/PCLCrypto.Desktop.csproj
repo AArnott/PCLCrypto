@@ -43,6 +43,8 @@
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicEngine.cs" />
     <Compile Include="CryptographicHash.cs" />
+    <Compile Include="CryptographicHashMac.cs" />
+    <Compile Include="CryptographicHashPlain.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProviderFactory.cs" />

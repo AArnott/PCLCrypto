@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Validation;
     using Platform = System.Security.Cryptography;
 
     /// <summary>
@@ -43,7 +44,7 @@ namespace PCLCrypto
         {
             get
             {
-                using (var algorithm = GetAlgorithmName(this.Algorithm))
+                using (var algorithm = GetAlgorithm(this.Algorithm))
                 {
                     return algorithm.HashSize / 8;
                 }
@@ -53,7 +54,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public ICryptographicHash CreateHash(byte[] keyMaterial)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(keyMaterial, "keyMaterial");
+
+            return new CryptographicHashMac(this.Algorithm, keyMaterial);
         }
 
         /// <inheritdoc />
@@ -67,7 +70,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="algorithm">The algorithm desired.</param>
         /// <returns>The platform-specific string to pass to OpenAlgorithm.</returns>
-        private static Platform.KeyedHashAlgorithm GetAlgorithmName(MacAlgorithm algorithm)
+        internal static Platform.KeyedHashAlgorithm GetAlgorithm(MacAlgorithm algorithm)
         {
             switch (algorithm)
             {
