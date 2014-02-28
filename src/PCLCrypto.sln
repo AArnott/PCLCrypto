@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{AD0886C4
 		..\EnlistmentInfo.targets = ..\EnlistmentInfo.targets
 		..\nuget\PCLCrypto.nuspec = ..\nuget\PCLCrypto.nuspec
 		..\nuget\PCLCrypto.proj = ..\nuget\PCLCrypto.proj
+		version.txt = version.txt
 		..\tools\Versioning.targets = ..\tools\Versioning.targets
 	EndProjectSection
 EndProject
