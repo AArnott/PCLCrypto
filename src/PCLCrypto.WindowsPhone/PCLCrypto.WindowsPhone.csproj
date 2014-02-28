@@ -122,8 +122,11 @@
     <Compile Include="..\PCLCrypto.WinRT\HashAlgorithmProviderFactory.cs">
       <Link>HashAlgorithmProviderFactory.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto\Crypto.cs">
-      <Link>Crypto.cs</Link>
+    <Compile Include="..\PCLCrypto\NetFxCrypto.cs">
+      <Link>NetFxCrypto.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
+      <Link>WinRTCrypto.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

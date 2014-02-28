@@ -14,14 +14,14 @@
         [TestMethod]
         public void OpenAlgorithm_GetAlgorithmName()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             Assert.AreEqual(AsymmetricAlgorithm.RsaOaepSha1, rsa.Algorithm);
         }
 
         [TestMethod]
         public void CreateKeyPair_InvalidInputs()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
                 rsa.CreateKeyPair(-1));
             ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
@@ -31,7 +31,7 @@
         [TestMethod]
         public void CreateKeyPair()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             var key = rsa.CreateKeyPair(512);
             Assert.IsNotNull(key);
             Assert.AreEqual(512, key.KeySize);
@@ -40,7 +40,7 @@
         [TestMethod]
         public void ImportKeyPair_Null()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => rsa.ImportKeyPair(null));
         }
@@ -48,7 +48,7 @@
         [TestMethod]
         public void ImportPublicKey_Null()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => rsa.ImportPublicKey(null));
         }
@@ -56,7 +56,7 @@
         [TestMethod]
         public void KeyPairRoundTrip()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
 
             var key = rsa.CreateKeyPair(512);
             byte[] keyBlob = key.Export();
@@ -70,7 +70,7 @@
         [TestMethod]
         public void PublicKeyRoundTrip()
         {
-            var rsa = Crypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
 
             var key = rsa.CreateKeyPair(512);
             byte[] keyBlob = key.ExportPublicKey();

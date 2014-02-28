@@ -18,36 +18,36 @@
         [TestMethod]
         public void GetBytes()
         {
-            byte[] keyFromPassword = Crypto.DeriveBytes.GetBytes(Password1, Salt1, 5, 10);
-            byte[] keyFromBytes = Crypto.DeriveBytes.GetBytes(Encoding.UTF8.GetBytes(Password1), Salt1, 5, 10);
+            byte[] keyFromPassword = NetFxCrypto.DeriveBytes.GetBytes(Password1, Salt1, 5, 10);
+            byte[] keyFromBytes = NetFxCrypto.DeriveBytes.GetBytes(Encoding.UTF8.GetBytes(Password1), Salt1, 5, 10);
             CollectionAssertEx.AreEqual(keyFromPassword, keyFromBytes);
 
-            byte[] keyWithOtherSalt = Crypto.DeriveBytes.GetBytes(Password1, Salt2, 5, 10);
+            byte[] keyWithOtherSalt = NetFxCrypto.DeriveBytes.GetBytes(Password1, Salt2, 5, 10);
             CollectionAssertEx.AreNotEqual(keyFromPassword, keyWithOtherSalt);
         }
 
         [TestMethod]
         public void GetBytes_NullBytes()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => Crypto.DeriveBytes.GetBytes((byte[])null, Salt1, 5, 10));
+            ExceptionAssert.Throws<ArgumentNullException>(() => NetFxCrypto.DeriveBytes.GetBytes((byte[])null, Salt1, 5, 10));
         }
 
         [TestMethod]
         public void GetBytes_NullPassword()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => Crypto.DeriveBytes.GetBytes((string)null, Salt1, 5, 10));
+            ExceptionAssert.Throws<ArgumentNullException>(() => NetFxCrypto.DeriveBytes.GetBytes((string)null, Salt1, 5, 10));
         }
 
         [TestMethod]
         public void GetBytes_Password_NullSalt()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => Crypto.DeriveBytes.GetBytes(Password1, null, 5, 10));
+            ExceptionAssert.Throws<ArgumentNullException>(() => NetFxCrypto.DeriveBytes.GetBytes(Password1, null, 5, 10));
         }
 
         [TestMethod]
         public void GetBytes_Bytes_NullSalt()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => Crypto.DeriveBytes.GetBytes(Encoding.UTF8.GetBytes(Password1), null, 5, 10));
+            ExceptionAssert.Throws<ArgumentNullException>(() => NetFxCrypto.DeriveBytes.GetBytes(Encoding.UTF8.GetBytes(Password1), null, 5, 10));
         }
     }
 }

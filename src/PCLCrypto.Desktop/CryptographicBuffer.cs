@@ -75,7 +75,7 @@ namespace PCLCrypto
         public byte[] GenerateRandom(uint length)
         {
             var buffer = new byte[length];
-            Crypto.RandomNumberGenerator.GetBytes(buffer);
+            NetFxCrypto.RandomNumberGenerator.GetBytes(buffer);
             return buffer;
         }
 
@@ -83,7 +83,7 @@ namespace PCLCrypto
         public uint GenerateRandomNumber()
         {
             byte[] buffer = new byte[sizeof(uint)];
-            Crypto.RandomNumberGenerator.GetBytes(buffer);
+            NetFxCrypto.RandomNumberGenerator.GetBytes(buffer);
             return BitConverter.ToUInt32(buffer, 0);
         }
     }

@@ -20,24 +20,24 @@
         [TestMethod]
         public void OpenAlgorithm()
         {
-            IHashAlgorithmProvider provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            IHashAlgorithmProvider provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             Assert.IsNotNull(provider);
         }
 
         [TestMethod]
         public void Algorithm()
         {
-            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             Assert.AreEqual(HashAlgorithm.Sha1, provider.Algorithm);
 
-            provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+            provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
             Assert.AreEqual(HashAlgorithm.Sha256, provider.Algorithm);
         }
 
         [TestMethod]
         public void HashData()
         {
-            var hasher = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var hasher = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             var hash = hasher.HashData(this.data);
             Assert.IsNotNull(hash);
             Assert.AreEqual(this.dataHash, Convert.ToBase64String(hash));
@@ -46,7 +46,7 @@
         [TestMethod]
         public void HashData_InvalidInputs()
         {
-            var hasher = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+            var hasher = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => hasher.HashData(null));
         }
@@ -54,17 +54,17 @@
         [TestMethod]
         public void HashLength()
         {
-            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             Assert.AreEqual(20, provider.HashLength);
 
-            provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+            provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
             Assert.AreEqual(256 / 8, provider.HashLength);
         }
 
         [TestMethod]
         public void CreateHash()
         {
-            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             var hasher = provider.CreateHash();
             Assert.IsNotNull(hasher);
         }
@@ -72,7 +72,7 @@
         [TestMethod]
         public void AppendAndGetValueAndReset()
         {
-            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             var hasher = provider.CreateHash();
             hasher.Append(this.data);
             byte[] hash = hasher.GetValueAndReset();
@@ -87,7 +87,7 @@
         [TestMethod]
         public void AppendTwice()
         {
-            var provider = Crypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
             var hasher = provider.CreateHash();
             hasher.Append(this.data);
             hasher.Append(this.data);

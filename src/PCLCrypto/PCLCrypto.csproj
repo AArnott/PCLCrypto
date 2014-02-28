@@ -31,7 +31,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Crypto.cs" />
+    <Compile Include="WinRTCrypto.cs" />
+    <Compile Include="NetFxCrypto.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

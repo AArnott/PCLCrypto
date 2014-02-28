@@ -20,34 +20,34 @@
         [TestMethod]
         public void OpenAlgorithm()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.AesCmac);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.AesCmac);
             Assert.IsNotNull(algorithm);
         }
 
         [TestMethod]
         public void Algorithm()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.AesCmac);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.AesCmac);
             Assert.AreEqual(MacAlgorithm.AesCmac, algorithm.Algorithm);
 
-            algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             Assert.AreEqual(MacAlgorithm.HmacSha1, algorithm.Algorithm);
         }
 
         [TestMethod]
         public void MacLength()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             Assert.AreEqual(20, algorithm.MacLength);
 
-            algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha256);
+            algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha256);
             Assert.AreEqual(256 / 8, algorithm.MacLength);
         }
 
         [TestMethod]
         public void CreateHash_InvalidInputs()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => algorithm.CreateHash(null));
         }
@@ -55,7 +55,7 @@
         [TestMethod]
         public void CreateHash()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ICryptographicHash hasher = algorithm.CreateHash(this.keyMaterial);
             Assert.IsNotNull(hasher);
             hasher.Append(this.data);
@@ -66,7 +66,7 @@
         [TestMethod]
         public void CreateKey_InvalidInputs()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => algorithm.CreateKey(null));
         }
@@ -74,7 +74,7 @@
         [TestMethod]
         public void CreateKey_NotExportable()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ICryptographicKey key = algorithm.CreateKey(this.keyMaterial);
             ExceptionAssert.Throws<NotSupportedException>(
                 () => key.Export());
@@ -85,12 +85,12 @@
         [TestMethod]
         public void CreateKey()
         {
-            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ICryptographicKey key = algorithm.CreateKey(this.keyMaterial);
             Assert.IsNotNull(key);
             Assert.AreEqual(this.keyMaterial.Length, key.KeySize);
-            byte[] mac = Crypto.CryptographicEngine.Sign(key, this.data);
-            Assert.IsTrue(Crypto.CryptographicEngine.VerifySignature(key, this.data, mac));
+            byte[] mac = WinRTCrypto.CryptographicEngine.Sign(key, this.data);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, mac));
             Assert.AreEqual(this.macBase64, Convert.ToBase64String(mac));
         }
     }

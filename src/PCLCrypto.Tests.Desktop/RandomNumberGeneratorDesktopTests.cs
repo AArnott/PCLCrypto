@@ -14,7 +14,7 @@
         [TestMethod]
         public void GetNonZeroBytes()
         {
-            var rng = Crypto.RandomNumberGenerator as System.Security.Cryptography.RandomNumberGenerator;
+            var rng = NetFxCrypto.RandomNumberGenerator as System.Security.Cryptography.RandomNumberGenerator;
             Assert.IsNotNull(rng);
             byte[] buffer = new byte[15];
             rng.GetNonZeroBytes(buffer);
@@ -24,7 +24,7 @@
         [TestMethod]
         public void GetNonZeroBytes_Null()
         {
-            var rng = Crypto.RandomNumberGenerator as System.Security.Cryptography.RandomNumberGenerator;
+            var rng = NetFxCrypto.RandomNumberGenerator as System.Security.Cryptography.RandomNumberGenerator;
             Assert.IsNotNull(rng);
             ExceptionAssert.Throws<ArgumentNullException>(() => rng.GetNonZeroBytes(null));
         }
