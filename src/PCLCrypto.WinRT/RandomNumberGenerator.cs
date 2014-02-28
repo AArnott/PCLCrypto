@@ -12,7 +12,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
-    using Windows.Security.Cryptography;
+    using Platform = Windows.Security.Cryptography;
 
     /// <summary>
     /// Exposes the WinRT implementation of <see cref="IRandomNumberGenerator"/>.
@@ -24,7 +24,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(buffer, "buffer");
 
-            var windowsBuffer = CryptographicBuffer.GenerateRandom((uint)buffer.Length);
+            var windowsBuffer = Platform.CryptographicBuffer.GenerateRandom((uint)buffer.Length);
             Array.Copy(windowsBuffer.ToArray(), buffer, buffer.Length);
         }
     }

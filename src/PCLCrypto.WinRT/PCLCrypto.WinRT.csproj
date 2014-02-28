@@ -52,6 +52,7 @@
       <Link>Crypto.cs</Link>
     </Compile>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="CryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="HashAlgorithmProviderFactory.cs" />

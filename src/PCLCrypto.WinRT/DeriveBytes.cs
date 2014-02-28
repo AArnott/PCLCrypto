@@ -15,7 +15,7 @@ namespace PCLCrypto
     using Windows.Security.Cryptography;
     using Windows.Security.Cryptography.Core;
     using Windows.Storage.Streams;
-    using Platform = Windows.Security.Cryptography.Core;
+    using Platform = Windows.Security.Cryptography;
 
     /// <summary>
     /// Exposes the WinRT implementation of <see cref="IDeriveBytes"/>.
@@ -29,8 +29,8 @@ namespace PCLCrypto
             Requires.NotNull(salt, "salt");
             Requires.Range(iterations > 0, "iterations");
             Requires.Range(countBytes > 0, "countBytes");
-            
-            IBuffer keyMaterialBuffer = CryptographicBuffer.ConvertStringToBinary(keyMaterial, BinaryStringEncoding.Utf8);
+
+            IBuffer keyMaterialBuffer = Platform.CryptographicBuffer.ConvertStringToBinary(keyMaterial, BinaryStringEncoding.Utf8);
             return this.GetBytes(keyMaterialBuffer, salt.ToBuffer(), iterations, countBytes).ToArray();
         }
 
@@ -61,13 +61,13 @@ namespace PCLCrypto
             Requires.Range(countBytes > 0, "countBytes");
 
             var keyDerivationProvider =
-                Platform.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithmNames.Pbkdf2Sha1);
+                Platform.Core.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithmNames.Pbkdf2Sha1);
             var pbkdf2Parms =
-                Platform.KeyDerivationParameters.BuildForPbkdf2(salt, (uint)iterations);
+                Platform.Core.KeyDerivationParameters.BuildForPbkdf2(salt, (uint)iterations);
 
             // create a key based on original key and derivation parameters
             var keyOriginal = keyDerivationProvider.CreateKey(keyMaterial);
-            IBuffer result = Platform.CryptographicEngine.DeriveKeyMaterial(keyOriginal, pbkdf2Parms, (uint)countBytes);
+            IBuffer result = Platform.Core.CryptographicEngine.DeriveKeyMaterial(keyOriginal, pbkdf2Parms, (uint)countBytes);
             return result;
         }
     }

@@ -63,6 +63,11 @@ namespace PCLCrypto
         /// Backing field for the CryptographicEngine property.
         /// </summary>
         private static ICryptographicEngine cryptographicEngine;
+
+        /// <summary>
+        /// Backing field for the CryptographicBuffer property.
+        /// </summary>
+        private static ICryptographicBuffer cryptographicBuffer;
 #endif
 
         /// <summary>
@@ -236,6 +241,26 @@ namespace PCLCrypto
                 }
 
                 return cryptographicEngine;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets the service for buffers.
+        /// </summary>
+        public static ICryptographicBuffer CryptographicBuffer 
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#else
+                if (cryptographicBuffer == null)
+                {
+                    cryptographicBuffer = new CryptographicBuffer();
+                }
+
+                return cryptographicBuffer;
 #endif
             }
         }

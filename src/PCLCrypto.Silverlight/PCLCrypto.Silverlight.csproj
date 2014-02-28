@@ -72,6 +72,9 @@
     <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
       <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\CryptographicBuffer.cs">
+      <Link>CryptographicBuffer.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\CryptographicHash.cs">
       <Link>CryptographicHash.cs</Link>
     </Compile>

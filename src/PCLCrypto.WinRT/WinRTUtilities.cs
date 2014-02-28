@@ -7,14 +7,20 @@
 namespace PCLCrypto
 {
     using System;
-    using Windows.Security.Cryptography;
+    using Validation;
     using Windows.Storage.Streams;
+    using Platform = Windows.Security.Cryptography;
 
     /// <summary>
     /// Utilities common to an IronPigeon application targeting WinRT.
     /// </summary>
     internal static class WinRTUtilities
     {
+        /// <summary>
+        /// An empty buffer.
+        /// </summary>
+        private static readonly byte[] EmptyBuffer = new byte[0];
+
         /// <summary>
         /// Converts a WinRT buffer to a .NET buffer.
         /// </summary>
@@ -29,11 +35,11 @@ namespace PCLCrypto
 
             if (buffer.Length == 0)
             {
-                return new byte[0]; // CopyToByteArray produces a null array in this case, so we fix it here.
+                return EmptyBuffer; // CopyToByteArray produces a null array in this case, so we fix it here.
             }
 
             byte[] result;
-            CryptographicBuffer.CopyToByteArray(buffer, out result);
+            Platform.CryptographicBuffer.CopyToByteArray(buffer, out result);
             return result;
         }
 
@@ -44,7 +50,9 @@ namespace PCLCrypto
         /// <returns>The WinRT buffer.</returns>
         public static IBuffer ToBuffer(this byte[] array)
         {
-            return CryptographicBuffer.CreateFromByteArray(array);
+            Requires.NotNull(array, "array");
+
+            return Platform.CryptographicBuffer.CreateFromByteArray(array);
         }
     }
 }
