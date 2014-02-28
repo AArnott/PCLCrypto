@@ -37,21 +37,7 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
             Requires.NotNull(data, "data");
 
-#if !Xamarin
-            var cngKey = key as CngCryptographicKey;
-            if (cngKey != null)
-            {
-                return this.Sign(cngKey, data);
-            }
-#endif
-
-            var rsaKey = key as RsaCryptographicKey;
-            if (rsaKey != null)
-            {
-                return this.Sign(rsaKey, data);
-            }
-
-            throw new NotSupportedException();
+            return ((CryptographicKey)key).Sign(data);
         }
 
         /// <inheritdoc />
@@ -67,21 +53,7 @@ namespace PCLCrypto
             Requires.NotNull(data, "data");
             Requires.NotNull(signature, "signature");
 
-#if !Xamarin
-            var cngKey = key as CngCryptographicKey;
-            if (cngKey != null)
-            {
-                return this.VerifySignature(cngKey, data, signature);
-            }
-#endif
-
-            var rsaKey = key as RsaCryptographicKey;
-            if (rsaKey != null)
-            {
-                return this.VerifySignature(rsaKey, data, signature);
-            }
-
-            throw new NotSupportedException();
+            return ((CryptographicKey)key).VerifySignature(data, signature);
         }
 
         /// <inheritdoc />
@@ -95,7 +67,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
         /// <returns>The hash algorithm.</returns>
-        private static Platform.HashAlgorithm GetHashAlgorithm(AsymmetricAlgorithm algorithm)
+        internal static Platform.HashAlgorithm GetHashAlgorithm(AsymmetricAlgorithm algorithm)
         {
             switch (algorithm)
             {
@@ -122,64 +94,6 @@ namespace PCLCrypto
                     return Platform.HashAlgorithm.Create("SHA512");
                 default:
                     throw new NotSupportedException();
-            }
-        }
-
-#if !Xamarin
-        /// <summary>
-        /// Signs data with the specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="data">The data.</param>
-        /// <returns>The signature.</returns>
-        private byte[] Sign(CngCryptographicKey key, byte[] data)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Verifies the signature of data with the specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="data">The data.</param>
-        /// <param name="signature">The signature.</param>
-        /// <returns>
-        /// <c>true</c> if the signature is valid.
-        /// </returns>
-        private bool VerifySignature(CngCryptographicKey key, byte[] data, byte[] signature)
-        {
-            throw new NotImplementedException();
-        }
-#endif
-
-        /// <summary>
-        /// Signs data with the specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="data">The data.</param>
-        /// <returns>The signature.</returns>
-        private byte[] Sign(RsaCryptographicKey key, byte[] data)
-        {
-            using (var hash = GetHashAlgorithm(key.Algorithm))
-            {
-                return key.Rsa.SignData(data, hash);
-            }
-        }
-
-        /// <summary>
-        /// Verifies the signature of data with the specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="data">The data.</param>
-        /// <param name="signature">The signature.</param>
-        /// <returns>
-        /// <c>true</c> if the signature is valid.
-        /// </returns>
-        private bool VerifySignature(RsaCryptographicKey key, byte[] data, byte[] signature)
-        {
-            using (var hash = GetHashAlgorithm(key.Algorithm))
-            {
-                return key.Rsa.VerifyData(data, hash, signature);
             }
         }
     }

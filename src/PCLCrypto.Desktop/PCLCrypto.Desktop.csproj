@@ -45,9 +45,12 @@
     <Compile Include="CryptographicHash.cs" />
     <Compile Include="CryptographicHashMac.cs" />
     <Compile Include="CryptographicHashPlain.cs" />
+    <Compile Include="CryptographicKey.cs" />
+    <Compile Include="CryptoUtilities.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProviderFactory.cs" />
+    <Compile Include="MacCryptographicKey.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
     <Compile Include="CngCryptographicKey.cs" />

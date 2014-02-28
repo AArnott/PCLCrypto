@@ -18,7 +18,7 @@ namespace PCLCrypto
     /// The .NET Framework implementation of the <see cref="ICryptographicKey"/> interface
     /// for CNG keys.
     /// </summary>
-    internal class CngCryptographicKey : ICryptographicKey
+    internal class CngCryptographicKey : CryptographicKey, ICryptographicKey
     {
         /// <summary>
         /// The platform crypto key.
@@ -52,6 +52,18 @@ namespace PCLCrypto
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
             return this.key.Export(CngAsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType));
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] Sign(byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifySignature(byte[] data, byte[] signature)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -72,12 +72,25 @@
         }
 
         [TestMethod]
+        public void CreateKey_NotExportable()
+        {
+            var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            ICryptographicKey key = algorithm.CreateKey(this.keyMaterial);
+            ExceptionAssert.Throws<NotSupportedException>(
+                () => key.Export());
+            ExceptionAssert.Throws<NotSupportedException>(
+                () => key.ExportPublicKey());
+        }
+
+        [TestMethod]
         public void CreateKey()
         {
             var algorithm = Crypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
             ICryptographicKey key = algorithm.CreateKey(this.keyMaterial);
             Assert.IsNotNull(key);
+            Assert.AreEqual(this.keyMaterial.Length, key.KeySize);
             byte[] mac = Crypto.CryptographicEngine.Sign(key, this.data);
+            Assert.IsTrue(Crypto.CryptographicEngine.VerifySignature(key, this.data, mac));
             Assert.AreEqual(this.macBase64, Convert.ToBase64String(mac));
         }
     }

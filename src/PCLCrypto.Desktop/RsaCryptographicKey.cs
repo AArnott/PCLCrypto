@@ -18,7 +18,7 @@ namespace PCLCrypto
     /// The .NET Framework implementation of the <see cref="ICryptographicKey"/> interface
     /// for RSA keys.
     /// </summary>
-    internal class RsaCryptographicKey : ICryptographicKey
+    internal class RsaCryptographicKey : CryptographicKey, ICryptographicKey
     {
         /// <summary>
         /// The platform crypto key.
@@ -86,6 +86,24 @@ namespace PCLCrypto
                     return this.key.ExportCspBlob(includePrivateParameters: false);
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] Sign(byte[] data)
+        {
+            using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            {
+                return this.Rsa.SignData(data, hash);
+            }
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifySignature(byte[] data, byte[] signature)
+        {
+            using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            {
+                return this.Rsa.VerifyData(data, hash, signature);
             }
         }
     }

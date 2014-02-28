@@ -12,6 +12,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
+    using Platform = System.Security.Cryptography;
 
     /// <summary>
     /// A .NET Framework implementation of <see cref="ICryptographicEngine"/>.
@@ -57,6 +58,16 @@ namespace PCLCrypto
 
         /// <inheritdoc />
         public bool VerifySignatureWithHashInput(ICryptographicKey key, byte[] data, byte[] signature)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Creates a hash algorithm instance that is appropriate for the given algorithm.T
+        /// </summary>
+        /// <param name="algorithm">The algorithm.</param>
+        /// <returns>The hash algorithm.</returns>
+        internal static Platform.HashAlgorithm GetHashAlgorithm(AsymmetricAlgorithm algorithm)
         {
             throw new NotImplementedException();
         }

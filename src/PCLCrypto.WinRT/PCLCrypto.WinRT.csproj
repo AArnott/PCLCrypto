@@ -45,6 +45,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto.Desktop\CryptoUtilities.cs">
+      <Link>CryptoUtilities.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto\Crypto.cs">
       <Link>Crypto.cs</Link>
     </Compile>

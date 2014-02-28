@@ -62,7 +62,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public ICryptographicKey CreateKey(byte[] keyMaterial)
         {
-            throw new NotImplementedException();
+            return new MacCryptographicKey(this.Algorithm, keyMaterial);
         }
 
         /// <summary>
