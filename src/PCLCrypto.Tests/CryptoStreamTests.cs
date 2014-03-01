@@ -94,7 +94,7 @@
         public void CryptoStreamWithEmptyFinalBlockViaRead()
         {
             var transform = new MockCryptoTransform(5);
-            var target = new MemoryStream(Encoding.UTF8.GetBytes("BCDEFGHJKLMNOPQ"));
+            var target = new ErraticReaderStream(new MemoryStream(Encoding.UTF8.GetBytes("BCDEFGHJKLMNOPQ")));
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 byte[] buffer = new byte[100];
@@ -182,6 +182,85 @@
             public void Dispose()
             {
                 this.IsDisposed = true;
+            }
+        }
+
+        /// <summary>
+        /// A readable stream that usually returns less than the number of bytes requested.
+        /// </summary>
+        /// <remarks>
+        /// Why would we use such a stream?
+        /// Well, a Stream.Read method may return n number of bytes 0 < n <= desiredCount
+        /// Returning 0 bytes means the end of the stream has been reached.
+        /// Returning less than the requested bytes could be due to reaching the end of the
+        /// stream, but it may also be due to the underlying stream being a network stream
+        /// and although the caller wants 500 bytes, only 300 are immediately available
+        /// so those are returned. The caller can then turn around and ask for 200 more
+        /// bytes, or any other number of bytes.
+        /// We mock this up here to verify that stream readers are tolerant of this behavior.
+        /// </remarks>
+        protected class ErraticReaderStream : Stream
+        {
+            private readonly Stream underlyingStream;
+
+            internal ErraticReaderStream(Stream underlyingStream)
+            {
+                Requires.NotNull(underlyingStream, "underlyingStream");
+                this.underlyingStream = underlyingStream;
+            }
+
+            public override bool CanRead
+            {
+                get { return true; }
+            }
+
+            public override bool CanSeek
+            {
+                get { return false; }
+            }
+
+            public override bool CanWrite
+            {
+                get { return false; }
+            }
+
+            public override long Length
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public override long Position
+            {
+                get { throw new NotImplementedException(); }
+                set { throw new NotImplementedException(); }
+            }
+
+            public override void Flush()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                // Always return one less byte than requested,
+                // unless only 1 is requested, in which case return that many.
+                // Returning 0 means end of stream.
+                return this.underlyingStream.Read(buffer, offset, Math.Max(1, count - 1));
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                throw new NotImplementedException();
             }
         }
     }
