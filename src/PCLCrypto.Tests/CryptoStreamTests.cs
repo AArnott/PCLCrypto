@@ -70,6 +70,32 @@
         }
 
         [TestMethod]
+        public void CannotReadFromWriteStream()
+        {
+            var transform = new MockCryptoTransform(5);
+            var target = new MemoryStream();
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Write))
+            {
+                byte[] buffer = new byte[1];
+                ExceptionAssert.Throws<NotSupportedException>(
+                    () => stream.Read(buffer, 0, 1));
+            }
+        }
+
+        [TestMethod]
+        public void CannotWriteToReadStream()
+        {
+            var transform = new MockCryptoTransform(5);
+            var target = new MemoryStream();
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
+            {
+                byte[] buffer = new byte[1];
+                ExceptionAssert.Throws<NotSupportedException>(
+                    () => stream.Write(buffer, 0, 1));
+            }
+        }
+
+        [TestMethod]
         public void CryptoStreamWithEmptyFinalBlockViaWrite()
         {
             var transform = new MockCryptoTransform(5);
