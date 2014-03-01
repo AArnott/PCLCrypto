@@ -74,25 +74,22 @@ namespace PCLCrypto
         /// </returns>
         internal static Platform.HashAlgorithm CreateHashAlgorithm(HashAlgorithm algorithm)
         {
-#if SILVERLIGHT && !WINDOWS_PHONE
-            throw new NotSupportedException();
-#else
             switch (algorithm)
             {
                 case HashAlgorithm.Md5:
-#if WINDOWS_PHONE
+#if SILVERLIGHT
                     throw new NotSupportedException();
 #else
                     return Platform.HashAlgorithm.Create("MD5");
 #endif
                 case HashAlgorithm.Sha1:
-#if WINDOWS_PHONE
+#if SILVERLIGHT
                     return new Platform.SHA1Managed();
 #else
                     return Platform.HashAlgorithm.Create("SHA1");
 #endif
                 case HashAlgorithm.Sha256:
-#if WINDOWS_PHONE
+#if SILVERLIGHT
                     return new Platform.SHA256Managed();
 #else
                     return Platform.HashAlgorithm.Create("SHA256");
@@ -102,13 +99,12 @@ namespace PCLCrypto
                     return Platform.HashAlgorithm.Create("SHA384");
 #endif
                 case HashAlgorithm.Sha512:
-#if !WINDOWS_PHONE
+#if !SILVERLIGHT
                     return Platform.HashAlgorithm.Create("SHA512");
 #endif
                 default:
                     throw new NotSupportedException();
             }
-#endif
         }
     }
 }
