@@ -88,23 +88,23 @@ namespace PCLCrypto
                 case AsymmetricAlgorithm.RsaOaepSha1:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
                 case AsymmetricAlgorithm.RsaSignPssSha1:
-                    return Platform.HashAlgorithm.Create("SHA1");
+                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha1);
                 case AsymmetricAlgorithm.DsaSha256:
                 case AsymmetricAlgorithm.RsaOaepSha256:
                 case AsymmetricAlgorithm.EcdsaP256Sha256:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
                 case AsymmetricAlgorithm.RsaSignPssSha256:
-                    return Platform.HashAlgorithm.Create("SHA256");
+                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha256);
                 case AsymmetricAlgorithm.EcdsaP384Sha384:
                 case AsymmetricAlgorithm.RsaOaepSha384:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
                 case AsymmetricAlgorithm.RsaSignPssSha384:
-                    return Platform.HashAlgorithm.Create("SHA384");
+                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha384);
                 case AsymmetricAlgorithm.EcdsaP521Sha512:
                 case AsymmetricAlgorithm.RsaOaepSha512:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
                 case AsymmetricAlgorithm.RsaSignPssSha512:
-                    return Platform.HashAlgorithm.Create("SHA512");
+                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha512);
                 default:
                     throw new NotSupportedException();
             }
