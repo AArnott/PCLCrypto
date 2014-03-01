@@ -84,7 +84,7 @@ namespace PCLCrypto
         /// </exception>
         private static Platform.SymmetricAlgorithm GetAlgorithm(SymmetricAlgorithm algorithm)
         {
-#if WINDOWS_PHONE
+#if SILVERLIGHT
             switch (algorithm)
             {
                 case SymmetricAlgorithm.AesCbcPkcs7:
@@ -92,8 +92,6 @@ namespace PCLCrypto
                 default:
                     throw new NotSupportedException();
             }
-#elif SILVERLIGHT
-            throw new NotSupportedException();
 #else
             Platform.SymmetricAlgorithm platform;
 
