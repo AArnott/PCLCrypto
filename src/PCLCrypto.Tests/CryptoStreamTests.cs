@@ -12,8 +12,6 @@
     [TestClass]
     public abstract class CryptoStreamTests
     {
-        private readonly byte[] data = new byte[] { 0x1, 0x2, };
-
         [TestMethod]
         public void DisposeAlsoDisposesTargetStream()
         {
