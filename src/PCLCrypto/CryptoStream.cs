@@ -17,7 +17,10 @@ namespace PCLCrypto
     /// </summary>
     public class CryptoStream : Stream
     {
-        ////private readonly Stream chainedStream;
+        /// <summary>
+        /// The stream that is read from or written to with each I/O operation.
+        /// </summary>
+        private readonly Stream chainedStream;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CryptoStream"/> class.
@@ -27,6 +30,7 @@ namespace PCLCrypto
         /// <param name="mode">The mode of operation.</param>
         public CryptoStream(Stream stream, ICryptoTransform transform, CryptoStreamMode mode)
         {
+            this.chainedStream = stream;
         }
 
         /// <summary>
@@ -120,5 +124,16 @@ namespace PCLCrypto
         }
         
         #endregion
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.chainedStream.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }
