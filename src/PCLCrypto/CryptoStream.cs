@@ -24,6 +24,21 @@ namespace PCLCrypto
         private readonly Stream chainedStream;
 
         /// <summary>
+        /// The read/write mode of this stream.
+        /// </summary>
+        private readonly CryptoStreamMode mode;
+
+        /// <summary>
+        /// The input buffer.
+        /// </summary>
+        private readonly byte[] inputBuffer;
+
+        /// <summary>
+        /// The output buffer.
+        /// </summary>
+        private readonly byte[] outputBuffer;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CryptoStream"/> class.
         /// </summary>
         /// <param name="stream">The stream to write to or read from.</param>
@@ -35,6 +50,9 @@ namespace PCLCrypto
             Requires.NotNull(transform, "transform");
 
             this.chainedStream = stream;
+            this.mode = mode;
+            this.inputBuffer = new byte[transform.InputBlockSize];
+            this.outputBuffer = new byte[transform.OutputBlockSize];
         }
 
         /// <summary>
@@ -47,39 +65,32 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override bool CanRead
         {
-            get { throw new NotImplementedException(); }
+            get { return this.mode == CryptoStreamMode.Read; }
         }
 
         /// <inheritdoc />
         public override bool CanSeek
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         /// <inheritdoc />
         public override bool CanWrite
         {
-            get { throw new NotImplementedException(); }
+            get { return this.mode == CryptoStreamMode.Write; }
         }
 
         /// <inheritdoc />
         public override long Length
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException(); }
         }
 
         /// <inheritdoc />
         public override long Position
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotSupportedException(); }
+            set { throw new NotSupportedException(); }
         }
 
         #endregion
@@ -126,7 +137,7 @@ namespace PCLCrypto
         {
             throw new NotImplementedException();
         }
-        
+
         #endregion
 
         /// <inheritdoc />

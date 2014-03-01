@@ -13,6 +13,28 @@
     public abstract class CryptoStreamTests
     {
         [TestMethod]
+        public void Properties()
+        {
+            var stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Write);
+            Assert.IsTrue(stream.CanWrite);
+            Assert.IsFalse(stream.CanRead);
+            Assert.IsFalse(stream.CanSeek);
+            Assert.IsFalse(stream.CanTimeout);
+            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Length; });
+            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Position; });
+            ExceptionAssert.Throws<NotSupportedException>(() => { stream.Position = 0; });
+
+            stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Read);
+            Assert.IsTrue(stream.CanRead);
+            Assert.IsFalse(stream.CanWrite);
+            Assert.IsFalse(stream.CanSeek);
+            Assert.IsFalse(stream.CanTimeout);
+            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Length; });
+            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Position; });
+            ExceptionAssert.Throws<NotSupportedException>(() => { stream.Position = 0; });
+        }
+
+        [TestMethod]
         public void DisposeAlsoDisposesTargetStream()
         {
             var transform = new MockCryptoTransform(5);
