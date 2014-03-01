@@ -28,7 +28,7 @@
     <Compile Include="AsymmetricAlgorithm.cs" />
     <Compile Include="CryptographicPublicKeyBlobType.cs" />
     <Compile Include="CryptographicPrivateKeyBlobType.cs" />
-    <Compile Include="CryptoStream.cs" />
+    <Compile Include="CryptoStreamMode.cs" />
     <Compile Include="HashAlgorithm.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="ICryptographicBuffer.cs" />
