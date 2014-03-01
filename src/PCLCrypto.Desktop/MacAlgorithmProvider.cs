@@ -74,31 +74,29 @@ namespace PCLCrypto
         {
             switch (algorithm)
             {
-#if !SILVERLIGHT || WINDOWS_PHONE
-#if !WINDOWS_PHONE
+#if !SILVERLIGHT
                 case MacAlgorithm.AesCmac:
                     return Platform.KeyedHashAlgorithm.Create("AesCmac");
                 case MacAlgorithm.HmacMd5:
                     return Platform.KeyedHashAlgorithm.Create("HmacMd5");
 #endif
                 case MacAlgorithm.HmacSha1:
-#if WINDOWS_PHONE
+#if SILVERLIGHT
                     return new Platform.HMACSHA1();
 #else
                     return Platform.KeyedHashAlgorithm.Create("HmacSha1");
 #endif
                 case MacAlgorithm.HmacSha256:
-#if WINDOWS_PHONE
+#if SILVERLIGHT
                     return new Platform.HMACSHA256();
 #else
                     return Platform.KeyedHashAlgorithm.Create("HmacSha256");
 #endif
-#if !WINDOWS_PHONE
+#if !SILVERLIGHT
                 case MacAlgorithm.HmacSha384:
                     return Platform.KeyedHashAlgorithm.Create("HmacSha384");
                 case MacAlgorithm.HmacSha512:
                     return Platform.KeyedHashAlgorithm.Create("HmacSha512");
-#endif
 #endif
                 default:
                     throw new NotSupportedException();
