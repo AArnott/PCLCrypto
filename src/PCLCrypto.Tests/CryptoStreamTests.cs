@@ -8,6 +8,7 @@
     using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using PCLTesting;
+    using Validation;
 
     [TestClass]
     public abstract class CryptoStreamTests
@@ -44,11 +45,19 @@
         }
 
         [TestMethod]
-        public void DisposeAlsoDoesNotDisposeTransform()
+        public void DisposeDoesNotDisposeTransform()
         {
             var hasher = new MockCryptoTransform(5);
             this.CreateCryptoStream(Stream.Null, hasher, CryptoStreamMode.Write).Dispose();
             Assert.IsFalse(hasher.IsDisposed);
+        }
+
+        [TestMethod]
+        public void DisposeTransformsFinalBlock()
+        {
+            var hasher = new MockCryptoTransform(5);
+            this.CreateCryptoStream(Stream.Null, hasher, CryptoStreamMode.Write).Dispose();
+            Assert.IsTrue(hasher.FinalBlockTransformed);
         }
 
         [TestMethod]
@@ -149,6 +158,8 @@
 
             internal bool IsDisposed { get; private set; }
 
+            internal bool FinalBlockTransformed { get; private set; }
+
             public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
             {
                 outputBuffer[outputOffset] = (byte)'-';
@@ -158,6 +169,9 @@
 
             public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
             {
+                Verify.Operation(!this.FinalBlockTransformed, "Final block already transformed.");
+
+                this.FinalBlockTransformed = true;
                 byte[] result = new byte[inputCount + 2];
                 result[0] = (byte)'_';
                 result[result.Length - 1] = (byte)'Z';

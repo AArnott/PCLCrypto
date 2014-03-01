@@ -24,6 +24,11 @@ namespace PCLCrypto
         private readonly Stream chainedStream;
 
         /// <summary>
+        /// The crypto transform to use for each block.
+        /// </summary>
+        private readonly ICryptoTransform transform;
+
+        /// <summary>
         /// The read/write mode of this stream.
         /// </summary>
         private readonly CryptoStreamMode mode;
@@ -50,6 +55,7 @@ namespace PCLCrypto
             Requires.NotNull(transform, "transform");
 
             this.chainedStream = stream;
+            this.transform = transform;
             this.mode = mode;
             this.inputBuffer = new byte[transform.InputBlockSize];
             this.outputBuffer = new byte[transform.OutputBlockSize];
@@ -103,6 +109,7 @@ namespace PCLCrypto
         /// </remarks>
         public void FlushFinalBlock()
         {
+            this.transform.TransformFinalBlock(new byte[0], 0, 0);
             this.HasFlushedFinalBlock = true;
         }
 
@@ -143,12 +150,26 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            try
             {
-                this.chainedStream.Dispose();
-            }
+                if (disposing)
+                {
+                    if (!this.HasFlushedFinalBlock)
+                    {
+                        this.FlushFinalBlock();
+                    }
 
-            base.Dispose(disposing);
+                    this.chainedStream.Dispose();
+
+                    // Clear all buffers since they could contain security data.
+                    Array.Clear(this.inputBuffer, 0, this.inputBuffer.Length);
+                    Array.Clear(this.outputBuffer, 0, this.outputBuffer.Length);
+                }
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
         }
     }
 }
