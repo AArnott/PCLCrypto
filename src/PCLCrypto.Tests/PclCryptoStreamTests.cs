@@ -10,7 +10,9 @@
     using PCLTesting;
 
     [TestClass]
+#pragma warning disable 0436
     public class PclCryptoStreamTests : CryptoStreamTests
+#pragma warning restore 0436
     {
         [TestMethod]
         public void Ctor_InvalidArgs()

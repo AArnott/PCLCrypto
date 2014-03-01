@@ -16,7 +16,9 @@
     /// .NET Framework's version of CryptoStream as well.
     /// </summary>
     [TestClass]
+#pragma warning disable 0436
     public class DesktopCryptoStreamTests : CryptoStreamTests
+#pragma warning restore 0436
     {
         protected override Stream CreateCryptoStream(Stream target, PCLCrypto.ICryptoTransform transform, PCLCrypto.CryptoStreamMode mode)
         {
