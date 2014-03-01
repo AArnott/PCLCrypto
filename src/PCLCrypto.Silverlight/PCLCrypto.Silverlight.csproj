@@ -75,6 +75,9 @@
     <Compile Include="..\PCLCrypto.Desktop\CryptographicBuffer.cs">
       <Link>CryptographicBuffer.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\CryptographicEngine.cs">
+      <Link>CryptographicEngine.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\CryptographicHash.cs">
       <Link>CryptographicHash.cs</Link>
     </Compile>
@@ -138,7 +141,6 @@
     <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
       <Link>WinRTCrypto.cs</Link>
     </Compile>
-    <Compile Include="CryptographicEngine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
