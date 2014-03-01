@@ -77,103 +77,121 @@ namespace PCLCrypto
         /// Returns a platform-specific algorithm that conforms to the prescribed platform-neutral algorithm.
         /// </summary>
         /// <param name="algorithm">The PCL algorithm.</param>
-        /// <returns>The platform-specific algorithm.</returns>
+        /// <returns>
+        /// The platform-specific algorithm.
+        /// </returns>
+        /// <exception cref="System.NotSupportedException">
+        /// </exception>
         private static Platform.SymmetricAlgorithm GetAlgorithm(SymmetricAlgorithm algorithm)
         {
-#if !SILVERLIGHT && !WINDOWS_PHONE
-            Platform.SymmetricAlgorithm platform;
-#endif
-
+#if WINDOWS_PHONE
             switch (algorithm)
             {
-#if !SILVERLIGHT && !WINDOWS_PHONE
-                case SymmetricAlgorithm.AesCbc:
-                    platform = Platform.SymmetricAlgorithm.Create("AES");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
                 case SymmetricAlgorithm.AesCbcPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("AES");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.AesEcb:
-                    platform = Platform.SymmetricAlgorithm.Create("AES");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.AesEcbPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("AES");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.DesCbc:
-                    platform = Platform.SymmetricAlgorithm.Create("DES");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.DesCbcPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("DES");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.DesEcb:
-                    platform = Platform.SymmetricAlgorithm.Create("DES");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.DesEcbPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("DES");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.Rc2Cbc:
-                    platform = Platform.SymmetricAlgorithm.Create("RC2");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.Rc2CbcPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("RC2");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.Rc2Ecb:
-                    platform = Platform.SymmetricAlgorithm.Create("RC2");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.Rc2EcbPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("RC2");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.Rc4:
-                    platform = Platform.SymmetricAlgorithm.Create("RC4");
-                    return platform;
-                case SymmetricAlgorithm.TripleDesCbc:
-                    platform = Platform.SymmetricAlgorithm.Create("TRIPLEDES");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.TripleDesCbcPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("TRIPLEDES");
-                    platform.Mode = Platform.CipherMode.CBC;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-                case SymmetricAlgorithm.TripleDesEcb:
-                    platform = Platform.SymmetricAlgorithm.Create("TRIPLEDES");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.None;
-                    return platform;
-                case SymmetricAlgorithm.TripleDesEcbPkcs7:
-                    platform = Platform.SymmetricAlgorithm.Create("TRIPLEDES");
-                    platform.Mode = Platform.CipherMode.ECB;
-                    platform.Padding = Platform.PaddingMode.PKCS7;
-                    return platform;
-#endif
+                    return new Platform.AesManaged();
                 default:
                     throw new NotSupportedException();
             }
+#elif SILVERLIGHT
+            throw new NotSupportedException();
+#else
+            Platform.SymmetricAlgorithm platform;
+
+            // Algorithm
+            switch (algorithm)
+            {
+                case SymmetricAlgorithm.AesCbc:
+                case SymmetricAlgorithm.AesCbcPkcs7:
+                case SymmetricAlgorithm.AesCcm:
+                case SymmetricAlgorithm.AesEcb:
+                case SymmetricAlgorithm.AesEcbPkcs7:
+                case SymmetricAlgorithm.AesGcm:
+                    platform = Platform.SymmetricAlgorithm.Create("AES");
+                    break;
+                case SymmetricAlgorithm.DesCbc:
+                case SymmetricAlgorithm.DesCbcPkcs7:
+                case SymmetricAlgorithm.DesEcb:
+                case SymmetricAlgorithm.DesEcbPkcs7:
+                    platform = Platform.SymmetricAlgorithm.Create("DES");
+                    break;
+                case SymmetricAlgorithm.Rc2Cbc:
+                case SymmetricAlgorithm.Rc2CbcPkcs7:
+                case SymmetricAlgorithm.Rc2Ecb:
+                case SymmetricAlgorithm.Rc2EcbPkcs7:
+                    platform = Platform.SymmetricAlgorithm.Create("RC2");
+                    break;
+                case SymmetricAlgorithm.Rc4:
+                    platform = Platform.SymmetricAlgorithm.Create("RC4");
+                    break;
+                case SymmetricAlgorithm.TripleDesCbc:
+                case SymmetricAlgorithm.TripleDesCbcPkcs7:
+                case SymmetricAlgorithm.TripleDesEcb:
+                case SymmetricAlgorithm.TripleDesEcbPkcs7:
+                    platform = Platform.SymmetricAlgorithm.Create("TRIPLEDES");
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            // Mode
+            switch (algorithm)
+            {
+                case SymmetricAlgorithm.AesCbc:
+                case SymmetricAlgorithm.AesCbcPkcs7:
+                case SymmetricAlgorithm.Rc2Cbc:
+                case SymmetricAlgorithm.Rc2CbcPkcs7:
+                case SymmetricAlgorithm.DesCbc:
+                case SymmetricAlgorithm.DesCbcPkcs7:
+                case SymmetricAlgorithm.TripleDesCbc:
+                case SymmetricAlgorithm.TripleDesCbcPkcs7:
+                    platform.Mode = Platform.CipherMode.CBC;
+                    break;
+                case SymmetricAlgorithm.AesEcb:
+                case SymmetricAlgorithm.AesEcbPkcs7:
+                case SymmetricAlgorithm.DesEcb:
+                case SymmetricAlgorithm.DesEcbPkcs7:
+                case SymmetricAlgorithm.TripleDesEcb:
+                case SymmetricAlgorithm.TripleDesEcbPkcs7:
+                case SymmetricAlgorithm.Rc2Ecb:
+                case SymmetricAlgorithm.Rc2EcbPkcs7:
+                    platform.Mode = Platform.CipherMode.ECB;
+                    break;
+                case SymmetricAlgorithm.AesCcm:
+                case SymmetricAlgorithm.AesGcm:
+                    throw new NotSupportedException();
+                default:
+                    break;
+            }
+
+            // Padding
+            switch (algorithm)
+            {
+                case SymmetricAlgorithm.AesCbc:
+                case SymmetricAlgorithm.AesEcb:
+                case SymmetricAlgorithm.DesCbc:
+                case SymmetricAlgorithm.DesEcb:
+                case SymmetricAlgorithm.Rc2Ecb:
+                case SymmetricAlgorithm.TripleDesCbc:
+                case SymmetricAlgorithm.TripleDesEcb:
+                case SymmetricAlgorithm.Rc2Cbc:
+                    platform.Padding = Platform.PaddingMode.None;
+                    break;
+                case SymmetricAlgorithm.DesCbcPkcs7:
+                case SymmetricAlgorithm.DesEcbPkcs7:
+                case SymmetricAlgorithm.Rc2CbcPkcs7:
+                case SymmetricAlgorithm.AesCbcPkcs7:
+                case SymmetricAlgorithm.AesEcbPkcs7:
+                case SymmetricAlgorithm.TripleDesCbcPkcs7:
+                case SymmetricAlgorithm.Rc2EcbPkcs7:
+                case SymmetricAlgorithm.TripleDesEcbPkcs7:
+                    platform.Padding = Platform.PaddingMode.PKCS7;
+                    break;
+                default:
+                    break;
+            }
+
+            return platform;
+#endif
         }
     }
 }
