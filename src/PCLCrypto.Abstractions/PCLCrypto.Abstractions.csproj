@@ -28,10 +28,12 @@
     <Compile Include="AsymmetricAlgorithm.cs" />
     <Compile Include="CryptographicPublicKeyBlobType.cs" />
     <Compile Include="CryptographicPrivateKeyBlobType.cs" />
+    <Compile Include="CryptoStream.cs" />
     <Compile Include="HashAlgorithm.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="ICryptographicBuffer.cs" />
     <Compile Include="ICryptographicHash.cs" />
+    <Compile Include="ICryptoTransform.cs" />
     <Compile Include="IHashAlgorithmProvider.cs" />
     <Compile Include="IHashAlgorithmProviderFactory.cs" />
     <Compile Include="IKeyDerivationAlgorithmProvider.cs" />
