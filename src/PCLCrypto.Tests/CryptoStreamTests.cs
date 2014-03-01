@@ -14,6 +14,15 @@
     public abstract class CryptoStreamTests
     {
         [TestMethod]
+        public void IncompatibleStreamDirection()
+        {
+            ExceptionAssert.Throws<ArgumentException>(
+                () => this.CreateCryptoStream(new ErraticReaderStream(Stream.Null), new MockCryptoTransform(5), CryptoStreamMode.Write));
+            ExceptionAssert.Throws<ArgumentException>(
+                () => this.CreateCryptoStream(new MockWriteOnlyStream(), new MockCryptoTransform(5), CryptoStreamMode.Read));
+        }
+
+        [TestMethod]
         public void Properties()
         {
             var stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Write);
@@ -246,6 +255,60 @@
                 // unless only 1 is requested, in which case return that many.
                 // Returning 0 means end of stream.
                 return this.underlyingStream.Read(buffer, offset, Math.Max(1, count - 1));
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private class MockWriteOnlyStream : Stream
+        {
+            public override bool CanRead
+            {
+                get { return false; }
+            }
+
+            public override bool CanSeek
+            {
+                get { return false; }
+            }
+
+            public override bool CanWrite
+            {
+                get { return true; }
+            }
+
+            public override long Length
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public override long Position
+            {
+                get { throw new NotImplementedException(); }
+                set { throw new NotImplementedException(); }
+            }
+
+            public override void Flush()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                throw new NotImplementedException();
             }
 
             public override long Seek(long offset, SeekOrigin origin)
