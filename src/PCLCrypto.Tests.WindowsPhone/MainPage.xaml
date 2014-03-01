@@ -30,18 +30,21 @@
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button x:Name="RunTestsButton" Content="Run Tests" Click="RunTestsButton_Click"/>
+            <StackPanel>
+                <Button x:Name="RunTestsButton" Content="Run Tests" Click="RunTestsButton_Click"/>
+                <ProgressBar Name="TestRunProgress" IsIndeterminate="True" Visibility="Collapsed" />
+                <TextBlock Visibility="Collapsed" HorizontalAlignment="Center" x:Name="TextSummaryText" Style="{StaticResource PhoneTextNormalStyle}" />
+            </StackPanel>
             <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
-                          Grid.Row="2">
+                          Grid.Row="1">
                 <TextBox x:Name="ResultsTextBox" IsReadOnly="True"
                     Grid.Row="2" AcceptsReturn="True"
                     VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"/>
             </ScrollViewer>
-            
+
         </Grid>
     </Grid>
- 
+
 </phone:PhoneApplicationPage>
