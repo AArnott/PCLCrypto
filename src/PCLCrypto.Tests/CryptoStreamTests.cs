@@ -199,7 +199,7 @@
         /// </summary>
         /// <remarks>
         /// Why would we use such a stream?
-        /// Well, a Stream.Read method may return n number of bytes 0 < n <= desiredCount
+        /// Well, a Stream.Read method may return n number of bytes 0 &lt; n &lt;= desiredCount
         /// Returning 0 bytes means the end of the stream has been reached.
         /// Returning less than the requested bytes could be due to reaching the end of the
         /// stream, but it may also be due to the underlying stream being a network stream
