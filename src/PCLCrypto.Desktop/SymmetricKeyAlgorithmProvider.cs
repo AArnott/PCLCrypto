@@ -80,8 +80,6 @@ namespace PCLCrypto
         /// <returns>
         /// The platform-specific algorithm.
         /// </returns>
-        /// <exception cref="System.NotSupportedException">
-        /// </exception>
         private static Platform.SymmetricAlgorithm GetAlgorithm(SymmetricAlgorithm algorithm)
         {
 #if SILVERLIGHT
