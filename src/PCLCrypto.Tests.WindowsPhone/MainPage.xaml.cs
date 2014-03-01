@@ -5,6 +5,7 @@
     using System.Globalization;
     using System.Linq;
     using System.Net;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Documents;
@@ -32,7 +33,7 @@
             try
             {
                 var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
-                await testRunner.RunTestsAsync();
+                await Task.Run(() => testRunner.RunTestsAsync());
                 this.TextSummaryText.Text = string.Format(
                     CultureInfo.CurrentCulture,
                     "{0}/{1} tests passed ({2}%)",
