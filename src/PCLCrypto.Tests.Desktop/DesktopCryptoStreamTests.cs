@@ -20,7 +20,7 @@
     {
         protected override Stream CreateCryptoStream(Stream target, PCLCrypto.ICryptoTransform transform, PCLCrypto.CryptoStreamMode mode)
         {
-            return new CryptoStream(target, new CryptoTransformAdapter(transform), ModeAdapter(mode));
+            return new CryptoStream(target, CryptoTransformAdapter.Adapt(transform), ModeAdapter(mode));
         }
 
         protected override void FlushFinalBlock(Stream stream)
@@ -45,10 +45,8 @@
         {
             private readonly PCLCrypto.ICryptoTransform transform;
 
-            internal CryptoTransformAdapter(PCLCrypto.ICryptoTransform transform)
+            private CryptoTransformAdapter(PCLCrypto.ICryptoTransform transform)
             {
-                Requires.NotNull(transform, "transform");
-
                 this.transform = transform;
             }
 
@@ -85,6 +83,11 @@
             public void Dispose()
             {
                 this.transform.Dispose();
+            }
+
+            internal static ICryptoTransform Adapt(PCLCrypto.ICryptoTransform transform)
+            {
+                return transform != null ? new CryptoTransformAdapter(transform) : null;
             }
         }
     }

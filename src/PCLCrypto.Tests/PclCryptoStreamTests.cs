@@ -12,6 +12,16 @@
     [TestClass]
     public class PclCryptoStreamTests : CryptoStreamTests
     {
+        [TestMethod]
+        public void Ctor_InvalidArgs()
+        {
+            // NetFx version throws NullReferenceException.
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => this.CreateCryptoStream(null, new MockCryptoTransform(5), CryptoStreamMode.Write));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => this.CreateCryptoStream(Stream.Null, null, CryptoStreamMode.Write));
+        }
+
         protected override Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode)
         {
             return new CryptoStream(target, transform, mode);

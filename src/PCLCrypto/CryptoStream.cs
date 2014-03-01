@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.IO;
     using System.Linq;
     using System.Text;
+    using Validation;
 
     /// <summary>
     /// Defines a stream that links data streams to cryptographic transformations.
@@ -30,6 +31,9 @@ namespace PCLCrypto
         /// <param name="mode">The mode of operation.</param>
         public CryptoStream(Stream stream, ICryptoTransform transform, CryptoStreamMode mode)
         {
+            Requires.NotNull(stream, "stream");
+            Requires.NotNull(transform, "transform");
+
             this.chainedStream = stream;
         }
 

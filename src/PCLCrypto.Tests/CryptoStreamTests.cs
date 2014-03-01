@@ -103,7 +103,7 @@
 
         protected abstract void FlushFinalBlock(Stream stream);
 
-        private class MockCryptoTransform : ICryptoTransform
+        protected class MockCryptoTransform : ICryptoTransform
         {
             internal MockCryptoTransform(int inputBlockSize)
             {
