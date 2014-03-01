@@ -38,7 +38,7 @@ namespace PCLCrypto
                 case AsymmetricAlgorithm.EcdsaP521Sha512:
                     return new CngAsymmetricKeyAlgorithmProvider(algorithm);
 #endif
-#if !SILVERLIGHT
+#if !SILVERLIGHT || WINDOWS_PHONE
                 case AsymmetricAlgorithm.RsaOaepSha1:
                 case AsymmetricAlgorithm.RsaOaepSha256:
                 case AsymmetricAlgorithm.RsaOaepSha384:
