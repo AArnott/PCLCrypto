@@ -25,12 +25,12 @@ namespace PCLCrypto
         /// Converts a WinRT buffer to a .NET buffer.
         /// </summary>
         /// <param name="buffer">The WinRT buffer.</param>
-        /// <returns>The .NET buffer.</returns>
+        /// <returns>The .NET buffer. Null if <paramref name="buffer"/> was null.</returns>
         public static byte[] ToArray(this IBuffer buffer)
         {
             if (buffer == null)
             {
-                throw new ArgumentNullException("buffer");
+                return null;
             }
 
             if (buffer.Length == 0)
@@ -47,10 +47,13 @@ namespace PCLCrypto
         /// Converts a .NET buffer to a WinRT buffer.
         /// </summary>
         /// <param name="array">The .NET buffer.</param>
-        /// <returns>The WinRT buffer.</returns>
+        /// <returns>The WinRT buffer. Null if <paramref name="array"/> was null.</returns>
         public static IBuffer ToBuffer(this byte[] array)
         {
-            Requires.NotNull(array, "array");
+            if (array == null)
+            {
+                return null;
+            }
 
             return Platform.CryptographicBuffer.CreateFromByteArray(array);
         }
