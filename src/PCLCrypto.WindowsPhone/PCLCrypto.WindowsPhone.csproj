@@ -59,15 +59,6 @@
     <Compile Include="..\PCLCrypto.Desktop\CryptographicEngine.cs">
       <Link>CryptographicEngine.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicHash.cs">
-      <Link>CryptographicHash.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicHashMac.cs">
-      <Link>CryptographicHashMac.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicHashPlain.cs">
-      <Link>CryptographicHashPlain.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\CryptographicKey.cs">
       <Link>CryptographicKey.cs</Link>
     </Compile>
@@ -101,6 +92,9 @@
     <Compile Include="..\PCLCrypto.Desktop\MacCryptographicKey.cs">
       <Link>MacCryptographicKey.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\NetFxCryptographicHash.cs">
+      <Link>NetFxCryptographicHash.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
       <Link>RandomNumberGenerator.cs</Link>
     </Compile>
@@ -121,6 +115,9 @@
     </Compile>
     <Compile Include="..\PCLCrypto.WinRT\HashAlgorithmProviderFactory.cs">
       <Link>HashAlgorithmProviderFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto\CryptoStream.cs">
+      <Link>CryptoStream.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto\NetFxCrypto.cs">
       <Link>NetFxCrypto.cs</Link>

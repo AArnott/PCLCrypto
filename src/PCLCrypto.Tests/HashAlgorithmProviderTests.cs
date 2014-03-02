@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
@@ -93,6 +94,19 @@
             hasher.Append(this.data);
             byte[] hash = hasher.GetValueAndReset();
             Assert.AreEqual(this.dataHashTwice, Convert.ToBase64String(hash));
+        }
+
+        [TestMethod]
+        public void HashByCryptoStream()
+        {
+            var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            var hasher = provider.CreateHash();
+            using (var stream = new PCLCrypto.CryptoStream(Stream.Null, hasher, CryptoStreamMode.Write))
+            {
+                stream.Write(this.data, 0, this.data.Length);
+            }
+
+            Assert.AreEqual(this.dataHash, Convert.ToBase64String(hasher.GetValueAndReset()));
         }
     }
 }

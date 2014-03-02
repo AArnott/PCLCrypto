@@ -33,7 +33,7 @@ namespace PCLCrypto
         /// Creates a reusable ICryptographicHash object.
         /// </summary>
         /// <returns>Reusable hash object.</returns>
-        ICryptographicHash CreateHash();
+        CryptographicHash CreateHash();
 
         /// <summary>
         /// Hashes binary data.

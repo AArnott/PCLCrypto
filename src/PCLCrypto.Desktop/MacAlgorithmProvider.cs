@@ -52,11 +52,13 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public ICryptographicHash CreateHash(byte[] keyMaterial)
+        public CryptographicHash CreateHash(byte[] keyMaterial)
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
 
-            return new CryptographicHashMac(this.Algorithm, keyMaterial);
+            var hash = GetAlgorithm(this.Algorithm);
+            hash.Key = keyMaterial;
+            return new NetFxCryptographicHash(hash);
         }
 
         /// <inheritdoc />

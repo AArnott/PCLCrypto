@@ -58,6 +58,9 @@
     <Compile Include="..\PCLCrypto.Tests\CryptographicEngineTests.cs">
       <Link>CryptographicEngineTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\CryptoStreamTests.cs">
+      <Link>CryptoStreamTests.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Tests\DeriveBytesTests.cs">
       <Link>DeriveBytesTests.cs</Link>
     </Compile>
@@ -69,6 +72,12 @@
     </Compile>
     <Compile Include="..\PCLCrypto.Tests\MacAlgorithmProviderTests.cs">
       <Link>MacAlgorithmProviderTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Tests\PclCryptoStreamTests.cs">
+      <Link>PclCryptoStreamTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Tests\PclTestUtilities.cs">
+      <Link>PclTestUtilities.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
       <Link>RandomNumberGeneratorTests.cs</Link>

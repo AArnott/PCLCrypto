@@ -43,8 +43,11 @@
     <Compile Include="CryptographicBufferTests.cs" />
     <Compile Include="CryptographicEngineTests.cs" />
     <Compile Include="DeriveBytesTests.cs" />
+    <Compile Include="CryptoStreamTests.cs" />
     <Compile Include="HashAlgorithmProviderTests.cs" />
     <Compile Include="KeyDerivationAlgorithmProviderTests.cs" />
+    <Compile Include="PclCryptoStreamTests.cs" />
+    <Compile Include="PclTestUtilities.cs" />
     <Compile Include="RandomNumberGeneratorTests.cs" />
     <Compile Include="MacAlgorithmProviderTests.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderTests.cs" />
@@ -70,6 +73,9 @@
     </Reference>
     <Reference Include="System.Threading.Tasks">
       <HintPath>..\packages\Microsoft.Bcl.1.1.6\lib\portable-net40+sl5+win8+wp8\System.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Validation">
+      <HintPath>..\packages\Validation.2.0.3.13323\lib\portable-windows8+net40+sl5+windowsphone8+MonoAndroid+MonoTouch\Validation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -51,6 +51,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net" />
+    <Reference Include="Validation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Validation.2.0.3.13323\lib\portable-windows8+net40+sl5+windowsphone8+MonoAndroid+MonoTouch\Validation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -65,6 +69,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +99,9 @@
     <Compile Include="..\PCLCrypto.Tests\CryptographicEngineTests.cs">
       <Link>CryptographicEngineTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\CryptoStreamTests.cs">
+      <Link>CryptoStreamTests.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Tests\DeriveBytesTests.cs">
       <Link>DeriveBytesTests.cs</Link>
     </Compile>
@@ -106,12 +114,16 @@
     <Compile Include="..\PCLCrypto.Tests\MacAlgorithmProviderTests.cs">
       <Link>MacAlgorithmProviderTests.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Tests\PclCryptoStreamTests.cs">
+      <Link>PclCryptoStreamTests.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
       <Link>RandomNumberGeneratorTests.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.Tests\SymmetricKeyAlgorithmProviderTests.cs">
       <Link>SymmetricKeyAlgorithmProviderTests.cs</Link>
     </Compile>
+    <Compile Include="DesktopCryptoStreamTests.cs" />
     <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
   </ItemGroup>
   <Choose>
