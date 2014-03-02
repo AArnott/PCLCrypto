@@ -191,16 +191,43 @@
             }
         }
 
+        [TestMethod]
+        public void CanTransformMultipleBlocksViaWrite()
+        {
+            var transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            var target = new MemoryStream();
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Write))
+            {
+                stream.Write(Encoding.UTF8.GetBytes("abcdefghij"), 0, 10);
+                stream.Write(Encoding.UTF8.GetBytes("klm"), 0, 3);
+                stream.Write(Encoding.UTF8.GetBytes("nop"), 0, 3);
+                stream.Write(Encoding.UTF8.GetBytes("qrstuvwxyz"), 0, 10);
+                this.FlushFinalBlock(stream);
+                Assert.AreEqual("-abcdefghij-klmno-pqrst-uvwxy_zZ", Encoding.UTF8.GetString(target.ToArray()));
+            }
+
+            transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            target = new MemoryStream();
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Write))
+            {
+                stream.Write(Encoding.UTF8.GetBytes("abc"), 0, 3);
+                stream.Write(Encoding.UTF8.GetBytes("defghijklmnop"), 0, 13);
+                this.FlushFinalBlock(stream);
+                Assert.AreEqual("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(target.ToArray()));
+            }
+        }
+
         protected abstract Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode);
 
         protected abstract void FlushFinalBlock(Stream stream);
 
         protected class MockCryptoTransform : ICryptoTransform
         {
-            internal MockCryptoTransform(int inputBlockSize)
+            internal MockCryptoTransform(int inputBlockSize, bool canTransformMultipleBlocks = false)
             {
                 this.InputBlockSize = inputBlockSize;
                 this.OutputBlockSize = inputBlockSize + 1;
+                this.CanTransformMultipleBlocks = canTransformMultipleBlocks;
             }
 
             public bool CanReuseTransform
@@ -208,10 +235,7 @@
                 get { throw new NotImplementedException(); }
             }
 
-            public bool CanTransformMultipleBlocks
-            {
-                get { return false; }
-            }
+            public bool CanTransformMultipleBlocks { get; private set; }
 
             public int InputBlockSize { get; private set; }
 
@@ -223,9 +247,18 @@
 
             public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
             {
+                if (this.CanTransformMultipleBlocks)
+                {
+                    Assert.IsTrue(inputCount % this.InputBlockSize == 0);
+                }
+                else
+                {
+                    Assert.IsTrue(inputCount == this.InputBlockSize);
+                }
+
                 outputBuffer[outputOffset] = (byte)'-';
                 Array.Copy(inputBuffer, inputOffset, outputBuffer, outputOffset + 1, inputCount);
-                return this.OutputBlockSize;
+                return inputCount + 1;
             }
 
             public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
