@@ -106,5 +106,17 @@ namespace PCLCrypto
                 return this.Rsa.VerifyData(data, hash, signature);
             }
         }
+
+        /// <inheritdoc />
+        protected internal override byte[] Encrypt(byte[] data, byte[] iv)
+        {
+            return this.Rsa.Encrypt(data, true);
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] Decrypt(byte[] data, byte[] iv)
+        {
+            return this.Rsa.Decrypt(data, true);
+        }
     }
 }
