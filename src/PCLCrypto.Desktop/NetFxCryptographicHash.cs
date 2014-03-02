@@ -87,6 +87,7 @@ namespace PCLCrypto
 
             byte[] hash = this.Algorithm.Hash;
             this.Algorithm.Initialize();
+            this.transformedFinalBlock = false;
             return hash;
         }
 
