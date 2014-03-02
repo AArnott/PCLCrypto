@@ -215,6 +215,15 @@
                 this.FlushFinalBlock(stream);
                 Assert.AreEqual("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(target.ToArray()));
             }
+
+            transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            target = new MemoryStream();
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Write))
+            {
+                stream.Write(Encoding.UTF8.GetBytes("abcdefghijk"), 0, 11);
+                this.FlushFinalBlock(stream);
+                Assert.AreEqual("-abcdefghij_kZ", Encoding.UTF8.GetString(target.ToArray()));
+            }
         }
 
         protected abstract Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode);

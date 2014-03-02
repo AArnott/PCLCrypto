@@ -260,6 +260,21 @@ namespace PCLCrypto
 
             while (count > 0)
             {
+                if (this.inputBufferSize == 0 && this.transform.CanTransformMultipleBlocks)
+                {
+                    int multiple = count / this.inputBuffer.Length;
+                    if (multiple > 1)
+                    {
+                        byte[] tempOutputBuffer = new byte[this.transform.OutputBlockSize * multiple];
+                        int inputBytesToTransform = multiple * this.transform.InputBlockSize;
+                        int transformedBytes = this.transform.TransformBlock(buffer, offset, inputBytesToTransform, tempOutputBuffer, 0);
+                        count -= inputBytesToTransform;
+                        offset += inputBytesToTransform;
+                        this.chainedStream.Write(tempOutputBuffer, 0, transformedBytes);
+                        Array.Clear(tempOutputBuffer, 0, tempOutputBuffer.Length);
+                    }
+                }
+
                 int copiedBytes = Math.Min(count, this.inputBuffer.Length - this.inputBufferSize);
                 Array.Copy(buffer, offset, this.inputBuffer, this.inputBufferSize, copiedBytes);
                 count -= copiedBytes;
