@@ -50,8 +50,6 @@
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="CryptographicEngine.cs" />
     <Compile Include="NetFxCryptographicHash.cs" />
-    <Compile Include="CryptographicHashMac.cs" />
-    <Compile Include="CryptographicHashPlain.cs" />
     <Compile Include="CryptographicKey.cs" />
     <Compile Include="CryptoUtilities.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />

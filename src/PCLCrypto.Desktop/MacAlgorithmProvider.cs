@@ -56,7 +56,9 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
 
-            return new CryptographicHashMac(this.Algorithm, keyMaterial);
+            var hash = GetAlgorithm(this.Algorithm);
+            hash.Key = keyMaterial;
+            return new NetFxCryptographicHash(hash);
         }
 
         /// <inheritdoc />

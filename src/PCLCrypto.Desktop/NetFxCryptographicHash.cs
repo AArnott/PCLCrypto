@@ -18,7 +18,7 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of the <see cref="CryptographicHash"/> interface.
     /// </summary>
-    internal abstract class NetFxCryptographicHash : CryptographicHash
+    internal class NetFxCryptographicHash : CryptographicHash
     {
         /// <summary>
         /// A zero-length byte array.
@@ -26,37 +26,58 @@ namespace PCLCrypto
         private static readonly byte[] EmptyBlock = new byte[0];
 
         /// <summary>
-        /// The stream that we write to for incremental hashing.
+        /// Initializes a new instance of the <see cref="NetFxCryptographicHash"/> class.
         /// </summary>
-        private Platform.CryptoStream stream;
+        /// <param name="algorithm">The algorithm.</param>
+        internal NetFxCryptographicHash(Platform.HashAlgorithm algorithm)
+        {
+            Requires.NotNull(algorithm, "algorithm");
+
+            this.Algorithm = algorithm;
+        }
 
         /// <summary>
-        /// The platform-specific hash algorithm.
+        /// Gets the platform-specific hash algorithm.
         /// </summary>
-        private Platform.HashAlgorithm algorithm;
+        protected Platform.HashAlgorithm Algorithm { get; private set; }
 
-        /// <summary>
-        /// A flag indicating whether this instance has been initialized.
-        /// </summary>
-        private bool initialized;
+        /// <inheritdoc />
+        protected override bool CanReuseTransform
+        {
+            get { return this.Algorithm.CanReuseTransform; }
+        }
+
+        /// <inheritdoc />
+        protected override bool CanTransformMultipleBlocks
+        {
+            get { return this.Algorithm.CanTransformMultipleBlocks; }
+        }
+
+        /// <inheritdoc />
+        protected override int InputBlockSize
+        {
+            get { return this.Algorithm.InputBlockSize; }
+        }
+
+        /// <inheritdoc />
+        protected override int OutputBlockSize
+        {
+            get { return this.Algorithm.OutputBlockSize; }
+        }
 
         /// <inheritdoc />
         public override void Append(byte[] data)
         {
-            this.Initialize();
-            this.stream.Write(data, 0, data.Length);
+            Requires.NotNull(data, "data");
+            this.TransformBlock(data, 0, data.Length, null, 0);
         }
 
         /// <inheritdoc />
         public override byte[] GetValueAndReset()
         {
-            this.Initialize();
-            this.stream.FlushFinalBlock();
-            byte[] hash = this.algorithm.Hash;
-
-            // Reset state on next invocation.
-            this.initialized = false;
-
+            this.TransformFinalBlock(EmptyBlock, 0, 0);
+            byte[] hash = this.Algorithm.Hash;
+            this.Algorithm.Initialize();
             return hash;
         }
 
@@ -66,64 +87,23 @@ namespace PCLCrypto
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            var disposable = this.algorithm as IDisposable;
+            var disposable = this.Algorithm as IDisposable;
             if (disposable != null)
             {
                 disposable.Dispose();
-                this.algorithm = null;
-            }
-
-            if (this.stream != null)
-            {
-                this.stream.Dispose();
-                this.stream = null;
             }
         }
 
-        /// <summary>
-        /// Creates the hash algorithm.
-        /// </summary>
-        /// <returns>The hash algorithm.</returns>
-        protected abstract Platform.HashAlgorithm CreateHashAlgorithm();
-
-        /// <summary>
-        /// Initializes for a new incremental hash.
-        /// </summary>
-        private void Initialize()
+        /// <inheritdoc />
+        protected override int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
-            if (!this.initialized)
-            {
-                if (this.algorithm != null)
-                {
-                    if (this.algorithm.CanReuseTransform)
-                    {
-                        this.algorithm.Initialize();
-                    }
-                    else
-                    {
-                        var disposable = this.algorithm as IDisposable;
-                        if (disposable != null)
-                        {
-                            disposable.Dispose();
-                        }
+            return this.Algorithm.TransformBlock(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset);
+        }
 
-                        this.algorithm = null;
-                    }
-                }
-
-                if (this.algorithm == null)
-                {
-                    this.algorithm = this.CreateHashAlgorithm();
-                }
-
-                if (this.stream != null)
-                {
-                    this.stream.Dispose();
-                }
-
-                this.stream = new Platform.CryptoStream(Stream.Null, this.algorithm, Platform.CryptoStreamMode.Write);
-                this.initialized = true;
-            }
+        /// <inheritdoc />
+        protected override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+        {
+            return this.Algorithm.TransformFinalBlock(inputBuffer, inputOffset, inputCount);
         }
     }
 }

@@ -35,6 +35,12 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        protected override bool CanReuseTransform
+        {
+            get { return true; }
+        }
+
+        /// <inheritdoc />
         public override void Append(byte[] data)
         {
             this.platform.Append(data.ToBuffer());
@@ -45,5 +51,39 @@ namespace PCLCrypto
         {
             return this.platform.GetValueAndReset().ToArray();
         }
+
+        #region ICryptoTransform methods
+
+        /// <inheritdoc />
+        protected override int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+        {
+            byte[] buffer;
+            if (inputOffset > 0 || inputCount < inputBuffer.Length)
+            {
+                buffer = new byte[inputCount];
+                Array.Copy(inputBuffer, inputOffset, buffer, 0, inputCount);
+            }
+            else
+            {
+                buffer = inputBuffer;
+            }
+
+            this.Append(buffer);
+            if (outputBuffer != null)
+            {
+                Array.Copy(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+            }
+
+            return inputCount;
+        }
+
+        /// <inheritdoc />
+        protected override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+        {
+            this.TransformBlock(inputBuffer, inputOffset, inputCount, null, 0);
+            return this.GetValueAndReset();
+        }
+
+        #endregion
     }
 }

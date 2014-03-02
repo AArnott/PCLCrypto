@@ -62,12 +62,6 @@
     <Compile Include="..\PCLCrypto.Desktop\CryptographicEngine.cs">
       <Link>CryptographicEngine.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicHashMac.cs">
-      <Link>CryptographicHashMac.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicHashPlain.cs">
-      <Link>CryptographicHashPlain.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\CryptographicKey.cs">
       <Link>CryptographicKey.cs</Link>
     </Compile>
