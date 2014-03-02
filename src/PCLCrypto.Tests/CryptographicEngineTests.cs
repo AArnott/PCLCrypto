@@ -24,6 +24,8 @@
             .OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7)
             .CreateSymmetricKey(Convert.FromBase64String("T1kMUiju2rHiRyhJKfo/Jg=="));
 
+        private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
+
         [TestMethod]
         public void Sign_NullInputs()
         {
@@ -121,12 +123,22 @@
         }
 
         [TestMethod]
-        public void EncryptAndDecrypt()
+        public void EncryptAndDecrypt_AES_NoIV()
         {
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, null);
             CollectionAssertEx.AreNotEqual(this.data, cipherText);
             Assert.AreEqual("oCSAA4sUCGa5ukwSJdeKWw==", Convert.ToBase64String(cipherText));
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, null);
+            CollectionAssertEx.AreEqual(this.data, plainText);
+        }
+
+        [TestMethod]
+        public void EncryptAndDecrypt_AES_IV()
+        {
+            byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, this.iv);
+            CollectionAssertEx.AreNotEqual(this.data, cipherText);
+            Assert.AreEqual("3ChRgsiJ0mXxJIEQS5Z4NA==", Convert.ToBase64String(cipherText));
+            byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, this.iv);
             CollectionAssertEx.AreEqual(this.data, plainText);
         }
     }
