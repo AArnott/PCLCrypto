@@ -226,6 +226,47 @@
             }
         }
 
+        [TestMethod]
+        public void CanTransformMultipleBlocksViaRead()
+        {
+            var transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            var target = new MemoryStream(Encoding.UTF8.GetBytes("abcdefghijklmnopqrstuvwxyz"));
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
+            {
+                var buffer = new byte[100];
+                Assert.AreEqual(12, stream.Read(buffer, 0, 12));
+                Assert.AreEqual("-abcdefghij-", Encoding.UTF8.GetString(buffer, 0, 12));
+                Assert.AreEqual(3, stream.Read(buffer, 12, 3));
+                Assert.AreEqual("klm", Encoding.UTF8.GetString(buffer, 12, 3));
+                Assert.AreEqual(4, stream.Read(buffer, 15, 4));
+                Assert.AreEqual("no-p", Encoding.UTF8.GetString(buffer, 15, 4));
+                Assert.AreEqual(13, stream.Read(buffer, 19, 13));
+                Assert.AreEqual("qrst-uvwxy_zZ", Encoding.UTF8.GetString(buffer, 19, 13));
+                Assert.AreEqual("-abcdefghij-klmno-pqrst-uvwxy_zZ", Encoding.UTF8.GetString(buffer, 0, 32));
+            }
+
+            transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            target = new MemoryStream(Encoding.UTF8.GetBytes("abcdefghijklmnop"));
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
+            {
+                var buffer = new byte[100];
+                Assert.AreEqual(4, stream.Read(buffer, 0, 4));
+                Assert.AreEqual("-abc", Encoding.UTF8.GetString(buffer, 0, 4));
+                Assert.AreEqual(16, stream.Read(buffer, 4, 16));
+                Assert.AreEqual("de-fghijklmno_pZ", Encoding.UTF8.GetString(buffer, 4, 16));
+                Assert.AreEqual("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(buffer, 0, 20));
+            }
+
+            transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            target = new MemoryStream(Encoding.UTF8.GetBytes("abcdefghijk"));
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
+            {
+                var buffer = new byte[100];
+                Assert.AreEqual(14, stream.Read(buffer, 0, 14));
+                Assert.AreEqual("-abcdefghij_kZ", Encoding.UTF8.GetString(buffer, 0, 14));
+            }
+        }
+
         protected abstract Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode);
 
         protected abstract void FlushFinalBlock(Stream stream);
