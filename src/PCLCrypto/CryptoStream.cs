@@ -64,6 +64,19 @@ namespace PCLCrypto
             Requires.NotNull(stream, "stream");
             Requires.NotNull(transform, "transform");
 
+            if (mode == CryptoStreamMode.Read)
+            {
+                Requires.Argument(stream.CanRead, "stream", "Stream is not readable.");
+            }
+            else if (mode == CryptoStreamMode.Write)
+            {
+                Requires.Argument(stream.CanWrite, "stream", "Stream is not writeable.");
+            }
+            else
+            {
+                Requires.That(false, "mode", "Unsupported mode.");
+            }
+
             this.chainedStream = stream;
             this.transform = transform;
             this.mode = mode;
