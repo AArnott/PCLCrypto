@@ -58,7 +58,7 @@ namespace PCLCrypto
         protected override int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
             byte[] buffer;
-            if (inputOffset > 0 || inputCount < inputBuffer.Length)
+            if (inputCount < inputBuffer.Length)
             {
                 buffer = new byte[inputCount];
                 Array.Copy(inputBuffer, inputOffset, buffer, 0, inputCount);
@@ -81,7 +81,16 @@ namespace PCLCrypto
         protected override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
         {
             this.TransformBlock(inputBuffer, inputOffset, inputCount, null, 0);
-            return this.GetValueAndReset();
+            if (inputCount == inputBuffer.Length)
+            {
+                return inputBuffer;
+            }
+            else
+            {
+                var buffer = new byte[inputCount];
+                Array.Copy(inputBuffer, inputOffset, buffer, 0, inputCount);
+                return buffer;
+            }
         }
 
         #endregion
