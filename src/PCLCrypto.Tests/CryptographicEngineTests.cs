@@ -12,11 +12,17 @@
     public class CryptographicEngineTests
     {
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
-        private readonly ICryptographicKey rsaKey =
-            WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1).CreateKeyPair(512);
+        private readonly ICryptographicKey rsaKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+            .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
+            .CreateKeyPair(512);
 
-        private readonly ICryptographicKey macKey =
-            WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1).CreateKey(new byte[] { 0x2, 0x4, 0x6 });
+        private readonly ICryptographicKey macKey = WinRTCrypto.MacAlgorithmProvider
+            .OpenAlgorithm(MacAlgorithm.HmacSha1)
+            .CreateKey(new byte[] { 0x2, 0x4, 0x6 });
+
+        private readonly ICryptographicKey aesKey = WinRTCrypto.SymmetricKeyAlgorithmProvider
+            .OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7)
+            .CreateSymmetricKey(Convert.FromBase64String("T1kMUiju2rHiRyhJKfo/Jg=="));
 
         [TestMethod]
         public void Sign_NullInputs()
@@ -94,6 +100,34 @@
             Array.Copy(this.data, tamperedData, this.data.Length);
             tamperedData[tamperedData.Length - 1] += 1;
             Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, tamperedData, signature));
+        }
+
+        [TestMethod]
+        public void Encrypt_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.Encrypt(null, this.data, null));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, null, null));
+        }
+
+        [TestMethod]
+        public void Decrypt_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.Decrypt(null, this.data, null));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, null, null));
+        }
+
+        [TestMethod]
+        public void EncryptAndDecrypt()
+        {
+            byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, null);
+            CollectionAssertEx.AreNotEqual(this.data, cipherText);
+            Assert.AreEqual("oCSAA4sUCGa5ukwSJdeKWw==", Convert.ToBase64String(cipherText));
+            byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, null);
+            CollectionAssertEx.AreEqual(this.data, plainText);
         }
     }
 }

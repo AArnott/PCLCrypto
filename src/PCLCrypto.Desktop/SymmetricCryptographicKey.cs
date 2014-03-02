@@ -17,7 +17,7 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of <see cref="ICryptographicKey"/> for use with symmetric algorithms.
     /// </summary>
-    internal class SymmetricCryptographicKey : ICryptographicKey, IDisposable
+    internal class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey, IDisposable
     {
         /// <summary>
         /// The platform's symmetric algorithm.

@@ -39,5 +39,27 @@ namespace PCLCrypto
         {
             throw new NotSupportedException();
         }
+
+        /// <summary>
+        /// Encrypts the specified data.
+        /// </summary>
+        /// <param name="data">The plaintext.</param>
+        /// <param name="iv">The initialization vector. Should be <c>null</c> for asymmetric algorithms.</param>
+        /// <returns>The ciphertext.</returns>
+        protected internal virtual byte[] Encrypt(byte[] data, byte[] iv)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Decrypts the specified data.
+        /// </summary>
+        /// <param name="data">The ciphertext.</param>
+        /// <param name="iv">The initialization vector. Should be <c>null</c> for asymmetric algorithms.</param>
+        /// <returns>The plaintext.</returns>
+        protected internal virtual byte[] Decrypt(byte[] data, byte[] iv)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

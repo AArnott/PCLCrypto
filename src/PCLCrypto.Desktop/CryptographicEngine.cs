@@ -22,13 +22,21 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Encrypt(ICryptographicKey key, byte[] data, byte[] iv)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(key, "key");
+            Requires.NotNull(data, "data");
+
+            var keyClass = (CryptographicKey)key;
+            return keyClass.Encrypt(data, iv);
         }
 
         /// <inheritdoc />
         public byte[] Decrypt(ICryptographicKey key, byte[] data, byte[] iv)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(key, "key");
+            Requires.NotNull(data, "data");
+
+            var keyClass = (CryptographicKey)key;
+            return keyClass.Decrypt(data, iv);
         }
 
         /// <inheritdoc />
