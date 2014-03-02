@@ -14,6 +14,7 @@
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
         private readonly ICryptographicKey rsaKey =
             WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1).CreateKeyPair(512);
+
         private readonly ICryptographicKey macKey =
             WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1).CreateKey(new byte[] { 0x2, 0x4, 0x6 });
 
