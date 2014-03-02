@@ -34,14 +34,24 @@ namespace PCLCrypto
         private readonly CryptoStreamMode mode;
 
         /// <summary>
-        /// The input buffer.
+        /// Data that has not yet been transformed.
         /// </summary>
         private readonly byte[] inputBuffer;
 
         /// <summary>
-        /// The output buffer.
+        /// Data that has been transformed but not flushed.
         /// </summary>
         private readonly byte[] outputBuffer;
+
+        /// <summary>
+        /// The number of valid bytes in <see cref="inputBuffer"/>.
+        /// </summary>
+        private int inputBufferSize;
+
+        /// <summary>
+        /// The number of valid bytes in <see cref="outputBuffer"/>.
+        /// </summary>
+        private int outputBufferSize;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CryptoStream"/> class.
@@ -109,8 +119,27 @@ namespace PCLCrypto
         /// </remarks>
         public void FlushFinalBlock()
         {
-            this.transform.TransformFinalBlock(new byte[0], 0, 0);
+            byte[] final = this.transform.TransformFinalBlock(this.inputBuffer, 0, this.inputBufferSize);
+            this.chainedStream.Write(final, 0, final.Length);
             this.HasFlushedFinalBlock = true;
+
+            // Propagate to the inner stream, as appropriate.
+            var inner = this.chainedStream as CryptoStream;
+            if (inner != null)
+            {
+                if (!inner.HasFlushedFinalBlock)
+                {
+                    inner.FlushFinalBlock();
+                }
+            }
+            else
+            {
+                this.chainedStream.Flush();
+            }
+
+            // Clear buffers since they may contain security sensitive data.
+            Array.Clear(this.inputBuffer, 0, this.inputBuffer.Length);
+            Array.Clear(this.outputBuffer, 0, this.outputBuffer.Length);
         }
 
         #region Stream methods
@@ -118,7 +147,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override void Flush()
         {
-            throw new NotImplementedException();
+            // Don't do anything here.
         }
 
         /// <inheritdoc />
@@ -142,7 +171,20 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException();
+            while (count > 0)
+            {
+                int copiedBytes = Math.Min(count, this.inputBuffer.Length - this.inputBufferSize);
+                Array.Copy(buffer, offset, this.inputBuffer, this.inputBufferSize, copiedBytes);
+                count -= copiedBytes;
+                offset += copiedBytes;
+                this.inputBufferSize += copiedBytes;
+                if (this.inputBufferSize == this.inputBuffer.Length)
+                {
+                    int transformedBytes = this.transform.TransformBlock(this.inputBuffer, 0, this.inputBuffer.Length, this.outputBuffer, 0);
+                    this.inputBufferSize = 0;
+                    this.chainedStream.Write(this.outputBuffer, 0, transformedBytes);
+                }
+            }
         }
 
         #endregion
