@@ -19,13 +19,13 @@
             Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));
         }
 
-        public static void AreNotEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        public static void AreNotEqual<T>(IEnumerable<T> notExpected, IEnumerable<T> actual)
         {
             // Although they are not expected to be equal, we expect them to be non-null.
             Assert.IsNotNull(actual);
-            Assert.IsNotNull(expected);
+            Assert.IsNotNull(notExpected);
 
-            Assert.IsFalse(Enumerable.SequenceEqual(expected, actual));
+            Assert.IsFalse(Enumerable.SequenceEqual(notExpected, actual));
         }
     }
 }
