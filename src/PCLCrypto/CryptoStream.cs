@@ -41,7 +41,7 @@ namespace PCLCrypto
         /// <summary>
         /// Data that has been transformed but not flushed.
         /// </summary>
-        private readonly byte[] outputBuffer;
+        private byte[] outputBuffer;
 
         /// <summary>
         /// The number of valid bytes in <see cref="inputBuffer"/>.
@@ -52,6 +52,12 @@ namespace PCLCrypto
         /// The number of valid bytes in <see cref="outputBuffer"/>.
         /// </summary>
         private int outputBufferSize;
+
+        /// <summary>
+        /// The index of the first valid byte in <see cref="outputBuffer"/>.
+        /// This advances when Read is called with a smaller buffer than we have bytes available.
+        /// </summary>
+        private int outputBufferIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CryptoStream"/> class.
@@ -171,7 +177,59 @@ namespace PCLCrypto
                 throw new NotSupportedException();
             }
 
-            throw new NotImplementedException();
+            int bytesCopied = 0;
+            while (count > 0 && (!this.HasFlushedFinalBlock || this.outputBufferSize > 0))
+            {
+                if (this.outputBufferSize > 0)
+                {
+                    int bytesToCopy = Math.Min(count, this.outputBufferSize);
+                    Array.Copy(this.outputBuffer, this.outputBufferIndex, buffer, offset, bytesToCopy);
+                    count -= bytesToCopy;
+                    offset += bytesToCopy;
+                    bytesCopied += bytesToCopy;
+                    this.outputBufferSize -= bytesToCopy;
+                    this.outputBufferIndex = this.outputBufferSize == 0
+                        ? 0
+                        : this.outputBufferIndex + bytesToCopy;
+                    continue;
+                }
+
+                // Only prepare to execute a transform if we have an empty output buffer.
+                if (this.outputBufferSize == 0 && !this.HasFlushedFinalBlock)
+                {
+                    // Try to fill our input buffer.
+                    int requestedBytes = this.inputBuffer.Length - this.inputBufferSize;
+                    if (requestedBytes > 0)
+                    {
+                        int bytesRead = this.chainedStream.Read(this.inputBuffer, this.inputBufferSize, requestedBytes);
+                        if (bytesRead == 0)
+                        {
+                            // When an attempt to read a stream results in zero bytes read,
+                            // it means we've reached the end of the stream.
+                            // Run the final transform and use its output as our final
+                            // output buffer.
+                            Array.Clear(this.outputBuffer, 0, this.outputBuffer.Length);
+                            this.outputBuffer = this.transform.TransformFinalBlock(this.inputBuffer, 0, this.inputBufferSize);
+                            this.inputBufferSize = 0;
+                            this.HasFlushedFinalBlock = true;
+                            this.outputBufferSize = this.outputBuffer.Length;
+                            Assumes.True(this.outputBufferIndex == 0);
+                            continue;
+                        }
+
+                        this.inputBufferSize += bytesRead;
+                    }
+
+                    // If we filled the input buffer, execute the transform.
+                    if (this.inputBufferSize == this.inputBuffer.Length)
+                    {
+                        this.outputBufferSize = this.transform.TransformBlock(this.inputBuffer, 0, this.inputBuffer.Length, this.outputBuffer, 0);
+                        this.inputBufferSize = 0;
+                    }
+                }
+            }
+
+            return bytesCopied;
         }
 
         /// <inheritdoc />

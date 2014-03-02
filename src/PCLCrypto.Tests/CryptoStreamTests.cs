@@ -137,8 +137,9 @@
                 Assert.AreEqual("-BCD", Encoding.UTF8.GetString(buffer, 0, 4));
                 Assert.AreEqual(5, stream.Read(buffer, 4, 5));
                 Assert.AreEqual("EF-GH", Encoding.UTF8.GetString(buffer, 4, 5));
-                Assert.AreEqual(11, stream.Read(buffer, 9, 11));
+                Assert.AreEqual(11, stream.Read(buffer, 9, 12));
                 Assert.AreEqual("JKL-MNOPQ_Z", Encoding.UTF8.GetString(buffer, 9, 11));
+                Assert.AreEqual(0, stream.Read(buffer, 0, 10)); // EOF
 
                 string expected = "-BCDEF-GHJKL-MNOPQ_Z";
                 Assert.AreEqual(expected, Encoding.UTF8.GetString(buffer, 0, expected.Length));
@@ -157,8 +158,9 @@
                 Assert.AreEqual("-BCD", Encoding.UTF8.GetString(buffer, 0, 4));
                 Assert.AreEqual(5, stream.Read(buffer, 4, 5));
                 Assert.AreEqual("EF-GH", Encoding.UTF8.GetString(buffer, 4, 5));
-                Assert.AreEqual(13, stream.Read(buffer, 9, 13));
+                Assert.AreEqual(13, stream.Read(buffer, 9, 14));
                 Assert.AreEqual("JKL-MNOPQ_RSZ", Encoding.UTF8.GetString(buffer, 9, 13));
+                Assert.AreEqual(0, stream.Read(buffer, 0, 10)); // EOF
 
                 string expected = "-BCDEF-GHJKL-MNOPQ_RSZ";
                 Assert.AreEqual(expected, Encoding.UTF8.GetString(buffer, 0, expected.Length));
