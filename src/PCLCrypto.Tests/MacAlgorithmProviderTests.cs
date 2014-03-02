@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
@@ -92,6 +93,19 @@
             byte[] mac = WinRTCrypto.CryptographicEngine.Sign(key, this.data);
             Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, mac));
             Assert.AreEqual(this.macBase64, Convert.ToBase64String(mac));
+        }
+
+        [TestMethod]
+        public void HashByCryptoStream()
+        {
+            var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var hasher = algorithm.CreateHash(this.keyMaterial);
+            using (var stream = new PCLCrypto.CryptoStream(Stream.Null, hasher, CryptoStreamMode.Write))
+            {
+                stream.Write(this.data, 0, this.data.Length);
+            }
+
+            Assert.AreEqual(this.macBase64, Convert.ToBase64String(hasher.GetValueAndReset()));
         }
     }
 }

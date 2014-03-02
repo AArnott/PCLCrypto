@@ -26,6 +26,11 @@ namespace PCLCrypto
         private static readonly byte[] EmptyBlock = new byte[0];
 
         /// <summary>
+        /// A value indicating whether <see cref="TransformFinalBlock"/> has been called.
+        /// </summary>
+        private bool transformedFinalBlock;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NetFxCryptographicHash"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
@@ -75,7 +80,11 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override byte[] GetValueAndReset()
         {
-            this.TransformFinalBlock(EmptyBlock, 0, 0);
+            if (!this.transformedFinalBlock)
+            {
+                this.TransformFinalBlock(EmptyBlock, 0, 0);
+            }
+
             byte[] hash = this.Algorithm.Hash;
             this.Algorithm.Initialize();
             return hash;
@@ -103,6 +112,8 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
         {
+            Verify.Operation(!this.transformedFinalBlock, "Already transformed the final block.");
+            this.transformedFinalBlock = true;
             return this.Algorithm.TransformFinalBlock(inputBuffer, inputOffset, inputCount);
         }
     }
