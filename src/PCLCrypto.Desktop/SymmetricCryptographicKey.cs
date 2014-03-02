@@ -61,5 +61,29 @@ namespace PCLCrypto
                 disposable.Dispose();
             }
         }
+
+        /// <inheritdoc />
+        protected internal override byte[] Encrypt(byte[] data, byte[] iv)
+        {
+            if (iv == null)
+            {
+                iv = new byte[this.algorithm.BlockSize / 8];
+            }
+
+            var encryptor = this.algorithm.CreateEncryptor(this.algorithm.Key, iv);
+            return encryptor.TransformFinalBlock(data, 0, data.Length);
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] Decrypt(byte[] data, byte[] iv)
+        {
+            if (iv == null)
+            {
+                iv = new byte[this.algorithm.BlockSize / 8];
+            }
+
+            var decryptor = this.algorithm.CreateDecryptor(this.algorithm.Key, iv);
+            return decryptor.TransformFinalBlock(data, 0, data.Length);
+        }
     }
 }
