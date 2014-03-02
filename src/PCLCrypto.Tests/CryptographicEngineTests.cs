@@ -11,9 +11,15 @@
     [TestClass]
     public class CryptographicEngineTests
     {
+        private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
+
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
-        private readonly ICryptographicKey rsaKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+        private readonly ICryptographicKey rsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
+            .CreateKeyPair(512);
+
+        private readonly ICryptographicKey rsaEncryptingKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+            .OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1)
             .CreateKeyPair(512);
 
         private readonly ICryptographicKey macKey = WinRTCrypto.MacAlgorithmProvider
@@ -22,7 +28,7 @@
 
         private readonly ICryptographicKey aesKey = WinRTCrypto.SymmetricKeyAlgorithmProvider
             .OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7)
-            .CreateSymmetricKey(Convert.FromBase64String("T1kMUiju2rHiRyhJKfo/Jg=="));
+            .CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
 
         private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
 
@@ -32,7 +38,7 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.Sign(null, this.data));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.Sign(this.rsaKey, null));
+                () => WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, null));
         }
 
         [TestMethod]
@@ -41,38 +47,38 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.VerifySignature(null, this.data, new byte[2]));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaKey, null, new byte[2]));
+                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, null, new byte[2]));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaKey, this.data, null));
+                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, null));
         }
 
         [TestMethod]
         public void SignAndVerifySignatureRsa()
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaKey, this.data);
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaKey, this.data, signature));
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
         }
 
         [TestMethod]
         public void SignatureAndVerifyTamperedSignatureRsa()
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaKey, this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
 
             // Tamper with the signature.
             signature[signature.Length - 1] += 1;
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaKey, this.data, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
         }
 
         [TestMethod]
         public void SignatureAndVerifyTamperedDataRsa()
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaKey, this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
 
             // Tamper with the data.
             byte[] tamperedData = new byte[this.data.Length];
             Array.Copy(this.data, tamperedData, this.data.Length);
             tamperedData[tamperedData.Length - 1] += 1;
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaKey, tamperedData, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, tamperedData, signature));
         }
 
         [TestMethod]
@@ -140,6 +146,19 @@
             Assert.AreEqual("3ChRgsiJ0mXxJIEQS5Z4NA==", Convert.ToBase64String(cipherText));
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, this.iv);
             CollectionAssertEx.AreEqual(this.data, plainText);
+        }
+
+        [TestMethod]
+        public void EncryptAndDecrypt_RSA()
+        {
+            byte[] keyMaterialBytes = Convert.FromBase64String(AesKeyMaterial);
+            byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(
+                this.rsaEncryptingKey, 
+                keyMaterialBytes,
+                null);
+            CollectionAssertEx.AreNotEqual(keyMaterialBytes, cipherText);
+            byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.rsaEncryptingKey, cipherText, null);
+            CollectionAssertEx.AreEqual(keyMaterialBytes, plainText);
         }
     }
 }
