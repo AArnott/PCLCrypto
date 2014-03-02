@@ -200,6 +200,37 @@ namespace PCLCrypto
                 // Only prepare to execute a transform if we have an empty output buffer.
                 if (this.outputBufferSize == 0 && !this.HasFlushedFinalBlock)
                 {
+                    if (this.inputBufferSize == 0 && this.transform.CanTransformMultipleBlocks)
+                    {
+                        int multiple = count / this.transform.OutputBlockSize;
+                        if (multiple > 1)
+                        {
+                            // The caller wants more than one block's worth of data.
+                            // Optimize for transforming multiple blocks at once.
+                            var tempInputBuffer = new byte[multiple * this.transform.InputBlockSize];
+                            int bytesRead = this.chainedStream.Read(tempInputBuffer, 0, tempInputBuffer.Length);
+                            int actualMultiple = bytesRead / this.transform.InputBlockSize;
+                            int actualMultipleInBytes = actualMultiple * this.transform.InputBlockSize;
+                            if (actualMultiple > 0)
+                            {
+                                var tempOutputBuffer = new byte[actualMultiple * this.transform.OutputBlockSize];
+                                int transformedBytes = this.transform.TransformBlock(tempInputBuffer, 0, actualMultipleInBytes, tempOutputBuffer, 0);
+                                Array.Copy(tempOutputBuffer, 0, buffer, offset, transformedBytes);
+                                offset += transformedBytes;
+                                count -= transformedBytes;
+                                bytesCopied += transformedBytes;
+                                Array.Clear(tempOutputBuffer, 0, tempOutputBuffer.Length);
+                            }
+
+                            // Save any straggling bytes from an incomplete block in the input buffer.
+                            int stragglingBytes = bytesRead - actualMultipleInBytes;
+                            Array.Copy(tempInputBuffer, actualMultipleInBytes, this.inputBuffer, 0, stragglingBytes);
+                            this.inputBufferSize += stragglingBytes;
+
+                            Array.Clear(tempInputBuffer, 0, tempInputBuffer.Length);
+                        }
+                    }
+
                     // Try to fill our input buffer.
                     int requestedBytes = this.inputBuffer.Length - this.inputBufferSize;
                     if (requestedBytes > 0)

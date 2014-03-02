@@ -265,6 +265,15 @@
                 Assert.AreEqual(14, stream.Read(buffer, 0, 14));
                 Assert.AreEqual("-abcdefghij_kZ", Encoding.UTF8.GetString(buffer, 0, 14));
             }
+
+            transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
+            target = new MemoryStream();
+            using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
+            {
+                var buffer = new byte[100];
+                Assert.AreEqual(2, stream.Read(buffer, 0, 12));
+                Assert.AreEqual("_Z", Encoding.UTF8.GetString(buffer, 0, 2));
+            }
         }
 
         protected abstract Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode);
