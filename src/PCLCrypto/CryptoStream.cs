@@ -172,6 +172,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
+            Requires.NotNull(buffer, "buffer");
+            Requires.Range(offset >= 0, "offset");
+            Requires.Range(count >= 0, "count");
             if (!this.CanRead)
             {
                 throw new NotSupportedException();
@@ -247,6 +250,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
+            Requires.NotNull(buffer, "buffer");
+            Requires.Range(offset >= 0, "offset");
+            Requires.Range(count >= 0, "count");
             if (!this.CanWrite)
             {
                 throw new NotSupportedException();

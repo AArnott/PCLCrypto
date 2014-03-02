@@ -96,6 +96,30 @@
         }
 
         [TestMethod]
+        public void Write_InvalidInputs()
+        {
+            using (var stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Write))
+            {
+                // .NET Framework version throws NRE for Read(null). We test it in PCL derived test class.
+                ////ExceptionAssert.Throws<ArgumentNullException>(() => stream.Write(null, 0, 0));
+                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Write(new byte[1], -1, 1));
+                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Write(new byte[1], 0, -1));
+            }
+        }
+
+        [TestMethod]
+        public void Read_InvalidInputs()
+        {
+            using (var stream = this.CreateCryptoStream(new MemoryStream(), new MockCryptoTransform(5), CryptoStreamMode.Read))
+            {
+                // .NET Framework version throws NRE for Read(null). We test it in PCL derived test class.
+                ////ExceptionAssert.Throws<ArgumentNullException>(() => stream.Read(null, 0, 0));
+                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Read(new byte[1], -1, 1));
+                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Read(new byte[1], 0, -1));
+            }
+        }
+
+        [TestMethod]
         public void CryptoStreamWithEmptyFinalBlockViaWrite()
         {
             var transform = new MockCryptoTransform(5);

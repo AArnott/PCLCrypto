@@ -24,6 +24,24 @@
                 () => this.CreateCryptoStream(Stream.Null, null, CryptoStreamMode.Write));
         }
 
+        [TestMethod]
+        public void Write_NullBuffer()
+        {
+            using (var stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Write))
+            {
+                ExceptionAssert.Throws<ArgumentNullException>(() => stream.Write(null, 0, 0));
+            }
+        }
+
+        [TestMethod]
+        public void Read_NullBuffer()
+        {
+            using (var stream = this.CreateCryptoStream(new MemoryStream(), new MockCryptoTransform(5), CryptoStreamMode.Read))
+            {
+                ExceptionAssert.Throws<ArgumentNullException>(() => stream.Read(null, 0, 0));
+            }
+        }
+
         protected override Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode)
         {
             return new CryptoStream(target, transform, mode);
