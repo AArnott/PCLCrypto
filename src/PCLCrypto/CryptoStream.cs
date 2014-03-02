@@ -153,6 +153,11 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
+            if (!this.CanRead)
+            {
+                throw new NotSupportedException();
+            }
+
             throw new NotImplementedException();
         }
 
@@ -171,6 +176,11 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
+            if (!this.CanWrite)
+            {
+                throw new NotSupportedException();
+            }
+
             while (count > 0)
             {
                 int copiedBytes = Math.Min(count, this.inputBuffer.Length - this.inputBufferSize);
