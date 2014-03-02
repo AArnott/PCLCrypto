@@ -16,10 +16,10 @@ namespace PCLCrypto
     using Platform = System.Security.Cryptography;
 
     /// <summary>
-    /// A .NET Framework implementation of <see cref="ICryptographicHash"/>
+    /// A .NET Framework implementation of <see cref="CryptographicHash"/>
     /// for use with plain hashing algorithms.
     /// </summary>
-    internal class CryptographicHashPlain : CryptographicHash
+    internal class CryptographicHashPlain : NetFxCryptographicHash
     {
         /// <summary>
         /// The algorithm enum.

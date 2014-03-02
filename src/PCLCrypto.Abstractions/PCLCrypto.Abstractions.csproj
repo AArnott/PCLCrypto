@@ -32,7 +32,7 @@
     <Compile Include="HashAlgorithm.cs" />
     <Compile Include="IAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="ICryptographicBuffer.cs" />
-    <Compile Include="ICryptographicHash.cs" />
+    <Compile Include="CryptographicHash.cs" />
     <Compile Include="ICryptoTransform.cs" />
     <Compile Include="IHashAlgorithmProvider.cs" />
     <Compile Include="IHashAlgorithmProviderFactory.cs" />

@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="CryptographicHash.cs" company="Andrew Arnott">
+// <copyright file="NetFxCryptographicHash.cs" company="Andrew Arnott">
 //     Copyright (c) Andrew Arnott. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -16,9 +16,9 @@ namespace PCLCrypto
     using Platform = System.Security.Cryptography;
 
     /// <summary>
-    /// A .NET Framework implementation of the <see cref="ICryptographicHash"/> interface.
+    /// A .NET Framework implementation of the <see cref="CryptographicHash"/> interface.
     /// </summary>
-    internal abstract class CryptographicHash : ICryptographicHash, IDisposable
+    internal abstract class NetFxCryptographicHash : CryptographicHash
     {
         /// <summary>
         /// A zero-length byte array.
@@ -41,14 +41,14 @@ namespace PCLCrypto
         private bool initialized;
 
         /// <inheritdoc />
-        public void Append(byte[] data)
+        public override void Append(byte[] data)
         {
             this.Initialize();
             this.stream.Write(data, 0, data.Length);
         }
 
         /// <inheritdoc />
-        public byte[] GetValueAndReset()
+        public override byte[] GetValueAndReset()
         {
             this.Initialize();
             this.stream.FlushFinalBlock();
@@ -61,19 +61,10 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             var disposable = this.algorithm as IDisposable;
             if (disposable != null)

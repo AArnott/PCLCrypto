@@ -52,10 +52,10 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public ICryptographicHash CreateHash(byte[] keyMaterial)
+        public CryptographicHash CreateHash(byte[] keyMaterial)
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
-            return new CryptographicHash(this.platform.CreateHash(keyMaterial.ToBuffer()));
+            return new WinRTCryptographicHash(this.platform.CreateHash(keyMaterial.ToBuffer()));
         }
 
         /// <inheritdoc />

@@ -52,7 +52,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public ICryptographicHash CreateHash(byte[] keyMaterial)
+        public CryptographicHash CreateHash(byte[] keyMaterial)
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
 

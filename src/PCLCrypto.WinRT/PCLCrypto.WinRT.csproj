@@ -59,7 +59,7 @@
     </Compile>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
-    <Compile Include="CryptographicHash.cs" />
+    <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="HashAlgorithmProviderFactory.cs" />
     <Compile Include="KeyDerivationAlgorithmProvider.cs" />

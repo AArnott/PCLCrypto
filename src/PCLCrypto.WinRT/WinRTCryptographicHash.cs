@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="CryptographicHash.cs" company="Andrew Arnott">
+// <copyright file="WinRTCryptographicHash.cs" company="Andrew Arnott">
 //     Copyright (c) Andrew Arnott. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -15,9 +15,9 @@ namespace PCLCrypto
     using Platform = Windows.Security.Cryptography;
 
     /// <summary>
-    /// The WinRT implementation of the <see cref="ICryptographicHash"/> interface.
+    /// The WinRT implementation of the <see cref="CryptographicHash"/> interface.
     /// </summary>
-    internal class CryptographicHash : ICryptographicHash
+    internal class WinRTCryptographicHash : CryptographicHash
     {
         /// <summary>
         /// The platform-specific hash object.
@@ -25,23 +25,23 @@ namespace PCLCrypto
         private readonly Platform.Core.CryptographicHash platform;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CryptographicHash"/> class.
+        /// Initializes a new instance of the <see cref="WinRTCryptographicHash"/> class.
         /// </summary>
         /// <param name="platformHash">The platform hash.</param>
-        internal CryptographicHash(Platform.Core.CryptographicHash platformHash)
+        internal WinRTCryptographicHash(Platform.Core.CryptographicHash platformHash)
         {
             Requires.NotNull(platformHash, "platformHash");
             this.platform = platformHash;
         }
 
         /// <inheritdoc />
-        public void Append(byte[] data)
+        public override void Append(byte[] data)
         {
             this.platform.Append(data.ToBuffer());
         }
 
         /// <inheritdoc />
-        public byte[] GetValueAndReset()
+        public override byte[] GetValueAndReset()
         {
             return this.platform.GetValueAndReset().ToArray();
         }

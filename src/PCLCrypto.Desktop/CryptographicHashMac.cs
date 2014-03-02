@@ -15,10 +15,10 @@ namespace PCLCrypto
     using Platform = System.Security.Cryptography;
 
     /// <summary>
-    /// A .NET Framework implementation of <see cref="ICryptographicHash"/>
+    /// A .NET Framework implementation of <see cref="CryptographicHash"/>
     /// for use with MAC algorithms.
     /// </summary>
-    internal class CryptographicHashMac : CryptographicHash
+    internal class CryptographicHashMac : NetFxCryptographicHash
     {
         /// <summary>
         /// The algorithm enum.

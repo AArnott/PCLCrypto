@@ -56,7 +56,7 @@
         public void CreateHash()
         {
             var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
-            ICryptographicHash hasher = algorithm.CreateHash(this.keyMaterial);
+            CryptographicHash hasher = algorithm.CreateHash(this.keyMaterial);
             Assert.IsNotNull(hasher);
             hasher.Append(this.data);
             byte[] mac = hasher.GetValueAndReset();

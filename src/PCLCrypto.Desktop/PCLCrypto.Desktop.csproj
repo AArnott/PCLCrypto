@@ -49,7 +49,7 @@
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="CryptographicEngine.cs" />
-    <Compile Include="CryptographicHash.cs" />
+    <Compile Include="NetFxCryptographicHash.cs" />
     <Compile Include="CryptographicHashMac.cs" />
     <Compile Include="CryptographicHashPlain.cs" />
     <Compile Include="CryptographicKey.cs" />

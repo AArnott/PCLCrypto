@@ -52,9 +52,9 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public ICryptographicHash CreateHash()
+        public CryptographicHash CreateHash()
         {
-            return new CryptographicHash(this.platform.CreateHash());
+            return new WinRTCryptographicHash(this.platform.CreateHash());
         }
 
         /// <inheritdoc />

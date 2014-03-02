@@ -51,7 +51,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public ICryptographicHash CreateHash()
+        public CryptographicHash CreateHash()
         {
             return new CryptographicHashPlain(this.Algorithm);
         }

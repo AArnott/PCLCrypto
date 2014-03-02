@@ -40,7 +40,7 @@ namespace PCLCrypto
         /// <returns>
         /// A CryptographicHash object that supports incremental hash operations.
         /// </returns>
-        ICryptographicHash CreateHash(byte[] keyMaterial);
+        CryptographicHash CreateHash(byte[] keyMaterial);
 
         /// <summary>
         /// Creates a symmetric key that can be used to create the MAC value.
