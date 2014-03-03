@@ -1,0 +1,3 @@
+[submodule "PCLTesting"]
+	path = PCLTesting
+	url = git@github.com:AArnott/pcltesting.git

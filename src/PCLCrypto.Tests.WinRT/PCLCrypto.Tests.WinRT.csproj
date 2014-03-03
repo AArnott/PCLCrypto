@@ -126,8 +126,9 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.165\lib\win8\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting">
-      <HintPath>..\packages\PCLTesting.0.1.1\lib\win8\PCLTesting.dll</HintPath>
+    <Reference Include="PCLTesting, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PCLTesting.0.1.2\lib\win8\PCLTesting.dll</HintPath>
     </Reference>
     <Reference Include="Validation">
       <HintPath>..\packages\Validation.2.0.3.13323\lib\portable-windows8+net40+sl5+windowsphone8+MonoAndroid+MonoTouch\Validation.dll</HintPath>
