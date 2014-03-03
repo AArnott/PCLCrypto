@@ -115,32 +115,48 @@ namespace PCLCrypto
         /// <returns>A non-empty string.</returns>
         internal static string GetHashAlgorithmOID(AsymmetricAlgorithm algorithm)
         {
+            string algorithmName;
             switch (algorithm)
             {
                 case AsymmetricAlgorithm.DsaSha1:
                 case AsymmetricAlgorithm.RsaOaepSha1:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
                 case AsymmetricAlgorithm.RsaSignPssSha1:
-                    return "SHA1"; // Platform.CryptoConfig.MapNameToOID("SHA1");
+                    algorithmName = "SHA1";
+                    break;
                 case AsymmetricAlgorithm.DsaSha256:
                 case AsymmetricAlgorithm.RsaOaepSha256:
                 case AsymmetricAlgorithm.EcdsaP256Sha256:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
                 case AsymmetricAlgorithm.RsaSignPssSha256:
-                    return "SHA256"; // Platform.CryptoConfig.MapNameToOID("SHA256");
+                    algorithmName = "SHA256";
+                    break;
                 case AsymmetricAlgorithm.EcdsaP384Sha384:
                 case AsymmetricAlgorithm.RsaOaepSha384:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
                 case AsymmetricAlgorithm.RsaSignPssSha384:
-                    return "SHA384"; // Platform.CryptoConfig.MapNameToOID("SHA384");
+                    algorithmName = "SHA384";
+                    break;
                 case AsymmetricAlgorithm.EcdsaP521Sha512:
                 case AsymmetricAlgorithm.RsaOaepSha512:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
                 case AsymmetricAlgorithm.RsaSignPssSha512:
-                    return "SHA512"; // Platform.CryptoConfig.MapNameToOID("SHA512");
+                    algorithmName = "SHA512";
+                    break;
                 default:
                     throw new NotSupportedException();
             }
+
+#if SILVERLIGHT
+            // Windows Phone 8.0 and Silverlight both are missing the
+            // CryptoConfig type. But that's ok since both platforms
+            // accept the algorithm name directly as well as the OID
+            // which we can't easily get to.
+            return algorithmName;
+#else
+            // Mono requires the OID, so we get it when we can.
+            return Platform.CryptoConfig.MapNameToOID(algorithmName);
+#endif
         }
 
         /// <summary>
