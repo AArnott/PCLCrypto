@@ -131,6 +131,44 @@ namespace PCLCrypto
         #endregion
 
         /// <summary>
+        /// Creates a CryptoStream chain of transforms.
+        /// </summary>
+        /// <param name="stream">The ultimate stream to be read from or written to.</param>
+        /// <param name="cryptoStreamMode">Whether to prepare for read or write operations to trigger the operations.</param>
+        /// <param name="transforms">The transforms to apply.</param>
+        /// <returns>The start of the chain of CryptoStreams.</returns>
+        public static CryptoStream Chain(Stream stream, CryptoStreamMode cryptoStreamMode, params ICryptoTransform[] transforms)
+        {
+            Requires.NotNull(stream, "stream");
+            Requires.NotNullOrEmpty(transforms, "transforms");
+
+            if (cryptoStreamMode == CryptoStreamMode.Write)
+            {
+                // Arrange the transforming streams in this fashion:
+                // T1 -> T2 -> stream
+                // Which means we need recursion to define:
+                // CS1(CS2(stream))
+                using (IEnumerator<ICryptoTransform> transformsEnumerator = transforms.Cast<ICryptoTransform>().GetEnumerator())
+                {
+                    return (CryptoStream)ChainWrite(stream, transformsEnumerator);
+                }
+            }
+            else
+            {
+                // Arrange the transforming streams in this fashion:
+                // stream -> T1 -> T2
+                // Which means we need iteration to define:
+                // CS2(CS1(stream))
+                foreach (var transform in transforms)
+                {
+                    stream = new CryptoStream(stream, transform, CryptoStreamMode.Read);
+                }
+
+                return (CryptoStream)stream;
+            }
+        }
+
+        /// <summary>
         /// Updates the underlying data source or repository with the current state of the buffer, then clears the buffer.
         /// </summary>
         /// <remarks>
@@ -344,6 +382,31 @@ namespace PCLCrypto
             finally
             {
                 base.Dispose(disposing);
+            }
+        }
+
+        /// <summary>
+        /// Creates a CryptoStream chain of transforms for writing streams.
+        /// </summary>
+        /// <param name="stream">The ultimate stream to be read from or written to.</param>
+        /// <param name="transforms">An enumerator positioned just before the transform to create for the outer-most stream.</param>
+        /// <returns>
+        /// The start of the chain of CryptoStreams.
+        /// </returns>
+        private static Stream ChainWrite(Stream stream, IEnumerator<ICryptoTransform> transforms)
+        {
+            Requires.NotNull(stream, "stream");
+            Requires.NotNull(transforms, "transforms");
+
+            // Creating a chain of streams is a fun business. We use recursion to keep things sane.
+            if (transforms.MoveNext())
+            {
+                var transform = transforms.Current;
+                return new CryptoStream(ChainWrite(stream, transforms), transform, CryptoStreamMode.Write);
+            }
+            else
+            {
+                return stream;
             }
         }
     }

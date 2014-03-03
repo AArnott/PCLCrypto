@@ -42,6 +42,45 @@
             }
         }
 
+        [TestMethod]
+        public void Chain_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => CryptoStream.Chain(null, CryptoStreamMode.Write, new MockCryptoTransform(5)));
+            ExceptionAssert.Throws<ArgumentException>(
+                () => CryptoStream.Chain(Stream.Null, CryptoStreamMode.Write));
+            ExceptionAssert.Throws<ArgumentException>(
+                () => CryptoStream.Chain(Stream.Null, CryptoStreamMode.Write, null));
+        }
+
+        [TestMethod]
+        public void Chain_Write()
+        {
+            var t1 = new MockCryptoTransform(6);
+            var t2 = new MockCryptoTransform(9);
+            var ms = new MemoryStream();
+            using (var cryptoStream = CryptoStream.Chain(ms, CryptoStreamMode.Write, t1, t2))
+            {
+                cryptoStream.Write(Encoding.UTF8.GetBytes("abcdefghijkl"), 0, 12);
+            }
+
+            Assert.AreEqual("--abcdef-g_hijkl_ZZ", Encoding.UTF8.GetString(ms.ToArray()));
+        }
+
+        [TestMethod]
+        public void Chain_Read()
+        {
+            var t1 = new MockCryptoTransform(6);
+            var t2 = new MockCryptoTransform(9);
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes("abcdefghijkl"));
+            using (var cryptoStream = CryptoStream.Chain(ms, CryptoStreamMode.Read, t1, t2))
+            {
+                var buffer = new byte[100];
+                int bytesRead = cryptoStream.Read(buffer, 0, 100);
+                Assert.AreEqual("--abcdef-g_hijkl_ZZ", Encoding.UTF8.GetString(buffer, 0, bytesRead));
+            }
+        }
+
         protected override Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode)
         {
             return new CryptoStream(target, transform, mode);
