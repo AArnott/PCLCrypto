@@ -1,6 +1,7 @@
 ﻿namespace PCLCrypto.Test.Android
 {
     using System;
+    using System.Globalization;
     using global::Android.App;
     using global::Android.Content;
     using global::Android.OS;
@@ -18,6 +19,8 @@
 
         private TextView resultsTextView;
 
+        private TextView summaryTextView;
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -31,6 +34,7 @@
             this.runTestsButton.Click += this.RunTestsButton_Click;
 
             this.resultsTextView = this.FindViewById<TextView>(Resource.Id.ResultsTextView);
+            this.summaryTextView = this.FindViewById<TextView>(Resource.Id.summaryTextView);
         }
 
         private async void RunTestsButton_Click(object sender, EventArgs e)
@@ -41,6 +45,12 @@
             {
                 var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
                 await testRunner.RunTestsAsync();
+                this.summaryTextView.Text = string.Format(
+                    CultureInfo.CurrentCulture,
+                    "{0}/{1} tests passed ({2}%)",
+                    testRunner.PassCount,
+                    testRunner.TestCount,
+                    100 * testRunner.PassCount / testRunner.TestCount);
                 this.resultsTextView.Text = testRunner.Log;
             }
             catch (Exception ex)

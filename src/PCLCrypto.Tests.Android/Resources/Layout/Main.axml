@@ -9,9 +9,23 @@
         android:layout_height="wrap_content"
         android:text="Run Tests" />
     <TextView
-        android:text=""
+        android:text="Test summary"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/ResultsTextView" />
+        android:layout_height="wrap_content"
+        android:id="@+id/summaryTextView" />
+    <ScrollView
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView1"
+        android:layout_weight="1">
+        <TextView
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/ResultsTextView" />
+    </ScrollView>
 </LinearLayout>
