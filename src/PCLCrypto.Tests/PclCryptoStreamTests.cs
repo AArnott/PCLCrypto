@@ -43,23 +43,34 @@
         }
 
         [TestMethod]
-        public void Chain_InvalidInputs()
+        public void WriteTo_InvalidInputs()
         {
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => CryptoStream.Chain(null, CryptoStreamMode.Write, new MockCryptoTransform(5)));
+                () => CryptoStream.WriteTo(null, new MockCryptoTransform(5)));
             ExceptionAssert.Throws<ArgumentException>(
-                () => CryptoStream.Chain(Stream.Null, CryptoStreamMode.Write));
+                () => CryptoStream.WriteTo(Stream.Null));
             ExceptionAssert.Throws<ArgumentException>(
-                () => CryptoStream.Chain(Stream.Null, CryptoStreamMode.Write, null));
+                () => CryptoStream.WriteTo(Stream.Null, null));
         }
 
         [TestMethod]
-        public void Chain_Write()
+        public void ReadFrom_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => CryptoStream.ReadFrom(null, new MockCryptoTransform(5)));
+            ExceptionAssert.Throws<ArgumentException>(
+                () => CryptoStream.ReadFrom(Stream.Null));
+            ExceptionAssert.Throws<ArgumentException>(
+                () => CryptoStream.ReadFrom(Stream.Null, null));
+        }
+
+        [TestMethod]
+        public void WriteTo()
         {
             var t1 = new MockCryptoTransform(6);
             var t2 = new MockCryptoTransform(9);
             var ms = new MemoryStream();
-            using (var cryptoStream = CryptoStream.Chain(ms, CryptoStreamMode.Write, t1, t2))
+            using (var cryptoStream = CryptoStream.WriteTo(ms, t1, t2))
             {
                 cryptoStream.Write(Encoding.UTF8.GetBytes("abcdefghijkl"), 0, 12);
             }
@@ -68,12 +79,12 @@
         }
 
         [TestMethod]
-        public void Chain_Read()
+        public void ReadFrom()
         {
             var t1 = new MockCryptoTransform(6);
             var t2 = new MockCryptoTransform(9);
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("abcdefghijkl"));
-            using (var cryptoStream = CryptoStream.Chain(ms, CryptoStreamMode.Read, t1, t2))
+            using (var cryptoStream = CryptoStream.ReadFrom(ms, t1, t2))
             {
                 var buffer = new byte[100];
                 int bytesRead = cryptoStream.Read(buffer, 0, 100);

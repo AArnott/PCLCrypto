@@ -131,41 +131,28 @@ namespace PCLCrypto
         #endregion
 
         /// <summary>
-        /// Creates a CryptoStream chain of transforms.
+        /// Creates a CryptoStream that can be used to write to the specified stream
+        /// after passing through a series of transforms.
         /// </summary>
-        /// <param name="stream">The ultimate stream to be read from or written to.</param>
-        /// <param name="cryptoStreamMode">Whether to prepare for read or write operations to trigger the operations.</param>
-        /// <param name="transforms">The transforms to apply.</param>
-        /// <returns>The start of the chain of CryptoStreams.</returns>
-        public static CryptoStream Chain(Stream stream, CryptoStreamMode cryptoStreamMode, params ICryptoTransform[] transforms)
+        /// <param name="stream">The ultimate stream to be written to.</param>
+        /// <param name="transforms">The transformations to apply to the data before writing to <paramref name="stream"/>.</param>
+        /// <returns>A CryptoStream instance.</returns>
+        public static CryptoStream WriteTo(Stream stream, params ICryptoTransform[] transforms)
         {
-            Requires.NotNull(stream, "stream");
-            Requires.NotNullOrEmpty(transforms, "transforms");
+            return Chain(stream, CryptoStreamMode.Write, transforms);
+        }
 
-            if (cryptoStreamMode == CryptoStreamMode.Write)
-            {
-                // Arrange the transforming streams in this fashion:
-                // T1 -> T2 -> stream
-                // Which means we need recursion to define:
-                // CS1(CS2(stream))
-                using (IEnumerator<ICryptoTransform> transformsEnumerator = transforms.Cast<ICryptoTransform>().GetEnumerator())
-                {
-                    return (CryptoStream)ChainWrite(stream, transformsEnumerator);
-                }
-            }
-            else
-            {
-                // Arrange the transforming streams in this fashion:
-                // stream -> T1 -> T2
-                // Which means we need iteration to define:
-                // CS2(CS1(stream))
-                foreach (var transform in transforms)
-                {
-                    stream = new CryptoStream(stream, transform, CryptoStreamMode.Read);
-                }
-
-                return (CryptoStream)stream;
-            }
+        /// <summary>
+        /// Creates a CryptoStream that can be used to read from the specified stream,
+        /// passing the retrieved data through a series of transforms before being read
+        /// from this stream.
+        /// </summary>
+        /// <param name="stream">The ultimate stream to be read from.</param>
+        /// <param name="transforms">The transformations to apply to the data after reading from <paramref name="stream"/>.</param>
+        /// <returns>A CryptoStream instance.</returns>
+        public static CryptoStream ReadFrom(Stream stream, params ICryptoTransform[] transforms)
+        {
+            return Chain(stream, CryptoStreamMode.Read, transforms);
         }
 
         /// <summary>
@@ -382,6 +369,44 @@ namespace PCLCrypto
             finally
             {
                 base.Dispose(disposing);
+            }
+        }
+
+        /// <summary>
+        /// Creates a CryptoStream chain of transforms.
+        /// </summary>
+        /// <param name="stream">The ultimate stream to be read from or written to.</param>
+        /// <param name="cryptoStreamMode">Whether to prepare for read or write operations to trigger the operations.</param>
+        /// <param name="transforms">The transforms to apply.</param>
+        /// <returns>The start of the chain of CryptoStreams.</returns>
+        private static CryptoStream Chain(Stream stream, CryptoStreamMode cryptoStreamMode, params ICryptoTransform[] transforms)
+        {
+            Requires.NotNull(stream, "stream");
+            Requires.NotNullOrEmpty(transforms, "transforms");
+
+            if (cryptoStreamMode == CryptoStreamMode.Write)
+            {
+                // Arrange the transforming streams in this fashion:
+                // T1 -> T2 -> stream
+                // Which means we need recursion to define:
+                // CS1(CS2(stream))
+                using (IEnumerator<ICryptoTransform> transformsEnumerator = transforms.Cast<ICryptoTransform>().GetEnumerator())
+                {
+                    return (CryptoStream)ChainWrite(stream, transformsEnumerator);
+                }
+            }
+            else
+            {
+                // Arrange the transforming streams in this fashion:
+                // stream -> T1 -> T2
+                // Which means we need iteration to define:
+                // CS2(CS1(stream))
+                foreach (var transform in transforms)
+                {
+                    stream = new CryptoStream(stream, transform, CryptoStreamMode.Read);
+                }
+
+                return (CryptoStream)stream;
             }
         }
 
