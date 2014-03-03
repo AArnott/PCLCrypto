@@ -14,7 +14,11 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="RunTestsButton" Content="Run Tests" Click="RunTestsButton_Click"/>
+        <StackPanel>
+            <Button x:Name="RunTestsButton" Content="Run Tests" Click="RunTestsButton_Click"/>
+            <ProgressBar Name="TestRunProgress" IsIndeterminate="True" Visibility="Collapsed" />
+            <TextBlock Visibility="Collapsed" HorizontalAlignment="Center" x:Name="TextSummaryText" />
+        </StackPanel>
         <TextBox x:Name="ResultsTextBox"
             Grid.Row="1" Grid.ColumnSpan="2" AcceptsReturn="True"
             VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"/>
