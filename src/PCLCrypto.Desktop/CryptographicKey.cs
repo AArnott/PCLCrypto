@@ -41,6 +41,29 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Signs data with this key.
+        /// </summary>
+        /// <param name="data">The hash of the data.</param>
+        /// <returns>The signature.</returns>
+        protected internal virtual byte[] SignHash(byte[] data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Verifies the signature of a hash of data with this key.
+        /// </summary>
+        /// <param name="data">The hash of the data.</param>
+        /// <param name="signature">The signature.</param>
+        /// <returns>
+        /// <c>true</c> if the signature is valid.
+        /// </returns>
+        protected internal virtual bool VerifyHash(byte[] data, byte[] signature)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
         /// Encrypts the specified data.
         /// </summary>
         /// <param name="data">The plaintext.</param>

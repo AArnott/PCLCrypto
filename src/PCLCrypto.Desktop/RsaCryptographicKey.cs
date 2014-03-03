@@ -108,6 +108,25 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        protected internal override byte[] SignHash(byte[] data)
+        {
+            return this.Rsa.SignHash(data, CryptographicEngine.GetHashAlgorithmOID(this.Algorithm));
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifyHash(byte[] data, byte[] signature)
+        {
+            try
+            {
+                return this.Rsa.VerifyHash(data, CryptographicEngine.GetHashAlgorithmOID(this.Algorithm), signature);
+            }
+            catch (CryptographicException)
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
             return this.Rsa.Encrypt(data, true);
