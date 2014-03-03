@@ -9,7 +9,13 @@
 		<licenseUrl>https://github.com/AArnott/PCLCrypto/blob/master/LICENSE</licenseUrl>
 		<projectUrl>https://github.com/AArnott/PCLCrypto</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>PCL Crypto provides a consistent, portable set of crypto APIs for .NET, Windows Phone, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.  This makes it easier to create cross-platform .NET libraries and apps.</description>
+		<description>
+			PCL Crypto provides a consistent, portable set of crypto APIs for
+			.NET, Windows Phone, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.
+			This makes it easier to create cross-platform .NET libraries and apps.
+			Crypto functionality includes asymmetric and symmetric encryption and signatures, 
+			and key derivation.
+		</description>
 		<summary>PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
 		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
 		<dependencies>
