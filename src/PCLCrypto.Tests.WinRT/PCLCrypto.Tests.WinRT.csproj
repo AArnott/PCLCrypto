@@ -76,9 +76,6 @@
     <Compile Include="..\PCLCrypto.Tests\PclCryptoStreamTests.cs">
       <Link>PclCryptoStreamTests.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Tests\PclTestUtilities.cs">
-      <Link>PclTestUtilities.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Tests\RandomNumberGeneratorTests.cs">
       <Link>RandomNumberGeneratorTests.cs</Link>
     </Compile>

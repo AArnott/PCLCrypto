@@ -57,28 +57,41 @@
         {
             byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
             Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, PclTestUtilities.Tamper(this.data), signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, PclTestUtilities.Tamper(signature)));
         }
 
         [TestMethod]
-        public void SignatureAndVerifyTamperedSignatureRsa()
+        public void SignHashedData_InvalidInputs()
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
-
-            // Tamper with the signature.
-            signature[signature.Length - 1] += 1;
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.SignHashedData(null, this.data));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSigningKey, null));
         }
 
         [TestMethod]
-        public void SignatureAndVerifyTamperedDataRsa()
+        public void VerifySignatureWithHashInput_InvalidInputs()
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
+            var signature = new byte[23];
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(null, this.data, signature));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, null, signature));
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, this.data, null));
+        }
 
-            // Tamper with the data.
-            byte[] tamperedData = new byte[this.data.Length];
-            Array.Copy(this.data, tamperedData, this.data.Length);
-            tamperedData[tamperedData.Length - 1] += 1;
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, tamperedData, signature));
+        [TestMethod]
+        public void SignHashedData_VerifySignatureWithHashInput()
+        {
+            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
+                .HashData(this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSigningKey, hash);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, hash, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, hash, PclTestUtilities.Tamper(signature)));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, PclTestUtilities.Tamper(this.data), signature));
         }
 
         [TestMethod]
@@ -86,28 +99,8 @@
         {
             byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.macKey, this.data);
             Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, signature));
-        }
-
-        [TestMethod]
-        public void SignatureAndVerifyTamperedSignatureMac()
-        {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.macKey, this.data);
-
-            // Tamper with the signature.
-            signature[signature.Length - 1] += 1;
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, signature));
-        }
-
-        [TestMethod]
-        public void SignatureAndVerifyTamperedDataMac()
-        {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.macKey, this.data);
-
-            // Tamper with the data.
-            byte[] tamperedData = new byte[this.data.Length];
-            Array.Copy(this.data, tamperedData, this.data.Length);
-            tamperedData[tamperedData.Length - 1] += 1;
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, tamperedData, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, PclTestUtilities.Tamper(this.data), signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, PclTestUtilities.Tamper(signature)));
         }
 
         [TestMethod]
@@ -153,7 +146,7 @@
         {
             byte[] keyMaterialBytes = Convert.FromBase64String(AesKeyMaterial);
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(
-                this.rsaEncryptingKey, 
+                this.rsaEncryptingKey,
                 keyMaterialBytes,
                 null);
             CollectionAssertEx.AreNotEqual(keyMaterialBytes, cipherText);

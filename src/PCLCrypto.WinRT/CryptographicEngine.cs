@@ -57,7 +57,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] SignHashedData(ICryptographicKey key, byte[] data)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(key, "key");
+            Requires.NotNull(data, "data");
+
+            var keyClass = (CryptographicKey)key;
+            return Platform.Core.CryptographicEngine.SignHashedData(
+                keyClass.Key,
+                data.ToBuffer()).ToArray();
         }
 
         /// <inheritdoc />
@@ -76,7 +82,15 @@ namespace PCLCrypto
         /// <inheritdoc />
         public bool VerifySignatureWithHashInput(ICryptographicKey key, byte[] data, byte[] signature)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(key, "key");
+            Requires.NotNull(data, "data");
+            Requires.NotNull(signature, "signature");
+
+            var keyClass = (CryptographicKey)key;
+            return Platform.Core.CryptographicEngine.VerifySignatureWithHashInput(
+                keyClass.Key,
+                data.ToBuffer(),
+                signature.ToBuffer());
         }
 
         /// <inheritdoc />
