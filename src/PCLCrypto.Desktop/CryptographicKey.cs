@@ -84,5 +84,25 @@ namespace PCLCrypto
         {
             throw new NotSupportedException();
         }
+
+        /// <summary>
+        /// Creates a crypto transform to encrypt a stream.
+        /// </summary>
+        /// <param name="iv">The initialization vector. Should be <c>null</c> for asymmetric algorithms.</param>
+        /// <returns>The ciphertext.</returns>
+        protected internal virtual ICryptoTransform CreateEncryptor(byte[] iv)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Creates a crypto transform to decrypt a stream.
+        /// </summary>
+        /// <param name="iv">The initialization vector. Should be <c>null</c> for asymmetric algorithms.</param>
+        /// <returns>The plaintext.</returns>
+        protected internal virtual ICryptoTransform CreateDecryptor(byte[] iv)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

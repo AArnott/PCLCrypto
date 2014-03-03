@@ -32,6 +32,12 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        public ICryptoTransform CreateEncryptor(ICryptographicKey key, byte[] iv)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
         public byte[] Decrypt(ICryptographicKey key, byte[] data, byte[] iv)
         {
             Requires.NotNull(key, "key");
@@ -41,6 +47,12 @@ namespace PCLCrypto
                 ((CryptographicKey)key).Key,
                 data.ToBuffer(),
                 iv.ToBuffer()).ToArray();
+        }
+
+        /// <inheritdoc />
+        public ICryptoTransform CreateDecryptor(ICryptographicKey key, byte[] iv)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc />

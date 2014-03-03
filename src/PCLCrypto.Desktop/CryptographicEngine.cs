@@ -30,6 +30,15 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        public ICryptoTransform CreateEncryptor(ICryptographicKey key, byte[] iv)
+        {
+            Requires.NotNull(key, "key");
+
+            var keyClass = (CryptographicKey)key;
+            return keyClass.CreateEncryptor(iv);
+        }
+
+        /// <inheritdoc />
         public byte[] Decrypt(ICryptographicKey key, byte[] data, byte[] iv)
         {
             Requires.NotNull(key, "key");
@@ -37,6 +46,15 @@ namespace PCLCrypto
 
             var keyClass = (CryptographicKey)key;
             return keyClass.Decrypt(data, iv);
+        }
+
+        /// <inheritdoc />
+        public ICryptoTransform CreateDecryptor(ICryptographicKey key, byte[] iv)
+        {
+            Requires.NotNull(key, "key");
+
+            var keyClass = (CryptographicKey)key;
+            return keyClass.CreateDecryptor(iv);
         }
 
         /// <inheritdoc />

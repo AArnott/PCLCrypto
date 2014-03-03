@@ -12,7 +12,7 @@
     public class CryptographicEngineTests
     {
         private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
-
+        private const string DataAesCiphertextBase64 = "3ChRgsiJ0mXxJIEQS5Z4NA==";
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
         private readonly ICryptographicKey rsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
@@ -136,7 +136,7 @@
         {
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, this.iv);
             CollectionAssertEx.AreNotEqual(this.data, cipherText);
-            Assert.AreEqual("3ChRgsiJ0mXxJIEQS5Z4NA==", Convert.ToBase64String(cipherText));
+            Assert.AreEqual(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, this.iv);
             CollectionAssertEx.AreEqual(this.data, plainText);
         }
@@ -152,6 +152,52 @@
             CollectionAssertEx.AreNotEqual(keyMaterialBytes, cipherText);
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.rsaEncryptingKey, cipherText, null);
             CollectionAssertEx.AreEqual(keyMaterialBytes, plainText);
+        }
+
+        [TestMethod]
+        public void CreateEncryptor_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.CreateEncryptor(null, this.iv));
+        }
+
+        [TestMethod]
+        public void CreateDecryptor_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(
+                () => WinRTCrypto.CryptographicEngine.CreateDecryptor(null, this.iv));
+        }
+
+        [TestMethod]
+        public void CreateEncryptor()
+        {
+            var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey, this.iv);
+            byte[] cipherText = encryptor.TransformFinalBlock(this.data, 0, this.data.Length);
+
+            Assert.AreEqual(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
+        }
+
+        [TestMethod]
+        public void CreateEncryptor_AcceptsNullIV()
+        {
+            var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey, null);
+            Assert.IsNotNull(encryptor);
+        }
+
+        [TestMethod]
+        public void CreateDecryptor_AcceptsNullIV()
+        {
+            var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey, null);
+            Assert.IsNotNull(decryptor);
+        }
+
+        [TestMethod]
+        public void CreateDecryptor()
+        {
+            byte[] cipherText = Convert.FromBase64String(DataAesCiphertextBase64);
+            var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey, this.iv);
+            byte[] plaintext = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
+            CollectionAssertEx.AreEqual(this.data, plaintext);
         }
     }
 }
