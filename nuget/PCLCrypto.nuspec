@@ -6,8 +6,8 @@
 		<title>PCL Crypto - Portable Crypto APIs</title>
 		<authors>Andrew Arnott</authors>
 		<owners>Andrew Arnott</owners>
-		<licenseUrl>https://github.com/AArnott/PCLCrypto/blob/master/LICENSE</licenseUrl>
-		<projectUrl>https://github.com/AArnott/PCLCrypto</projectUrl>
+		<licenseUrl>https://pclcrypto.codeplex.com/license</licenseUrl>
+		<projectUrl>https://pclcrypto.codeplex.com/</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
 			PCL Crypto provides a consistent, portable set of crypto APIs for
