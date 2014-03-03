@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
@@ -198,6 +199,24 @@
             var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey, this.iv);
             byte[] plaintext = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
             CollectionAssertEx.AreEqual(this.data, plaintext);
+        }
+
+        [TestMethod]
+        public void EncryptDecryptStreamChain()
+        {
+            var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey);
+            var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey);
+
+            var decryptedStream = new MemoryStream();
+            using (var decryptingStream = new CryptoStream(decryptedStream, decryptor, CryptoStreamMode.Write))
+            {
+                using (var encryptingStream = new CryptoStream(decryptingStream, encryptor, CryptoStreamMode.Write))
+                {
+                    encryptingStream.Write(this.data, 0, this.data.Length);
+                }
+            }
+
+            CollectionAssertEx.AreEqual(this.data, decryptedStream.ToArray());
         }
     }
 }
