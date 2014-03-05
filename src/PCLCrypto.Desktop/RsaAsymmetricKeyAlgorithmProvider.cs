@@ -74,7 +74,7 @@ namespace PCLCrypto
             var rsa = new Platform.RSACryptoServiceProvider();
             switch (blobType)
             {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     rsa.ImportCspBlob(keyBlob);
                     break;
                 default:
