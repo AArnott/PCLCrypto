@@ -70,7 +70,7 @@ namespace PCLCrypto
         {
             switch (blobType)
             {
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
+                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return this.key.ExportCspBlob(includePrivateParameters: true);
                 default:
                     throw new NotSupportedException();
