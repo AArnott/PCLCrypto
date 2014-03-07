@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
@@ -57,28 +58,56 @@
         public void KeyPairRoundTrip()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-
             var key = rsa.CreateKeyPair(512);
-            byte[] keyBlob = key.Export();
 
-            var key2 = rsa.ImportKeyPair(keyBlob);
-            byte[] key2Blob = key2.Export();
+            int supportedFormats = 0;
+            foreach (CryptographicPrivateKeyBlobType format in Enum.GetValues(typeof(CryptographicPrivateKeyBlobType)))
+            {
+                try
+                {
+                    byte[] keyBlob = key.Export(format);
+                    var key2 = rsa.ImportKeyPair(keyBlob, format);
+                    byte[] key2Blob = key2.Export(format);
 
-            CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+                    CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+                    Debug.WriteLine("Format {0} supported.", format);
+                    supportedFormats++;
+                }
+                catch (NotSupportedException)
+                {
+                    Debug.WriteLine("Format {0} NOT supported.", format);
+                }
+            }
+
+            Assert.IsTrue(supportedFormats > 0, "No supported formats.");
         }
 
         [TestMethod]
         public void PublicKeyRoundTrip()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-
             var key = rsa.CreateKeyPair(512);
-            byte[] keyBlob = key.ExportPublicKey();
 
-            var key2 = rsa.ImportPublicKey(keyBlob);
-            byte[] key2Blob = key2.ExportPublicKey();
+            int supportedFormats = 0;
+            foreach (CryptographicPublicKeyBlobType format in Enum.GetValues(typeof(CryptographicPublicKeyBlobType)))
+            {
+                try
+                {
+                    byte[] keyBlob = key.ExportPublicKey(format);
+                    var key2 = rsa.ImportPublicKey(keyBlob, format);
+                    byte[] key2Blob = key2.ExportPublicKey(format);
 
-            CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+                    CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+                    Debug.WriteLine("Format {0} supported.", format);
+                    supportedFormats++;
+                }
+                catch (NotSupportedException)
+                {
+                    Debug.WriteLine("Format {0} NOT supported.", format);
+                }
+            }
+
+            Assert.IsTrue(supportedFormats > 0, "No supported formats.");
         }
     }
 }
