@@ -159,7 +159,7 @@
         }
 
         [TestMethod]
-        public void PublicPairInterop()
+        public void PublicKeyInterop()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             int supportedFormats = 0;
