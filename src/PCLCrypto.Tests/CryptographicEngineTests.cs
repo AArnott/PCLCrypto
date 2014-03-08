@@ -15,8 +15,11 @@
         private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
         private const string DataAesCiphertextBase64 = "3ChRgsiJ0mXxJIEQS5Z4NA==";
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
-        private readonly ICryptographicKey rsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+        private readonly ICryptographicKey rsaSha1SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
+            .CreateKeyPair(512);
+        private readonly ICryptographicKey rsaSha256SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+            .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256)
             .CreateKeyPair(512);
 
         private readonly ICryptographicKey rsaEncryptingKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
@@ -39,7 +42,7 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.Sign(null, this.data));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, null));
+                () => WinRTCrypto.CryptographicEngine.Sign(this.rsaSha1SigningKey, null));
         }
 
         [TestMethod]
@@ -48,18 +51,34 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.VerifySignature(null, this.data, new byte[2]));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, null, new byte[2]));
+                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, null, new byte[2]));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, null));
+                () => WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, this.data, null));
         }
 
         [TestMethod]
-        public void SignAndVerifySignatureRsa()
+        public void SignAndVerifySignatureRsaSha1()
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSigningKey, this.data);
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, PclTestUtilities.Tamper(this.data), signature));
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, PclTestUtilities.Tamper(signature)));
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSha1SigningKey, this.data);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, this.data, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, PclTestUtilities.Tamper(this.data), signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, this.data, PclTestUtilities.Tamper(signature)));
+        }
+
+        [TestMethod]
+        public void SignAndVerifySignatureRsaSha256()
+        {
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSha256SigningKey, this.data);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, this.data, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, PclTestUtilities.Tamper(this.data), signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, this.data, PclTestUtilities.Tamper(signature)));
+        }
+
+        [TestMethod]
+        public void SignAndVerifySignatureRsa_WrongHashAlgorithm()
+        {
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSha1SigningKey, this.data);
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, this.data, signature));
         }
 
         [TestMethod]
@@ -68,7 +87,7 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.SignHashedData(null, this.data));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSigningKey, null));
+                () => WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSha1SigningKey, null));
         }
 
         [TestMethod]
@@ -78,21 +97,43 @@
             ExceptionAssert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(null, this.data, signature));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, null, signature));
+                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha1SigningKey, null, signature));
             ExceptionAssert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, this.data, null));
+                () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha1SigningKey, this.data, null));
         }
 
         [TestMethod]
-        public void SignHashedData_VerifySignatureWithHashInput()
+        public void SignHashedData_VerifySignatureWithHashInput_Sha1()
         {
             byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
                 .HashData(this.data);
-            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSigningKey, hash);
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSigningKey, this.data, signature));
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, hash, signature));
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, hash, PclTestUtilities.Tamper(signature)));
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSigningKey, PclTestUtilities.Tamper(this.data), signature));
+            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSha1SigningKey, hash);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, this.data, signature));
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha1SigningKey, hash, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha1SigningKey, hash, PclTestUtilities.Tamper(signature)));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha1SigningKey, PclTestUtilities.Tamper(this.data), signature));
+        }
+
+        [TestMethod]
+        public void SignHashedData_VerifySignatureWithHashInput_Sha256()
+        {
+            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256)
+                .HashData(this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSha256SigningKey, hash);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, this.data, signature));
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha256SigningKey, hash, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha256SigningKey, hash, PclTestUtilities.Tamper(signature)));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha256SigningKey, PclTestUtilities.Tamper(this.data), signature));
+        }
+
+        [TestMethod]
+        public void SignHashedData_VerifySignatureWithHashInput_WrongHashAlgorithm()
+        {
+            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
+                .HashData(this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSha1SigningKey, hash);
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, this.data, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha256SigningKey, hash, signature));
         }
 
         [TestMethod]
