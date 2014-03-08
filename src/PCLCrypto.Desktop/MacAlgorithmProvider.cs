@@ -68,41 +68,26 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Returns the string to pass to the platform APIs for a given algorithm.
+        /// Returns the keyed hash algorithm from the platform.
         /// </summary>
         /// <param name="algorithm">The algorithm desired.</param>
-        /// <returns>The platform-specific string to pass to OpenAlgorithm.</returns>
+        /// <returns>The platform-specific algorithm.</returns>
         internal static Platform.KeyedHashAlgorithm GetAlgorithm(MacAlgorithm algorithm)
         {
+#if SILVERLIGHT
             switch (algorithm)
             {
-#if !SILVERLIGHT
-                case MacAlgorithm.AesCmac:
-                    return Platform.KeyedHashAlgorithm.Create("AesCmac");
-                case MacAlgorithm.HmacMd5:
-                    return Platform.KeyedHashAlgorithm.Create("HmacMd5");
-#endif
                 case MacAlgorithm.HmacSha1:
-#if SILVERLIGHT
                     return new Platform.HMACSHA1();
-#else
-                    return Platform.KeyedHashAlgorithm.Create("HmacSha1");
-#endif
                 case MacAlgorithm.HmacSha256:
-#if SILVERLIGHT
                     return new Platform.HMACSHA256();
-#else
-                    return Platform.KeyedHashAlgorithm.Create("HmacSha256");
-#endif
-#if !SILVERLIGHT
-                case MacAlgorithm.HmacSha384:
-                    return Platform.KeyedHashAlgorithm.Create("HmacSha384");
-                case MacAlgorithm.HmacSha512:
-                    return Platform.KeyedHashAlgorithm.Create("HmacSha512");
-#endif
                 default:
                     throw new NotSupportedException();
             }
+#else
+            string alorithmName = MacAlgorithmProviderFactory.GetAlgorithmName(algorithm);
+            return Platform.KeyedHashAlgorithm.Create(alorithmName);
+#endif
         }
     }
 }
