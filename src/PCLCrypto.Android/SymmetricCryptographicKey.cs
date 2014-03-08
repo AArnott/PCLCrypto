@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Java.Security;
     using Javax.Crypto;
     using Javax.Crypto.Spec;
     using Validation;
@@ -28,19 +29,19 @@ namespace PCLCrypto
         /// <summary>
         /// The symmetric key.
         /// </summary>
-        private readonly byte[] key;
+        private readonly IKey key;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
-        /// <param name="key">The key.</param>
-        internal SymmetricCryptographicKey(SymmetricAlgorithm algorithm, byte[] key)
+        /// <param name="keyMaterial">The key.</param>
+        internal SymmetricCryptographicKey(SymmetricAlgorithm algorithm, byte[] keyMaterial)
         {
-            Requires.NotNull(key, "key");
+            Requires.NotNull(keyMaterial, "keyMaterial");
 
             this.algorithm = algorithm;
-            this.key = key;
+            this.key = new SecretKeySpec(keyMaterial, SymmetricKeyAlgorithmProviderFactory.GetTitleName(this.algorithm));
         }
 
         /// <inheritdoc />
@@ -150,13 +151,18 @@ namespace PCLCrypto
             var cipherName = this.GetCipherAcquisitionName();
 
             var cipher = Cipher.GetInstance(cipherName.ToString());
-            using (var keySpec = new SecretKeySpec(this.key, SymmetricKeyAlgorithmProviderFactory.GetTitleName(this.algorithm)))
+            using (var ivspec = new IvParameterSpec(this.ThisOrDefaultIV(iv, cipher)))
             {
-                using (var ivspec = new IvParameterSpec(this.ThisOrDefaultIV(iv, cipher)))
+                try
                 {
-                    cipher.Init(mode, keySpec, ivspec);
-                    return cipher;
+                    cipher.Init(mode, this.key, ivspec);
                 }
+                catch (Java.Security.InvalidKeyException ex)
+                {
+                    throw new ArgumentException(ex.Message, ex);
+                }
+
+                return cipher;
             }
         }
 
