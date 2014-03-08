@@ -12,11 +12,11 @@ namespace PCLCrypto
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using Android.Runtime;
     using Java.Security;
     using Java.Security.Interfaces;
     using Javax.Crypto;
     using Validation;
-    using Android.Runtime;
 
     /// <summary>
     /// The .NET Framework implementation of the <see cref="ICryptographicKey"/> interface

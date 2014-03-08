@@ -63,7 +63,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(data, "data");
 
-            using (var hasher = CreateHash())
+            using (var hasher = this.CreateHash())
             {
                 hasher.Append(data);
                 return hasher.GetValueAndReset();
