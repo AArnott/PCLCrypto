@@ -181,5 +181,38 @@
 
             Assert.IsTrue(supportedFormats > 0, "No supported formats.");
         }
+
+        [TestMethod]
+        public void EncryptionInterop()
+        {
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            byte[] data = new byte[] { 1, 2, 3 };
+            byte[] cipherText = Convert.FromBase64String("EvnsqTK9tDemRIceCap4Yc5znXeb+nyBPsFRf6oT+OPqQ958RH7NXE3xLKsVJhOLJ4iJ2NM+AlrKRltIK8cTmw==");
+            foreach (var formatAndBlob in PrivateKeyFormatsAndBlobs)
+            {
+                ICryptographicKey key;
+                try
+                {
+                    key = rsa.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key);
+                }
+                catch (NotSupportedException)
+                {
+                    continue;
+                }
+
+                // Verify that we can decrypt something encrypted previously (on WinRT)
+                byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
+                Assert.AreEqual(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
+
+                // Now verify we can decrypt something we encrypted ourselves.
+                byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
+                byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
+                Assert.AreEqual(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
+
+                return; // We only need one key format to work for the encryption test.
+            }
+
+            Assert.IsTrue(false, "No supported formats.");
+        }
     }
 }
