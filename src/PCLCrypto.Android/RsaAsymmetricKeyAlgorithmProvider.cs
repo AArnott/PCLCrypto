@@ -72,7 +72,7 @@ namespace PCLCrypto
                     privateKey = factory.GeneratePrivate(spec);
 
                     var privateRsaKey = privateKey.JavaCast<IRSAPrivateKey>();
-                    var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, BigInteger.ValueOf(101)); // TODO: replace 101 with actual public exponent.
+                    var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, BigInteger.ValueOf(0x10001)); // TODO: replace 65537 with actual public exponent.
                     publicKey = factory.GeneratePublic(publicKeySpec);
                     break;
                 default:
