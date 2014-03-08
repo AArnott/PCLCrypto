@@ -65,17 +65,11 @@
     <Compile Include="..\PCLCrypto.Desktop\KeyDerivationParametersFactory.cs">
       <Link>KeyDerivationParametersFactory.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProvider.cs">
-      <Link>MacAlgorithmProvider.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProviderFactory.cs">
       <Link>MacAlgorithmProviderFactory.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.Desktop\MacCryptographicKey.cs">
       <Link>MacCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\NetFxCryptographicHash.cs">
-      <Link>NetFxCryptographicHash.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
       <Link>RandomNumberGenerator.cs</Link>
@@ -102,7 +96,9 @@
       <Link>WinRTCrypto.cs</Link>
     </Compile>
     <Compile Include="HashAlgorithmProvider.cs" />
+    <Compile Include="JavaCryptographicHashMac.cs" />
     <Compile Include="JavaCryptographicHash.cs" />
+    <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
