@@ -115,37 +115,7 @@ namespace PCLCrypto
         /// <returns>A non-empty string.</returns>
         internal static string GetHashAlgorithmOID(AsymmetricAlgorithm algorithm)
         {
-            string algorithmName;
-            switch (algorithm)
-            {
-                case AsymmetricAlgorithm.DsaSha1:
-                case AsymmetricAlgorithm.RsaOaepSha1:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
-                case AsymmetricAlgorithm.RsaSignPssSha1:
-                    algorithmName = "SHA1";
-                    break;
-                case AsymmetricAlgorithm.DsaSha256:
-                case AsymmetricAlgorithm.RsaOaepSha256:
-                case AsymmetricAlgorithm.EcdsaP256Sha256:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
-                case AsymmetricAlgorithm.RsaSignPssSha256:
-                    algorithmName = "SHA256";
-                    break;
-                case AsymmetricAlgorithm.EcdsaP384Sha384:
-                case AsymmetricAlgorithm.RsaOaepSha384:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
-                case AsymmetricAlgorithm.RsaSignPssSha384:
-                    algorithmName = "SHA384";
-                    break;
-                case AsymmetricAlgorithm.EcdsaP521Sha512:
-                case AsymmetricAlgorithm.RsaOaepSha512:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
-                case AsymmetricAlgorithm.RsaSignPssSha512:
-                    algorithmName = "SHA512";
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            string algorithmName = HashAlgorithmProviderFactory.GetHashAlgorithmName(AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(algorithm));
 
 #if SILVERLIGHT
             // Windows Phone 8.0 and Silverlight both are missing the
@@ -170,32 +140,8 @@ namespace PCLCrypto
         internal static Platform.HashAlgorithm GetHashAlgorithm(AsymmetricAlgorithm algorithm)
 #endif
         {
-            switch (algorithm)
-            {
-                case AsymmetricAlgorithm.DsaSha1:
-                case AsymmetricAlgorithm.RsaOaepSha1:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
-                case AsymmetricAlgorithm.RsaSignPssSha1:
-                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha1);
-                case AsymmetricAlgorithm.DsaSha256:
-                case AsymmetricAlgorithm.RsaOaepSha256:
-                case AsymmetricAlgorithm.EcdsaP256Sha256:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
-                case AsymmetricAlgorithm.RsaSignPssSha256:
-                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha256);
-                case AsymmetricAlgorithm.EcdsaP384Sha384:
-                case AsymmetricAlgorithm.RsaOaepSha384:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
-                case AsymmetricAlgorithm.RsaSignPssSha384:
-                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha384);
-                case AsymmetricAlgorithm.EcdsaP521Sha512:
-                case AsymmetricAlgorithm.RsaOaepSha512:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
-                case AsymmetricAlgorithm.RsaSignPssSha512:
-                    return HashAlgorithmProvider.CreateHashAlgorithm(HashAlgorithm.Sha512);
-                default:
-                    throw new NotSupportedException();
-            }
+            var hashAlgorithm = AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(algorithm);
+            return HashAlgorithmProvider.CreateHashAlgorithm(hashAlgorithm);
         }
     }
 }
