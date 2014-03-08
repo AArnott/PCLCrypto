@@ -12,9 +12,9 @@
     public class DeriveBytesTests
     {
         private const string Password1 = "Password";
+        private const string DerivedKey = "S23vp2E3VXpRGQ==";
         private static readonly byte[] Salt1 = new byte[] { 0x1, 0x2, 0x4, 0x5, 0x3, 0x6, 0x7, 0x8 };
         private static readonly byte[] Salt2 = new byte[] { 0x1, 0x3, 0x2, 0x5, 0x3, 0x6, 0x7, 0x8 };
-        private const string DerivedKey = "S23vp2E3VXpRGQ==";
 
         [TestMethod]
         public void GetBytes()

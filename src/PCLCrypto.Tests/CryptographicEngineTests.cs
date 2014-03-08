@@ -18,6 +18,7 @@
         private readonly ICryptographicKey rsaSha1SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
             .CreateKeyPair(512);
+
         private readonly ICryptographicKey rsaSha256SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256)
             .CreateKeyPair(512);
