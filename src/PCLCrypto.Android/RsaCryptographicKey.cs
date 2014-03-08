@@ -110,8 +110,8 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            // TODO: Replace "SHA1" below with whatever the appropriate hash is.
-            using (Signature instance = Signature.GetInstance("SHA1withRSA"))
+            string hashName = HashAlgorithmProviderFactory.GetHashAlgorithmName(AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(this.Algorithm));
+            using (Signature instance = Signature.GetInstance(hashName + "withRSA"))
             {
                 instance.InitSign(this.privateKey);
                 instance.Update(data);
@@ -123,8 +123,8 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            // TODO: Replace "SHA1" below with whatever the appropriate hash is.
-            using (Signature instance = Signature.GetInstance("SHA1withRSA"))
+            string hashName = HashAlgorithmProviderFactory.GetHashAlgorithmName(AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(this.Algorithm));
+            using (Signature instance = Signature.GetInstance(hashName + "withRSA"))
             {
                 instance.InitVerify(this.publicKey);
                 instance.Update(data);
