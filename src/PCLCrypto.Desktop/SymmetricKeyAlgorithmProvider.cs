@@ -56,6 +56,9 @@ namespace PCLCrypto
         {
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
+#if Android
+            return new SymmetricCryptographicKey(this.Algorithm, keyMaterial);
+#else
             var platform = GetAlgorithm(this.algorithm);
             try
             {
@@ -71,6 +74,7 @@ namespace PCLCrypto
             }
 
             return new SymmetricCryptographicKey(platform);
+#endif
         }
 
 #if !SILVERLIGHT

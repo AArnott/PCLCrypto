@@ -74,12 +74,6 @@
     <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
       <Link>RandomNumberGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\SymmetricCryptographicKey.cs">
-      <Link>SymmetricCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProvider.cs">
-      <Link>SymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProviderFactory.cs">
       <Link>SymmetricKeyAlgorithmProviderFactory.cs</Link>
     </Compile>
@@ -102,6 +96,8 @@
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
+    <Compile Include="SymmetricCryptographicKey.cs" />
+    <Compile Include="SymmetricKeyAlgorithmProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
