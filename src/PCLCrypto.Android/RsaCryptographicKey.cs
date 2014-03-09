@@ -135,24 +135,26 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] SignHash(byte[] data)
         {
-            using (Signature instance = Signature.GetInstance("NONEwithRSA"))
-            {
-                instance.InitSign(this.privateKey);
-                instance.Update(data);
-                byte[] signature = instance.Sign();
-                return signature;
-            }
+            throw new NotSupportedException();
+            ////using (Signature instance = Signature.GetInstance("NONEwithRSA"))
+            ////{
+            ////    instance.InitSign(this.privateKey);
+            ////    instance.Update(data);
+            ////    byte[] signature = instance.Sign();
+            ////    return signature;
+            ////}
         }
 
         /// <inheritdoc />
         protected internal override bool VerifyHash(byte[] data, byte[] signature)
         {
-            using (Signature instance = Signature.GetInstance("NONEwithRSA"))
-            {
-                instance.InitVerify(this.publicKey);
-                instance.Update(data);
-                return instance.Verify(signature);
-            }
+            throw new NotSupportedException();
+            ////using (Signature instance = Signature.GetInstance("NONEwithRSA"))
+            ////{
+            ////    instance.InitVerify(this.publicKey);
+            ////    instance.Update(data);
+            ////    return instance.Verify(signature);
+            ////}
         }
 
         /// <inheritdoc />
