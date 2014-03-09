@@ -39,6 +39,9 @@ namespace PCLCrypto
         /// </summary>
         private readonly AsymmetricAlgorithm algorithm;
 
+        /// <summary>
+        /// The RSA instance to use for exporting the PRIVATEKEYBLOB.
+        /// </summary>
         private readonly System.Security.Cryptography.RSACryptoServiceProvider rsa;
 
         /// <summary>
@@ -59,6 +62,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="publicKey">The public key.</param>
         /// <param name="privateKey">The private key.</param>
+        /// <param name="rsa">The RSA instance, if available.</param>
         /// <param name="algorithm">The algorithm.</param>
         internal RsaCryptographicKey(IPublicKey publicKey, IPrivateKey privateKey, System.Security.Cryptography.RSACryptoServiceProvider rsa, AsymmetricAlgorithm algorithm)
         {
@@ -217,7 +221,7 @@ namespace PCLCrypto
         /// for a given algorithm.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
-        /// <returns></returns>
+        /// <returns>A non-empty string.</returns>
         /// <exception cref="System.NotSupportedException">Thrown if the algorithm is not supported.</exception>
         private static string GetSignatureName(AsymmetricAlgorithm algorithm)
         {

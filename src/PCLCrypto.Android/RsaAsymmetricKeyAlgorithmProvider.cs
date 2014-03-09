@@ -62,7 +62,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            System.Security.Cryptography.RSACryptoServiceProvider rsa=null;
+            System.Security.Cryptography.RSACryptoServiceProvider rsa = null;
             IPrivateKey privateKey;
             IPublicKey publicKey;
             switch (blobType)
@@ -82,6 +82,7 @@ namespace PCLCrypto
                         publicKey = factory.GeneratePublic(publicKeySpec);
                         break;
                     }
+
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     {
                         var spec = new PKCS8EncodedKeySpec(keyBlob);
@@ -93,6 +94,7 @@ namespace PCLCrypto
                         publicKey = factory.GeneratePublic(publicKeySpec);
                         break;
                     }
+
                 default:
                     throw new NotSupportedException();
             }
