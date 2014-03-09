@@ -92,14 +92,29 @@ namespace PCLCrypto
         /// Writes out a private key as a PRIVATEKEYBLOB (<see cref="CryptographicPrivateKeyBlobType.Capi1PrivateKey"/>).
         /// </summary>
         /// <param name="privateKey">The private key.</param>
-        /// <param name="keyspec">The keyspec.</param>
+        /// <param name="keySpec">The keyspec.</param>
         /// <returns>A buffer containing the PRIVATEKEYBLOB.</returns>
-        internal static byte[] GetEncodedPrivateKeyBlob(this IPrivateKey privateKey, KeySpec keyspec = KeySpec.KeyExchange)
+        internal static byte[] GetEncodedPrivateKeyBlob(this IPrivateKey privateKey, KeySpec keySpec = KeySpec.KeyExchange)
         {
             Requires.NotNull(privateKey, "privateKey");
 
-            var bos = new MemoryStream();
-            DataOutputStream dos = new DataOutputStream(bos);
+            var ms = new MemoryStream();
+            WritePrivateKeyBlob(ms, privateKey, keySpec);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Writes out a private key as a PRIVATEKEYBLOB (<see cref="CryptographicPrivateKeyBlobType.Capi1PrivateKey"/>).
+        /// </summary>
+        /// <param name="stream">The stream to write the blob to.</param>
+        /// <param name="privateKey">The private key.</param>
+        /// <param name="keySpec">The keyspec.</param>
+        internal static void WritePrivateKeyBlob(this Stream stream, IPrivateKey privateKey, KeySpec keySpec = KeySpec.KeyExchange)
+        {
+            Requires.NotNull(stream, "stream");
+            Requires.NotNull(privateKey, "privateKey");
+
+            var writer = new BinaryWriter(stream);
 
             IRSAPrivateCrtKey pvkKey = privateKey.JavaCast<IRSAPrivateCrtKey>();
 
@@ -111,64 +126,61 @@ namespace PCLCrypto
                 : modulus.Length;
             int bitlen = 8 * bytelen;
 
-            dos.Write(PRIVATEKEYBLOB);
-            dos.Write(CURBLOBVERSION);
-            dos.WriteShort(RESERVED);
-            WriteLEInt(KEYSPECS[keyspec], dos);
-            dos.WriteBytes(MAGIC2);
-            WriteLEInt(bitlen, dos);
-            int pubexp = Integer.ParseInt(pvkKey.PublicExponent.ToString());
-            WriteLEInt(pubexp, dos);
-
-            // reverse array to Little Endian order; since data is same reference as modulus at the moment, modulus is also reversed.
-            byte[] data = modulus;
-            ReverseMemory(data);
+            writer.Write(PRIVATEKEYBLOB);
+            writer.Write(CURBLOBVERSION);
+            writer.Write(RESERVED);
+            writer.WriteLittleEndian(KEYSPECS[keySpec]);
+            writer.Write(Encoding.ASCII.GetBytes(MAGIC2));
+            writer.WriteLittleEndian(bitlen);
+            writer.WriteLittleEndian(pvkKey.PublicExponent.IntValue());
 
             // note that modulus may contain an extra zero byte (highest order byte after reversing)
             // specifying bytelen bytes to write will drop high-order zero byte
-            dos.Write(data, 0, bytelen);
+            byte[] data = modulus;
+            ReverseMemory(data); // Switches to Little Endian byte order.
+            writer.Write(data, 0, bytelen);
 
             data = pvkKey.PrimeP.ToByteArray();
             ReverseMemory(data);
-            dos.Write(data, 0, bytelen / 2);
+            writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrimeQ.ToByteArray();
             ReverseMemory(data);
-            dos.Write(data, 0, bytelen / 2);
+            writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrimeExponentP.ToByteArray();
             ReverseMemory(data);
-            dos.Write(data, 0, bytelen / 2);
+            writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrimeExponentQ.ToByteArray();
             ReverseMemory(data);
-            dos.Write(data, 0, bytelen / 2);
+            writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.CrtCoefficient.ToByteArray();
             ReverseMemory(data);
-            dos.Write(data, 0, bytelen / 2);
+            writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrivateExponent.ToByteArray();
             ReverseMemory(data);
-            dos.Write(data, 0, bytelen);
-            dos.Flush();
-            dos.Close();
-            return bos.ToArray();
+            writer.Write(data, 0, bytelen);
+
+            writer.Flush();
+            writer.Close();
         }
 
         /// <summary>
         /// Writes an integer to an output stream in Little Endian format.
         /// </summary>
+        /// <param name="writer">The binary writer.</param>
         /// <param name="value">The number to emit.</param>
-        /// <param name="output">The output stream.</param>
-        private static void WriteLEInt(int value, OutputStream output)
+        private static void WriteLittleEndian(this BinaryWriter writer, int value)
         {
-            Requires.NotNull(output, "output");
+            Requires.NotNull(writer, "output");
 
-            output.Write(value & 0xFF);
-            output.Write((value >> 8) & 0xFF);
-            output.Write((value >> 16) & 0xFF);
-            output.Write((value >> 24) & 0xFF);
+            writer.Write((byte)(value & 0xFF));
+            writer.Write((byte)((value >> 8) & 0xFF));
+            writer.Write((byte)((value >> 16) & 0xFF));
+            writer.Write((byte)((value >> 24) & 0xFF));
         }
 
         /// <summary>
