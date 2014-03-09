@@ -209,6 +209,8 @@ namespace PCLCrypto
             {
                 case AsymmetricAlgorithm.RsaOaepSha1:
                     return "RSA/ECB/OAEPWithSHA1AndMGF1Padding";
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                    return "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
                 case AsymmetricAlgorithm.RsaPkcs1:
                     return "RSA/ECB/PKCS1Padding";
                 default:
