@@ -93,6 +93,7 @@
     <Compile Include="JavaCryptographicHashMac.cs" />
     <Compile Include="JavaCryptographicHash.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
+    <Compile Include="PvkConvert.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />

@@ -39,6 +39,8 @@ namespace PCLCrypto
         /// </summary>
         private readonly AsymmetricAlgorithm algorithm;
 
+        private readonly System.Security.Cryptography.RSACryptoServiceProvider rsa;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
@@ -58,13 +60,14 @@ namespace PCLCrypto
         /// <param name="publicKey">The public key.</param>
         /// <param name="privateKey">The private key.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(IPublicKey publicKey, IPrivateKey privateKey, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(IPublicKey publicKey, IPrivateKey privateKey, System.Security.Cryptography.RSACryptoServiceProvider rsa, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
             Requires.NotNull(privateKey, "privateKey");
 
             this.publicKey = publicKey.JavaCast<IRSAPublicKey>();
             this.privateKey = privateKey.JavaCast<IRSAPrivateKey>();
+            this.rsa = rsa;
             this.algorithm = algorithm;
         }
 
@@ -87,8 +90,15 @@ namespace PCLCrypto
         {
             switch (blobType)
             {
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
+                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     Verify.Operation(this.privateKey != null, "No private key.");
+                    if (this.rsa != null)
+                    {
+                        return this.rsa.ExportCspBlob(true);
+                    }
+
+                    return PvkConvert.privatekeyinfoToPrivatekeyblob(this.privateKey, PvkConvert.AT_KEYEXCHANGE);
+                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return this.privateKey.GetEncoded();
                 default:
                     throw new NotSupportedException();
