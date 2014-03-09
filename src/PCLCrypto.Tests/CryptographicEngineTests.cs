@@ -125,6 +125,16 @@
         }
 
         [TestMethod]
+        public void Sign_VerifySignatureWithHashInput_Sha1()
+        {
+            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
+                .HashData(this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSha1SigningKey, this.data);
+
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha1SigningKey, hash, signature));
+        }
+
+        [TestMethod]
         public void SignHashedData_VerifySignatureWithHashInput_Sha256()
         {
             byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256)
@@ -143,6 +153,16 @@
             byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(this.rsaSha256SigningKey, hash);
 
             Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha256SigningKey, this.data, signature));
+        }
+
+        [TestMethod]
+        public void Sign_VerifySignatureWithHashInput_Sha256()
+        {
+            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256)
+                .HashData(this.data);
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.rsaSha256SigningKey, this.data);
+
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(this.rsaSha256SigningKey, hash, signature));
         }
 
         [TestMethod]
