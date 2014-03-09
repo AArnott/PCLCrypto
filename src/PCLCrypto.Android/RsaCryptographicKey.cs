@@ -101,7 +101,7 @@ namespace PCLCrypto
                         return this.rsa.ExportCspBlob(true);
                     }
 
-                    return PvkConvert.privatekeyinfoToPrivatekeyblob(this.privateKey, PvkConvert.AT_KEYEXCHANGE);
+                    return this.privateKey.GetEncodedPrivateKeyBlob();
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return this.privateKey.GetEncoded();
                 default:
