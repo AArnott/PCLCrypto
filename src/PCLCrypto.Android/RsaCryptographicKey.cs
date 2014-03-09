@@ -120,8 +120,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            string hashName = HashAlgorithmProviderFactory.GetHashAlgorithmName(AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(this.Algorithm));
-            using (Signature instance = Signature.GetInstance(hashName + "withRSA"))
+            using (Signature instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
             {
                 instance.InitSign(this.privateKey);
                 instance.Update(data);
@@ -133,8 +132,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            string hashName = HashAlgorithmProviderFactory.GetHashAlgorithmName(AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(this.Algorithm));
-            using (Signature instance = Signature.GetInstance(hashName + "withRSA"))
+            using (Signature instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
             {
                 instance.InitVerify(this.publicKey);
                 instance.Update(data);
@@ -174,7 +172,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
-            using (Cipher cipher = Cipher.GetInstance("RSA"))
+            using (Cipher cipher = Cipher.GetInstance(GetCipherName(this.Algorithm)))
             {
                 cipher.Init(Javax.Crypto.CipherMode.EncryptMode, this.publicKey);
                 byte[] cipherText = cipher.DoFinal(data);
@@ -186,11 +184,57 @@ namespace PCLCrypto
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
             Verify.Operation(this.privateKey != null, "Private key missing.");
-            using (Cipher cipher = Cipher.GetInstance("RSA"))
+            using (Cipher cipher = Cipher.GetInstance(GetCipherName(this.Algorithm)))
             {
                 cipher.Init(Javax.Crypto.CipherMode.DecryptMode, this.privateKey);
                 byte[] plainText = cipher.DoFinal(data);
                 return plainText;
+            }
+        }
+
+        /// <summary>
+        /// Gets the string to pass to <see cref="Cipher.GetInstance(string)"/>
+        /// for the given algorithm.
+        /// </summary>
+        /// <param name="algorithm">The algorithm.</param>
+        /// <returns>A non-empty string.</returns>
+        /// <exception cref="System.NotSupportedException">Thrown if the algorithm isn't supported.</exception>
+        private static string GetCipherName(AsymmetricAlgorithm algorithm)
+        {
+            switch (algorithm)
+            {
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                    return "RSA/ECB/OAEPWithSHA1AndMGF1Padding";
+                case AsymmetricAlgorithm.RsaPkcs1:
+                    return "RSA/ECB/PKCS1Padding";
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the string to pass to <see cref="Signature.GetInstance(string)"/>
+        /// for a given algorithm.
+        /// </summary>
+        /// <param name="algorithm">The algorithm.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NotSupportedException">Thrown if the algorithm is not supported.</exception>
+        private static string GetSignatureName(AsymmetricAlgorithm algorithm)
+        {
+            string hashName = HashAlgorithmProviderFactory.GetHashAlgorithmName(AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(algorithm));
+            switch (algorithm)
+            {
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
+                    return hashName + "withRSA";
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                case AsymmetricAlgorithm.RsaSignPssSha1:
+                case AsymmetricAlgorithm.RsaSignPssSha256:
+                case AsymmetricAlgorithm.RsaSignPssSha384:
+                case AsymmetricAlgorithm.RsaSignPssSha512:
+                default:
+                    throw new NotSupportedException();
             }
         }
     }
