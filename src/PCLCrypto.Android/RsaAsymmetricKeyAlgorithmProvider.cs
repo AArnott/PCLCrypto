@@ -115,6 +115,9 @@ namespace PCLCrypto
                     KeyFactory factory = KeyFactory.GetInstance("RSA");
                     publicKey = factory.GeneratePublic(spec);
                     break;
+                case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                    publicKey = PvkConvert.FromPublicKeyBlob(keyBlob);
+                    break;
                 default:
                     throw new NotSupportedException();
             }

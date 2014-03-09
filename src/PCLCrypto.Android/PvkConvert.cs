@@ -104,6 +104,42 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Writes out a public key as a PUBLICKEYBLOB (<see cref="CryptographicPublicKeyBlobType.Capi1PublicKey"/>).
+        /// </summary>
+        /// <param name="publicKey">The public key.</param>
+        /// <param name="keySpec">The keyspec.</param>
+        /// <returns>A buffer containing the PUBLICKEYBLOB.</returns>
+        internal static byte[] GetEncodedPublicKeyBlob(this IPublicKey publicKey, KeySpec keySpec = KeySpec.KeyExchange)
+        {
+            Requires.NotNull(publicKey, "publicKey");
+
+            var ms = new MemoryStream();
+            WritePublicKeyBlob(ms, publicKey, keySpec);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Decodes a PUBLICKEYBLOB into an <see cref="IPublicKey"/>.
+        /// </summary>
+        /// <param name="keyBlob">The key BLOB.</param>
+        /// <returns>An <see cref="IPublicKey"/> instance.</returns>
+        internal static IPublicKey FromPublicKeyBlob(byte[] keyBlob)
+        {
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            var rsa = new System.Security.Cryptography.RSACryptoServiceProvider();
+            rsa.ImportCspBlob(keyBlob);
+            var parameters = rsa.ExportParameters(false);
+            BigInteger modulus = new BigInteger(parameters.Modulus);
+            BigInteger publicExponent = new BigInteger(parameters.Exponent);
+
+            var spec = new RSAPublicKeySpec(modulus, publicExponent);
+            KeyFactory factory = KeyFactory.GetInstance("RSA");
+            IPublicKey publicKey = factory.GeneratePublic(spec);
+            return publicKey;
+        }
+
+        /// <summary>
         /// Writes out a private key as a PRIVATEKEYBLOB (<see cref="CryptographicPrivateKeyBlobType.Capi1PrivateKey"/>).
         /// </summary>
         /// <param name="stream">The stream to write the blob to.</param>
@@ -116,10 +152,9 @@ namespace PCLCrypto
 
             var writer = new BinaryWriter(stream);
 
-            IRSAPrivateCrtKey pvkKey = privateKey.JavaCast<IRSAPrivateCrtKey>();
+            var pvkKey = privateKey.JavaCast<IRSAPrivateCrtKey>();
 
-            BigInteger mod = pvkKey.Modulus;
-            byte[] modulus = mod.ToByteArray();
+            byte[] modulus = pvkKey.Modulus.ToByteArray();
 
             int bytelen = modulus[0] == 0     // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
                 ? modulus.Length - 1
@@ -162,6 +197,46 @@ namespace PCLCrypto
 
             data = pvkKey.PrivateExponent.ToByteArray();
             ReverseMemory(data);
+            writer.Write(data, 0, bytelen);
+
+            writer.Flush();
+            writer.Close();
+        }
+
+        /// <summary>
+        /// Writes out a public key as a PUBLICKEYBLOB (<see cref="CryptographicPublicKeyBlobType.Capi1PublicKey"/>).
+        /// </summary>
+        /// <param name="stream">The stream to write the blob to.</param>
+        /// <param name="publicKey">The public key.</param>
+        /// <param name="keySpec">The keyspec.</param>
+        internal static void WritePublicKeyBlob(this Stream stream, IPublicKey publicKey, KeySpec keySpec = KeySpec.KeyExchange)
+        {
+            Requires.NotNull(stream, "stream");
+            Requires.NotNull(publicKey, "publicKey");
+
+            var writer = new BinaryWriter(stream);
+
+            var pubKey = publicKey.JavaCast<IRSAPublicKey>();
+
+            byte[] modulus = pubKey.Modulus.ToByteArray();
+
+            int bytelen = modulus[0] == 0     // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
+                ? modulus.Length - 1
+                : modulus.Length;
+            int bitlen = 8 * bytelen;
+
+            writer.Write(PUBLICKEYBLOB);
+            writer.Write(CURBLOBVERSION);
+            writer.Write(RESERVED);
+            writer.WriteLittleEndian(KEYSPECS[keySpec]);
+            writer.Write(Encoding.ASCII.GetBytes(MAGIC1));
+            writer.WriteLittleEndian(bitlen);
+            writer.WriteLittleEndian(pubKey.PublicExponent.IntValue());
+
+            // note that modulus may contain an extra zero byte (highest order byte after reversing)
+            // specifying bytelen bytes to write will drop high-order zero byte
+            byte[] data = modulus;
+            ReverseMemory(data); // Switches to Little Endian byte order.
             writer.Write(data, 0, bytelen);
 
             writer.Flush();

@@ -116,6 +116,13 @@ namespace PCLCrypto
             {
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
                     return this.publicKey.GetEncoded();
+                case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                    if (this.rsa != null)
+                    {
+                        return this.rsa.ExportCspBlob(false);
+                    }
+
+                    return this.publicKey.GetEncodedPublicKeyBlob();
                 default:
                     throw new NotSupportedException();
             }
