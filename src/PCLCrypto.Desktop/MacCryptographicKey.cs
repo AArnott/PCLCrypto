@@ -64,8 +64,13 @@ namespace PCLCrypto
         {
             using (var algorithm = MacAlgorithmProvider.GetAlgorithm(this.algorithm))
             {
+#if Android
+                algorithm.Init(MacAlgorithmProvider.GetSecretKey(this.algorithm, this.key));
+                return algorithm.DoFinal(data);
+#else
                 algorithm.Key = this.key;
                 return algorithm.ComputeHash(data);
+#endif
             }
         }
 
@@ -74,8 +79,14 @@ namespace PCLCrypto
         {
             using (var algorithm = MacAlgorithmProvider.GetAlgorithm(this.algorithm))
             {
+                byte[] computedMac;
+#if Android
+                algorithm.Init(MacAlgorithmProvider.GetSecretKey(this.algorithm, this.key));
+                computedMac = algorithm.DoFinal(data);
+#else
                 algorithm.Key = this.key;
-                byte[] computedMac = algorithm.ComputeHash(data);
+                computedMac = algorithm.ComputeHash(data);
+#endif
                 return CryptoUtilities.BufferEquals(computedMac, signature);
             }
         }

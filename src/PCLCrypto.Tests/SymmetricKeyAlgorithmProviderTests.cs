@@ -30,7 +30,11 @@
             ExceptionAssert.Throws<ArgumentException>(
                 () => provider.CreateSymmetricKey(new byte[0]));
             ExceptionAssert.Throws<ArgumentException>(
-                () => provider.CreateSymmetricKey(new byte[4]));
+                () =>
+                {
+                    var key = provider.CreateSymmetricKey(new byte[4]);
+                    WinRTCrypto.CryptographicEngine.Encrypt(key, new byte[] { 1, 2, 3 });
+                });
         }
 
         [TestMethod]

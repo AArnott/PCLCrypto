@@ -134,7 +134,11 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
         /// <returns>The hash algorithm.</returns>
+#if Android
+        internal static Java.Security.MessageDigest GetHashAlgorithm(AsymmetricAlgorithm algorithm)
+#else
         internal static Platform.HashAlgorithm GetHashAlgorithm(AsymmetricAlgorithm algorithm)
+#endif
         {
             var hashAlgorithm = AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(algorithm);
             return HashAlgorithmProvider.CreateHashAlgorithm(hashAlgorithm);
