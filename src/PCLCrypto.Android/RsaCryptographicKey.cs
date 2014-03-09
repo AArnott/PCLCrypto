@@ -145,6 +145,8 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] SignHash(byte[] data)
         {
+            // Please visit this Q&A for a discussion about what we need to make this method work.
+            // http://stackoverflow.com/questions/22276976/how-to-sign-based-on-data-but-verify-based-on-hash-in-java/22280659?noredirect=1#22280659
             throw new NotSupportedException();
             ////using (Signature instance = Signature.GetInstance("NONEwithRSA"))
             ////{
@@ -158,6 +160,8 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override bool VerifyHash(byte[] data, byte[] signature)
         {
+            // Please visit this Q&A for a discussion about what we need to make this method work.
+            // http://stackoverflow.com/questions/22276976/how-to-sign-based-on-data-but-verify-based-on-hash-in-java/22280659?noredirect=1#22280659
             throw new NotSupportedException();
             ////using (Signature instance = Signature.GetInstance("NONEwithRSA"))
             ////{
