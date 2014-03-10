@@ -46,6 +46,43 @@
         }
 
         [TestMethod]
+        public void EncodeToHexString_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(() => WinRTCrypto.CryptographicBuffer.EncodeToHexString(null));
+        }
+
+        [TestMethod]
+        public void EncodeToHexString_EmptyBuffer()
+        {
+            Assert.AreEqual(string.Empty, WinRTCrypto.CryptographicBuffer.EncodeToHexString(new byte[0]));
+        }
+
+        [TestMethod]
+        public void EncodeToHexString()
+        {
+            Assert.AreEqual("00010faefff0", WinRTCrypto.CryptographicBuffer.EncodeToHexString(new byte[] { 0x00, 0x1, 0xf, 0xae, 0xff, 0xf0 }));
+        }
+
+        [TestMethod]
+        public void DecodeFromHexString_InvalidInputs()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(() => WinRTCrypto.CryptographicBuffer.DecodeFromHexString(null));
+            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicBuffer.DecodeFromHexString("123")); // odd length
+        }
+
+        [TestMethod]
+        public void DecodeFromHexString_EmptyString()
+        {
+            CollectionAssertEx.AreEqual(new byte[0], WinRTCrypto.CryptographicBuffer.DecodeFromHexString(string.Empty));
+        }
+
+        [TestMethod]
+        public void DecodeFromHexString()
+        {
+            CollectionAssertEx.AreEqual(new byte[] { 0x00, 0x1, 0xf, 0xae, 0xff, 0xf0 }, WinRTCrypto.CryptographicBuffer.DecodeFromHexString("00010faefff0"));
+        }
+
+        [TestMethod]
         public void GenerateRandom()
         {
             byte[] buffer1 = WinRTCrypto.CryptographicBuffer.GenerateRandom(15);

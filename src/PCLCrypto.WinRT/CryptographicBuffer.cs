@@ -19,6 +19,11 @@ namespace PCLCrypto
     /// </summary>
     internal class CryptographicBuffer : ICryptographicBuffer
     {
+        /// <summary>
+        /// An empty byte array.
+        /// </summary>
+        private static readonly byte[] EmptyBuffer = new byte[0];
+
         /// <inheritdoc/>
         public bool Compare(byte[] object1, byte[] object2)
         {
@@ -31,49 +36,80 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public string ConvertBinaryToString(Encoding encoding, byte[] buffer)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(encoding, "encoding");
+            Requires.NotNull(buffer, "buffer");
+
+            return encoding.GetString(buffer, 0, buffer.Length);
         }
 
         /// <inheritdoc/>
         public byte[] ConvertStringToBinary(string value, Encoding encoding)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(value, "value");
+            Requires.NotNull(encoding, "encoding");
+
+            return encoding.GetBytes(value);
         }
 
         /// <inheritdoc/>
         public void CopyToByteArray(byte[] buffer, out byte[] value)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(buffer, "buffer");
+
+            value = new byte[buffer.Length];
+            Array.Copy(buffer, value, buffer.Length);
         }
 
         /// <inheritdoc/>
         public byte[] CreateFromByteArray(byte[] value)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(value, "value");
+
+            var result = new byte[value.Length];
+            Array.Copy(value, result, value.Length);
+            return result;
         }
 
         /// <inheritdoc/>
         public byte[] DecodeFromBase64String(string value)
         {
-            throw new NotImplementedException();
+            return Convert.FromBase64String(value);
         }
 
         /// <inheritdoc/>
         public byte[] DecodeFromHexString(string value)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(value, "value");
+
+            if (value.Length == 0)
+            {
+                return EmptyBuffer;
+            }
+
+            try
+            {
+                return Platform.DecodeFromHexString(value).ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message, "value", ex);
+            }
         }
 
         /// <inheritdoc/>
         public string EncodeToBase64String(byte[] buffer)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(buffer, "buffer");
+
+            return Convert.ToBase64String(buffer);
         }
 
         /// <inheritdoc/>
         public string EncodeToHexString(byte[] buffer)
         {
-            throw new NotImplementedException();
+            Requires.NotNull(buffer, "buffer");
+
+            return Platform.EncodeToHexString(buffer.ToBuffer());
         }
 
         /// <inheritdoc/>
