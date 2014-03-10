@@ -238,10 +238,10 @@ namespace PCLCrypto
             switch (algorithm)
             {
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
-                    return hashName + "withRSA";
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
                 case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                    return hashName + "withRSA";
                 case AsymmetricAlgorithm.RsaSignPssSha1:
                 case AsymmetricAlgorithm.RsaSignPssSha256:
                 case AsymmetricAlgorithm.RsaSignPssSha384:
