@@ -124,7 +124,7 @@ namespace PCLCrypto
         /// </returns>
         private static Platform.SymmetricAlgorithm GetAlgorithm(SymmetricAlgorithm algorithm)
         {
-#if SILVERLIGHT
+#if SILVERLIGHT || __IOS__
             switch (algorithm)
             {
                 case SymmetricAlgorithm.AesCbcPkcs7:
@@ -135,6 +135,11 @@ namespace PCLCrypto
 #else
             Platform.SymmetricAlgorithm platform = Platform.SymmetricAlgorithm.Create(
                 SymmetricKeyAlgorithmProviderFactory.GetTitleName(algorithm));
+            if (platform == null)
+            {
+                throw new NotSupportedException();
+            }
+
             platform.Mode = GetMode(algorithm);
             platform.Padding = GetPadding(algorithm);
 
