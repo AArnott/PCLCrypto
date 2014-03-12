@@ -31,6 +31,9 @@ namespace PCLCrypto
     /// <summary>
     /// Key formatting utilities.
     /// </summary>
+    /// <remarks>
+    /// Perhaps we could replace this whole file with a dependency on Mono.Security.Cryptography.CryptoConvert, defined in Mono.Security.dll
+    /// </remarks>
     internal static class PvkConvert
     {
         /// <summary>
