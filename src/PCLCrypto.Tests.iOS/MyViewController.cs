@@ -5,6 +5,7 @@ namespace PCLCrypto.Tests.iOS
     using System.Drawing;
     using PCLTesting.Infrastructure;
     using System.Globalization;
+    using System.Threading.Tasks;
 
     public class MyViewController : UIViewController
     {
@@ -64,10 +65,11 @@ namespace PCLCrypto.Tests.iOS
             this.runTestsButton.TouchUpInside += async (object sender, EventArgs e) =>
             {
                 this.runTestsButton.SetTitle("Tests running!", UIControlState.Disabled);
+                this.runTestsButton.Enabled = false;
                 try
                 {
                     var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
-                    await testRunner.RunTestsAsync();
+                    await Task.Run(() => testRunner.RunTestsAsync());
                     this.summaryTextView.Text = string.Format(
                         CultureInfo.CurrentCulture,
                         "{0}/{1} tests passed ({2}%)",
@@ -86,6 +88,7 @@ namespace PCLCrypto.Tests.iOS
                 }
 
                 this.runTestsButton.SetTitle("Run tests", UIControlState.Normal);
+                this.runTestsButton.Enabled = true;
             };
 
             this.runTestsButton.AutoresizingMask =
