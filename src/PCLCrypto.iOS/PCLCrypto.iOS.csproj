@@ -104,12 +104,6 @@
       <SubType>
       </SubType>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RsaAsymmetricKeyAlgorithmProvider.cs">
-      <Link>RsaAsymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RsaCryptographicKey.cs">
-      <Link>RsaCryptographicKey.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\SymmetricCryptographicKey.cs">
       <Link>SymmetricCryptographicKey.cs</Link>
     </Compile>
@@ -131,6 +125,8 @@
     <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
       <Link>WinRTCrypto.cs</Link>
     </Compile>
+    <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="RsaCryptographicKey.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
