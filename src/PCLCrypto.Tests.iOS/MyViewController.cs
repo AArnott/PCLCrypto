@@ -9,8 +9,9 @@ namespace PCLCrypto.Tests.iOS
     public class MyViewController : UIViewController
     {
         private UIButton runTestsButton;
-        private UITextView resultsTextView;
-        private UITextView summaryTextView;
+        private UIScrollView resultsScrollView;
+        private UILabel resultsTextView;
+        private UILabel summaryTextView;
         private float buttonWidth = 200;
         private float buttonHeight = 50;
 
@@ -26,18 +27,30 @@ namespace PCLCrypto.Tests.iOS
             this.View.BackgroundColor = UIColor.White;
             this.View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 
-            this.resultsTextView = new UITextView();
-            this.resultsTextView.Frame = new RectangleF(
-                0,
-                this.buttonHeight,
-                this.View.Frame.Width,
-                this.View.Frame.Height - this.buttonHeight * 2);
-            this.summaryTextView = new UITextView();
-            this.summaryTextView.Frame = new RectangleF(
-                0,
-                this.View.Frame.Height - this.buttonHeight,
-                this.View.Frame.Width,
-                this.buttonHeight);
+            this.resultsScrollView = new UIScrollView
+            {
+                Frame = new RectangleF(
+                    0,
+                    this.buttonHeight,
+                    this.View.Frame.Width,
+                    this.View.Frame.Height - this.buttonHeight * 2),
+            };
+            this.resultsTextView = new UILabel
+            {
+                Lines = 0,
+                Font = UIFont.PreferredBody,
+                LineBreakMode = UILineBreakMode.WordWrap,
+                AdjustsFontSizeToFitWidth = false,
+                Frame = this.resultsScrollView.Frame,
+            };
+            this.summaryTextView = new UILabel
+            {
+                Frame = new RectangleF(
+                    0,
+                    this.View.Frame.Height - this.buttonHeight,
+                    this.View.Frame.Width,
+                    this.buttonHeight),
+            };
 
             this.runTestsButton = UIButton.FromType(UIButtonType.RoundedRect);
             this.runTestsButton.Frame = new RectangleF(
@@ -62,6 +75,9 @@ namespace PCLCrypto.Tests.iOS
                         testRunner.TestCount,
                         100 * testRunner.PassCount / testRunner.TestCount);
                     this.resultsTextView.Text = testRunner.Log;
+                    this.resultsTextView.SizeToFit();
+
+                    this.resultsScrollView.ContentSize = new SizeF(this.resultsScrollView.ContentSize.Width, this.resultsTextView.Frame.Size.Height);
                 }
                 catch (Exception ex)
                 {
@@ -72,14 +88,15 @@ namespace PCLCrypto.Tests.iOS
                 this.runTestsButton.SetTitle("Run tests", UIControlState.Normal);
             };
 
-            this.runTestsButton.AutoresizingMask = 
+            this.runTestsButton.AutoresizingMask =
                 UIViewAutoresizing.FlexibleWidth |
                 UIViewAutoresizing.FlexibleTopMargin |
                 UIViewAutoresizing.FlexibleBottomMargin;
 
             this.View.AddSubview(this.runTestsButton);
             this.View.AddSubview(this.summaryTextView);
-            this.View.AddSubview(this.resultsTextView);
+            this.View.AddSubview(this.resultsScrollView);
+            this.resultsScrollView.AddSubview(this.resultsTextView);
         }
     }
 }
