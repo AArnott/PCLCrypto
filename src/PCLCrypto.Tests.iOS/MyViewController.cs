@@ -9,8 +9,8 @@ namespace PCLCrypto.Tests.iOS
     public class MyViewController : UIViewController
     {
         private UIButton runTestsButton;
-        private UITextView summaryTextView;
         private UITextView resultsTextView;
+        private UITextView summaryTextView;
         private float buttonWidth = 200;
         private float buttonHeight = 50;
 
@@ -26,14 +26,14 @@ namespace PCLCrypto.Tests.iOS
             this.View.BackgroundColor = UIColor.White;
             this.View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 
-            this.summaryTextView = new UITextView();
-            this.summaryTextView.Frame = new RectangleF(
+            this.resultsTextView = new UITextView();
+            this.resultsTextView.Frame = new RectangleF(
                 0,
                 this.buttonHeight,
                 this.View.Frame.Width,
                 this.View.Frame.Height - this.buttonHeight * 2);
-            this.resultsTextView = new UITextView();
-            this.resultsTextView.Frame = new RectangleF(
+            this.summaryTextView = new UITextView();
+            this.summaryTextView.Frame = new RectangleF(
                 0,
                 this.View.Frame.Height - this.buttonHeight,
                 this.View.Frame.Width,
@@ -65,6 +65,7 @@ namespace PCLCrypto.Tests.iOS
                 }
                 catch (Exception ex)
                 {
+                    this.summaryTextView.Text = "Test run failed.";
                     this.resultsTextView.Text = ex.ToString();
                 }
 
@@ -77,8 +78,8 @@ namespace PCLCrypto.Tests.iOS
                 UIViewAutoresizing.FlexibleBottomMargin;
 
             this.View.AddSubview(this.runTestsButton);
-            this.View.AddSubview(this.resultsTextView);
             this.View.AddSubview(this.summaryTextView);
+            this.View.AddSubview(this.resultsTextView);
         }
     }
 }
