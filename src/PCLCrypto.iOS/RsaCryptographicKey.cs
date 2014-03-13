@@ -127,13 +127,58 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
-            throw new NotImplementedException();
+            byte[] cipherText;
+            var code = this.publicKey.Encrypt(GetPadding(this.Algorithm), data, out cipherText);
+            Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+            return cipherText;
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            throw new NotImplementedException();
+            // Initialize a plaintext buffer that is at least as large
+            // as the plaintext could possibly be, which is as large as the
+            // ciphertext is. Note the resulting plaintext could be smaller
+            // as padding may be included in the ciphertext.
+            byte[] plainText = new byte[data.Length];
+
+            // BUGBUG: Xamarin.iOS interop API doesn't allow us to determine the
+            // actual length of the plaintext after decryption. Padding causes an
+            // unpredictable plaintext length to be returned and we rely on the
+            // SecKeyDecrypt API's output plainTextLen parameter to tell us, but
+            // Xamarin.iOS doesn't hand this back to us.
+            var code = this.privateKey.Decrypt(GetPadding(this.Algorithm), data, plainText);
+            Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+            return plainText;
+        }
+
+        /// <summary>
+        /// Gets the iOS padding algorithm for a given asymmetric algorithm.
+        /// </summary>
+        /// <param name="algorithm">The asymmetric algorithm.</param>
+        /// <returns>The iOS platform padding enum.</returns>
+        private static SecPadding GetPadding(AsymmetricAlgorithm algorithm)
+        {
+            switch (algorithm)
+            {
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                    return SecPadding.OAEP;
+                case AsymmetricAlgorithm.RsaPkcs1:
+                    return SecPadding.PKCS1;
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
+                    return SecPadding.PKCS1SHA1;
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
+                    return SecPadding.PKCS1SHA256;
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
+                    return SecPadding.PKCS1SHA384;
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                    return SecPadding.PKCS1SHA512;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }
