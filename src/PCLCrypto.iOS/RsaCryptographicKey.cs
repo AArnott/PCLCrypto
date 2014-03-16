@@ -104,13 +104,29 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            throw new NotImplementedException();
+            byte[] signature = new byte[this.privateKey.BlockSize * 8];
+            GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            GCHandle sigHandle = GCHandle.Alloc(signature, GCHandleType.Pinned);
+            try
+            {
+                int signatureLength = signature.Length;
+                SecStatusCode code = SecKeyRawSign(this.privateKey.Handle, GetPadding(this.Algorithm), dataHandle.AddrOfPinnedObject(), data.Length, sigHandle.AddrOfPinnedObject(), ref signatureLength);
+                Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+                TrimBuffer(ref signature, signatureLength, secureClearOldBuffer: false);
+                return signature;
+            }
+            finally
+            {
+                dataHandle.Free();
+                sigHandle.Free();
+            }
         }
 
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            throw new NotImplementedException();
+            SecStatusCode code = this.publicKey.RawVerify(GetPadding(this.Algorithm), data, signature);
+            return code == SecStatusCode.Success;
         }
 
         /// <inheritdoc />
@@ -155,15 +171,7 @@ namespace PCLCrypto
                 int plainTextLength = plainText.Length;
                 SecStatusCode code = SecKeyDecrypt(this.privateKey.Handle, GetPadding(this.Algorithm), cipherTextHandle.AddrOfPinnedObject(), data.Length, plainTextHandle.AddrOfPinnedObject(), ref plainTextLength);
                 Verify.Operation(code == SecStatusCode.Success, "status was " + code);
-                if (plainTextLength < plainText.Length)
-                {
-                    // Reallocate the plaintext buffer so we can return a buffer of the appropriate size to the caller.
-                    byte[] smallerBuffer = new byte[plainTextLength];
-                    Array.Copy(plainText, smallerBuffer, plainTextLength);
-
-                    // A one more piece of security, clear out the plaintext buffer we won't be returning to the caller.
-                    Array.Clear(plainText, 0, plainText.Length);
-                }
+                TrimBuffer(ref plainText, plainTextLength, secureClearOldBuffer: true);
 
                 return plainText;
             }
@@ -173,6 +181,27 @@ namespace PCLCrypto
                 plainTextHandle.Free();
             }
         }
+
+        private static void TrimBuffer(ref byte[] buffer, int bufferLength, bool secureClearOldBuffer)
+        {
+            Requires.NotNull(buffer, "buffer");
+
+            if (bufferLength < buffer.Length)
+            {
+                // Reallocate the buffer so we can return a buffer of the appropriate size to the caller.
+                byte[] smallerBuffer = new byte[bufferLength];
+                Array.Copy(buffer, smallerBuffer, bufferLength);
+
+                if (secureClearOldBuffer)
+                {
+                    // A one more piece of security, clear out the original buffer we won't be returning to the caller.
+                    Array.Clear(buffer, 0, buffer.Length);
+                }
+
+                buffer = smallerBuffer;
+            }
+        }
+
 
         /// <summary>
         /// Gets the iOS padding algorithm for a given asymmetric algorithm.
