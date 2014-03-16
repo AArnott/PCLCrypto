@@ -52,7 +52,7 @@ namespace PCLCrypto
             NSString kSecAttrKeySizeInBits;
             NSString kSecAttrKeyTypeRSA;
 
-            var handle = Dlfcn.dlopen(Constants.SecurityLibrary, 0);
+            IntPtr handle = Dlfcn.dlopen(Constants.SecurityLibrary, 0);
             Assumes.False(handle == IntPtr.Zero);
 
             try

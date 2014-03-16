@@ -13,6 +13,7 @@ namespace PCLCrypto
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using MonoTouch;
     using MonoTouch.Security;
     using Validation;
 
@@ -250,10 +251,10 @@ namespace PCLCrypto
         /// <param name="plainText">The buffer to receive the plaintext. This should be at least as large as the <paramref name="cipherText"/> buffer.</param>
         /// <param name="plainTextLen">Indicates the length of the <paramref name="plainText"/> buffer. Upon return, this value is set to the length of the actual decrypted bytes.</param>
         /// <returns>A value indicating the successful or failure result of the operation.</returns>
-        [DllImport("/System/Library/Frameworks/Security.framework/Security")]
+        [DllImport(Constants.SecurityLibrary)]
         private static extern SecStatusCode SecKeyDecrypt(IntPtr handle, SecPadding padding, IntPtr cipherText, int cipherTextLen, IntPtr plainText, ref int plainTextLen);
 
-        [DllImport("/System/Library/Frameworks/Security.framework/Security")]
+        [DllImport(Constants.SecurityLibrary)]
         private static extern SecStatusCode SecKeyRawSign(IntPtr handle, SecPadding padding, IntPtr dataToSign, int dataToSignLen, IntPtr sig, ref int sigLen);
     }
 }
