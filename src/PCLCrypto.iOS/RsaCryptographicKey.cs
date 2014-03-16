@@ -107,7 +107,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            byte[] signature = new byte[this.privateKey.BlockSize * 8];
+            byte[] signature = new byte[this.privateKey.BlockSize];
             GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             GCHandle sigHandle = GCHandle.Alloc(signature, GCHandleType.Pinned);
             try
