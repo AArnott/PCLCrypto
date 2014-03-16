@@ -23,10 +23,13 @@ namespace PCLCrypto
     internal class RsaCryptographicKey : CryptographicKey, ICryptographicKey
     {
         /// <summary>
-        /// The platform crypto key.
+        /// The platform public key.
         /// </summary>
         private readonly SecKey publicKey;
 
+        /// <summary>
+        /// The platform private key.
+        /// </summary>
         private readonly SecKey privateKey;
 
         /// <summary>
@@ -182,6 +185,12 @@ namespace PCLCrypto
             }
         }
 
+        /// <summary>
+        /// Resizes a buffer to match the prescribed size.
+        /// </summary>
+        /// <param name="buffer">The buffer to be resized.</param>
+        /// <param name="bufferLength">Desired length of the buffer.</param>
+        /// <param name="secureClearOldBuffer">if set to <c>true</c>, the old buffer is cleared of its contents in the event that it is discarded.</param>
         private static void TrimBuffer(ref byte[] buffer, int bufferLength, bool secureClearOldBuffer)
         {
             Requires.NotNull(buffer, "buffer");
@@ -201,7 +210,6 @@ namespace PCLCrypto
                 buffer = smallerBuffer;
             }
         }
-
 
         /// <summary>
         /// Gets the iOS padding algorithm for a given asymmetric algorithm.
@@ -241,11 +249,11 @@ namespace PCLCrypto
         /// <param name="cipherTextLen">The length of the ciphertext to decrypt.</param>
         /// <param name="plainText">The buffer to receive the plaintext. This should be at least as large as the <paramref name="cipherText"/> buffer.</param>
         /// <param name="plainTextLen">Indicates the length of the <paramref name="plainText"/> buffer. Upon return, this value is set to the length of the actual decrypted bytes.</param>
-        /// <returns></returns>
+        /// <returns>A value indicating the successful or failure result of the operation.</returns>
         [DllImport("/System/Library/Frameworks/Security.framework/Security")]
-        private extern static SecStatusCode SecKeyDecrypt(IntPtr handle, SecPadding padding, IntPtr cipherText, int cipherTextLen, IntPtr plainText, ref int plainTextLen);
+        private static extern SecStatusCode SecKeyDecrypt(IntPtr handle, SecPadding padding, IntPtr cipherText, int cipherTextLen, IntPtr plainText, ref int plainTextLen);
 
         [DllImport("/System/Library/Frameworks/Security.framework/Security")]
-        private extern static SecStatusCode SecKeyRawSign(IntPtr handle, SecPadding padding, IntPtr dataToSign, int dataToSignLen, IntPtr sig, ref int sigLen);
+        private static extern SecStatusCode SecKeyRawSign(IntPtr handle, SecPadding padding, IntPtr dataToSign, int dataToSignLen, IntPtr sig, ref int sigLen);
     }
 }
