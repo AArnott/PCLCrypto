@@ -9,6 +9,7 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
@@ -142,14 +143,35 @@ namespace PCLCrypto
             // as padding may be included in the ciphertext.
             byte[] plainText = new byte[data.Length];
 
-            // BUGBUG: Xamarin.iOS interop API doesn't allow us to determine the
+            // WORKAROUND: Xamarin.iOS interop API doesn't allow us to determine the
             // actual length of the plaintext after decryption. Padding causes an
             // unpredictable plaintext length to be returned and we rely on the
             // SecKeyDecrypt API's output plainTextLen parameter to tell us, but
-            // Xamarin.iOS doesn't hand this back to us.
-            var code = this.privateKey.Decrypt(GetPadding(this.Algorithm), data, plainText);
-            Verify.Operation(code == SecStatusCode.Success, "status was " + code);
-            return plainText;
+            // Xamarin.iOS doesn't hand this back to us. So we use our own P/Invoke method instead.
+            GCHandle cipherTextHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            GCHandle plainTextHandle = GCHandle.Alloc(plainText, GCHandleType.Pinned);
+            try
+            {
+                int plainTextLength = plainText.Length;
+                SecStatusCode code = SecKeyDecrypt(this.privateKey.Handle, GetPadding(this.Algorithm), cipherTextHandle.AddrOfPinnedObject(), data.Length, plainTextHandle.AddrOfPinnedObject(), ref plainTextLength);
+                Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+                if (plainTextLength < plainText.Length)
+                {
+                    // Reallocate the plaintext buffer so we can return a buffer of the appropriate size to the caller.
+                    byte[] smallerBuffer = new byte[plainTextLength];
+                    Array.Copy(plainText, smallerBuffer, plainTextLength);
+
+                    // A one more piece of security, clear out the plaintext buffer we won't be returning to the caller.
+                    Array.Clear(plainText, 0, plainText.Length);
+                }
+
+                return plainText;
+            }
+            finally
+            {
+                cipherTextHandle.Free();
+                plainTextHandle.Free();
+            }
         }
 
         /// <summary>
@@ -180,5 +202,21 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
         }
+
+        /// <summary>
+        /// Decrypts a ciphertext that was asymmetrically encrypted.
+        /// </summary>
+        /// <param name="handle">The <see cref="SecKey.Handle"/> value from the private key to use in decryption.</param>
+        /// <param name="padding">The padding algorithm applied during encryption.</param>
+        /// <param name="cipherText">A pointer to the ciphertext to decrypt.</param>
+        /// <param name="cipherTextLen">The length of the ciphertext to decrypt.</param>
+        /// <param name="plainText">The buffer to receive the plaintext. This should be at least as large as the <paramref name="cipherText"/> buffer.</param>
+        /// <param name="plainTextLen">Indicates the length of the <paramref name="plainText"/> buffer. Upon return, this value is set to the length of the actual decrypted bytes.</param>
+        /// <returns></returns>
+        [DllImport("/System/Library/Frameworks/Security.framework/Security")]
+        private extern static SecStatusCode SecKeyDecrypt(IntPtr handle, SecPadding padding, IntPtr cipherText, int cipherTextLen, IntPtr plainText, ref int plainTextLen);
+
+        [DllImport("/System/Library/Frameworks/Security.framework/Security")]
+        private extern static SecStatusCode SecKeyRawSign(IntPtr handle, SecPadding padding, IntPtr dataToSign, int dataToSignLen, IntPtr sig, ref int sigLen);
     }
 }
