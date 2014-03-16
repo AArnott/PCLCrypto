@@ -66,7 +66,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public int KeySize
         {
-            get { throw new NotImplementedException(); }
+            get { return this.publicKey.BlockSize * 8; }
         }
 
         /// <summary>
