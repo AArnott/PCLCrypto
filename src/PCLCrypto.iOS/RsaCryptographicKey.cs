@@ -14,6 +14,9 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using MonoTouch;
+    using MonoTouch.CoreFoundation;
+    using MonoTouch.Foundation;
+    using MonoTouch.ObjCRuntime;
     using MonoTouch.Security;
     using Validation;
 
@@ -29,9 +32,19 @@ namespace PCLCrypto
         private readonly SecKey publicKey;
 
         /// <summary>
+        /// The tag that may be used to query the keychain for the public key.
+        /// </summary>
+        private readonly string publicKeyTag;
+
+        /// <summary>
         /// The platform private key.
         /// </summary>
         private readonly SecKey privateKey;
+
+        /// <summary>
+        /// The tag that may be used to query the keychain for the private key.
+        /// </summary>
+        private readonly string privateKeyTag;
 
         /// <summary>
         /// The algorithm to use when performing cryptography.
@@ -42,12 +55,14 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="publicKey">The public key.</param>
+        /// <param name="publicKeyTag">The tag that may be used to query the keychain for the public key.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(SecKey publicKey, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(SecKey publicKey, string publicKeyTag, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
 
             this.publicKey = publicKey;
+            this.publicKeyTag = publicKeyTag;
             this.algorithm = algorithm;
         }
 
@@ -55,15 +70,19 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="publicKey">The public key.</param>
+        /// <param name="publicKeyTag">The tag that may be used to query the keychain for the public key.</param>
         /// <param name="privateKey">The private key.</param>
+        /// <param name="privateKeyTag">The tag that may be used to query the keychain for the private key.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(SecKey publicKey, SecKey privateKey, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(SecKey publicKey, string publicKeyTag, SecKey privateKey, string privateKeyTag, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
             Requires.NotNull(privateKey, "privateKey");
 
             this.publicKey = publicKey;
+            this.publicKeyTag = publicKeyTag;
             this.privateKey = privateKey;
+            this.privateKeyTag = privateKeyTag;
             this.algorithm = algorithm;
         }
 

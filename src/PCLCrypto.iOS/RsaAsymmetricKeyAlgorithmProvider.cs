@@ -48,44 +48,34 @@ namespace PCLCrypto
         {
             Requires.Range(keySize > 0, "keySize");
 
-            NSString kSecAttrKeyType;
-            NSString kSecAttrKeySizeInBits;
-            NSString kSecAttrKeyTypeRSA;
+            string privateKeyAppTag = Guid.NewGuid().ToString();
+            string publicKeyAppTag = Guid.NewGuid().ToString();
 
-            IntPtr handle = Dlfcn.dlopen(Constants.SecurityLibrary, 0);
-            Assumes.False(handle == IntPtr.Zero);
+            // Configure parameters for the joint keypair.
+            var keyPairAttr = new NSMutableDictionary();
+            keyPairAttr[KSec.AttrKeyType] = KSec.AttrKeyTypeRSA;
+            keyPairAttr[KSec.AttrKeySizeInBits] = NSNumber.FromInt32(keySize);
 
-            try
-            {
-                kSecAttrKeyType = Dlfcn.GetStringConstant(handle, "kSecAttrKeyType");
-                kSecAttrKeySizeInBits = Dlfcn.GetStringConstant(handle, "kSecAttrKeySizeInBits");
-                kSecAttrKeyTypeRSA = Dlfcn.GetStringConstant(handle, "kSecAttrKeyTypeRSA");
-            }
-            finally
-            {
-                Dlfcn.dlclose(handle);
-            }
+            // Configure parameters for the private key
+            var privateKeyAttr = new NSMutableDictionary();
+            privateKeyAttr[KSec.AttrIsPermanent] = NSNumber.FromBoolean(true);
+            privateKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(privateKeyAppTag);
 
-            NSObject[] keys = new NSObject[] 
-            { 
-                kSecAttrKeyType, 
-                kSecAttrKeySizeInBits 
-            };
-            NSObject[] values = new NSObject[] 
-            { 
-                kSecAttrKeyTypeRSA, 
-                new NSNumber(keySize) 
-            };
+            // Configure parameters for the public key
+            var publicKeyAttr = new NSMutableDictionary();
+            publicKeyAttr[KSec.AttrIsPermanent] = NSNumber.FromBoolean(true);
+            publicKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(publicKeyAppTag);
 
-            SecKey publicKey;
-            SecKey privateKey;
+            // Parent the individual key parameters to the keypair one.
+            keyPairAttr[KSec.PublicKeyAttrs] = publicKeyAttr;
+            keyPairAttr[KSec.PrivateKeyAttrs] = privateKeyAttr;
 
-            NSDictionary parameters = NSDictionary.FromObjectsAndKeys(values, keys);
-
-            SecStatusCode code = SecKey.GenerateKeyPair(parameters, out publicKey, out privateKey);
+            // Generate the RSA key.
+            SecKey publicKey, privateKey;
+            SecStatusCode code = SecKey.GenerateKeyPair(keyPairAttr, out publicKey, out privateKey);
             Verify.Operation(code == SecStatusCode.Success, "status was " + code);
 
-            return new RsaCryptographicKey(publicKey, privateKey, this.algorithm);
+            return new RsaCryptographicKey(publicKey, publicKeyAppTag, privateKey, privateKeyAppTag, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -102,7 +92,7 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 
-            return new RsaCryptographicKey(publicKey, privateKey, this.algorithm);
+            return new RsaCryptographicKey(publicKey, null, privateKey, null, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -119,7 +109,7 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 
-            return new RsaCryptographicKey(publicKey, this.algorithm);
+            return new RsaCryptographicKey(publicKey, null, this.algorithm);
         }
     }
 }
