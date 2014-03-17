@@ -48,8 +48,9 @@ namespace PCLCrypto
         {
             Requires.Range(keySize > 0, "keySize");
 
-            string privateKeyAppTag = Guid.NewGuid().ToString();
-            string publicKeyAppTag = Guid.NewGuid().ToString();
+            string keyIdentifier = Guid.NewGuid().ToString();
+            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
+            string privateKeyIdentifier = RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier);
 
             // Configure parameters for the joint keypair.
             var keyPairAttr = new NSMutableDictionary();
@@ -59,12 +60,12 @@ namespace PCLCrypto
             // Configure parameters for the private key
             var privateKeyAttr = new NSMutableDictionary();
             privateKeyAttr[KSec.AttrIsPermanent] = NSNumber.FromBoolean(true);
-            privateKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(privateKeyAppTag);
+            privateKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(privateKeyIdentifier, NSStringEncoding.UTF8);
 
             // Configure parameters for the public key
             var publicKeyAttr = new NSMutableDictionary();
             publicKeyAttr[KSec.AttrIsPermanent] = NSNumber.FromBoolean(true);
-            publicKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(publicKeyAppTag);
+            publicKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(publicKeyIdentifier, NSStringEncoding.UTF8);
 
             // Parent the individual key parameters to the keypair one.
             keyPairAttr[KSec.PublicKeyAttrs] = publicKeyAttr;
@@ -75,7 +76,7 @@ namespace PCLCrypto
             SecStatusCode code = SecKey.GenerateKeyPair(keyPairAttr, out publicKey, out privateKey);
             Verify.Operation(code == SecStatusCode.Success, "status was " + code);
 
-            return new RsaCryptographicKey(publicKey, publicKeyAppTag, privateKey, privateKeyAppTag, this.algorithm);
+            return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -92,7 +93,7 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 
-            return new RsaCryptographicKey(publicKey, null, privateKey, null, this.algorithm);
+            return new RsaCryptographicKey(publicKey, privateKey, null, this.algorithm);
         }
 
         /// <inheritdoc/>

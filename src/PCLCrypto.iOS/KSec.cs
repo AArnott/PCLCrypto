@@ -41,6 +41,9 @@ namespace PCLCrypto
                 ClassKey = Dlfcn.GetStringConstant(handle, "kSecClassKey");
                 Class = Dlfcn.GetStringConstant(handle, "kSecClass");
                 ReturnData = Dlfcn.GetStringConstant(handle, "kSecReturnData");
+                AttrAccessibleWhenUnlocked = Dlfcn.GetStringConstant(handle, "kSecAttrAccessibleWhenUnlocked");
+                AttrAccessible = Dlfcn.GetStringConstant(handle, "kSecAttrAccessible");
+                ReturnRef = Dlfcn.GetStringConstant(handle, "kSecReturnRef");
             }
             finally
             {
@@ -97,5 +100,20 @@ namespace PCLCrypto
         /// Gets the kSecReturnData value.
         /// </summary>
         public static NSString ReturnData { get; private set; }
+
+        /// <summary>
+        /// Gets the kSecAttrAccessible value.
+        /// </summary>
+        public static NSString AttrAccessible { get; private set; }
+        
+        /// <summary>
+        /// Gets the kSecAttrAccessibleWhenUnlocked value.
+        /// </summary>
+        public static NSString AttrAccessibleWhenUnlocked { get; private set; }
+
+        /// <summary>
+        /// Gets the kSecReturnRef value.
+        /// </summary>
+        public static NSString ReturnRef { get; private set; }
     }
 }

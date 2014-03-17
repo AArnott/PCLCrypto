@@ -32,19 +32,14 @@ namespace PCLCrypto
         private readonly SecKey publicKey;
 
         /// <summary>
-        /// The tag that may be used to query the keychain for the public key.
-        /// </summary>
-        private readonly string publicKeyTag;
-
-        /// <summary>
         /// The platform private key.
         /// </summary>
         private readonly SecKey privateKey;
 
         /// <summary>
-        /// The tag that may be used to query the keychain for the private key.
+        /// The tag that may be used to query the keychain for the key.
         /// </summary>
-        private readonly string privateKeyTag;
+        private readonly string keyIdentifier;
 
         /// <summary>
         /// The algorithm to use when performing cryptography.
@@ -55,14 +50,14 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="publicKey">The public key.</param>
-        /// <param name="publicKeyTag">The tag that may be used to query the keychain for the public key.</param>
+        /// <param name="keyIdentifier">The key identifier that may be used to query the keychain.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(SecKey publicKey, string publicKeyTag, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(SecKey publicKey, string keyIdentifier, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
 
             this.publicKey = publicKey;
-            this.publicKeyTag = publicKeyTag;
+            this.keyIdentifier = keyIdentifier;
             this.algorithm = algorithm;
         }
 
@@ -70,19 +65,17 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="publicKey">The public key.</param>
-        /// <param name="publicKeyTag">The tag that may be used to query the keychain for the public key.</param>
         /// <param name="privateKey">The private key.</param>
-        /// <param name="privateKeyTag">The tag that may be used to query the keychain for the private key.</param>
+        /// <param name="keyIdentifier">The key identifier that may be used to query the keychain.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(SecKey publicKey, string publicKeyTag, SecKey privateKey, string privateKeyTag, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(SecKey publicKey, SecKey privateKey, string keyIdentifier, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
             Requires.NotNull(privateKey, "privateKey");
 
             this.publicKey = publicKey;
-            this.publicKeyTag = publicKeyTag;
             this.privateKey = privateKey;
-            this.privateKeyTag = privateKeyTag;
+            this.keyIdentifier = keyIdentifier;
             this.algorithm = algorithm;
         }
 
@@ -115,10 +108,12 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
+            RSAParameters rsaParameters = this.GetRSAParameters(includePrivateKey: false);
+
             switch (blobType)
             {
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                ////return this.key.ExportCspBlob(includePrivateParameters: false);
                 default:
                     throw new NotSupportedException();
             }
@@ -275,5 +270,76 @@ namespace PCLCrypto
 
         [DllImport(Constants.SecurityLibrary)]
         private static extern SecStatusCode SecKeyRawSign(IntPtr handle, SecPadding padding, IntPtr dataToSign, int dataToSignLen, IntPtr sig, ref int sigLen);
+
+        [DllImport(Constants.SecurityLibrary)]
+        private static extern int SecItemCopyMatching(IntPtr query, out IntPtr result);
+
+        private static NSMutableDictionary CreateKeyQueryDictionary(string tag)
+        {
+            var parameters = new NSMutableDictionary();
+            parameters[KSec.Class] = KSec.ClassKey;
+            parameters[KSec.AttrApplicationTag] = NSData.FromString(tag, NSStringEncoding.UTF8);
+            parameters[KSec.AttrKeyType] = KSec.AttrKeyTypeRSA;
+            parameters[KSec.AttrAccessible] = KSec.AttrAccessibleWhenUnlocked;
+            return parameters;
+        }
+
+        internal static string GetPrivateKeyIdentifierWithTag(string tag)
+        {
+            return tag + ".privateKey";
+        }
+
+        internal static string GetPublicKeyIdentifierWithTag(string tag)
+        {
+            return tag + ".publicKey";
+        }
+
+        private static NSData KeyDataWithTag(string tag)
+        {
+            NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
+            queryKey[KSec.ReturnData] = NSNumber.FromBoolean(true);
+
+            IntPtr typeRef;
+            int code = SecItemCopyMatching(queryKey.Handle, out typeRef);
+            var keyData = new NSData(typeRef);
+            return keyData;
+        }
+
+        private static SecKey KeyRefWithTag(string tag)
+        {
+            NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
+            queryKey[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+
+            IntPtr typeRef;
+            int code = SecItemCopyMatching(queryKey.Handle, out typeRef);
+            var keyRef = new SecKey(typeRef, owns: true);
+            return keyRef;
+        }
+
+        /// <summary>
+        /// Extracts the RSA parameters from platform keys.
+        /// </summary>
+        /// <param name="includePrivateKey">if set to <c>true</c> the RSA parameters will include the private key.</param>
+        /// <returns>The extracted RSA parameters.</returns>
+        private RSAParameters GetRSAParameters(bool includePrivateKey)
+        {
+            if (this.privateKey == null && includePrivateKey)
+            {
+                throw new InvalidOperationException("No private key data available.");
+            }
+
+            if (includePrivateKey)
+            {
+                throw new NotImplementedException();
+            }
+
+            NSData publicKeyData = KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier));
+            byte[] publicKeyBuffer = publicKeyData.ToArray();
+
+            NSData privateKeyData = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier));
+            byte[] privateKeyBuffer = privateKeyData.ToArray();
+
+            return new RSAParameters();
+        }
     }
 }
