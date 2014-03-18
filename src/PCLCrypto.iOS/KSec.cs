@@ -40,10 +40,14 @@ namespace PCLCrypto
                 PrivateKeyAttrs = Dlfcn.GetStringConstant(handle, "kSecPrivateKeyAttrs");
                 ClassKey = Dlfcn.GetStringConstant(handle, "kSecClassKey");
                 Class = Dlfcn.GetStringConstant(handle, "kSecClass");
+                AttrKeyClass = Dlfcn.GetStringConstant(handle, "kSecAttrKeyClass");
+                AttrKeyClassPublic = Dlfcn.GetStringConstant(handle, "kSecAttrKeyClassPublic");
                 ReturnData = Dlfcn.GetStringConstant(handle, "kSecReturnData");
+                ReturnPersistentRef = Dlfcn.GetStringConstant(handle, "kSecReturnPersistentRef");
                 AttrAccessibleWhenUnlocked = Dlfcn.GetStringConstant(handle, "kSecAttrAccessibleWhenUnlocked");
                 AttrAccessible = Dlfcn.GetStringConstant(handle, "kSecAttrAccessible");
                 ReturnRef = Dlfcn.GetStringConstant(handle, "kSecReturnRef");
+                ValueData = Dlfcn.GetStringConstant(handle, "kSecValueData");
             }
             finally
             {
@@ -115,5 +119,26 @@ namespace PCLCrypto
         /// Gets the kSecReturnRef value.
         /// </summary>
         public static NSString ReturnRef { get; private set; }
+
+        /// <summary>
+        /// Gets the kSecValueData value.
+        /// </summary>
+        public static NSString ValueData { get; private set; }
+
+        /// <summary>
+        /// Gets the kSecAttrKeyClass value.
+        /// </summary>
+        public static NSString AttrKeyClass { get; private set; }
+
+        /// <summary>
+        /// Gets the kSecReturnPersistentRef value.
+        /// </summary>
+        public static NSString ReturnPersistentRef { get; private set; }
+
+        /// <summary>
+        /// Gets the kSecAttrKeyClassPublic value.
+        /// </summary>
+        /// <returns></returns>
+        public static NSString AttrKeyClassPublic { get; private set; }
     }
 }

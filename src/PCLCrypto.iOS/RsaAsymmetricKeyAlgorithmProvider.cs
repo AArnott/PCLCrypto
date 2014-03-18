@@ -101,16 +101,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            SecKey publicKey;
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    throw new NotImplementedException();
-                default:
-                    throw new NotSupportedException();
-            }
-
-            return new RsaCryptographicKey(publicKey, null, this.algorithm);
+            return RsaCryptographicKey.ImportPublicKey(keyBlob, blobType, this.algorithm);
         }
     }
 }

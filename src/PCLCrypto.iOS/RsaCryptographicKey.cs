@@ -1,6 +1,8 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="RsaCryptographicKey.cs" company="Andrew Arnott">
 //     Copyright (c) Andrew Arnott. All rights reserved.
+//     Portions of this inspired by Patrick Hogan:
+//         https://github.com/kuapay/iOS-Certificate--Key--and-Trust-Sample-Project/blob/master/Crypto/Crypto/Crypto/BDRSACryptor.m
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -27,6 +29,11 @@ namespace PCLCrypto
     /// </summary>
     internal class RsaCryptographicKey : CryptographicKey, ICryptographicKey
     {
+        /// <summary>
+        /// The OID sequence to include at the start of an X.509 public key certificate.
+        /// </summary>
+        private static readonly byte[] OidSequence = new byte[] { 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00 };
+
         /// <summary>
         /// The platform public key.
         /// </summary>
@@ -113,6 +120,37 @@ namespace PCLCrypto
 
             switch (blobType)
             {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    {
+                        byte[] publicKeyData = KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
+
+                        byte[] builder = new byte[15];
+                        int bitstringEncLength;
+                        if (publicKeyData.Length + 1 < 128)
+                        {
+                            bitstringEncLength = 1;
+                        }
+                        else
+                        {
+                            bitstringEncLength = (publicKeyData.Length + 1) / 256 + 2;
+                        }
+
+                        builder[0] = 0x30;
+                        int i = OidSequence.Length + 2 + bitstringEncLength + publicKeyData.Length;
+                        int j = Encode(builder, 1, i);
+
+                        var encodedKey = new NSMutableData();
+                        encodedKey.AppendBytes(builder, 0, j + 1);
+                        encodedKey.AppendBytes(OidSequence);
+                        builder[0] = 0x03;
+                        j = Encode(builder, 1, publicKeyData.Length + 1);
+                        builder[j + 1] = 0x00;
+                        encodedKey.AppendBytes(builder, 0, j + 2);
+                        encodedKey.AppendBytes(publicKeyData);
+
+                        byte[] x509 = encodedKey.ToArray();
+                        return x509;
+                    }
                 case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                 default:
@@ -221,6 +259,106 @@ namespace PCLCrypto
             }
         }
 
+        internal static RsaCryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType, AsymmetricAlgorithm algorithm)
+        {
+            string keyIdentifier = Guid.NewGuid().ToString();
+            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
+
+            switch (blobType)
+            {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    {
+                        byte[] bytes = GetRawPublicKeyDataFromX509(keyBlob);
+                        var keyQueryDictionary = CreateKeyQueryDictionary(publicKeyIdentifier);
+                        keyQueryDictionary[KSec.ValueData] = NSData.FromArray(bytes);
+                        keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
+                        keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+                        IntPtr resultHandle;
+                        int status = SecItemAdd(keyQueryDictionary.Handle, out resultHandle);
+                        if (resultHandle != IntPtr.Zero)
+                        {
+                            var key = new SecKey(resultHandle, true);
+                            return new RsaCryptographicKey(key, keyIdentifier, algorithm);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("SecItemAdd return " + status);
+                        }
+                    }
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        private static byte[] GetRawPublicKeyDataFromX509(byte[] keyBlob)
+        {
+            int i = 0;
+            if (keyBlob[i++] != 0x30)
+            {
+                throw new ArgumentException("Bad format.");
+            }
+
+            if (keyBlob[i] > 0x80)
+            {
+                i += keyBlob[i] - 0x80 + 1;
+            }
+            else
+            {
+                i++;
+            }
+
+            if (i >= keyBlob.Length)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            if (keyBlob[i] != 0x30)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            i += OidSequence.Length;
+
+            if (i >= keyBlob.Length - 2)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            if (keyBlob[i++] != 0x03)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            if (keyBlob[i] > 0x80)
+            {
+                i += keyBlob[i] - 0x80 + 1;
+            }
+            else
+            {
+                i++;
+            }
+
+            if (i >= keyBlob.Length)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            if (keyBlob[i++] != 0x00)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            if (i >= keyBlob.Length)
+            {
+                throw new ArgumentException("Bad format");
+            }
+
+            byte[] strippedPublicKeyData = new byte[keyBlob.Length - i];
+            Array.Copy(keyBlob, i, strippedPublicKeyData, 0, strippedPublicKeyData.Length);
+
+            return strippedPublicKeyData;
+        }
+
         /// <summary>
         /// Resizes a buffer to match the prescribed size.
         /// </summary>
@@ -295,6 +433,9 @@ namespace PCLCrypto
         [DllImport(Constants.SecurityLibrary)]
         private static extern int SecItemCopyMatching(IntPtr query, out IntPtr result);
 
+        [DllImport(Constants.SecurityLibrary)]
+        private static extern int SecItemAdd(IntPtr query, out IntPtr result);
+
         private static NSMutableDictionary CreateKeyQueryDictionary(string tag)
         {
             var parameters = new NSMutableDictionary();
@@ -335,6 +476,25 @@ namespace PCLCrypto
             int code = SecItemCopyMatching(queryKey.Handle, out typeRef);
             var keyRef = new SecKey(typeRef, owns: true);
             return keyRef;
+        }
+
+        private static int Encode(byte[] buffer, int offset, int length)
+        {
+            if (length < 128)
+            {
+                buffer[offset] = (byte)length;
+                return 1;
+            }
+
+            int i = length / 256 + 1;
+            buffer[offset] = (byte)(i + 0x80);
+            for (int j = 0; j < i; ++j)
+            {
+                buffer[offset + i - j] = (byte)(length & 0xff);
+                length = length >> 8;
+            }
+
+            return i + 1;
         }
 
         /// <summary>
