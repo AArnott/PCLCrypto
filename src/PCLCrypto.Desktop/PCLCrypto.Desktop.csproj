@@ -46,10 +46,12 @@
     <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
       <Link>WinRTCrypto.cs</Link>
     </Compile>
+    <Compile Include="Formatters\Asn.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="CryptographicEngine.cs" />
+    <Compile Include="Formatters\X509SubjectPublicKeyInfoFormatter.cs" />
     <Compile Include="NetFxCryptographicHash.cs" />
     <Compile Include="CryptographicKey.cs" />
     <Compile Include="CryptoUtilities.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProviderFactory.cs" />
     <Compile Include="MacCryptographicKey.cs" />
+    <Compile Include="Formatters\Pkcs1KeyFormatter.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
     <Compile Include="CngCryptographicKey.cs" />

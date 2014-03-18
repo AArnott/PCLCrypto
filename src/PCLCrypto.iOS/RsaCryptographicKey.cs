@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography;
@@ -21,6 +22,7 @@ namespace PCLCrypto
     using MonoTouch.Foundation;
     using MonoTouch.ObjCRuntime;
     using MonoTouch.Security;
+    using PCLCrypto.Formatters;
     using Validation;
 
     /// <summary>
@@ -29,11 +31,6 @@ namespace PCLCrypto
     /// </summary>
     internal class RsaCryptographicKey : CryptographicKey, ICryptographicKey
     {
-        /// <summary>
-        /// The OID sequence to include at the start of an X.509 public key certificate.
-        /// </summary>
-        private static readonly byte[] OidSequence = new byte[] { 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00 };
-
         /// <summary>
         /// The platform public key.
         /// </summary>
@@ -106,8 +103,8 @@ namespace PCLCrypto
         {
             switch (blobType)
             {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                ////return this.key.ExportCspBlob(includePrivateParameters: true);
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    return KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
                 default:
                     throw new NotSupportedException();
             }
@@ -116,43 +113,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            RSAParameters rsaParameters = this.GetRSAParameters(includePrivateKey: false);
-
+            RSAParameters parameters = Pkcs1KeyFormatter.ReadPkcs1PublicKey(KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier)).ToArray());
             switch (blobType)
             {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    {
-                        byte[] publicKeyData = KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
-
-                        byte[] builder = new byte[15];
-                        int bitstringEncLength;
-                        if (publicKeyData.Length + 1 < 128)
-                        {
-                            bitstringEncLength = 1;
-                        }
-                        else
-                        {
-                            bitstringEncLength = (publicKeyData.Length + 1) / 256 + 2;
-                        }
-
-                        builder[0] = 0x30;
-                        int i = OidSequence.Length + 2 + bitstringEncLength + publicKeyData.Length;
-                        int j = Encode(builder, 1, i);
-
-                        var encodedKey = new NSMutableData();
-                        encodedKey.AppendBytes(builder, 0, j + 1);
-                        encodedKey.AppendBytes(OidSequence);
-                        builder[0] = 0x03;
-                        j = Encode(builder, 1, publicKeyData.Length + 1);
-                        builder[j + 1] = 0x00;
-                        encodedKey.AppendBytes(builder, 0, j + 2);
-                        encodedKey.AppendBytes(publicKeyData);
-
-                        byte[] x509 = encodedKey.ToArray();
-                        return x509;
-                    }
                 case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                    return Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: false);
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    return X509SubjectPublicKeyInfoFormatter.WriteX509SubjectPublicKeyInfo(parameters);
                 default:
                     throw new NotSupportedException();
             }
@@ -261,102 +228,72 @@ namespace PCLCrypto
 
         internal static RsaCryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType, AsymmetricAlgorithm algorithm)
         {
-            string keyIdentifier = Guid.NewGuid().ToString();
-            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
-
+            RSAParameters parameters;
             switch (blobType)
             {
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    {
-                        byte[] bytes = GetRawPublicKeyDataFromX509(keyBlob);
-                        var keyQueryDictionary = CreateKeyQueryDictionary(publicKeyIdentifier);
-                        keyQueryDictionary[KSec.ValueData] = NSData.FromArray(bytes);
-                        keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
-                        keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
-                        IntPtr resultHandle;
-                        int status = SecItemAdd(keyQueryDictionary.Handle, out resultHandle);
-                        if (resultHandle != IntPtr.Zero)
-                        {
-                            var key = new SecKey(resultHandle, true);
-                            return new RsaCryptographicKey(key, keyIdentifier, algorithm);
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException("SecItemAdd return " + status);
-                        }
-                    }
+                    parameters = X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob);
+                    break;
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                    parameters = Pkcs1KeyFormatter.ReadPkcs1PublicKey(keyBlob);
+                    break;
                 default:
                     throw new NotSupportedException();
             }
+
+            // Inject the PKCS#1 public key into the KeyChain.
+            string keyIdentifier = Guid.NewGuid().ToString();
+            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
+            var keyQueryDictionary = CreateKeyQueryDictionary(publicKeyIdentifier);
+            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: false));
+            keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
+            keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+            IntPtr resultHandle;
+            int status = SecItemAdd(keyQueryDictionary.Handle, out resultHandle);
+            if (resultHandle != IntPtr.Zero)
+            {
+                var key = new SecKey(resultHandle, true);
+                return new RsaCryptographicKey(key, keyIdentifier, algorithm);
+            }
+            else
+            {
+                throw new InvalidOperationException("SecItemAdd return " + status);
+            }
         }
 
-        private static byte[] GetRawPublicKeyDataFromX509(byte[] keyBlob)
+        internal static RsaCryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithm)
         {
-            int i = 0;
-            if (keyBlob[i++] != 0x30)
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            RSAParameters parameters;
+            switch (blobType)
             {
-                throw new ArgumentException("Bad format.");
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyBlob);
+                    break;
+                default:
+                    throw new NotSupportedException();
             }
 
-            if (keyBlob[i] > 0x80)
-            {
-                i += keyBlob[i] - 0x80 + 1;
-            }
-            else
-            {
-                i++;
-            }
+            string keyIdentifier = Guid.NewGuid().ToString();
+            SecKey privateKey = ImportKey(parameters, GetPrivateKeyIdentifierWithTag(keyIdentifier));
+            SecKey publicKey = ImportKey(parameters.PublicKeyFilter(), GetPublicKeyIdentifierWithTag(keyIdentifier));
+            return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, algorithm);
+        }
 
-            if (i >= keyBlob.Length)
+        private static SecKey ImportKey(RSAParameters parameters, string tag)
+        {
+            using (var keyQueryDictionary = CreateKeyQueryDictionary(tag))
             {
-                throw new ArgumentException("Bad format");
+                byte[] pkcs1Key = Pkcs1KeyFormatter.WritePkcs1(parameters, parameters.D != null);
+                keyQueryDictionary[KSec.ValueData] = NSData.FromArray(pkcs1Key);
+                keyQueryDictionary[KSec.AttrKeyClass] = parameters.D != null ? KSec.AttrKeyClassPrivate : KSec.AttrKeyClassPublic;
+                keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+                IntPtr handle;
+                int status = SecItemAdd(keyQueryDictionary.Handle, out handle);
+                Verify.Operation(status == 0, "SecItemAdd returned {0}", status);
+                return new SecKey(handle, true);
             }
-
-            if (keyBlob[i] != 0x30)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            i += OidSequence.Length;
-
-            if (i >= keyBlob.Length - 2)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (keyBlob[i++] != 0x03)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (keyBlob[i] > 0x80)
-            {
-                i += keyBlob[i] - 0x80 + 1;
-            }
-            else
-            {
-                i++;
-            }
-
-            if (i >= keyBlob.Length)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (keyBlob[i++] != 0x00)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (i >= keyBlob.Length)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            byte[] strippedPublicKeyData = new byte[keyBlob.Length - i];
-            Array.Copy(keyBlob, i, strippedPublicKeyData, 0, strippedPublicKeyData.Length);
-
-            return strippedPublicKeyData;
         }
 
         /// <summary>
@@ -476,51 +413,6 @@ namespace PCLCrypto
             int code = SecItemCopyMatching(queryKey.Handle, out typeRef);
             var keyRef = new SecKey(typeRef, owns: true);
             return keyRef;
-        }
-
-        private static int Encode(byte[] buffer, int offset, int length)
-        {
-            if (length < 128)
-            {
-                buffer[offset] = (byte)length;
-                return 1;
-            }
-
-            int i = length / 256 + 1;
-            buffer[offset] = (byte)(i + 0x80);
-            for (int j = 0; j < i; ++j)
-            {
-                buffer[offset + i - j] = (byte)(length & 0xff);
-                length = length >> 8;
-            }
-
-            return i + 1;
-        }
-
-        /// <summary>
-        /// Extracts the RSA parameters from platform keys.
-        /// </summary>
-        /// <param name="includePrivateKey">if set to <c>true</c> the RSA parameters will include the private key.</param>
-        /// <returns>The extracted RSA parameters.</returns>
-        private RSAParameters GetRSAParameters(bool includePrivateKey)
-        {
-            if (this.privateKey == null && includePrivateKey)
-            {
-                throw new InvalidOperationException("No private key data available.");
-            }
-
-            if (includePrivateKey)
-            {
-                throw new NotImplementedException();
-            }
-
-            NSData publicKeyData = KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier));
-            byte[] publicKeyBuffer = publicKeyData.ToArray();
-
-            NSData privateKeyData = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier));
-            byte[] privateKeyBuffer = privateKeyData.ToArray();
-
-            return new RSAParameters();
         }
     }
 }
