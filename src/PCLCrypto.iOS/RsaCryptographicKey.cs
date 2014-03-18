@@ -8,6 +8,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography;
@@ -122,41 +123,61 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            byte[] signature = new byte[this.privateKey.BlockSize];
-            GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            GCHandle sigHandle = GCHandle.Alloc(signature, GCHandleType.Pinned);
-            try
+            using (var hasher = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
             {
-                int signatureLength = signature.Length;
-                SecStatusCode code = SecKeyRawSign(this.privateKey.Handle, GetPadding(this.Algorithm), dataHandle.AddrOfPinnedObject(), data.Length, sigHandle.AddrOfPinnedObject(), ref signatureLength);
-                Verify.Operation(code == SecStatusCode.Success, "status was " + code);
-                TrimBuffer(ref signature, signatureLength, secureClearOldBuffer: false);
-                return signature;
-            }
-            finally
-            {
-                dataHandle.Free();
-                sigHandle.Free();
+                byte[] hash = hasher.ComputeHash(data);
+                return this.SignHash(hash);
             }
         }
 
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            SecStatusCode code = this.publicKey.RawVerify(GetPadding(this.Algorithm), data, signature);
-            return code == SecStatusCode.Success;
+            using (var hasher = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            {
+                byte[] hash = hasher.ComputeHash(data);
+                return this.VerifyHash(hash, signature);
+            }
         }
 
         /// <inheritdoc />
         protected internal override byte[] SignHash(byte[] data)
         {
-            throw new NotImplementedException();
+            byte[] signature = new byte[this.privateKey.BlockSize];
+
+            GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            GCHandle signatureHandle = GCHandle.Alloc(signature, GCHandleType.Pinned);
+            try
+            {
+                int signatureLength = signature.Length;
+                var padding = GetPadding(this.Algorithm);
+                SecStatusCode code = SecKeyRawSign(
+                     this.privateKey.Handle,
+                     padding,
+                     dataHandle.AddrOfPinnedObject(),
+                     data.Length,
+                     signatureHandle.AddrOfPinnedObject(),
+                     ref signatureLength);
+
+                Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+                TrimBuffer(ref signature, signatureLength, secureClearOldBuffer: false);
+            }
+            finally
+            {
+                signatureHandle.Free();
+                dataHandle.Free();
+            }
+
+            // TODO: Do we need to do any work on the returned signature so that it includes
+            // the proper OID header?
+            return signature;
         }
 
         /// <inheritdoc />
         protected internal override bool VerifyHash(byte[] data, byte[] signature)
         {
-            throw new NotImplementedException();
+            SecStatusCode code = this.publicKey.RawVerify(GetPadding(this.Algorithm), data, signature);
+            return code == SecStatusCode.Success;
         }
 
         /// <inheritdoc />
