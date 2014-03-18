@@ -1,4 +1,10 @@
-﻿namespace PCLCrypto.Formatters
+﻿//-----------------------------------------------------------------------
+// <copyright file="Asn.cs" company="Andrew Arnott">
+//     Copyright (c) Andrew Arnott. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace PCLCrypto.Formatters
 {
     using System;
     using System.Collections.Generic;
@@ -7,9 +13,115 @@
     using System.Text;
     using Validation;
 
-    // http://en.wikipedia.org/wiki/X.690
+    /// <summary>
+    /// Encodes/decodes ASN.1 messages.
+    /// </summary>
+    /// <remarks>
+    /// The ASN.1 format is documented here:
+    /// http://en.wikipedia.org/wiki/X.690
+    /// </remarks>
     internal static class Asn
     {
+        /// <summary>
+        /// The BER encoding Class of a data element.
+        /// </summary>
+        internal enum BerClass : byte
+        {
+            /// <summary>
+            /// The type is native to ASN.1
+            /// </summary>
+            Universal = 0x00,
+
+            /// <summary>
+            /// The type is only valid for one specific application
+            /// </summary>
+            Application = 0x40,
+
+            /// <summary>
+            /// Meaning of this type depends on the context (such as within a sequence, set or choice)
+            /// </summary>
+            ContextSpecific = 0x80,
+
+            /// <summary>
+            /// Defined in private specifications
+            /// </summary>
+            Private = 0xC0,
+
+            /// <summary>
+            /// The set of bits that describe the class.
+            /// </summary>
+            Mask = 0xC0,
+        }
+
+        /// <summary>
+        /// The BER encoding PC (primitive or constructed) of a data element.
+        /// </summary>
+        internal enum BerPC : byte
+        {
+            /// <summary>
+            /// The content is primitive like an <see cref="BerTag.Integer"/>.
+            /// </summary>
+            Primitive = 0x00,
+
+            /// <summary>
+            /// The content holds type-length-value values like a <see cref="BerTag.Sequence"/>.
+            /// </summary>
+            Constructed = 0x20,
+
+            /// <summary>
+            /// The set of bits that describe the PC.
+            /// </summary>
+            Mask = 0x20,
+        }
+
+        /// <summary>
+        /// The BER encoding Tag of a data element.
+        /// </summary>
+        internal enum BerTag : byte
+        {
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is an integer.
+            /// </summary>
+            Integer = 0x2,
+
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is a bit string.
+            /// </summary>
+            BitString = 0x3,
+
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is null.
+            /// </summary>
+            Null = 0x5,
+
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is an object identifier.
+            /// </summary>
+            ObjectIdentifier = 0x6,
+
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is a sequence.
+            /// </summary>
+            Sequence = 0x10,
+
+            /// <summary>
+            /// The set of bits that describe the tag.
+            /// </summary>
+            Mask = 0x1F,
+        }
+
+        /// <summary>
+        /// Reads a sequence of ASN.1 elements from a stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>A sequence of elements.</returns>
+        /// <remarks>
+        /// The stream may not contain exclusively ASN.1 data.
+        /// This method will read the stream exactly one element at a time,
+        /// and the caller should only enumerate as many elements as are expected
+        /// to avoid reading into other data.
+        /// If the end of the stream is reached, the sequence terminates.
+        /// </remarks>
         internal static IEnumerable<DataElement> ReadAsn1Elements(this Stream stream)
         {
             Requires.NotNull(stream, "stream");
@@ -58,6 +170,11 @@
             while (true);
         }
 
+        /// <summary>
+        /// Writes a single ASN.1 element to a stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="element">The data element.</param>
         internal static void WriteAsn1Element(this Stream stream, DataElement element)
         {
             Requires.NotNull(stream, "stream");
@@ -87,6 +204,11 @@
             stream.Write(element.Content, 0, element.Content.Length);
         }
 
+        /// <summary>
+        /// Gets the minimum number of bytes required to represent an unsigned integer.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The number of bytes [1-4] required to represent the value.</returns>
         private static byte GetMinimumBytesRequiredToRepresent(uint value)
         {
             if (value > 0xffffff)
@@ -107,8 +229,18 @@
             }
         }
 
+        /// <summary>
+        /// Describes an individual ASN.1 element.
+        /// </summary>
         internal struct DataElement
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DataElement"/> struct.
+            /// </summary>
+            /// <param name="class">The class.</param>
+            /// <param name="pc">The PC.</param>
+            /// <param name="tag">The tag.</param>
+            /// <param name="content">The content.</param>
             public DataElement(BerClass @class, BerPC pc, BerTag tag, byte[] content)
                 : this()
             {
@@ -118,39 +250,25 @@
                 this.Content = content;
             }
 
+            /// <summary>
+            /// Gets the class.
+            /// </summary>
             public BerClass Class { get; private set; }
+
+            /// <summary>
+            /// Gets the PC.
+            /// </summary>
             public BerPC PC { get; private set; }
+
+            /// <summary>
+            /// Gets the Tag.
+            /// </summary>
             public BerTag Tag { get; private set; }
+
+            /// <summary>
+            /// Gets the Content.
+            /// </summary>
             public byte[] Content { get; private set; }
-        }
-
-        internal enum BerClass : byte
-        {
-            Universal = 0x00,
-            Application = 0x40,
-            ContextSpecific = 0x80,
-            Private = 0xC0,
-
-            Mask = 0xC0,
-        }
-
-        internal enum BerPC : byte
-        {
-            Primitive = 0x00,
-            Constructed = 0x20,
-
-            Mask = 0x20,
-        }
-
-        internal enum BerTag : byte
-        {
-            Integer = 0x2,
-            BitString = 0x3,
-            Null = 0x5,
-            ObjectIdentifier = 0x6,
-            Sequence = 0x10,
-
-            Mask = 0x1F,
         }
     }
 }

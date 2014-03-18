@@ -1,8 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="RsaCryptographicKey.cs" company="Andrew Arnott">
 //     Copyright (c) Andrew Arnott. All rights reserved.
-//     Portions of this inspired by Patrick Hogan:
-//         https://github.com/kuapay/iOS-Certificate--Key--and-Trust-Sample-Project/blob/master/Crypto/Crypto/Crypto/BDRSACryptor.m
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -125,6 +123,81 @@ namespace PCLCrypto
             }
         }
 
+        internal static RsaCryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType, AsymmetricAlgorithm algorithm)
+        {
+            RSAParameters parameters;
+            switch (blobType)
+            {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    parameters = X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob);
+                    break;
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                    parameters = Pkcs1KeyFormatter.ReadPkcs1PublicKey(keyBlob);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            // Inject the PKCS#1 public key into the KeyChain.
+            string keyIdentifier = Guid.NewGuid().ToString();
+            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
+            var keyQueryDictionary = CreateKeyQueryDictionary(publicKeyIdentifier);
+            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: false));
+            keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
+            keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+            IntPtr resultHandle;
+            int status = SecItemAdd(keyQueryDictionary.Handle, out resultHandle);
+            if (resultHandle != IntPtr.Zero)
+            {
+                var key = new SecKey(resultHandle, true);
+                return new RsaCryptographicKey(key, keyIdentifier, algorithm);
+            }
+            else
+            {
+                throw new InvalidOperationException("SecItemAdd return " + status);
+            }
+        }
+
+        internal static RsaCryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithm)
+        {
+            Requires.NotNull(keyBlob, "keyBlob");
+
+            RSAParameters parameters;
+            switch (blobType)
+            {
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyBlob);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            string keyIdentifier = Guid.NewGuid().ToString();
+            SecKey privateKey = ImportKey(parameters, GetPrivateKeyIdentifierWithTag(keyIdentifier));
+            SecKey publicKey = ImportKey(parameters.PublicKeyFilter(), GetPublicKeyIdentifierWithTag(keyIdentifier));
+            return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, algorithm);
+        }
+
+        /// <summary>
+        /// Returns a key identifier specifically for private keys.
+        /// </summary>
+        /// <param name="tag">The generic private/public key identifier.</param>
+        /// <returns>The specific private key identifier.</returns>
+        internal static string GetPrivateKeyIdentifierWithTag(string tag)
+        {
+            return tag + ".privateKey";
+        }
+
+        /// <summary>
+        /// Returns a key identifier specifically for public keys.
+        /// </summary>
+        /// <param name="tag">The generic private/public key identifier.</param>
+        /// <returns>The specific public key identifier.</returns>
+        internal static string GetPublicKeyIdentifierWithTag(string tag)
+        {
+            return tag + ".publicKey";
+        }
+
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
@@ -226,61 +299,12 @@ namespace PCLCrypto
             }
         }
 
-        internal static RsaCryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType, AsymmetricAlgorithm algorithm)
-        {
-            RSAParameters parameters;
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    parameters = X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob);
-                    break;
-                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    parameters = Pkcs1KeyFormatter.ReadPkcs1PublicKey(keyBlob);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
-            // Inject the PKCS#1 public key into the KeyChain.
-            string keyIdentifier = Guid.NewGuid().ToString();
-            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
-            var keyQueryDictionary = CreateKeyQueryDictionary(publicKeyIdentifier);
-            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: false));
-            keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
-            keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
-            IntPtr resultHandle;
-            int status = SecItemAdd(keyQueryDictionary.Handle, out resultHandle);
-            if (resultHandle != IntPtr.Zero)
-            {
-                var key = new SecKey(resultHandle, true);
-                return new RsaCryptographicKey(key, keyIdentifier, algorithm);
-            }
-            else
-            {
-                throw new InvalidOperationException("SecItemAdd return " + status);
-            }
-        }
-
-        internal static RsaCryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithm)
-        {
-            Requires.NotNull(keyBlob, "keyBlob");
-
-            RSAParameters parameters;
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyBlob);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
-            string keyIdentifier = Guid.NewGuid().ToString();
-            SecKey privateKey = ImportKey(parameters, GetPrivateKeyIdentifierWithTag(keyIdentifier));
-            SecKey publicKey = ImportKey(parameters.PublicKeyFilter(), GetPublicKeyIdentifierWithTag(keyIdentifier));
-            return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, algorithm);
-        }
-
+        /// <summary>
+        /// Imports an RSA key into the iOS keychain.
+        /// </summary>
+        /// <param name="parameters">The RSA parameters.</param>
+        /// <param name="tag">The tag by which this key will be known.</param>
+        /// <returns>The security key.</returns>
         private static SecKey ImportKey(RSAParameters parameters, string tag)
         {
             using (var keyQueryDictionary = CreateKeyQueryDictionary(tag))
@@ -373,6 +397,11 @@ namespace PCLCrypto
         [DllImport(Constants.SecurityLibrary)]
         private static extern int SecItemAdd(IntPtr query, out IntPtr result);
 
+        /// <summary>
+        /// Initializes a dictionary used to query for keys.
+        /// </summary>
+        /// <param name="tag">The tag of the key to be accessed.</param>
+        /// <returns>The query dictionary.</returns>
         private static NSMutableDictionary CreateKeyQueryDictionary(string tag)
         {
             var parameters = new NSMutableDictionary();
@@ -383,16 +412,11 @@ namespace PCLCrypto
             return parameters;
         }
 
-        internal static string GetPrivateKeyIdentifierWithTag(string tag)
-        {
-            return tag + ".privateKey";
-        }
-
-        internal static string GetPublicKeyIdentifierWithTag(string tag)
-        {
-            return tag + ".publicKey";
-        }
-
+        /// <summary>
+        /// Gets thee PKCS#1 key data for a key in the key chain.
+        /// </summary>
+        /// <param name="tag">The unique tag for the key to retrieve data for.</param>
+        /// <returns>The raw key data.</returns>
         private static NSData KeyDataWithTag(string tag)
         {
             NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
@@ -404,6 +428,11 @@ namespace PCLCrypto
             return keyData;
         }
 
+        /// <summary>
+        /// Obtains a reference to an iOS security key given its identifying tag.
+        /// </summary>
+        /// <param name="tag">The tag of the key in the keychain.</param>
+        /// <returns>The security key.</returns>
         private static SecKey KeyRefWithTag(string tag)
         {
             NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
