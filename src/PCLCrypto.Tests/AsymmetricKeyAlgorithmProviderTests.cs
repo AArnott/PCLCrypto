@@ -227,5 +227,17 @@
 
             Assert.IsTrue(false, "No supported formats.");
         }
+
+        ////[TestMethod]
+        ////public void SignedDataVerifyInterop()
+        ////{
+
+        ////}
+
+        ////[TestMethod]
+        ////public void SignedHashVerifyInterop()
+        ////{
+
+        ////}
     }
 }
