@@ -175,31 +175,31 @@ namespace PCLCrypto
             // note that modulus may contain an extra zero byte (highest order byte after reversing)
             // specifying bytelen bytes to write will drop high-order zero byte
             byte[] data = modulus;
-            ReverseMemory(data); // Switches to Little Endian byte order.
+            Array.Reverse(data); // Switches to Little Endian byte order.
             writer.Write(data, 0, bytelen);
 
             data = pvkKey.PrimeP.ToByteArray();
-            ReverseMemory(data);
+            Array.Reverse(data);
             writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrimeQ.ToByteArray();
-            ReverseMemory(data);
+            Array.Reverse(data);
             writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrimeExponentP.ToByteArray();
-            ReverseMemory(data);
+            Array.Reverse(data);
             writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrimeExponentQ.ToByteArray();
-            ReverseMemory(data);
+            Array.Reverse(data);
             writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.CrtCoefficient.ToByteArray();
-            ReverseMemory(data);
+            Array.Reverse(data);
             writer.Write(data, 0, bytelen / 2);
 
             data = pvkKey.PrivateExponent.ToByteArray();
-            ReverseMemory(data);
+            Array.Reverse(data);
             writer.Write(data, 0, bytelen);
 
             writer.Flush();
@@ -239,7 +239,7 @@ namespace PCLCrypto
             // note that modulus may contain an extra zero byte (highest order byte after reversing)
             // specifying bytelen bytes to write will drop high-order zero byte
             byte[] data = modulus;
-            ReverseMemory(data); // Switches to Little Endian byte order.
+            Array.Reverse(data); // Switches to Little Endian byte order.
             writer.Write(data, 0, bytelen);
 
             writer.Flush();
@@ -259,23 +259,6 @@ namespace PCLCrypto
             writer.Write((byte)((value >> 8) & 0xFF));
             writer.Write((byte)((value >> 16) & 0xFF));
             writer.Write((byte)((value >> 24) & 0xFF));
-        }
-
-        /// <summary>
-        /// Performs a byte-for-byte order reversal of a memory buffer.
-        /// </summary>
-        /// <param name="buffer">The buffer the reverse.</param>
-        private static void ReverseMemory(byte[] buffer)
-        {
-            Requires.NotNull(buffer, "buffer");
-
-            int length = buffer.Length;
-            for (int i = 0; i < length / 2; i++)
-            {
-                byte b = buffer[i];
-                buffer[i] = buffer[length - i - 1];
-                buffer[length - i - 1] = b;
-            }
         }
     }
 }
