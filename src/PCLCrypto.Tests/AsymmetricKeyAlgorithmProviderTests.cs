@@ -91,7 +91,7 @@
                     var key2 = rsa.ImportKeyPair(keyBlob, format);
                     byte[] key2Blob = key2.Export(format);
 
-                    CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+                    Assert.AreEqual(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
                     Debug.WriteLine("Format {0} supported.", format);
                     Debug.WriteLine(Convert.ToBase64String(keyBlob));
                     supportedFormats++;

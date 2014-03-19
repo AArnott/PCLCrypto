@@ -194,7 +194,7 @@ namespace PCLCrypto.Formatters
                 stream.WriteByte((byte)(0x80 + lengthOfLength));
 
                 // We must write this out as big endian. We use an endian-agnostic way of reading out the integer.
-                for (int significancePosition = 4 - lengthOfLength; significancePosition >= 0; significancePosition--)
+                for (int significancePosition = 4 - lengthOfLength - 1; significancePosition >= 0; significancePosition--)
                 {
                     byte lengthOctet = (byte)(0xff & (element.Content.Length >> (8 * significancePosition)));
                     stream.WriteByte(lengthOctet);
