@@ -43,14 +43,14 @@ namespace PCLCrypto.Formatters
 
             return new RSAParameters
             {
-                Modulus = sequence[1].Content,
-                Exponent = sequence[2].Content,
-                D = sequence[3].Content,
-                P = sequence[4].Content,
-                Q = sequence[5].Content,
-                DP = sequence[6].Content,
-                DQ = sequence[7].Content,
-                InverseQ = sequence[8].Content,
+                Modulus = TrimLeadingZero(sequence[1].Content),
+                Exponent = TrimLeadingZero(sequence[2].Content),
+                D = TrimLeadingZero(sequence[3].Content),
+                P = TrimLeadingZero(sequence[4].Content),
+                Q = TrimLeadingZero(sequence[5].Content),
+                DP = TrimLeadingZero(sequence[6].Content),
+                DQ = TrimLeadingZero(sequence[7].Content),
+                InverseQ = TrimLeadingZero(sequence[8].Content),
             };
         }
 
@@ -76,8 +76,8 @@ namespace PCLCrypto.Formatters
             Requires.Argument(sequence.Count == 2, "stream", "Invalid format.");
             return new RSAParameters
             {
-                Modulus = sequence[0].Content,
-                Exponent = sequence[1].Content,
+                Modulus = TrimLeadingZero(sequence[0].Content),
+                Exponent = TrimLeadingZero(sequence[1].Content),
             };
         }
 
@@ -157,6 +157,24 @@ namespace PCLCrypto.Formatters
         {
             RSAParameters privateKeyParameters = ReadPkcs1PrivateKey(privateKeyBlob);
             return WritePkcs1(privateKeyParameters, includePrivateKey: false);
+        }
+
+        /// <summary>
+        /// Trims up to one leading byte from the start of a buffer if that byte is a 0x00
+        /// without modifying the original buffer.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
+        internal static byte[] TrimLeadingZero(byte[] buffer)
+        {
+            if (buffer.Length > 0 && buffer[0] == 0)
+            {
+                byte[] trimmed = new byte[buffer.Length - 1];
+                Buffer.BlockCopy(buffer, 1, trimmed, 0, trimmed.Length);
+                return trimmed;
+            }
+
+            return buffer;
         }
     }
 }

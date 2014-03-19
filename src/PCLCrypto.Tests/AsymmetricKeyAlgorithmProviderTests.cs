@@ -15,7 +15,7 @@
         /// <summary>
         /// All the available private key blob types and a single sample key (RsaOaepSha1) serialized into each format.
         /// </summary>
-        private static readonly Dictionary<CryptographicPrivateKeyBlobType, string> PrivateKeyFormatsAndBlobs = new Dictionary<CryptographicPrivateKeyBlobType, string>
+        internal static readonly Dictionary<CryptographicPrivateKeyBlobType, string> PrivateKeyFormatsAndBlobs = new Dictionary<CryptographicPrivateKeyBlobType, string>
         {
             { CryptographicPrivateKeyBlobType.BCryptPrivateKey, "UlNBMgACAAADAAAAQAAAACAAAAAgAAAAAQAB94rt9gMQH/izb02sdFQFJOFGf+J9mLETVOwlzj7WgPkvuSr5l5m91XLTjoxg5P6BZk8TicedMcR1cm3EZeQbk/n5fJGZGJ1n2b5qHjA6ybTwowbvAiii+iDO2pr/yqFL/YJvynOsnsxj5S69p6TGJev+fzzEn2ZoQjGk7y6JSdk=" },
             { CryptographicPrivateKeyBlobType.Capi1PrivateKey, "BwIAAACkAABSU0EyAAIAAAEAAQCTG+RlxG1ydcQxnceJE09mgf7kYIyO03LVvZmX+Sq5L/mA1j7OJexUE7GYfeJ/RuEkBVR0rE1vs/gfEAP27Yr3S6HK/5raziD6oigC7waj8LTJOjAear7ZZ50YmZF8+fnZSYku76QxQmhmn8Q8f/7rJcakp70u5WPMnqxzym+C/XH4w8fVeWrH86kHPX/xCtVcj17ivLaIYxATl1lscp7YmSF20HSQyDDJSJjVQMhvoQlF21N//14q09xLaRzYxUD6p5DHUXoJaLb7p39VwHGO6BGhi5I+THOr/v85oCvvwEHvw64F2h3dN53P1uNcW8JnmPsooQQR6wvVBc6re20ZzNlpf96Gue4vx3N+TpYYytz32XtLRAqQ5OA9lgnzTA0=" },
@@ -26,7 +26,7 @@
         /// <summary>
         /// All the available public key blob types and a single sample key (RsaOaepSha1) serialized into each format.
         /// </summary>
-        private static readonly Dictionary<CryptographicPublicKeyBlobType, string> PublicKeyFormatsAndBlobs = new Dictionary<CryptographicPublicKeyBlobType, string>
+        internal static readonly Dictionary<CryptographicPublicKeyBlobType, string> PublicKeyFormatsAndBlobs = new Dictionary<CryptographicPublicKeyBlobType, string>
         {
             { CryptographicPublicKeyBlobType.BCryptPublicKey, "UlNBMQACAAADAAAAQAAAAAAAAAAAAAAAAQABoetbetfLDOWmobkoUTBXEM9ImOqIV18ikFiJddccSqTAB28MdbKBVwv40Y40aJb3MO+mv5rlN0QO1iWfFGD/pw==" },
             { CryptographicPublicKeyBlobType.Capi1PublicKey, "BgIAAACkAABSU0ExAAIAAAEAAQCn/2AUnyXWDkQ35Zq/pu8w95ZoNI7R+AtXgbJ1DG8HwKRKHNd1iViQIl9XiOqYSM8QVzBRKLmhpuUMy9d6W+uh" },
