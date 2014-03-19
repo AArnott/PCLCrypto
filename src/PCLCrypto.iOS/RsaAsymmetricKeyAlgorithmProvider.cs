@@ -9,12 +9,14 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
     using MonoTouch;
     using MonoTouch.Foundation;
     using MonoTouch.ObjCRuntime;
     using MonoTouch.Security;
+    using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;
 
@@ -84,7 +86,20 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            return RsaCryptographicKey.ImportKeyPair(keyBlob, blobType, this.Algorithm);
+            RSAParameters parameters;
+            switch (blobType)
+            {
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyBlob);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            string keyIdentifier = Guid.NewGuid().ToString();
+            SecKey privateKey = ImportKey(parameters, RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier));
+            SecKey publicKey = ImportKey(parameters.PublicKeyFilter(), RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier));
+            return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, this.Algorithm);
         }
 
         /// <inheritdoc/>
@@ -92,7 +107,58 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            return RsaCryptographicKey.ImportPublicKey(keyBlob, blobType, this.algorithm);
+            RSAParameters parameters;
+            switch (blobType)
+            {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    parameters = X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob);
+                    break;
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                    parameters = Pkcs1KeyFormatter.ReadPkcs1PublicKey(keyBlob);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            // Inject the PKCS#1 public key into the KeyChain.
+            string keyIdentifier = Guid.NewGuid().ToString();
+            string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
+            var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(publicKeyIdentifier);
+            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: false));
+            keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
+            keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+            IntPtr resultHandle;
+            int status = RsaCryptographicKey.SecItemAdd(keyQueryDictionary.Handle, out resultHandle);
+            if (resultHandle != IntPtr.Zero)
+            {
+                var key = new SecKey(resultHandle, true);
+                return new RsaCryptographicKey(key, keyIdentifier, this.Algorithm);
+            }
+            else
+            {
+                throw new InvalidOperationException("SecItemAdd return " + status);
+            }
+        }
+
+        /// <summary>
+        /// Imports an RSA key into the iOS keychain.
+        /// </summary>
+        /// <param name="parameters">The RSA parameters.</param>
+        /// <param name="tag">The tag by which this key will be known.</param>
+        /// <returns>The security key.</returns>
+        private static SecKey ImportKey(RSAParameters parameters, string tag)
+        {
+            using (var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(tag))
+            {
+                byte[] pkcs1Key = Pkcs1KeyFormatter.WritePkcs1(parameters, parameters.D != null);
+                keyQueryDictionary[KSec.ValueData] = NSData.FromArray(pkcs1Key);
+                keyQueryDictionary[KSec.AttrKeyClass] = parameters.D != null ? KSec.AttrKeyClassPrivate : KSec.AttrKeyClassPublic;
+                keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
+                IntPtr handle;
+                int status = RsaCryptographicKey.SecItemAdd(keyQueryDictionary.Handle, out handle);
+                Verify.Operation(status == 0, "SecItemAdd returned {0}", status);
+                return new SecKey(handle, true);
+            }
         }
     }
 }
