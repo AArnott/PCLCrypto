@@ -12,6 +12,7 @@ namespace PCLCrypto
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using Mono.Security.Cryptography;
     using MonoTouch;
     using MonoTouch.Foundation;
     using MonoTouch.ObjCRuntime;
@@ -91,6 +92,11 @@ namespace PCLCrypto
             {
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
                     parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyBlob);
+                    break;
+                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
+                    var rsa = new RSACryptoServiceProvider();
+                    rsa.ImportCspBlob(keyBlob);
+                    parameters = rsa.ExportParameters(true);
                     break;
                 default:
                     throw new NotSupportedException();
