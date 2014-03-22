@@ -171,6 +171,23 @@ namespace PCLCrypto.Formatters
         }
 
         /// <summary>
+        /// Reads a sequence of ASN.1 elements from a stream.
+        /// </summary>
+        /// <param name="value">The buffer to read from.</param>
+        /// <returns>A sequence of elements.</returns>
+        /// <remarks>
+        /// The stream may not contain exclusively ASN.1 data.
+        /// This method will read the stream exactly one element at a time,
+        /// and the caller should only enumerate as many elements as are expected
+        /// to avoid reading into other data.
+        /// If the end of the stream is reached, the sequence terminates.
+        /// </remarks>
+        internal static IEnumerable<DataElement> ReadAsn1Elements(byte[] value)
+        {
+            return ReadAsn1Elements(new MemoryStream(value));
+        }
+
+        /// <summary>
         /// Writes a single ASN.1 element to a stream.
         /// </summary>
         /// <param name="stream">The stream.</param>
