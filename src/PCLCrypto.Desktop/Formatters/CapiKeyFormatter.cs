@@ -52,7 +52,7 @@
             stream.Write(keyBlob, 0, keyBlob.Length);
         }
 
-        private static void VerifyCapiCompatibleParameters(RSAParameters parameters)
+        internal static void VerifyCapiCompatibleParameters(RSAParameters parameters)
         {
             try
             {

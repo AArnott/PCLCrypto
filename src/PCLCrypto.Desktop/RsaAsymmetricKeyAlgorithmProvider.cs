@@ -11,6 +11,9 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+#if DESKTOP
+    using Mono.Security.Cryptography;
+#endif
     using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;
@@ -54,8 +57,23 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var rsa = new Platform.RSACryptoServiceProvider();
-            rsa.ImportParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
+            var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            Platform.RSA rsa;
+            if (CapiKeyFormatter.IsCapiCompatible(parameters))
+            {
+                rsa = new Platform.RSACryptoServiceProvider();
+            }
+            else
+            {
+#if DESKTOP
+                rsa = new RSAManaged();
+#else
+                CapiKeyFormatter.VerifyCapiCompatibleParameters(parameters);
+                throw new NotSupportedException();
+#endif
+            }
+
+            rsa.ImportParameters(parameters);
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
