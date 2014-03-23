@@ -21,186 +21,84 @@ namespace PCLCrypto.Formatters
     /// <remarks>
     /// http://tools.ietf.org/html/rfc3447#page-46
     /// </remarks>
-    internal static class Pkcs1KeyFormatter
+    internal class Pkcs1KeyFormatter : KeyFormatter
     {
-        internal static readonly byte[] Pkcs1ObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01 };
-
-        internal static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
+        /// <summary>
+        /// If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.
+        /// </summary>
+        private readonly bool prependLeadingZeroOnCertainElements;
 
         /// <summary>
-        /// Reads a PKCS1 private key from a stream.
+        /// Initializes a new instance of the <see cref="Pkcs1KeyFormatter"/> class.
         /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <returns>The <see cref="RSAParameters"/> read from the stream.</returns>
-        internal static RSAParameters ReadPkcs1PrivateKey(this Stream stream)
-        {
-            Requires.NotNull(stream, "stream");
-
-            var keyBlobElement = Asn.ReadAsn1Elements(stream).First();
-            Requires.Argument(
-                keyBlobElement.Class == Asn.BerClass.Universal &&
-                keyBlobElement.PC == Asn.BerPC.Constructed &&
-                keyBlobElement.Tag == Asn.BerTag.Sequence,
-                "keyBlob",
-                "Unexpected format.");
-
-            stream = new MemoryStream(keyBlobElement.Content);
-            var sequence = Asn.ReadAsn1Elements(stream).ToList();
-            Requires.Argument(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0, "keyBlob", "Unsupported version.");
-
-            return new RSAParameters
-            {
-                Modulus = TrimLeadingZero(sequence[1].Content),
-                Exponent = TrimLeadingZero(sequence[2].Content),
-                D = TrimLeadingZero(sequence[3].Content),
-                P = TrimLeadingZero(sequence[4].Content),
-                Q = TrimLeadingZero(sequence[5].Content),
-                DP = TrimLeadingZero(sequence[6].Content),
-                DQ = TrimLeadingZero(sequence[7].Content),
-                InverseQ = TrimLeadingZero(sequence[8].Content),
-            };
-        }
-
-        /// <summary>
-        /// Reads a PKCS1 public key from a stream.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <returns>The <see cref="RSAParameters"/> read from the stream.</returns>
-        internal static RSAParameters ReadPkcs1PublicKey(this Stream stream)
-        {
-            Requires.NotNull(stream, "stream");
-
-            var keyBlobElement = Asn.ReadAsn1Elements(stream).First();
-            Requires.Argument(
-                keyBlobElement.Class == Asn.BerClass.Universal &&
-                keyBlobElement.PC == Asn.BerPC.Constructed &&
-                keyBlobElement.Tag == Asn.BerTag.Sequence,
-                "keyBlob",
-                "Unexpected format.");
-
-            stream = new MemoryStream(keyBlobElement.Content);
-            var sequence = Asn.ReadAsn1Elements(stream).ToList();
-            Requires.Argument(sequence.Count == 2, "stream", "Invalid format.");
-            return new RSAParameters
-            {
-                Modulus = TrimLeadingZero(sequence[0].Content),
-                Exponent = TrimLeadingZero(sequence[1].Content),
-            };
-        }
-
-        /// <summary>
-        /// Reads a PKCS1 private key from a buffer.
-        /// </summary>
-        /// <param name="keyBlob">The buffer.</param>
-        /// <returns>The <see cref="RSAParameters"/> read from the buffer.</returns>
-        internal static RSAParameters ReadPkcs1PrivateKey(byte[] keyBlob)
-        {
-            return ReadPkcs1PrivateKey(new MemoryStream(keyBlob));
-        }
-
-        /// <summary>
-        /// Reads a PKCS1 public key from a buffer.
-        /// </summary>
-        /// <param name="keyBlob">The buffer.</param>
-        /// <returns>The <see cref="RSAParameters"/> read from the buffer.</returns>
-        internal static RSAParameters ReadPkcs1PublicKey(byte[] keyBlob)
-        {
-            return ReadPkcs1PublicKey(new MemoryStream(keyBlob));
-        }
-
-        /// <summary>
-        /// Writes an RSA key to a stream in the PKCS#1 format.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <param name="value">The RSA key to write to the stream.</param>
-        /// <param name="includePrivateKey">if set to <c>true</c> the serialized form will include the private key.</param>
         /// <param name="prependLeadingZeroOnCertainElements">If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.</param>
-        internal static void WritePkcs1(this Stream stream, RSAParameters value, bool includePrivateKey, bool prependLeadingZeroOnCertainElements = false)
+        internal Pkcs1KeyFormatter(bool prependLeadingZeroOnCertainElements = false)
+        {
+            this.prependLeadingZeroOnCertainElements = prependLeadingZeroOnCertainElements;
+        }
+
+        protected override RSAParameters ReadCore(Stream stream)
+        {
+            var keyBlobElement = Asn.ReadAsn1Elements(stream).First();
+            VerifyFormat(
+                keyBlobElement.Class == Asn.BerClass.Universal &&
+                keyBlobElement.PC == Asn.BerPC.Constructed &&
+                keyBlobElement.Tag == Asn.BerTag.Sequence);
+
+            stream = new MemoryStream(keyBlobElement.Content);
+            var sequence = Asn.ReadAsn1Elements(stream).ToList();
+
+            switch (sequence.Count)
+            {
+                case 2:
+                    return new RSAParameters
+                    {
+                        Modulus = TrimLeadingZero(sequence[0].Content),
+                        Exponent = TrimLeadingZero(sequence[1].Content),
+                    };
+                case 9:
+                    VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0, "Unsupported version.");
+                    return new RSAParameters
+                    {
+                        Modulus = TrimLeadingZero(sequence[1].Content),
+                        Exponent = TrimLeadingZero(sequence[2].Content),
+                        D = TrimLeadingZero(sequence[3].Content),
+                        P = TrimLeadingZero(sequence[4].Content),
+                        Q = TrimLeadingZero(sequence[5].Content),
+                        DP = TrimLeadingZero(sequence[6].Content),
+                        DQ = TrimLeadingZero(sequence[7].Content),
+                        InverseQ = TrimLeadingZero(sequence[8].Content),
+                    };
+                default:
+                    throw FailFormat();
+            }
+        }
+
+        protected override void WriteCore(Stream stream, RSAParameters value)
         {
             Requires.NotNull(stream, "stream");
-            Requires.Argument(!includePrivateKey || value.D != null, "value", "Private key not available.");
 
             var sequence = new MemoryStream();
 
-            if (includePrivateKey)
+            if (HasPrivateKey(value))
             {
                 // Only include the version element if this is a private key.
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, new byte[1]));
             }
 
-            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Modulus) : value.Modulus));
+            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Modulus) : value.Modulus));
             sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.Exponent));
-            if (includePrivateKey)
+            if (HasPrivateKey(value))
             {
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.D));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.P) : value.P));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Q) : value.Q));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.DP) : value.DP));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.P) : value.P));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Q) : value.Q));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.DP) : value.DP));
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.DQ));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.InverseQ) : value.InverseQ));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.InverseQ) : value.InverseQ));
             }
 
             stream.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Constructed, Asn.BerTag.Sequence, sequence.ToArray()));
-        }
-
-        /// <summary>
-        /// Writes an RSA key to a buffer in the PKCS#1 format.
-        /// </summary>
-        /// <param name="value">The RSA key to write to the stream.</param>
-        /// <param name="includePrivateKey">if set to <c>true</c> the serialized form will include the private key.</param>
-        /// <param name="prependLeadingZeroOnCertainElements">If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.</param>
-        /// <returns>The buffer containing the PKCS#1 key.</returns>
-        internal static byte[] WritePkcs1(RSAParameters value, bool includePrivateKey, bool prependLeadingZeroOnCertainElements = false)
-        {
-            var stream = new MemoryStream();
-            WritePkcs1(stream, value, includePrivateKey, prependLeadingZeroOnCertainElements);
-            return stream.ToArray();
-        }
-
-        /// <summary>
-        /// Gets the PKCS#1 formatted RSA public key from a PKCS#1 formatted private key.
-        /// </summary>
-        /// <param name="privateKeyBlob">The PKCS#1 formatted private key.</param>
-        /// <returns>The PKCS#1 formatted public key.</returns>
-        internal static byte[] GetRSAPublicKeyFromPrivateKey(byte[] privateKeyBlob)
-        {
-            RSAParameters privateKeyParameters = ReadPkcs1PrivateKey(privateKeyBlob);
-            return WritePkcs1(privateKeyParameters, includePrivateKey: false);
-        }
-
-        /// <summary>
-        /// Trims up to one leading byte from the start of a buffer if that byte is a 0x00
-        /// without modifying the original buffer.
-        /// </summary>
-        /// <param name="buffer">The buffer.</param>
-        /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
-        internal static byte[] TrimLeadingZero(byte[] buffer)
-        {
-            if (buffer.Length > 0 && buffer[0] == 0)
-            {
-                byte[] trimmed = new byte[buffer.Length - 1];
-                Buffer.BlockCopy(buffer, 1, trimmed, 0, trimmed.Length);
-                return trimmed;
-            }
-
-            return buffer;
-        }
-
-        /// <summary>
-        /// Returns a buffer with a 0x00 byte prepended if the buffer doesn't start with that byte.
-        /// </summary>
-        /// <param name="buffer">The buffer to prepend.</param>
-        /// <returns>A buffer with the prepended zero.</returns>
-        internal static byte[] PrependLeadingZero(byte[] buffer)
-        {
-            if (buffer[0] != 0)
-            {
-                byte[] modifiedBuffer = new byte[buffer.Length + 1];
-                Buffer.BlockCopy(buffer, 0, modifiedBuffer, 1, buffer.Length);
-                return modifiedBuffer;
-            }
-
-            return buffer;
         }
     }
 }

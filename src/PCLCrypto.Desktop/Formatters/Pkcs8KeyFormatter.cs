@@ -13,31 +13,19 @@
     /// <remarks>
     /// Spec found at: http://tools.ietf.org/html/rfc5208#page-3
     /// </remarks>
-    internal static class Pkcs8KeyFormatter
+    internal class Pkcs8KeyFormatter : KeyFormatter
     {
-        internal static RSAParameters ReadPkcs8PrivateKeyInfo(byte[] privateKeyInfo)
-        {
-            return ReadPkcs8PrivateKeyInfo(new MemoryStream(privateKeyInfo));
-        }
-
-        internal static RSAParameters ReadPkcs8PrivateKeyInfo(this Stream stream)
+        protected override RSAParameters ReadCore(Stream stream)
         {
             var universalConstructedSequence = stream.ReadAsn1Elements().Single();
             var sequence = Asn.ReadAsn1Elements(universalConstructedSequence.Content).ToList();
-            if (sequence[0].Content.Length != 1 || sequence[0].Content[0] != 0x00)
-            {
-                throw new ArgumentException("Unrecognized version.");
-            }
-
-            if (!X509SubjectPublicKeyInfoFormatter.BufferEqual(Asn.ReadAsn1Elements(sequence[1].Content).First().Content, Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier))
-            {
-                throw new ArgumentException("Unrecognized object identifier.");
-            }
-
-            return Pkcs1KeyFormatter.ReadPkcs1PrivateKey(sequence[2].Content);
+            VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0x00, "Unrecognized version.");
+            Asn.DataElement oid = Asn.ReadAsn1Elements(sequence[1].Content).First();
+            VerifyFormat(X509SubjectPublicKeyInfoFormatter.BufferEqual(oid.Content, Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier), "Unrecognized object identifier.");
+            return KeyFormatter.Pkcs1.Read(sequence[2].Content);
         }
 
-        internal static byte[] WritePkcs8PrivateKeyInfo(RSAParameters parameters)
+        protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
             var rootElement = new Asn.DataElement(
                 Asn.BerClass.Universal,
@@ -66,7 +54,7 @@
                     Asn.BerClass.Universal,
                     Asn.BerPC.Primitive,
                     Asn.BerTag.OctetString,
-                    Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: true, prependLeadingZeroOnCertainElements: true)),
+                    KeyFormatter.Pkcs1PrependZeros.Write(parameters, HasPrivateKey(parameters))),
                 new Asn.DataElement(
                     Asn.BerClass.ContextSpecific,
                     Asn.BerPC.Constructed,
@@ -90,7 +78,7 @@
                                 Asn.BerTag.BitString,
                                 new byte[] { 0x00, 0x10 })))));
 
-            return Asn.WriteAsn1Element(rootElement);
+            Asn.WriteAsn1Element(stream, rootElement);
         }
     }
 }

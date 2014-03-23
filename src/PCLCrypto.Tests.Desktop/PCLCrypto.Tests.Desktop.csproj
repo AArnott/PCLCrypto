@@ -94,8 +94,14 @@
     <Compile Include="..\pclcrypto.desktop\formatters\Asn.cs">
       <Link>Formatters\Asn.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\KeyFormatter.cs">
+      <Link>Formatters\KeyFormatter.cs</Link>
+    </Compile>
     <Compile Include="..\pclcrypto.desktop\formatters\Pkcs1KeyFormatter.cs">
       <Link>Formatters\Pkcs1KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs8KeyFormatter.cs">
+      <Link>Formatters\Pkcs8KeyFormatter.cs</Link>
     </Compile>
     <Compile Include="..\pclcrypto.desktop\formatters\X509SubjectPublicKeyInfoFormatter.cs">
       <Link>Formatters\X509SubjectPublicKeyInfoFormatter.cs</Link>

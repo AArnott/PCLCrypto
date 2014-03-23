@@ -76,6 +76,21 @@
     <CodesignKey>iPhone Distribution</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Asn.cs">
+      <Link>Formatters\Asn.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\KeyFormatter.cs">
+      <Link>Formatters\KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs1KeyFormatter.cs">
+      <Link>Formatters\Pkcs1KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs8KeyFormatter.cs">
+      <Link>Formatters\Pkcs8KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\X509SubjectPublicKeyInfoFormatter.cs">
+      <Link>Formatters\X509SubjectPublicKeyInfoFormatter.cs</Link>
+    </Compile>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <None Include="app.config" />

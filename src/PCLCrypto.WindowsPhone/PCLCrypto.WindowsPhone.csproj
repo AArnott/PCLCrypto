@@ -83,6 +83,9 @@
     <Compile Include="..\PCLCrypto.Desktop\Formatters\Asn.cs">
       <Link>Formatters\Asn.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\KeyFormatter.cs">
+      <Link>Formatters\KeyFormatter.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs1KeyFormatter.cs">
       <Link>Formatters\Pkcs1KeyFormatter.cs</Link>
     </Compile>

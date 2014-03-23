@@ -12,6 +12,7 @@ namespace PCLCrypto
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using PCLCrypto.Formatters;
     using Validation;
 
     /// <summary>
@@ -73,7 +74,7 @@ namespace PCLCrypto
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return this.key.ExportCspBlob(includePrivateParameters: true);
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    return Formatters.Pkcs8KeyFormatter.WritePkcs8PrivateKeyInfo(this.key.ExportParameters(true));
+                    return KeyFormatter.Pkcs8.Write(this.key.ExportParameters(true));
                 default:
                     throw new NotSupportedException();
             }
@@ -87,7 +88,7 @@ namespace PCLCrypto
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     return this.key.ExportCspBlob(includePrivateParameters: false);
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    return Formatters.X509SubjectPublicKeyInfoFormatter.WriteX509SubjectPublicKeyInfo(this.key.ExportParameters(includePrivateParameters: false));
+                    return KeyFormatter.X509SubjectPublicKeyInfo.Write(this.key.ExportParameters(includePrivateParameters: false));
                 default:
                     throw new NotSupportedException();
             }

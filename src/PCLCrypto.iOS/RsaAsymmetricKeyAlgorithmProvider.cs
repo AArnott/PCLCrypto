@@ -91,7 +91,7 @@ namespace PCLCrypto
             switch (blobType)
             {
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyBlob);
+                    parameters = KeyFormatter.Pkcs1.Read(keyBlob);
                     break;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     var rsa = new RSACryptoServiceProvider();
@@ -104,7 +104,7 @@ namespace PCLCrypto
 
             string keyIdentifier = Guid.NewGuid().ToString();
             SecKey privateKey = ImportKey(parameters, RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier));
-            SecKey publicKey = ImportKey(parameters.PublicKeyFilter(), RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier));
+            SecKey publicKey = ImportKey(KeyFormatter.PublicKeyFilter(parameters), RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier));
             return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, this.Algorithm);
         }
 
@@ -117,10 +117,10 @@ namespace PCLCrypto
             switch (blobType)
             {
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    parameters = X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob);
+                    parameters = KeyFormatter.X509SubjectPublicKeyInfo.Read(keyBlob);
                     break;
                 case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    parameters = Pkcs1KeyFormatter.ReadPkcs1PublicKey(keyBlob);
+                    parameters = KeyFormatter.Pkcs1.Read(keyBlob);
                     break;
                 default:
                     throw new NotSupportedException();
@@ -130,7 +130,7 @@ namespace PCLCrypto
             string keyIdentifier = Guid.NewGuid().ToString();
             string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
             var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(publicKeyIdentifier);
-            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(Pkcs1KeyFormatter.WritePkcs1(parameters, includePrivateKey: false));
+            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(KeyFormatter.Pkcs1.Write(parameters, includePrivateKey: false));
             keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
             keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
             IntPtr resultHandle;
@@ -156,7 +156,7 @@ namespace PCLCrypto
         {
             using (var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(tag))
             {
-                byte[] pkcs1Key = Pkcs1KeyFormatter.WritePkcs1(parameters, parameters.D != null);
+                byte[] pkcs1Key = KeyFormatter.Pkcs1.Write(parameters, parameters.D != null);
                 keyQueryDictionary[KSec.ValueData] = NSData.FromArray(pkcs1Key);
                 keyQueryDictionary[KSec.AttrKeyClass] = parameters.D != null ? KSec.AttrKeyClassPrivate : KSec.AttrKeyClassPublic;
                 keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);

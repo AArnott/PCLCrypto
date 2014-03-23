@@ -61,7 +61,7 @@ namespace PCLCrypto
                     rsa.ImportCspBlob(keyBlob);
                     break;
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    rsa.ImportParameters(Pkcs8KeyFormatter.ReadPkcs8PrivateKeyInfo(keyBlob));
+                    rsa.ImportParameters(KeyFormatter.Pkcs8.Read(keyBlob));
                     break;
                 default:
                     throw new NotSupportedException();
@@ -82,7 +82,7 @@ namespace PCLCrypto
                     rsa.ImportCspBlob(keyBlob);
                     break;
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    rsa.ImportParameters(X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob));
+                    rsa.ImportParameters(KeyFormatter.X509SubjectPublicKeyInfo.Read(keyBlob));
                     break;
                 default:
                     throw new NotSupportedException();
