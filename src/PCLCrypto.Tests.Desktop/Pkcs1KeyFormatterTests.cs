@@ -36,19 +36,5 @@
             Assert.AreEqual(WinRTCrypto.CryptographicBuffer.EncodeToHexString(rsaCapi.DQ), WinRTCrypto.CryptographicBuffer.EncodeToHexString(homeReadPkcs1.DQ), "DQ");
             Assert.AreEqual(WinRTCrypto.CryptographicBuffer.EncodeToHexString(rsaCapi.InverseQ), WinRTCrypto.CryptographicBuffer.EncodeToHexString(homeReadPkcs1.InverseQ), "InverseQ");
         }
-
-        private static void ValidateParameters(RSAParameters parameters)
-        {
-            int halfModulusLength = (parameters.Modulus.Length + 1) / 2;
-
-            // These are the same assertions that Windows crypto lib itself
-            // follows when it returns 'bad data'.
-            Assert.AreEqual(halfModulusLength, parameters.P.Length);
-            Assert.AreEqual(halfModulusLength, parameters.Q.Length);
-            Assert.AreEqual(halfModulusLength, parameters.DP.Length);
-            Assert.AreEqual(halfModulusLength, parameters.DQ.Length);
-            Assert.AreEqual(halfModulusLength, parameters.InverseQ.Length);
-            Assert.AreEqual(parameters.Modulus.Length, parameters.D.Length);
-        }
     }
 }
