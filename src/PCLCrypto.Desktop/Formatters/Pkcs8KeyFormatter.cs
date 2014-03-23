@@ -1,4 +1,10 @@
-﻿namespace PCLCrypto.Formatters
+﻿//-----------------------------------------------------------------------
+// <copyright file="Pkcs8KeyFormatter.cs" company="Andrew Arnott">
+//     Copyright (c) Andrew Arnott. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace PCLCrypto.Formatters
 {
     using System;
     using System.Collections.Generic;
@@ -8,23 +14,35 @@
     using System.Text;
 
     /// <summary>
-    /// 
+    /// Serializes RSA keys in the PKCS8 PrivateKeyInfo format.
     /// </summary>
     /// <remarks>
     /// Spec found at: http://tools.ietf.org/html/rfc5208#page-3
     /// </remarks>
     internal class Pkcs8KeyFormatter : KeyFormatter
     {
+        /// <summary>
+        /// Reads a key from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>
+        /// The RSA Parameters of the key.
+        /// </returns>
         protected override RSAParameters ReadCore(Stream stream)
         {
             var universalConstructedSequence = stream.ReadAsn1Elements().Single();
             var sequence = Asn.ReadAsn1Elements(universalConstructedSequence.Content).ToList();
-            VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0x00, "Unrecognized version.");
+            KeyFormatter.VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0x00, "Unrecognized version.");
             Asn.DataElement oid = Asn.ReadAsn1Elements(sequence[1].Content).First();
-            VerifyFormat(X509SubjectPublicKeyInfoFormatter.BufferEqual(oid.Content, Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier), "Unrecognized object identifier.");
+            KeyFormatter.VerifyFormat(X509SubjectPublicKeyInfoFormatter.BufferEqual(oid.Content, Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier), "Unrecognized object identifier.");
             return KeyFormatter.Pkcs1.Read(sequence[2].Content);
         }
 
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The RSA parameters of the key.</param>
         protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
             var rootElement = new Asn.DataElement(

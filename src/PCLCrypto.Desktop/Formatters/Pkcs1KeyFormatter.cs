@@ -19,7 +19,7 @@ namespace PCLCrypto.Formatters
     /// (rsaPublicKey and rsaPrivateKey).
     /// </summary>
     /// <remarks>
-    /// http://tools.ietf.org/html/rfc3447#page-46
+    /// The format is described here: http://tools.ietf.org/html/rfc3447#page-46
     /// </remarks>
     internal class Pkcs1KeyFormatter : KeyFormatter
     {
@@ -37,10 +37,17 @@ namespace PCLCrypto.Formatters
             this.prependLeadingZeroOnCertainElements = prependLeadingZeroOnCertainElements;
         }
 
+        /// <summary>
+        /// Reads a key from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>
+        /// The RSA Parameters of the key.
+        /// </returns>
         protected override RSAParameters ReadCore(Stream stream)
         {
             var keyBlobElement = Asn.ReadAsn1Elements(stream).First();
-            VerifyFormat(
+            KeyFormatter.VerifyFormat(
                 keyBlobElement.Class == Asn.BerClass.Universal &&
                 keyBlobElement.PC == Asn.BerPC.Constructed &&
                 keyBlobElement.Tag == Asn.BerTag.Sequence);
@@ -57,7 +64,7 @@ namespace PCLCrypto.Formatters
                         Exponent = TrimLeadingZero(sequence[1].Content),
                     };
                 case 9:
-                    VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0, "Unsupported version.");
+                    KeyFormatter.VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0, "Unsupported version.");
                     return new RSAParameters
                     {
                         Modulus = TrimLeadingZero(sequence[1].Content),
@@ -70,17 +77,22 @@ namespace PCLCrypto.Formatters
                         InverseQ = TrimLeadingZero(sequence[8].Content),
                     };
                 default:
-                    throw FailFormat();
+                    throw KeyFormatter.FailFormat();
             }
         }
 
+        /// <summary>
+        /// Writes the core.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="value">The value.</param>
         protected override void WriteCore(Stream stream, RSAParameters value)
         {
             Requires.NotNull(stream, "stream");
 
             var sequence = new MemoryStream();
 
-            if (HasPrivateKey(value))
+            if (KeyFormatter.HasPrivateKey(value))
             {
                 // Only include the version element if this is a private key.
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, new byte[1]));
@@ -88,7 +100,7 @@ namespace PCLCrypto.Formatters
 
             sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Modulus) : value.Modulus));
             sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.Exponent));
-            if (HasPrivateKey(value))
+            if (KeyFormatter.HasPrivateKey(value))
             {
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.D));
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.P) : value.P));

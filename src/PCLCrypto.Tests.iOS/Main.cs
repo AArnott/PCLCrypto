@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-
-namespace PCLCrypto.Tests.iOS
+﻿namespace PCLCrypto.Tests.iOS
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using MonoTouch.Foundation;
+    using MonoTouch.UIKit;
+
     public class Application
     {
         // This is the main entry point of the application.

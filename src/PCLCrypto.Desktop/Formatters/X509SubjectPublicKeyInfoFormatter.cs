@@ -20,6 +20,22 @@ namespace PCLCrypto.Formatters
     /// </summary>
     internal class X509SubjectPublicKeyInfoFormatter : KeyFormatter
     {
+        /// <summary>
+        /// Reads a key from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>
+        /// The RSA Parameters of the key.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">
+        /// Unexpected format.
+        /// or
+        /// Unexpected format.
+        /// or
+        /// Unexpected algorithm.
+        /// or
+        /// Unexpected format.
+        /// </exception>
         protected override RSAParameters ReadCore(Stream stream)
         {
             var sequence = stream.ReadAsn1Elements().First();
@@ -35,7 +51,7 @@ namespace PCLCrypto.Formatters
             }
 
             var oid = Asn.ReadAsn1Elements(elements[0].Content).First();
-            if (!BufferEqual(Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier, oid.Content))
+            if (!KeyFormatter.BufferEqual(Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier, oid.Content))
             {
                 throw new ArgumentException("Unexpected algorithm.");
             }
@@ -46,9 +62,14 @@ namespace PCLCrypto.Formatters
             }
 
             byte[] rsaPublicKey = TrimLeadingZero(elements[1].Content);
-            return PublicKeyFilter(KeyFormatter.Pkcs1.Read(rsaPublicKey));
+            return KeyFormatter.PublicKeyFilter(KeyFormatter.Pkcs1.Read(rsaPublicKey));
         }
 
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The RSA parameters of the key.</param>
         protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
             Requires.NotNull(stream, "stream");

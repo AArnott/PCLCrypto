@@ -1,4 +1,10 @@
-﻿namespace PCLCrypto.Formatters
+﻿//-----------------------------------------------------------------------
+// <copyright file="KeyFormatter.cs" company="Andrew Arnott">
+//     Copyright (c) Andrew Arnott. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace PCLCrypto.Formatters
 {
     using System;
     using System.Collections.Generic;
@@ -8,22 +14,51 @@
     using System.Text;
     using Validation;
 
+    /// <summary>
+    /// A base class for encoding and decoding RSA keys in various formats.
+    /// </summary>
     internal abstract class KeyFormatter
     {
+        /// <summary>
+        /// The PKCS1 key formatter.
+        /// </summary>
         internal static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
 
+        /// <summary>
+        /// The PKCS1 key formatter that prepends zeros to certain RSA parameters.
+        /// </summary>
         internal static readonly KeyFormatter Pkcs1PrependZeros = new Pkcs1KeyFormatter(prependLeadingZeroOnCertainElements: true);
 
+        /// <summary>
+        /// The PKCS8 key formatter.
+        /// </summary>
         internal static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
 
+        /// <summary>
+        /// The X509 subject public key information formatter.
+        /// </summary>
         internal static readonly KeyFormatter X509SubjectPublicKeyInfo = new X509SubjectPublicKeyInfoFormatter();
 
+        /// <summary>
+        /// The CAPI key formatter.
+        /// </summary>
         internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
 
+        /// <summary>
+        /// The PKCS1 object identifier
+        /// </summary>
         protected static readonly byte[] Pkcs1ObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01 };
 
+        /// <summary>
+        /// The RSA encryption object identifier
+        /// </summary>
         protected static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
 
+        /// <summary>
+        /// Gets the formatter to use for a given blob type.
+        /// </summary>
+        /// <param name="blobType">Type of the key blob.</param>
+        /// <returns>An instance of <see cref="KeyFormatter"/></returns>
         internal static KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)
@@ -39,6 +74,11 @@
             }
         }
 
+        /// <summary>
+        /// Gets the formatter to use for a given blob type.
+        /// </summary>
+        /// <param name="blobType">Type of the key blob.</param>
+        /// <returns>An instance of <see cref="KeyFormatter"/></returns>
         internal static KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
         {
             switch (blobType)
@@ -54,17 +94,29 @@
             }
         }
 
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The parameters.</param>
         internal void Write(Stream stream, RSAParameters parameters)
         {
-            Write(stream, parameters, HasPrivateKey(parameters));
+            this.Write(stream, parameters, HasPrivateKey(parameters));
         }
 
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="includePrivateKey">if set to <c>true</c> the private key will be written as well; otherwise just the public key will be written.</param>
         internal void Write(Stream stream, RSAParameters parameters, bool includePrivateKey)
         {
             Requires.NotNull(stream, "stream");
             Requires.Argument(HasPrivateKey(parameters) || !includePrivateKey, "parameters", "No private key data included.");
 
-            if (!includePrivateKey) {
+            if (!includePrivateKey)
+            {
                 parameters = PublicKeyFilter(parameters);
             }
 
@@ -72,11 +124,22 @@
             this.WriteCore(stream, trimmedParameters);
         }
 
+        /// <summary>
+        /// Writes a key to a buffer.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The buffer with the serialized key.</returns>
         internal byte[] Write(RSAParameters parameters)
         {
-            return Write(parameters, HasPrivateKey(parameters));
+            return this.Write(parameters, HasPrivateKey(parameters));
         }
 
+        /// <summary>
+        /// Writes a key to a buffer.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="includePrivateKey">if set to <c>true</c> the private key will be written as well; otherwise just the public key will be written.</param>
+        /// <returns>The buffer with the serialized key.</returns>
         internal byte[] Write(RSAParameters parameters, bool includePrivateKey)
         {
             var ms = new MemoryStream();
@@ -84,26 +147,82 @@
             return ms.ToArray();
         }
 
+        /// <summary>
+        /// Reads a key from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The RSA key parameters.</returns>
         internal RSAParameters Read(Stream stream)
         {
             return this.ReadCore(stream);
         }
 
+        /// <summary>
+        /// Reads a key from the specified buffer.
+        /// </summary>
+        /// <param name="keyBlob">The buffer containing the key data.</param>
+        /// <returns>The RSA key parameters.</returns>
         internal RSAParameters Read(byte[] keyBlob)
         {
             var ms = new MemoryStream(keyBlob);
             return this.Read(ms);
         }
 
-        protected abstract RSAParameters ReadCore(Stream stream);
+        /// <summary>
+        /// Returns an instance of <see cref="RSAParameters"/> that does not contain private key info.
+        /// </summary>
+        /// <param name="value">The RSA parameters which may include a private key.</param>
+        /// <returns>An instance of <see cref="RSAParameters"/> that only includes public key information.</returns>
+        protected internal static RSAParameters PublicKeyFilter(RSAParameters value)
+        {
+            return new RSAParameters
+            {
+                Modulus = value.Modulus,
+                Exponent = value.Exponent,
+            };
+        }
 
-        protected abstract void WriteCore(Stream stream, RSAParameters parameters);
+        /// <summary>
+        /// Trims the leading zero from all parameter buffers.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The modified set of parameters.</returns>
+        /// <remarks>
+        /// The original parameters and their buffers are not modified.
+        /// </remarks>
+        protected internal static RSAParameters TrimLeadingZero(RSAParameters parameters)
+        {
+            parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
+            if (HasPrivateKey(parameters))
+            {
+                parameters.D = TrimLeadingZero(parameters.D);
+                parameters.P = TrimLeadingZero(parameters.P);
+                parameters.Q = TrimLeadingZero(parameters.Q);
+                parameters.DP = TrimLeadingZero(parameters.DP);
+                parameters.DQ = TrimLeadingZero(parameters.DQ);
+                parameters.InverseQ = TrimLeadingZero(parameters.InverseQ);
+            }
 
+            return parameters;
+        }
+
+        /// <summary>
+        /// Determines whether a set of RSA parameters includes a private key.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns><c>true</c> if a private key is included; <c>false</c> otherwise.</returns>
         protected static bool HasPrivateKey(RSAParameters parameters)
         {
             return parameters.P != null;
         }
 
+        /// <summary>
+        /// Checks whether two buffers have equal contents.
+        /// </summary>
+        /// <param name="buffer1">The first buffer.</param>
+        /// <param name="buffer2">The second buffer.</param>
+        /// <returns><c>true</c> if the buffers contain equal contents.</returns>
         protected static bool BufferEqual(byte[] buffer1, byte[] buffer2)
         {
             Requires.NotNull(buffer1, "buffer1");
@@ -167,6 +286,11 @@
             return buffer;
         }
 
+        /// <summary>
+        /// Throws an exception if a condition does not evaluate to true.
+        /// </summary>
+        /// <param name="condition">if set to <c>false</c> an exception will be thrown.</param>
+        /// <param name="message">An optional message describing the failure.</param>
         protected static void VerifyFormat(bool condition, string message = null)
         {
             if (!condition)
@@ -175,39 +299,28 @@
             }
         }
 
+        /// <summary>
+        /// Throws an exception. For use during key deserialization.
+        /// </summary>
+        /// <param name="message">An optional message describing the failure.</param>
+        /// <returns>Nothing. This method always throws.</returns>
         protected static Exception FailFormat(string message = null)
         {
             throw new FormatException(message ?? "Unexpected format or unsupported key.");
         }
 
         /// <summary>
-        /// Returns an instance of <see cref="RSAParameters"/> that does not contain private key info.
+        /// Reads a key from the specified stream.
         /// </summary>
-        /// <param name="value">The RSA parameters which may include a private key.</param>
-        /// <returns>An instance of <see cref="RSAParameters"/> that only includes public key information.</returns>
-        protected internal static RSAParameters PublicKeyFilter(RSAParameters value)
-        {
-            return new RSAParameters
-            {
-                Modulus = value.Modulus,
-                Exponent = value.Exponent,
-            };
-        }
+        /// <param name="stream">The stream.</param>
+        /// <returns>The RSA Parameters of the key.</returns>
+        protected abstract RSAParameters ReadCore(Stream stream);
 
-        protected internal static RSAParameters TrimLeadingZero(RSAParameters parameters) {
-            parameters.Modulus = TrimLeadingZero(parameters.Modulus);
-            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
-            if (HasPrivateKey(parameters))
-            {
-                parameters.D = TrimLeadingZero(parameters.D);
-                parameters.P = TrimLeadingZero(parameters.P);
-                parameters.Q = TrimLeadingZero(parameters.Q);
-                parameters.DP = TrimLeadingZero(parameters.DP);
-                parameters.DQ = TrimLeadingZero(parameters.DQ);
-                parameters.InverseQ = TrimLeadingZero(parameters.InverseQ);
-            }
-
-            return parameters;
-        }
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The RSA parameters of the key.</param>
+        protected abstract void WriteCore(Stream stream, RSAParameters parameters);
     }
 }

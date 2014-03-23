@@ -1,29 +1,28 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-
 namespace PCLCrypto.Tests.iOS
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using MonoTouch.Foundation;
+    using MonoTouch.UIKit;
+
     [Register("AppDelegate")]
     public partial class AppDelegate : UIApplicationDelegate
     {
-        UIWindow window;
-        MyViewController viewController;
+        private UIWindow window;
+        private MyViewController viewController;
 
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            window = new UIWindow(UIScreen.MainScreen.Bounds);
+            this.window = new UIWindow(UIScreen.MainScreen.Bounds);
 
-            viewController = new MyViewController();
-            window.RootViewController = viewController;
+            this.viewController = new MyViewController();
+            this.window.RootViewController = this.viewController;
 
-            window.MakeKeyAndVisible();
+            this.window.MakeKeyAndVisible();
 
             return true;
         }
     }
 }
-
