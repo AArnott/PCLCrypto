@@ -64,7 +64,12 @@
             Requires.NotNull(stream, "stream");
             Requires.Argument(HasPrivateKey(parameters) || !includePrivateKey, "parameters", "No private key data included.");
 
-            this.WriteCore(stream, includePrivateKey ? parameters : PublicKeyFilter(parameters));
+            if (!includePrivateKey) {
+                parameters = PublicKeyFilter(parameters);
+            }
+
+            RSAParameters trimmedParameters = TrimLeadingZero(parameters);
+            this.WriteCore(stream, trimmedParameters);
         }
 
         internal byte[] Write(RSAParameters parameters)
@@ -101,6 +106,9 @@
 
         protected static bool BufferEqual(byte[] buffer1, byte[] buffer2)
         {
+            Requires.NotNull(buffer1, "buffer1");
+            Requires.NotNull(buffer2, "buffer2");
+
             if (buffer1.Length != buffer2.Length)
             {
                 return false;
@@ -125,6 +133,8 @@
         /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
         protected static byte[] TrimLeadingZero(byte[] buffer)
         {
+            Requires.NotNull(buffer, "buffer");
+
             if (buffer.Length > 0 && buffer[0] == 0)
             {
                 byte[] trimmed = new byte[buffer.Length - 1];
@@ -145,6 +155,8 @@
         /// </returns>
         protected static byte[] PrependLeadingZero(byte[] buffer, bool alwaysPrependZero = false)
         {
+            Requires.NotNull(buffer, "buffer");
+
             if (buffer[0] != 0 || alwaysPrependZero)
             {
                 byte[] modifiedBuffer = new byte[buffer.Length + 1];
@@ -180,6 +192,22 @@
                 Modulus = value.Modulus,
                 Exponent = value.Exponent,
             };
+        }
+
+        protected internal static RSAParameters TrimLeadingZero(RSAParameters parameters) {
+            parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
+            if (HasPrivateKey(parameters))
+            {
+                parameters.D = TrimLeadingZero(parameters.D);
+                parameters.P = TrimLeadingZero(parameters.P);
+                parameters.Q = TrimLeadingZero(parameters.Q);
+                parameters.DP = TrimLeadingZero(parameters.DP);
+                parameters.DQ = TrimLeadingZero(parameters.DQ);
+                parameters.InverseQ = TrimLeadingZero(parameters.InverseQ);
+            }
+
+            return parameters;
         }
     }
 }

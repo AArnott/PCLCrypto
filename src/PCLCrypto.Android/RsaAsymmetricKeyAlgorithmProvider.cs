@@ -101,7 +101,7 @@ namespace PCLCrypto
             var spec = new RSAPublicKeySpec(new BigInteger(parameters.Modulus), new BigInteger(parameters.Exponent));
             KeyFactory factory = KeyFactory.GetInstance("RSA");
             IPublicKey publicKey = factory.GeneratePublic(spec);
-            return new RsaCryptographicKey(publicKey, this.algorithm);
+            return new RsaCryptographicKey(publicKey, parameters, this.algorithm);
         }
     }
 }

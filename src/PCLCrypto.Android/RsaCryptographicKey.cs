@@ -49,12 +49,14 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="publicKey">The public key.</param>
+        /// <param name="parameters">The RSA instance, if available.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(IPublicKey publicKey, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(IPublicKey publicKey, RSAParameters parameters, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
 
             this.publicKey = publicKey.JavaCast<IRSAPublicKey>();
+            this.parameters = parameters;
             this.algorithm = algorithm;
         }
 
