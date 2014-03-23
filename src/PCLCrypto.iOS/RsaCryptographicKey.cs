@@ -100,7 +100,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            var parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier)).ToArray());
+            byte[] keyData = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
+            var parameters = Pkcs1KeyFormatter.ReadPkcs1PrivateKey(keyData);
+
             switch (blobType)
             {
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
@@ -108,6 +110,7 @@ namespace PCLCrypto
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     var rsa = new RSACryptoServiceProvider();
                     rsa.ImportParameters(parameters);
+
                     return rsa.ExportCspBlob(true);
                 default:
                     throw new NotSupportedException();
