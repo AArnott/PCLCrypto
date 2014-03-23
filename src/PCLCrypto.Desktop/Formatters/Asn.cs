@@ -173,6 +173,11 @@ namespace PCLCrypto.Formatters
                     length = (uint)b;
                 }
 
+                if (length > 8 * 1024)
+                {
+                    throw new FormatException("Invalid format or length too large.");
+                }
+
                 byte[] content = new byte[length];
                 int bytesRead = stream.Read(content, 0, (int)length);
                 if (bytesRead != length)
