@@ -80,6 +80,11 @@ namespace PCLCrypto.Formatters
         internal enum BerTag : byte
         {
             /// <summary>
+            /// Indicates that this is the end of the stream.
+            /// </summary>
+            EndOfContent = 0x0,
+
+            /// <summary>
             /// Indicates that <see cref="DataElement.Content"/> is an integer.
             /// </summary>
             Integer = 0x2,
@@ -88,6 +93,11 @@ namespace PCLCrypto.Formatters
             /// Indicates that <see cref="DataElement.Content"/> is a bit string.
             /// </summary>
             BitString = 0x3,
+
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is an octet string.
+            /// </summary>
+            OctetString = 0x4,
 
             /// <summary>
             /// Indicates that <see cref="DataElement.Content"/> is null.
@@ -103,6 +113,11 @@ namespace PCLCrypto.Formatters
             /// Indicates that <see cref="DataElement.Content"/> is a sequence.
             /// </summary>
             Sequence = 0x10,
+
+            /// <summary>
+            /// Indicates that <see cref="DataElement.Content"/> is a set and set of.
+            /// </summary>
+            SetAndSetOf = 0x11,
 
             /// <summary>
             /// The set of bits that describe the tag.
@@ -222,6 +237,34 @@ namespace PCLCrypto.Formatters
         }
 
         /// <summary>
+        /// Returns a buffer containing an encoded ASN.1 element.
+        /// </summary>
+        /// <param name="element">The data element.</param>
+        /// <returns>The encoded ASN.1 element.</returns>
+        internal static byte[] WriteAsn1Element(DataElement element)
+        {
+            var ms = new MemoryStream();
+            ms.WriteAsn1Element(element);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Returns a buffer containing encoded ASN.1 elements.
+        /// </summary>
+        /// <param name="elements">The data elements to encode.</param>
+        /// <returns>The encoded ASN.1 elements.</returns>
+        internal static byte[] WriteAsn1Elements(params DataElement[] elements)
+        {
+            var nestedStream = new MemoryStream();
+            foreach (var element in elements)
+            {
+                nestedStream.WriteAsn1Element(element);
+            }
+
+            return nestedStream.ToArray();
+        }
+
+        /// <summary>
         /// Gets the minimum number of bytes required to represent an unsigned integer.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -265,6 +308,18 @@ namespace PCLCrypto.Formatters
                 this.PC = pc;
                 this.Tag = tag;
                 this.Content = content;
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DataElement"/> struct.
+            /// </summary>
+            /// <param name="class">The class.</param>
+            /// <param name="pc">The PC.</param>
+            /// <param name="tag">The tag.</param>
+            /// <param name="nestedElements">The content.</param>
+            public DataElement(BerClass @class, BerPC pc, BerTag tag, params DataElement[] nestedElements)
+                : this(@class, pc, tag, Asn.WriteAsn1Elements(nestedElements))
+            {
             }
 
             /// <summary>
