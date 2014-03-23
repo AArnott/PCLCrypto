@@ -51,6 +51,7 @@
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="CryptographicEngine.cs" />
+    <Compile Include="Formatters\Pkcs8KeyFormatter.cs" />
     <Compile Include="Formatters\X509SubjectPublicKeyInfoFormatter.cs" />
     <Compile Include="NetFxCryptographicHash.cs" />
     <Compile Include="CryptographicKey.cs" />

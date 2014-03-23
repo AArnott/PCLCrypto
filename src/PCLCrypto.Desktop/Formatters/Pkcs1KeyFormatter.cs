@@ -18,8 +18,15 @@ namespace PCLCrypto.Formatters
     /// Encodes/decodes public keys and private keys in the PKCS#1 format
     /// (rsaPublicKey and rsaPrivateKey).
     /// </summary>
+    /// <remarks>
+    /// http://tools.ietf.org/html/rfc3447#page-46
+    /// </remarks>
     internal static class Pkcs1KeyFormatter
     {
+        internal static readonly byte[] Pkcs1ObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01 };
+
+        internal static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
+
         /// <summary>
         /// Reads a PKCS1 private key from a stream.
         /// </summary>
@@ -107,7 +114,8 @@ namespace PCLCrypto.Formatters
         /// <param name="stream">The stream.</param>
         /// <param name="value">The RSA key to write to the stream.</param>
         /// <param name="includePrivateKey">if set to <c>true</c> the serialized form will include the private key.</param>
-        internal static void WritePkcs1(this Stream stream, RSAParameters value, bool includePrivateKey)
+        /// <param name="prependLeadingZeroOnCertainElements">If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.</param>
+        internal static void WritePkcs1(this Stream stream, RSAParameters value, bool includePrivateKey, bool prependLeadingZeroOnCertainElements = false)
         {
             Requires.NotNull(stream, "stream");
             Requires.Argument(!includePrivateKey || value.D != null, "value", "Private key not available.");
@@ -120,16 +128,16 @@ namespace PCLCrypto.Formatters
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, new byte[1]));
             }
 
-            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.Modulus));
+            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Modulus) : value.Modulus));
             sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.Exponent));
             if (includePrivateKey)
             {
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.D));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.P));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.Q));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.DP));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.P) : value.P));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Q) : value.Q));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.DP) : value.DP));
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.DQ));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.InverseQ));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.InverseQ) : value.InverseQ));
             }
 
             stream.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Constructed, Asn.BerTag.Sequence, sequence.ToArray()));
@@ -140,11 +148,12 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="value">The RSA key to write to the stream.</param>
         /// <param name="includePrivateKey">if set to <c>true</c> the serialized form will include the private key.</param>
+        /// <param name="prependLeadingZeroOnCertainElements">If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.</param>
         /// <returns>The buffer containing the PKCS#1 key.</returns>
-        internal static byte[] WritePkcs1(RSAParameters value, bool includePrivateKey)
+        internal static byte[] WritePkcs1(RSAParameters value, bool includePrivateKey, bool prependLeadingZeroOnCertainElements = false)
         {
             var stream = new MemoryStream();
-            WritePkcs1(stream, value, includePrivateKey);
+            WritePkcs1(stream, value, includePrivateKey, prependLeadingZeroOnCertainElements);
             return stream.ToArray();
         }
 
@@ -172,6 +181,23 @@ namespace PCLCrypto.Formatters
                 byte[] trimmed = new byte[buffer.Length - 1];
                 Buffer.BlockCopy(buffer, 1, trimmed, 0, trimmed.Length);
                 return trimmed;
+            }
+
+            return buffer;
+        }
+
+        /// <summary>
+        /// Returns a buffer with a 0x00 byte prepended if the buffer doesn't start with that byte.
+        /// </summary>
+        /// <param name="buffer">The buffer to prepend.</param>
+        /// <returns>A buffer with the prepended zero.</returns>
+        internal static byte[] PrependLeadingZero(byte[] buffer)
+        {
+            if (buffer[0] != 0)
+            {
+                byte[] modifiedBuffer = new byte[buffer.Length + 1];
+                Buffer.BlockCopy(buffer, 0, modifiedBuffer, 1, buffer.Length);
+                return modifiedBuffer;
             }
 
             return buffer;

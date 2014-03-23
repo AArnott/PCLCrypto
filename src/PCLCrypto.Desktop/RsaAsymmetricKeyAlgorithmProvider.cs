@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;
 
@@ -59,6 +60,9 @@ namespace PCLCrypto
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     rsa.ImportCspBlob(keyBlob);
                     break;
+                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
+                    rsa.ImportParameters(Pkcs8KeyFormatter.ReadPkcs8PrivateKeyInfo(keyBlob));
+                    break;
                 default:
                     throw new NotSupportedException();
             }
@@ -76,6 +80,9 @@ namespace PCLCrypto
             {
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     rsa.ImportCspBlob(keyBlob);
+                    break;
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    rsa.ImportParameters(X509SubjectPublicKeyInfoFormatter.ReadX509SubjectPublicKeyInfo(keyBlob));
                     break;
                 default:
                     throw new NotSupportedException();

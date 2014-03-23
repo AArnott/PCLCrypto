@@ -1,8 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="X509SubjectPublicKeyInfoFormatter.cs" company="Andrew Arnott">
 //     Copyright (c) Andrew Arnott. All rights reserved.
-//     Portions of this inspired by Patrick Hogan:
-//         https://github.com/kuapay/iOS-Certificate--Key--and-Trust-Sample-Project/blob/master/Crypto/Crypto/Crypto/BDRSACryptor.m
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -10,6 +8,7 @@ namespace PCLCrypto.Formatters
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
@@ -21,19 +20,42 @@ namespace PCLCrypto.Formatters
     /// </summary>
     internal static class X509SubjectPublicKeyInfoFormatter
     {
-        /// <summary>
-        /// The OID sequence to include at the start of an X.509 public key certificate.
-        /// </summary>
-        private static readonly byte[] OidSequence = new byte[] { 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00 };
+        internal static RSAParameters ReadX509SubjectPublicKeyInfo(byte[] keyBlob)
+        {
+            return ReadX509SubjectPublicKeyInfo(new MemoryStream(keyBlob));
+        }
 
         /// <summary>
         /// Reads the public key information from an X509 subject public key info blob.
         /// </summary>
-        /// <param name="keyBlob">The key blob.</param>
+        /// <param name="stream">The key blob.</param>
         /// <returns>The <see cref="RSAParameters"/> describing the public key.</returns>
-        internal static RSAParameters ReadX509SubjectPublicKeyInfo(byte[] keyBlob)
+        internal static RSAParameters ReadX509SubjectPublicKeyInfo(Stream stream)
         {
-            byte[] rsaPublicKey = GetRawPublicKeyDataFromX509(keyBlob);
+            var sequence = stream.ReadAsn1Elements().First();
+            if (sequence.Class != Asn.BerClass.Universal || sequence.PC != Asn.BerPC.Constructed || sequence.Tag != Asn.BerTag.Sequence)
+            {
+                throw new ArgumentException("Unexpected format.");
+            }
+
+            var elements = Asn.ReadAsn1Elements(sequence.Content).ToList();
+            if (elements.Count != 2 || elements[0].Class != Asn.BerClass.Universal || elements[0].PC != Asn.BerPC.Constructed || elements[0].Tag != Asn.BerTag.Sequence)
+            {
+                throw new ArgumentException("Unexpected format.");
+            }
+
+            var oid = Asn.ReadAsn1Elements(elements[0].Content).First();
+            if (!BufferEqual(Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier, oid.Content))
+            {
+                throw new ArgumentException("Unexpected algorithm.");
+            }
+
+            if (elements[1].Class != Asn.BerClass.Universal || elements[1].PC != Asn.BerPC.Primitive || elements[1].Tag != Asn.BerTag.BitString || elements[1].Content[0] != 0)
+            {
+                throw new ArgumentException("Unexpected format.");
+            }
+
+            byte[] rsaPublicKey = TrimLeadingZero(elements[1].Content);
             return Pkcs1KeyFormatter.ReadPkcs1PublicKey(rsaPublicKey);
         }
 
@@ -46,32 +68,30 @@ namespace PCLCrypto.Formatters
         {
             Requires.NotNull(stream, "stream");
 
-            var rsaPublicKeyStream = new MemoryStream();
-            rsaPublicKeyStream.WritePkcs1(value, includePrivateKey: false);
-            byte[] rsaPublicKey = rsaPublicKeyStream.ToArray();
-
-            byte[] builder = new byte[15];
-            int bitstringEncLength;
-            if (rsaPublicKey.Length + 1 < 128)
-            {
-                bitstringEncLength = 1;
-            }
-            else
-            {
-                bitstringEncLength = ((rsaPublicKey.Length + 1) / 256) + 2;
-            }
-
-            builder[0] = 0x30;
-            int i = OidSequence.Length + 2 + bitstringEncLength + rsaPublicKey.Length;
-            int j = Encode(builder, 1, i);
-
-            stream.Write(builder, 0, j + 1);
-            stream.Write(OidSequence, 0, OidSequence.Length);
-            builder[0] = 0x03;
-            j = Encode(builder, 1, rsaPublicKey.Length + 1);
-            builder[j + 1] = 0x00;
-            stream.Write(builder, 0, j + 2);
-            stream.Write(rsaPublicKey, 0, rsaPublicKey.Length);
+            var rootElement = new Asn.DataElement(
+                Asn.BerClass.Universal,
+                Asn.BerPC.Constructed,
+                Asn.BerTag.Sequence,
+                new Asn.DataElement(
+                    Asn.BerClass.Universal,
+                    Asn.BerPC.Constructed,
+                    Asn.BerTag.Sequence,
+                    new Asn.DataElement(
+                        Asn.BerClass.Universal,
+                        Asn.BerPC.Primitive,
+                        Asn.BerTag.ObjectIdentifier,
+                        Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier),
+                    new Asn.DataElement(
+                        Asn.BerClass.Universal,
+                        Asn.BerPC.Primitive,
+                        Asn.BerTag.Null,
+                        new byte[0])),
+                new Asn.DataElement(
+                        Asn.BerClass.Universal,
+                        Asn.BerPC.Primitive,
+                        Asn.BerTag.BitString,
+                        PrependLeadingZero(Pkcs1KeyFormatter.WritePkcs1(PublicKeyFilter(value), includePrivateKey: false, prependLeadingZeroOnCertainElements: true))));
+            stream.WriteAsn1Element(rootElement);
         }
 
         /// <summary>
@@ -100,104 +120,52 @@ namespace PCLCrypto.Formatters
             };
         }
 
-        /// <summary>
-        /// Gets the PKCS#1 rsaPublicKey data from an X.509 blob.
-        /// </summary>
-        /// <param name="keyBlob">The X.509 certificate.</param>
-        /// <returns>The PKCS#1 rsaPublicKey blob.</returns>
-        private static byte[] GetRawPublicKeyDataFromX509(byte[] keyBlob)
+        internal static bool BufferEqual(byte[] buffer1, byte[] buffer2)
         {
-            int i = 0;
-            if (keyBlob[i++] != 0x30)
+            if (buffer1.Length != buffer2.Length)
             {
-                throw new ArgumentException("Bad format.");
+                return false;
             }
 
-            if (keyBlob[i] > 0x80)
+            for (int i = 0; i < buffer1.Length; i++)
             {
-                i += keyBlob[i] - 0x80 + 1;
-            }
-            else
-            {
-                i++;
-            }
-
-            if (i >= keyBlob.Length)
-            {
-                throw new ArgumentException("Bad format");
+                if (buffer1[i] != buffer2[i])
+                {
+                    return false;
+                }
             }
 
-            if (keyBlob[i] != 0x30)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            i += OidSequence.Length;
-
-            if (i >= keyBlob.Length - 2)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (keyBlob[i++] != 0x03)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (keyBlob[i] > 0x80)
-            {
-                i += keyBlob[i] - 0x80 + 1;
-            }
-            else
-            {
-                i++;
-            }
-
-            if (i >= keyBlob.Length)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (keyBlob[i++] != 0x00)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            if (i >= keyBlob.Length)
-            {
-                throw new ArgumentException("Bad format");
-            }
-
-            byte[] strippedPublicKeyData = new byte[keyBlob.Length - i];
-            Array.Copy(keyBlob, i, strippedPublicKeyData, 0, strippedPublicKeyData.Length);
-
-            return strippedPublicKeyData;
+            return true;
         }
 
         /// <summary>
-        /// No idea what it does. I think it's a part of an ASN.1 encoder.
+        /// Returns a buffer with a 0x00 byte prepended.
         /// </summary>
-        /// <param name="buffer">A buffer to write to.</param>
-        /// <param name="offset">The index at which writing into the buffer starts.</param>
-        /// <param name="length">The length to encode into the buffer maybe?</param>
-        /// <returns>The number of bytes written into the buffer, I think.</returns>
-        private static int Encode(byte[] buffer, int offset, int length)
+        /// <param name="buffer">The buffer to prepend.</param>
+        /// <returns>A buffer with the prepended zero.</returns>
+        private static byte[] PrependLeadingZero(byte[] buffer)
         {
-            if (length < 128)
+            byte[] modifiedBuffer = new byte[buffer.Length + 1];
+            Buffer.BlockCopy(buffer, 0, modifiedBuffer, 1, buffer.Length);
+            return modifiedBuffer;
+        }
+
+        /// <summary>
+        /// Trims up to one leading byte from the start of a buffer if that byte is a 0x00
+        /// without modifying the original buffer.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
+        internal static byte[] TrimLeadingZero(byte[] buffer)
+        {
+            if (buffer.Length > 0 && buffer[0] == 0)
             {
-                buffer[offset] = (byte)length;
-                return 1;
+                byte[] trimmed = new byte[buffer.Length - 1];
+                Buffer.BlockCopy(buffer, 1, trimmed, 0, trimmed.Length);
+                return trimmed;
             }
 
-            int i = (length / 256) + 1;
-            buffer[offset] = (byte)(i + 0x80);
-            for (int j = 0; j < i; ++j)
-            {
-                buffer[offset + i - j] = (byte)(length & 0xff);
-                length = length >> 8;
-            }
-
-            return i + 1;
+            return buffer;
         }
     }
 }
