@@ -10,11 +10,10 @@
 		<projectUrl>https://pclcrypto.codeplex.com/</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
-			PCL Crypto provides a consistent, portable set of crypto APIs for
-			.NET, Windows Phone, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.
+			PCL Crypto provides a consistent, portable set of crypto APIs for .NET, Windows Phone, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.
 			This makes it easier to create cross-platform .NET libraries and apps.
-			Crypto functionality includes asymmetric and symmetric encryption and signatures, 
-			and key derivation.
+			Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation.
+			PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.
 		</description>
 		<summary>PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
 		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
@@ -32,7 +31,7 @@
 	</metadata>
 	<files>
 		<!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
-		     the platform-specific lib folder will indicate Windows 8.1 is required. -->
+				 the platform-specific lib folder will indicate Windows 8.1 is required. -->
 		<file target="lib\portable-net40+sl50+wp80+win+MonoAndroid10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.*" />
 		<file target="lib\net40-Client" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.*" />
 		<file target="lib\sl5" src="$OutputPath$PCLCrypto.Silverlight\PCLCrypto.*" />
