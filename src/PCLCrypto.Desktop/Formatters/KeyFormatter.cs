@@ -18,9 +18,41 @@
 
         internal static readonly KeyFormatter X509SubjectPublicKeyInfo = new X509SubjectPublicKeyInfoFormatter();
 
+        internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
+
         protected static readonly byte[] Pkcs1ObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01 };
 
         protected static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
+
+        internal KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
+        {
+            switch (blobType)
+            {
+                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
+                    return Pkcs8;
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    return Pkcs1;
+                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
+                    return Capi;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        internal KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
+        {
+            switch (blobType)
+            {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    return X509SubjectPublicKeyInfo;
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                    return Pkcs1;
+                case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                    return Capi;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
 
         internal void Write(Stream stream, RSAParameters parameters)
         {
