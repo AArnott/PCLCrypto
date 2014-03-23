@@ -69,29 +69,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    return this.key.ExportCspBlob(includePrivateParameters: true);
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    return KeyFormatter.Pkcs8.Write(this.key.ExportParameters(true));
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(this.key.ExportParameters(true));
         }
 
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    return this.key.ExportCspBlob(includePrivateParameters: false);
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    return KeyFormatter.X509SubjectPublicKeyInfo.Write(this.key.ExportParameters(includePrivateParameters: false));
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(this.key.ExportParameters(false));
         }
 
         /// <inheritdoc />

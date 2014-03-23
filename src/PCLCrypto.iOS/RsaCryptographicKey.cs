@@ -102,34 +102,15 @@ namespace PCLCrypto
         {
             byte[] keyData = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
             var parameters = KeyFormatter.Pkcs1.Read(keyData);
-
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    return KeyFormatter.Pkcs1.Write(parameters, true);
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    var rsa = new RSACryptoServiceProvider();
-                    rsa.ImportParameters(parameters);
-
-                    return rsa.ExportCspBlob(true);
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(parameters);
         }
 
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            RSAParameters parameters = KeyFormatter.Pkcs1.Read(KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier)).ToArray());
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    return KeyFormatter.Pkcs1.Write(parameters, includePrivateKey: false);
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    return KeyFormatter.X509SubjectPublicKeyInfo.Write(parameters, includePrivateKey: false);
-                default:
-                    throw new NotSupportedException();
-            }
+            byte[] keyData = KeyDataWithTag(GetPublicKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
+            RSAParameters parameters = KeyFormatter.Pkcs1.Read(keyData);
+            return KeyFormatter.GetFormatter(blobType).Write(parameters);
         }
 
         /// <summary>

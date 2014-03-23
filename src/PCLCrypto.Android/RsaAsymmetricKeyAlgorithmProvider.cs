@@ -10,6 +10,7 @@ namespace PCLCrypto
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
     using Android.Runtime;
@@ -17,6 +18,7 @@ namespace PCLCrypto
     using Java.Security;
     using Java.Security.Interfaces;
     using Java.Security.Spec;
+    using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;
 
@@ -54,7 +56,20 @@ namespace PCLCrypto
             keyGen.Initialize(keySize);
             var key = keyGen.GenerateKeyPair();
 
-            return new RsaCryptographicKey(key.Public, key.Private, null, this.algorithm);
+            var privateKeyParameters = key.Private.JavaCast<IRSAPrivateCrtKey>();
+            var parameters = new RSAParameters
+            {
+                Modulus = privateKeyParameters.Modulus.ToByteArray(),
+                Exponent = privateKeyParameters.PublicExponent.ToByteArray(),
+                P = privateKeyParameters.PrimeP.ToByteArray(),
+                Q = privateKeyParameters.PrimeQ.ToByteArray(),
+                DP = privateKeyParameters.PrimeExponentP.ToByteArray(),
+                DQ = privateKeyParameters.PrimeExponentQ.ToByteArray(),
+                InverseQ = privateKeyParameters.CrtCoefficient.ToByteArray(),
+                D = privateKeyParameters.PrivateExponent.ToByteArray(),
+            };
+
+            return new RsaCryptographicKey(key.Public, key.Private, parameters, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -62,44 +77,19 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            System.Security.Cryptography.RSACryptoServiceProvider rsa = null;
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
             IPrivateKey privateKey;
             IPublicKey publicKey;
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    {
-                        rsa = new System.Security.Cryptography.RSACryptoServiceProvider();
-                        rsa.ImportCspBlob(keyBlob);
-                        var p = rsa.ExportParameters(true);
 
-                        var spec = new RSAPrivateKeySpec(new BigInteger(p.Modulus), new BigInteger(p.D));
-                        var factory = KeyFactory.GetInstance("RSA");
-                        privateKey = factory.GeneratePrivate(spec);
+            var spec = new RSAPrivateKeySpec(new BigInteger(parameters.Modulus), new BigInteger(parameters.D));
+            var factory = KeyFactory.GetInstance("RSA");
+            privateKey = factory.GeneratePrivate(spec);
 
-                        var privateRsaKey = privateKey.JavaCast<IRSAPrivateKey>();
-                        var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, new BigInteger(p.Exponent));
-                        publicKey = factory.GeneratePublic(publicKeySpec);
-                        break;
-                    }
+            var privateRsaKey = privateKey.JavaCast<IRSAPrivateKey>();
+            var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, new BigInteger(parameters.Exponent));
+            publicKey = factory.GeneratePublic(publicKeySpec);
 
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    {
-                        var spec = new PKCS8EncodedKeySpec(keyBlob);
-                        var factory = KeyFactory.GetInstance("RSA");
-                        privateKey = factory.GeneratePrivate(spec);
-
-                        var privateRsaKey = privateKey.JavaCast<IRSAPrivateKey>();
-                        var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, BigInteger.ValueOf(0x10001)); // TODO: replace 65537 with actual public exponent.
-                        publicKey = factory.GeneratePublic(publicKeySpec);
-                        break;
-                    }
-
-                default:
-                    throw new NotSupportedException();
-            }
-
-            return new RsaCryptographicKey(publicKey, privateKey, rsa, this.algorithm);
+            return new RsaCryptographicKey(publicKey, privateKey, parameters, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -107,21 +97,10 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            IPublicKey publicKey;
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBlob);
-                    KeyFactory factory = KeyFactory.GetInstance("RSA");
-                    publicKey = factory.GeneratePublic(spec);
-                    break;
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    publicKey = PvkConvert.FromPublicKeyBlob(keyBlob);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
+            var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            var spec = new RSAPublicKeySpec(new BigInteger(parameters.Modulus), new BigInteger(parameters.Exponent));
+            KeyFactory factory = KeyFactory.GetInstance("RSA");
+            IPublicKey publicKey = factory.GeneratePublic(spec);
             return new RsaCryptographicKey(publicKey, this.algorithm);
         }
     }

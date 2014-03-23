@@ -55,18 +55,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var rsa = new Platform.RSACryptoServiceProvider();
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    rsa.ImportCspBlob(keyBlob);
-                    break;
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    rsa.ImportParameters(KeyFormatter.Pkcs8.Read(keyBlob));
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
+            rsa.ImportParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
@@ -76,18 +65,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var rsa = new Platform.RSACryptoServiceProvider();
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    rsa.ImportCspBlob(keyBlob);
-                    break;
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    rsa.ImportParameters(KeyFormatter.X509SubjectPublicKeyInfo.Read(keyBlob));
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
+            rsa.ImportParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
     }

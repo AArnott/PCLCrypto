@@ -24,14 +24,14 @@
 
         protected static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
 
-        internal KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
+        internal static KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)
             {
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return Pkcs8;
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    return Pkcs1;
+                    return Pkcs1PrependZeros;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return Capi;
                 default:
@@ -39,14 +39,14 @@
             }
         }
 
-        internal KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
+        internal static KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
         {
             switch (blobType)
             {
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
                     return X509SubjectPublicKeyInfo;
                 case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    return Pkcs1;
+                    return Pkcs1PrependZeros;
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     return Capi;
                 default:

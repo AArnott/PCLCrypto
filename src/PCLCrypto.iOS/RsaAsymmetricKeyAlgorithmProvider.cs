@@ -87,20 +87,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            RSAParameters parameters;
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    parameters = KeyFormatter.Pkcs1.Read(keyBlob);
-                    break;
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    var rsa = new RSACryptoServiceProvider();
-                    rsa.ImportCspBlob(keyBlob);
-                    parameters = rsa.ExportParameters(true);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
 
             string keyIdentifier = Guid.NewGuid().ToString();
             SecKey privateKey = ImportKey(parameters, RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier));
@@ -113,18 +100,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            RSAParameters parameters;
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    parameters = KeyFormatter.X509SubjectPublicKeyInfo.Read(keyBlob);
-                    break;
-                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    parameters = KeyFormatter.Pkcs1.Read(keyBlob);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
 
             // Inject the PKCS#1 public key into the KeyChain.
             string keyIdentifier = Guid.NewGuid().ToString();
