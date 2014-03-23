@@ -16,6 +16,7 @@ namespace PCLCrypto
     using Java.Security;
     using Java.Security.Interfaces;
     using Javax.Crypto;
+    using PCLCrypto.Formatters;
     using Validation;
 
     /// <summary>
@@ -40,20 +41,22 @@ namespace PCLCrypto
         private readonly AsymmetricAlgorithm algorithm;
 
         /// <summary>
-        /// The RSA instance to use for exporting the PRIVATEKEYBLOB.
+        /// The RSAParameters to use during export.
         /// </summary>
-        private readonly System.Security.Cryptography.RSACryptoServiceProvider rsa;
+        private readonly RSAParameters parameters;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="publicKey">The public key.</param>
+        /// <param name="parameters">The RSA instance, if available.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(IPublicKey publicKey, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(IPublicKey publicKey, RSAParameters parameters, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
 
             this.publicKey = publicKey.JavaCast<IRSAPublicKey>();
+            this.parameters = parameters;
             this.algorithm = algorithm;
         }
 
@@ -62,16 +65,16 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="publicKey">The public key.</param>
         /// <param name="privateKey">The private key.</param>
-        /// <param name="rsa">The RSA instance, if available.</param>
+        /// <param name="parameters">The RSA instance, if available.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(IPublicKey publicKey, IPrivateKey privateKey, System.Security.Cryptography.RSACryptoServiceProvider rsa, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(IPublicKey publicKey, IPrivateKey privateKey, RSAParameters parameters, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(publicKey, "publicKey");
             Requires.NotNull(privateKey, "privateKey");
 
             this.publicKey = publicKey.JavaCast<IRSAPublicKey>();
             this.privateKey = privateKey.JavaCast<IRSAPrivateKey>();
-            this.rsa = rsa;
+            this.parameters = parameters;
             this.algorithm = algorithm;
         }
 
@@ -92,40 +95,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    Verify.Operation(this.privateKey != null, "No private key.");
-                    if (this.rsa != null)
-                    {
-                        return this.rsa.ExportCspBlob(true);
-                    }
-
-                    return this.privateKey.GetEncodedPrivateKeyBlob();
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    return this.privateKey.GetEncoded();
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(this.parameters);
         }
 
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    return this.publicKey.GetEncoded();
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    if (this.rsa != null)
-                    {
-                        return this.rsa.ExportCspBlob(false);
-                    }
-
-                    return this.publicKey.GetEncodedPublicKeyBlob();
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(this.parameters, includePrivateKey: false);
         }
 
         /// <inheritdoc />

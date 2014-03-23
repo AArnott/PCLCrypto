@@ -22,6 +22,10 @@
     <DefineConstants>TRACE;DESKTOP</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Mono.Security.3.2.3.0\lib\net40\Mono.Security.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,10 +50,15 @@
     <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
       <Link>WinRTCrypto.cs</Link>
     </Compile>
+    <Compile Include="Formatters\Asn.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="CryptographicEngine.cs" />
+    <Compile Include="Formatters\CapiKeyFormatter.cs" />
+    <Compile Include="Formatters\KeyFormatter.cs" />
+    <Compile Include="Formatters\Pkcs8KeyFormatter.cs" />
+    <Compile Include="Formatters\X509SubjectPublicKeyInfoFormatter.cs" />
     <Compile Include="NetFxCryptographicHash.cs" />
     <Compile Include="CryptographicKey.cs" />
     <Compile Include="CryptoUtilities.cs" />
@@ -61,6 +70,7 @@
     <Compile Include="MacAlgorithmProvider.cs" />
     <Compile Include="MacAlgorithmProviderFactory.cs" />
     <Compile Include="MacCryptographicKey.cs" />
+    <Compile Include="Formatters\Pkcs1KeyFormatter.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
     <Compile Include="CngCryptographicKey.cs" />

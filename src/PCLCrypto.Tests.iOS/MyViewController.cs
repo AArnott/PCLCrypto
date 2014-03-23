@@ -1,11 +1,13 @@
 namespace PCLCrypto.Tests.iOS
 {
     using System;
+    using System.Diagnostics;
     using MonoTouch.UIKit;
     using System.Drawing;
     using PCLTesting.Infrastructure;
     using System.Globalization;
     using System.Threading.Tasks;
+    using System.Security.Cryptography;
 
     public class MyViewController : UIViewController
     {
@@ -100,6 +102,30 @@ namespace PCLCrypto.Tests.iOS
             this.View.AddSubview(this.summaryTextView);
             this.View.AddSubview(this.resultsScrollView);
             this.resultsScrollView.AddSubview(this.resultsTextView);
+
+            RSATimerTest();
+        }
+
+        private async void RSATimerTest()
+        {
+            const int keyLength = 1024;
+            var timer = new Stopwatch();
+            await Task.Run(delegate
+            {
+                timer.Start();
+                ////var rsa = new Mono.Security.Cryptography.RSAManaged(keyLength);
+                ////rsa.ExportParameters(true);
+                WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(PCLCrypto.AsymmetricAlgorithm.RsaOaepSha1)
+                    .CreateKeyPair(keyLength)
+                    .ExportPublicKey(CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey);
+                timer.Stop();
+            });
+
+            string msg = string.Format("{0} RSA keygen in {1:N1} seconds", keyLength, timer.Elapsed.TotalSeconds);
+
+            this.resultsTextView.Text = msg;
+            this.resultsTextView.SizeToFit();
+            this.resultsScrollView.ContentSize = new SizeF(this.resultsScrollView.ContentSize.Width, this.resultsTextView.Frame.Size.Height);
         }
     }
 }

@@ -80,6 +80,24 @@
     <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
       <Link>DeriveBytes.cs</Link>
     </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Asn.cs">
+      <Link>Formatters\Asn.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\CapiKeyFormatter.cs">
+      <Link>Formatters\CapiKeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\KeyFormatter.cs">
+      <Link>Formatters\KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs1KeyFormatter.cs">
+      <Link>Formatters\Pkcs1KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs8KeyFormatter.cs">
+      <Link>Formatters\Pkcs8KeyFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\PCLCrypto.Desktop\Formatters\X509SubjectPublicKeyInfoFormatter.cs">
+      <Link>Formatters\X509SubjectPublicKeyInfoFormatter.cs</Link>
+    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\HashAlgorithmProvider.cs">
       <Link>HashAlgorithmProvider.cs</Link>
     </Compile>

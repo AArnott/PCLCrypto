@@ -12,6 +12,7 @@ namespace PCLCrypto
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using PCLCrypto.Formatters;
     using Validation;
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace PCLCrypto
         /// <summary>
         /// The platform crypto key.
         /// </summary>
-        private readonly RSACryptoServiceProvider key;
+        private readonly RSA key;
 
         /// <summary>
         /// The algorithm to use when performing cryptography.
@@ -35,7 +36,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="key">The RSA crypto service provider.</param>
         /// <param name="algorithm">The algorithm.</param>
-        internal RsaCryptographicKey(RSACryptoServiceProvider key, AsymmetricAlgorithm algorithm)
+        internal RsaCryptographicKey(RSA key, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(key, "key");
 
@@ -52,7 +53,7 @@ namespace PCLCrypto
         /// <summary>
         /// Gets the RSA crypto service provider that contains this key.
         /// </summary>
-        internal RSACryptoServiceProvider Rsa
+        internal RSA Rsa
         {
             get { return this.key; }
         }
@@ -68,25 +69,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            switch (blobType)
-            {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    return this.key.ExportCspBlob(includePrivateParameters: true);
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(this.key.ExportParameters(true));
         }
 
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    return this.key.ExportCspBlob(includePrivateParameters: false);
-                default:
-                    throw new NotSupportedException();
-            }
+            return KeyFormatter.GetFormatter(blobType).Write(this.key.ExportParameters(false));
         }
 
         /// <inheritdoc />
@@ -94,7 +83,9 @@ namespace PCLCrypto
         {
             using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
             {
-                return this.Rsa.SignData(data, hash);
+                var formatter = new RSAPKCS1SignatureFormatter(this.Rsa);
+                formatter.SetHashAlgorithm(hash.ToString());
+                return formatter.CreateSignature(hash.ComputeHash(data));
             }
         }
 
@@ -103,14 +94,21 @@ namespace PCLCrypto
         {
             using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
             {
-                return this.Rsa.VerifyData(data, hash, signature);
+                var deformatter = new RSAPKCS1SignatureDeformatter(this.Rsa);
+                deformatter.SetHashAlgorithm(hash.ToString());
+                return deformatter.VerifySignature(hash.ComputeHash(data), signature);
             }
         }
 
         /// <inheritdoc />
         protected internal override byte[] SignHash(byte[] data)
         {
-            return this.Rsa.SignHash(data, CryptographicEngine.GetHashAlgorithmOID(this.Algorithm));
+            using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            {
+                var formatter = new RSAPKCS1SignatureFormatter(this.Rsa);
+                formatter.SetHashAlgorithm(hash.ToString());
+                return formatter.CreateSignature(data);
+            }
         }
 
         /// <inheritdoc />
@@ -118,7 +116,12 @@ namespace PCLCrypto
         {
             try
             {
-                return this.Rsa.VerifyHash(data, CryptographicEngine.GetHashAlgorithmOID(this.Algorithm), signature);
+                using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+                {
+                    var deformatter = new RSAPKCS1SignatureDeformatter(this.Rsa);
+                    deformatter.SetHashAlgorithm(hash.ToString());
+                    return deformatter.VerifySignature(data, signature);
+                }
             }
             catch (CryptographicException)
             {
@@ -129,13 +132,15 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
-            return this.Rsa.Encrypt(data, true);
+            var keyExchange = new RSAOAEPKeyExchangeFormatter(this.Rsa);
+            return keyExchange.CreateKeyExchange(data);
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            return this.Rsa.Decrypt(data, true);
+            var keyExchange = new RSAOAEPKeyExchangeDeformatter(this.Rsa);
+            return keyExchange.DecryptKeyExchange(data);
         }
     }
 }

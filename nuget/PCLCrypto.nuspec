@@ -19,6 +19,10 @@
 		<summary>PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
 		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
 		<dependencies>
+			<group target="net40-Client">
+				<dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
+				<dependency id="Validation" version="[2.0.3.13323,3.0)"/>
+			</group>
 			<group>
 				<!--<dependency id="Microsoft.Bcl.Async" version="1.0.165" />
 				<dependency id="Microsoft.Bcl" version="1.0.19" />-->

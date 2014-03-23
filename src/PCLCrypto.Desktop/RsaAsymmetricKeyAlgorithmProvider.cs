@@ -11,6 +11,10 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+#if DESKTOP
+    using Mono.Security.Cryptography;
+#endif
+    using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;
 
@@ -53,16 +57,23 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var rsa = new Platform.RSACryptoServiceProvider();
-            switch (blobType)
+            var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            Platform.RSA rsa;
+            if (CapiKeyFormatter.IsCapiCompatible(parameters))
             {
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    rsa.ImportCspBlob(keyBlob);
-                    break;
-                default:
-                    throw new NotSupportedException();
+                rsa = new Platform.RSACryptoServiceProvider();
+            }
+            else
+            {
+#if DESKTOP
+                rsa = new RSAManaged();
+#else
+                CapiKeyFormatter.VerifyCapiCompatibleParameters(parameters);
+                throw new NotSupportedException();
+#endif
             }
 
+            rsa.ImportParameters(parameters);
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
@@ -72,15 +83,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var rsa = new Platform.RSACryptoServiceProvider();
-            switch (blobType)
-            {
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    rsa.ImportCspBlob(keyBlob);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
+            rsa.ImportParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
     }
