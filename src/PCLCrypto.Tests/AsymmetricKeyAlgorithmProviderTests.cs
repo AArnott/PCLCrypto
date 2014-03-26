@@ -243,6 +243,20 @@
             Assert.AreEqual(Convert.ToBase64String(data), Convert.ToBase64String(plaintext));
         }
 
+        [TestMethod]
+        public void RSAParametersNotOverlyTrimmed()
+        {
+            // Test a private key that has a most significant bit of zero in its D parameter.
+            // Specifically, we want to verify that such a key can be exported into the CAPI format.
+            var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var key = algorithm.ImportKeyPair(
+                Convert.FromBase64String("MIIBOgIBAAJBAKZ/iS3+Df6z6qD4/ZJI3Mfr/rWOvFdTZwCyoZ+CoMSW5QT93OW5fxWphus4Civ3+Q4fBrklNWvdmCjHgUuPOZkCAwEAAQI/8Qty7sMAP975sFLJyR7zg/yFpRQgV8zHMptqoiPb3L7CxcfPB71gjI3XPLfVc5cxNRl1QANEKGf+PE/Pb+xRAiEAz0zChuSpSLv0Rmccbeb0V7FsCTKKn8QQhE61DCE4ZgkCIQDNnOtqKnkuHws8sEYKfuolmlFPp0LD0PPptLwr8wGbEQIhAAlAhsoYeIm7gcqGnZk2Hp+vVoAOlmtNB+Ov05rH/MlpAiCq3EdUhc8FYI6589GAT07LyJzhECEPD8hg4OutqdYfwQIhAHcfeFuEU67QFPQs0JSzfG/mDDKtGCrcY7KGPBG4rRme"),
+                CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey);
+
+            // Just make sure it doesn't throw an exception.
+            key.Export(CryptographicPrivateKeyBlobType.Capi1PrivateKey);
+        }
+
         ////[TestMethod]
         ////public void SignedDataVerifyInterop()
         ////{
