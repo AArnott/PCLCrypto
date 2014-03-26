@@ -120,7 +120,7 @@ namespace PCLCrypto.Formatters
                 parameters = PublicKeyFilter(parameters);
             }
 
-            RSAParameters trimmedParameters = TrimLeadingZero(parameters);
+            RSAParameters trimmedParameters = NegotiateSizes(parameters);
             this.WriteCore(stream, trimmedParameters);
         }
 
@@ -154,7 +154,9 @@ namespace PCLCrypto.Formatters
         /// <returns>The RSA key parameters.</returns>
         internal RSAParameters Read(Stream stream)
         {
-            return this.ReadCore(stream);
+            var parameters = this.ReadCore(stream);
+            var trimmedParameters = NegotiateSizes(parameters);
+            return trimmedParameters;
         }
 
         /// <summary>
@@ -183,27 +185,42 @@ namespace PCLCrypto.Formatters
         }
 
         /// <summary>
-        /// Trims the leading zero from all parameter buffers.
+        /// Tries to add/remove leading zeros as necessary in an attempt to make the parameters CAPI compatible.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
         /// <returns>The modified set of parameters.</returns>
         /// <remarks>
         /// The original parameters and their buffers are not modified.
         /// </remarks>
-        protected internal static RSAParameters TrimLeadingZero(RSAParameters parameters)
+        protected internal static RSAParameters NegotiateSizes(RSAParameters parameters)
         {
-            parameters.Modulus = TrimLeadingZero(parameters.Modulus);
-            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
             if (HasPrivateKey(parameters))
             {
-                parameters.D = TrimLeadingZero(parameters.D);
-                parameters.P = TrimLeadingZero(parameters.P);
-                parameters.Q = TrimLeadingZero(parameters.Q);
-                parameters.DP = TrimLeadingZero(parameters.DP);
-                parameters.DQ = TrimLeadingZero(parameters.DQ);
-                parameters.InverseQ = TrimLeadingZero(parameters.InverseQ);
+                if (CapiKeyFormatter.IsCapiCompatible(parameters))
+                {
+                    // Don't change a thing. Everything is perfect.
+                    return parameters;
+                }
+
+                // It's not safe to pad zeros (that seems to throw encryption off)
+                // but we might be able to remove zeros to help lengths meet CAPI expectations.
+                int keyLength = Math.Abs(parameters.Modulus.Length - parameters.D.Length) < 2 ? Math.Min(parameters.Modulus.Length, parameters.D.Length) : (parameters.Modulus.Length + parameters.D.Length) / 2;
+                parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
+                parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
+
+                int halfKeyLength = (keyLength + 1) / 2;
+                parameters.P = TrimOrPadZeroToLength(parameters.P, halfKeyLength);
+                parameters.Q = TrimOrPadZeroToLength(parameters.Q, halfKeyLength);
+                parameters.DP = TrimOrPadZeroToLength(parameters.DP, halfKeyLength);
+                parameters.DQ = TrimOrPadZeroToLength(parameters.DQ, halfKeyLength);
+                parameters.InverseQ = TrimOrPadZeroToLength(parameters.InverseQ, halfKeyLength);
+            }
+            else
+            {
+                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
             }
 
+            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
             return parameters;
         }
 
@@ -262,6 +279,31 @@ namespace PCLCrypto.Formatters
             }
 
             return buffer;
+        }
+
+        /// <summary>
+        /// Trims up to one leading byte from the start of a buffer if that byte is a 0x00
+        /// without modifying the original buffer.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
+        protected static byte[] TrimOrPadZeroToLength(byte[] buffer, int desiredLength)
+        {
+            Requires.NotNull(buffer, "buffer");
+            Requires.Range(desiredLength > 0, "desiredLength");
+
+            if (buffer.Length > desiredLength)
+            {
+                return TrimLeadingZero(buffer);
+            }
+            else if (buffer.Length < desiredLength)
+            {
+                return PrependLeadingZero(buffer);
+            }
+            else
+            {
+                return buffer;
+            }
         }
 
         /// <summary>

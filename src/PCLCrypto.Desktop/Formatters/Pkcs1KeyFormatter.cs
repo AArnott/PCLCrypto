@@ -60,21 +60,21 @@ namespace PCLCrypto.Formatters
                 case 2:
                     return new RSAParameters
                     {
-                        Modulus = TrimLeadingZero(sequence[0].Content),
-                        Exponent = TrimLeadingZero(sequence[1].Content),
+                        Modulus = sequence[0].Content,
+                        Exponent = sequence[1].Content,
                     };
                 case 9:
                     KeyFormatter.VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0, "Unsupported version.");
                     return new RSAParameters
                     {
-                        Modulus = TrimLeadingZero(sequence[1].Content),
-                        Exponent = TrimLeadingZero(sequence[2].Content),
-                        D = TrimLeadingZero(sequence[3].Content),
-                        P = TrimLeadingZero(sequence[4].Content),
-                        Q = TrimLeadingZero(sequence[5].Content),
-                        DP = TrimLeadingZero(sequence[6].Content),
-                        DQ = TrimLeadingZero(sequence[7].Content),
-                        InverseQ = TrimLeadingZero(sequence[8].Content),
+                        Modulus = sequence[1].Content,
+                        Exponent = sequence[2].Content,
+                        D = sequence[3].Content,
+                        P = sequence[4].Content,
+                        Q = sequence[5].Content,
+                        DP = sequence[6].Content,
+                        DQ = sequence[7].Content,
+                        InverseQ = sequence[8].Content,
                     };
                 default:
                     throw KeyFormatter.FailFormat();
