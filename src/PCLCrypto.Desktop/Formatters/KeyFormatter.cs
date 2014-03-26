@@ -286,7 +286,10 @@ namespace PCLCrypto.Formatters
         /// without modifying the original buffer.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
-        /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
+        /// <param name="desiredLength">The length to try to trim or pad to match.</param>
+        /// <returns>
+        /// A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.
+        /// </returns>
         protected static byte[] TrimOrPadZeroToLength(byte[] buffer, int desiredLength)
         {
             Requires.NotNull(buffer, "buffer");
