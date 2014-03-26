@@ -202,9 +202,9 @@ namespace PCLCrypto.Formatters
                     return parameters;
                 }
 
-                // It's not safe to pad zeros (that seems to throw encryption off)
-                // but we might be able to remove zeros to help lengths meet CAPI expectations.
-                int keyLength = Math.Abs(parameters.Modulus.Length - parameters.D.Length) < 2 ? Math.Min(parameters.Modulus.Length, parameters.D.Length) : (parameters.Modulus.Length + parameters.D.Length) / 2;
+                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+                parameters.D = TrimLeadingZero(parameters.D);
+                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D.Length);
                 parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
                 parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
 
