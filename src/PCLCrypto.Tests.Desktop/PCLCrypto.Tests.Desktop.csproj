@@ -142,6 +142,7 @@
     <Compile Include="..\PCLCrypto.Tests\SymmetricKeyAlgorithmProviderTests.cs">
       <Link>SymmetricKeyAlgorithmProviderTests.cs</Link>
     </Compile>
+    <Compile Include="AsnTests.cs" />
     <Compile Include="DesktopCryptoStreamTests.cs" />
     <Compile Include="Pkcs1KeyFormatterTests.cs" />
     <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
