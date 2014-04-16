@@ -36,24 +36,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\pclcrypto.desktop\formatters\Asn.cs">
-      <Link>Formatters\Asn.cs</Link>
-    </Compile>
-    <Compile Include="..\pclcrypto.desktop\formatters\CapiKeyFormatter.cs">
-      <Link>Formatters\CapiKeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\pclcrypto.desktop\formatters\KeyFormatter.cs">
-      <Link>Formatters\KeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\pclcrypto.desktop\formatters\Pkcs1KeyFormatter.cs">
-      <Link>Formatters\Pkcs1KeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\pclcrypto.desktop\formatters\Pkcs8KeyFormatter.cs">
-      <Link>Formatters\Pkcs8KeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\pclcrypto.desktop\formatters\X509SubjectPublicKeyInfoFormatter.cs">
-      <Link>Formatters\X509SubjectPublicKeyInfoFormatter.cs</Link>
-    </Compile>
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="JavaCryptographicHashMac.cs" />
     <Compile Include="JavaCryptographicHash.cs" />
@@ -92,4 +74,5 @@
   <Import Project="..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems')" />
   <Import Project="..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems')" />
   <Import Project="..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems')" />
 </Project>
