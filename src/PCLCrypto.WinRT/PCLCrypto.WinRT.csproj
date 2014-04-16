@@ -45,9 +45,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto\NetFxCrypto.cs">
-      <Link>NetFxCrypto.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
       <Link>WinRTCrypto.cs</Link>
     </Compile>

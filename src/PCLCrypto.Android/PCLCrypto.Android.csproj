@@ -54,9 +54,6 @@
     <Compile Include="..\pclcrypto.desktop\formatters\X509SubjectPublicKeyInfoFormatter.cs">
       <Link>Formatters\X509SubjectPublicKeyInfoFormatter.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto\NetFxCrypto.cs">
-      <Link>NetFxCrypto.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
       <Link>WinRTCrypto.cs</Link>
     </Compile>
