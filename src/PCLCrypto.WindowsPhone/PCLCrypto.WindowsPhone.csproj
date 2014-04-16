@@ -62,14 +62,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Desktop\RsaAsymmetricKeyAlgorithmProvider.cs">
-      <Link>RsaAsymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RsaCryptographicKey.cs">
-      <Link>RsaCryptographicKey.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Validation">
       <HintPath>..\packages\Validation.2.0.3.13323\lib\portable-windows8+net40+sl5+windowsphone8+MonoAndroid+MonoTouch\Validation.dll</HintPath>
     </Reference>
@@ -96,4 +88,5 @@
   <Import Project="..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems')" />
   <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems')" />
   <Import Project="..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems')" />
 </Project>

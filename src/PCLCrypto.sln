@@ -67,18 +67,23 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.Formatters
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.NetFxSymmetric", "PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.shproj", "{1511F9F5-0210-4375-B5C3-4CAF5B761FB4}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.NetFxRSA", "PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.shproj", "{9AABBE87-236E-43AF-8BC9-268AC7B3AC2B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{9aabbe87-236e-43af-8bc9-268ac7b3ac2b}*SharedItemsImports = 13
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{bdbcb22f-d740-4c54-9fe5-abb6baa92aa0}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
@@ -667,5 +672,6 @@ Global
 		{3B2D4380-8BCB-4626-8E9E-6958E0A34115} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{2649B02A-7FDC-43FA-8A0C-755BBD74DBDD} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{1511F9F5-0210-4375-B5C3-4CAF5B761FB4} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{9AABBE87-236E-43AF-8BC9-268AC7B3AC2B} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 	EndGlobalSection
 EndGlobal
