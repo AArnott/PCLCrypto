@@ -55,7 +55,6 @@
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
-    <Compile Include="HashAlgorithmProviderFactory.cs" />
     <Compile Include="KeyDerivationAlgorithmProvider.cs" />
     <Compile Include="KeyDerivationAlgorithmProviderFactory.cs" />
     <Compile Include="KeyDerivationParameters.cs" />
@@ -92,4 +91,5 @@
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <Import Project="..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems')" />
 </Project>
