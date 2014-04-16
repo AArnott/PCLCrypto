@@ -76,6 +76,7 @@ Global
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{802098cc-e489-4fc0-b115-30cc967b7b38}*SharedItemsImports = 13
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{8f74d3d1-6e53-4814-b215-b4d3515da80a}*SharedItemsImports = 13
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{63cec67d-3ba0-453b-99b5-07cc0ddc3e1e}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU

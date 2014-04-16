@@ -33,9 +33,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Shared.Common\CryptoStream.cs">
-      <Link>CryptoStream.cs</Link>
-    </Compile>
     <Compile Include="WinRTCrypto.cs" />
     <Compile Include="NetFxCrypto.cs" />
   </ItemGroup>
@@ -59,4 +56,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <Import Project="..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems')" />
 </Project>
