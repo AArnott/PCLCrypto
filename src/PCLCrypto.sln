@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30410.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{9701D978-72F1-4CF6-B695-2447651A6F96}"
 EndProject
@@ -57,7 +57,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.Silverlight
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.iOS", "PCLCrypto.Tests.iOS\PCLCrypto.Tests.iOS.csproj", "{A6080690-BD84-454F-B1AB-091F9D0E4DCE}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.NetFx", "PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.shproj", "{8F74D3D1-6E53-4814-B215-B4D3515DA80A}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.Common", "PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.shproj", "{802098CC-E489-4FC0-B115-30CC967B7B38}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{802098cc-e489-4fc0-b115-30cc967b7b38}*SharedItemsImports = 13
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{8f74d3d1-6e53-4814-b215-b4d3515da80a}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
 		Ad-Hoc|DesktopRT = Ad-Hoc|DesktopRT
@@ -605,17 +624,19 @@ Global
 		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{7D334182-70A1-4F0A-A6A9-96E40E731240} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{7C7E2D50-036F-4E08-B4E0-F09889501CFD} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{4C9991D2-526E-476A-B81D-CFEC533E2F24} = {90F9B46D-96A3-4165-9513-89566E4C5682}
+		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{338C45B2-B125-40B6-ADDA-754B20231CD9} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{B244682C-9C7D-4A71-9C3B-E9C1CA1ED747} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{EF6F2D0C-B8AD-4BF2-A87B-C07BB37EF0C2} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{4879EE8F-2740-498D-B401-560F4EE66167} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{D9C82A2B-E296-4902-A479-0E93F06EBDDC} = {9701D978-72F1-4CF6-B695-2447651A6F96}
-		{4C9991D2-526E-476A-B81D-CFEC533E2F24} = {90F9B46D-96A3-4165-9513-89566E4C5682}
-		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{90A54774-0083-48B4-B8A1-2FCCC24CBE86} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{71148EB2-5513-48DF-8A30-00887E001D1F} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{1B396C98-0EB8-461C-8B00-0D52C262F377} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{7C1F893F-C83D-481E-9466-E769C3B45FCE} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{A6080690-BD84-454F-B1AB-091F9D0E4DCE} = {90F9B46D-96A3-4165-9513-89566E4C5682}
+		{8F74D3D1-6E53-4814-B215-B4D3515DA80A} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{802098CC-E489-4FC0-B115-30CC967B7B38} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 	EndGlobalSection
 EndGlobal

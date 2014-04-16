@@ -51,34 +51,20 @@
       <Link>WinRTCrypto.cs</Link>
     </Compile>
     <Compile Include="Formatters\Asn.cs" />
-    <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
-    <Compile Include="CryptographicBuffer.cs" />
-    <Compile Include="CryptographicEngine.cs" />
     <Compile Include="Formatters\CapiKeyFormatter.cs" />
     <Compile Include="Formatters\KeyFormatter.cs" />
     <Compile Include="Formatters\Pkcs8KeyFormatter.cs" />
     <Compile Include="Formatters\X509SubjectPublicKeyInfoFormatter.cs" />
-    <Compile Include="NetFxCryptographicHash.cs" />
-    <Compile Include="CryptographicKey.cs" />
-    <Compile Include="CryptoUtilities.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
-    <Compile Include="KeyDerivationAlgorithmProvider.cs" />
-    <Compile Include="KeyDerivationAlgorithmProviderFactory.cs" />
-    <Compile Include="KeyDerivationCryptographicKey.cs" />
-    <Compile Include="KeyDerivationParametersFactory.cs" />
+    <Compile Include="NetFxCryptographicHash.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
-    <Compile Include="MacAlgorithmProviderFactory.cs" />
-    <Compile Include="MacCryptographicKey.cs" />
     <Compile Include="Formatters\Pkcs1KeyFormatter.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />
     <Compile Include="CngCryptographicKey.cs" />
-    <Compile Include="DeriveBytes.cs" />
-    <Compile Include="RandomNumberGenerator.cs" />
     <Compile Include="SymmetricCryptographicKey.cs" />
     <Compile Include="SymmetricKeyAlgorithmProvider.cs" />
-    <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
@@ -101,4 +87,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <Import Project="..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems')" />
 </Project>

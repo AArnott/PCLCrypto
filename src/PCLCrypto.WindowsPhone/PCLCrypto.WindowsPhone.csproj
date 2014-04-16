@@ -62,24 +62,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
-      <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicBuffer.cs">
-      <Link>CryptographicBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicEngine.cs">
-      <Link>CryptographicEngine.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicKey.cs">
-      <Link>CryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptoUtilities.cs">
-      <Link>CryptoUtilities.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
-      <Link>DeriveBytes.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\Formatters\Asn.cs">
       <Link>Formatters\Asn.cs</Link>
     </Compile>
@@ -101,32 +83,11 @@
     <Compile Include="..\PCLCrypto.Desktop\HashAlgorithmProvider.cs">
       <Link>HashAlgorithmProvider.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProvider.cs">
-      <Link>KeyDerivationAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProviderFactory.cs">
-      <Link>KeyDerivationAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationCryptographicKey.cs">
-      <Link>KeyDerivationCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationParametersFactory.cs">
-      <Link>KeyDerivationParametersFactory.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProvider.cs">
       <Link>MacAlgorithmProvider.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProviderFactory.cs">
-      <Link>MacAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\MacCryptographicKey.cs">
-      <Link>MacCryptographicKey.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\NetFxCryptographicHash.cs">
       <Link>NetFxCryptographicHash.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
-      <Link>RandomNumberGenerator.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.Desktop\RsaAsymmetricKeyAlgorithmProvider.cs">
       <Link>RsaAsymmetricKeyAlgorithmProvider.cs</Link>
@@ -139,9 +100,6 @@
     </Compile>
     <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProvider.cs">
       <Link>SymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProviderFactory.cs">
-      <Link>SymmetricKeyAlgorithmProviderFactory.cs</Link>
     </Compile>
     <Compile Include="..\PCLCrypto.WinRT\HashAlgorithmProviderFactory.cs">
       <Link>HashAlgorithmProviderFactory.cs</Link>
@@ -164,6 +122,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
   <ProjectExtensions />
@@ -175,4 +136,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <Import Project="..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems')" />
 </Project>
