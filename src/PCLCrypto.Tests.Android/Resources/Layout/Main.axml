@@ -8,6 +8,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Run Tests" />
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:id="@+id/progressBar1"
+        android:progressDrawable="@android:drawable/progress_horizontal"
+        android:indeterminate="false"
+        android:progress="25"
+        android:max="100"
+        android:indeterminateOnly="false" />
     <TextView
         android:text="Test summary"
         android:textAppearance="?android:attr/textAppearanceMedium"

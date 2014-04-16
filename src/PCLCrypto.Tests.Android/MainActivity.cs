@@ -8,6 +8,7 @@
     using global::Android.Runtime;
     using global::Android.Views;
     using global::Android.Widget;
+    using PCLCommandBase;
     using PCLCrypto.Tests;
     using PCLTesting.Infrastructure;
     using Resource = PCLCrypto.Tests.Android.Resource;
@@ -15,11 +16,9 @@
     [Activity(Label = "PCLCrypto.Test.Android", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
-        private Button runTestsButton;
+        private TestRunner runner;
 
-        private TextView resultsTextView;
-
-        private TextView summaryTextView;
+        private TestRunnerViewModel viewModel;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -28,37 +27,50 @@
             // Set our view from the "main" layout resource
             this.SetContentView(Resource.Layout.Main);
 
-            //// Get our button from the layout resource,
-            //// and attach an event to it
-            this.runTestsButton = this.FindViewById<Button>(Resource.Id.RunTests);
-            this.runTestsButton.Click += this.RunTestsButton_Click;
+            this.runner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
+            this.viewModel = new TestRunnerViewModel(this.runner);
 
-            this.resultsTextView = this.FindViewById<TextView>(Resource.Id.ResultsTextView);
-            this.summaryTextView = this.FindViewById<TextView>(Resource.Id.summaryTextView);
-        }
+            // Get our button from the layout resource,
+            // and attach an event to it
+            var runTestsButton = this.FindViewById<Button>(Resource.Id.RunTests);
+            var resultsTextView = this.FindViewById<TextView>(Resource.Id.ResultsTextView);
+            var summaryTextView = this.FindViewById<TextView>(Resource.Id.summaryTextView);
+            var progressBar = this.FindViewById<ProgressBar>(Resource.Id.progressBar1);
 
-        private async void RunTestsButton_Click(object sender, EventArgs e)
-        {
-            this.runTestsButton.Enabled = false;
-
-            try
+            runTestsButton.Click += (s, e) =>
             {
-                var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
-                await testRunner.RunTestsAsync();
-                this.summaryTextView.Text = string.Format(
-                    CultureInfo.CurrentCulture,
-                    "{0}/{1} tests passed ({2}%)",
-                    testRunner.PassCount,
-                    testRunner.TestCount,
-                    100 * testRunner.PassCount / testRunner.TestCount);
-                this.resultsTextView.Text = testRunner.Log;
-            }
-            catch (Exception ex)
-            {
-                this.resultsTextView.Text = ex.ToString();
-            }
+                if (this.viewModel.StartCommand.CanExecute(null))
+                {
+                    this.viewModel.StartCommand.Execute(null);
+                }
+                else
+                {
+                    this.viewModel.StopCommand.Execute(null);
+                }
+            };
 
-            this.runTestsButton.Enabled = true;
+            this.viewModel.PropertyChanged += (s, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case "IsRunning":
+                        runTestsButton.Text = this.viewModel.IsRunning ? "Abort" : "Run Tests";
+                        progressBar.Visibility = this.viewModel.IsRunning ? ViewStates.Visible : ViewStates.Gone;
+                        break;
+                    case "CurrentProgress":
+                        progressBar.Max = this.viewModel.CurrentProgress.TestCount;
+                        progressBar.Progress = this.viewModel.CurrentProgress.ExecuteCount;
+                        break;
+                    case "Log":
+                        resultsTextView.Text = this.viewModel.Log;
+                        break;
+                    case "Summary":
+                        summaryTextView.Text = this.viewModel.Summary;
+                        break;
+                }
+            };
+
+            this.viewModel.StartCommand.Execute(null);
         }
     }
 }
