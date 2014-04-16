@@ -9,6 +9,7 @@
     <Import_RootNamespace>PCLCrypto.Shared.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CryptoStream.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptoUtilities.cs" />
   </ItemGroup>
 </Project>

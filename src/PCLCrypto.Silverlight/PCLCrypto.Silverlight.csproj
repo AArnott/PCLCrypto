@@ -87,9 +87,6 @@
     <Compile Include="..\PCLCrypto.WinRT\HashAlgorithmProviderFactory.cs">
       <Link>HashAlgorithmProviderFactory.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto\CryptoStream.cs">
-      <Link>CryptoStream.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto\NetFxCrypto.cs">
       <Link>NetFxCrypto.cs</Link>
     </Compile>

@@ -33,7 +33,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CryptoStream.cs" />
+    <Compile Include="..\PCLCrypto.Shared.Common\CryptoStream.cs">
+      <Link>CryptoStream.cs</Link>
+    </Compile>
     <Compile Include="WinRTCrypto.cs" />
     <Compile Include="NetFxCrypto.cs" />
   </ItemGroup>
