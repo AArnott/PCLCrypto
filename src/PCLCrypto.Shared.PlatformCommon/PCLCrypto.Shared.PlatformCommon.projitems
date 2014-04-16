@@ -6,7 +6,7 @@
     <SharedGUID>3b2d4380-8bcb-4626-8e9e-6958e0a34115</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>PCLCrypto.Shared.PlatformCommon</Import_RootNamespace>
+    <Import_RootNamespace>PCLCrypto</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CryptoUtilities.cs" />

@@ -6,7 +6,7 @@
     <SharedGUID>2649b02a-7fdc-43fa-8a0c-755bbd74dbdd</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>PCLCrypto.Shared.Desktop</Import_RootNamespace>
+    <Import_RootNamespace>PCLCrypto</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Formatters\Asn.cs" />
