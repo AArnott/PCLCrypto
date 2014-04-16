@@ -11,12 +11,14 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+#if Android
     using Java.Security;
+#endif
     using Validation;
     using Platform = System.Security.Cryptography;
 
     /// <summary>
-    /// The Java implementation of <see cref="IHashAlgorithmProvider"/>.
+    /// The .NET Framework implementation of <see cref="IHashAlgorithmProvider"/>.
     /// </summary>
     internal class HashAlgorithmProvider : IHashAlgorithmProvider
     {
@@ -45,9 +47,13 @@ namespace PCLCrypto
         {
             get
             {
-                using (var hash = CreateHashAlgorithm(this.Algorithm))
+                using (var hasher = CreateHashAlgorithm(this.Algorithm))
                 {
-                    return hash.DigestLength;
+#if Android
+                    return hasher.DigestLength / 8;
+#else
+                    return hasher.HashSize / 8;
+#endif
                 }
             }
         }
@@ -55,7 +61,11 @@ namespace PCLCrypto
         /// <inheritdoc />
         public CryptographicHash CreateHash()
         {
+#if Android
             return new JavaCryptographicHash(CreateHashAlgorithm(this.Algorithm));
+#else
+            return new NetFxCryptographicHash(CreateHashAlgorithm(this.Algorithm));
+#endif
         }
 
         /// <inheritdoc />
@@ -63,13 +73,22 @@ namespace PCLCrypto
         {
             Requires.NotNull(data, "data");
 
+#if Android
             using (var hasher = this.CreateHash())
             {
                 hasher.Append(data);
                 return hasher.GetValueAndReset();
             }
+#else
+            using (var hasher = CreateHashAlgorithm(this.Algorithm))
+            {
+                return hasher.ComputeHash(data);
+            }
+#endif
         }
 
+#if Android
+        
         /// <summary>
         /// Creates the hash algorithm.
         /// </summary>
@@ -95,5 +114,34 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
         }
+
+#else
+
+        /// <summary>
+        /// Creates the hash algorithm.
+        /// </summary>
+        /// <param name="algorithm">The algorithm.</param>
+        /// <returns>
+        /// A platform-specific hash algorithm.
+        /// </returns>
+        internal static Platform.HashAlgorithm CreateHashAlgorithm(HashAlgorithm algorithm)
+        {
+#if SILVERLIGHT
+            switch (algorithm)
+            {
+                case HashAlgorithm.Sha1:
+                    return new Platform.SHA1Managed();
+                case HashAlgorithm.Sha256:
+                    return new Platform.SHA256Managed();
+                default:
+                    throw new NotSupportedException();
+           }
+#else
+            string algorithmName = HashAlgorithmProviderFactory.GetHashAlgorithmName(algorithm);
+            return Platform.HashAlgorithm.Create(algorithmName);
+#endif
+        }
+
+#endif
     }
 }

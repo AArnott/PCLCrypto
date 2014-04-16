@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicKey.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeriveBytes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HashAlgorithmProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithmProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithmProviderFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationCryptographicKey.cs" />

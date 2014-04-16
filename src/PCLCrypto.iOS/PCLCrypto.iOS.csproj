@@ -54,9 +54,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Desktop\HashAlgorithmProvider.cs">
-      <Link>HashAlgorithmProvider.cs</Link>
-    </Compile>
     <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProvider.cs">
       <Link>MacAlgorithmProvider.cs</Link>
     </Compile>
