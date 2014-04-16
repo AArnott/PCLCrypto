@@ -33,9 +33,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WinRTCrypto.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

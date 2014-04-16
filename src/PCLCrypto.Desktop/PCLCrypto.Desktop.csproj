@@ -38,9 +38,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
-      <Link>WinRTCrypto.cs</Link>
-    </Compile>
     <Compile Include="Formatters\Asn.cs" />
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="Formatters\CapiKeyFormatter.cs" />

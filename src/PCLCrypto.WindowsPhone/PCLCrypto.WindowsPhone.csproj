@@ -101,9 +101,6 @@
     <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProvider.cs">
       <Link>SymmetricKeyAlgorithmProvider.cs</Link>
     </Compile>
-    <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
-      <Link>WinRTCrypto.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Validation">
