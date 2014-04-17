@@ -50,7 +50,7 @@ namespace PCLCrypto
                 using (var hasher = CreateHashAlgorithm(this.Algorithm))
                 {
 #if Android
-                    return hasher.DigestLength / 8;
+                    return hasher.DigestLength;
 #else
                     return hasher.HashSize / 8;
 #endif
