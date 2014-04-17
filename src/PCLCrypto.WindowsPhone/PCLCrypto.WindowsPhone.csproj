@@ -62,107 +62,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto.Desktop\AsymmetricKeyAlgorithmProviderFactory.cs">
-      <Link>AsymmetricKeyAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicBuffer.cs">
-      <Link>CryptographicBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicEngine.cs">
-      <Link>CryptographicEngine.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptographicKey.cs">
-      <Link>CryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\CryptoUtilities.cs">
-      <Link>CryptoUtilities.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\DeriveBytes.cs">
-      <Link>DeriveBytes.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\Formatters\Asn.cs">
-      <Link>Formatters\Asn.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\Formatters\CapiKeyFormatter.cs">
-      <Link>Formatters\CapiKeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\Formatters\KeyFormatter.cs">
-      <Link>Formatters\KeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs1KeyFormatter.cs">
-      <Link>Formatters\Pkcs1KeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\Formatters\Pkcs8KeyFormatter.cs">
-      <Link>Formatters\Pkcs8KeyFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\Formatters\X509SubjectPublicKeyInfoFormatter.cs">
-      <Link>Formatters\X509SubjectPublicKeyInfoFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\HashAlgorithmProvider.cs">
-      <Link>HashAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProvider.cs">
-      <Link>KeyDerivationAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationAlgorithmProviderFactory.cs">
-      <Link>KeyDerivationAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationCryptographicKey.cs">
-      <Link>KeyDerivationCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\KeyDerivationParametersFactory.cs">
-      <Link>KeyDerivationParametersFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProvider.cs">
-      <Link>MacAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\MacAlgorithmProviderFactory.cs">
-      <Link>MacAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\MacCryptographicKey.cs">
-      <Link>MacCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\NetFxCryptographicHash.cs">
-      <Link>NetFxCryptographicHash.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RandomNumberGenerator.cs">
-      <Link>RandomNumberGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RsaAsymmetricKeyAlgorithmProvider.cs">
-      <Link>RsaAsymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\RsaCryptographicKey.cs">
-      <Link>RsaCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\SymmetricCryptographicKey.cs">
-      <Link>SymmetricCryptographicKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProvider.cs">
-      <Link>SymmetricKeyAlgorithmProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.Desktop\SymmetricKeyAlgorithmProviderFactory.cs">
-      <Link>SymmetricKeyAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto.WinRT\HashAlgorithmProviderFactory.cs">
-      <Link>HashAlgorithmProviderFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto\CryptoStream.cs">
-      <Link>CryptoStream.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto\NetFxCrypto.cs">
-      <Link>NetFxCrypto.cs</Link>
-    </Compile>
-    <Compile Include="..\PCLCrypto\WinRTCrypto.cs">
-      <Link>WinRTCrypto.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Validation">
       <HintPath>..\packages\Validation.2.0.3.13323\lib\portable-windows8+net40+sl5+windowsphone8+MonoAndroid+MonoTouch\Validation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
@@ -175,4 +83,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <Import Project="..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems')" />
 </Project>
