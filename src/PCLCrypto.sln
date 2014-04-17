@@ -105,6 +105,7 @@ Global
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{a6080690-bd84-454f-b1ab-091f9d0e4dce}*SharedItemsImports = 4
+		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{1b396c98-0eb8-461c-8b00-0d52c262f377}*SharedItemsImports = 4
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{2649b02a-7fdc-43fa-8a0c-755bbd74dbdd}*SharedItemsImports = 13
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
@@ -113,6 +114,7 @@ Global
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{d50a6ec5-b1f4-4352-bbc5-2a956a55f2ae}*SharedItemsImports = 4
+		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{7c1f893f-c83d-481e-9466-e769c3b45fce}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{802098cc-e489-4fc0-b115-30cc967b7b38}*SharedItemsImports = 13
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{8f74d3d1-6e53-4814-b215-b4d3515da80a}*SharedItemsImports = 13
 		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{1511f9f5-0210-4375-b5c3-4caf5b761fb4}*SharedItemsImports = 13

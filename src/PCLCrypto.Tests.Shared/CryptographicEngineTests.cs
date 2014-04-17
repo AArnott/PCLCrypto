@@ -16,6 +16,8 @@
         private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
         private const string DataAesCiphertextBase64 = "3ChRgsiJ0mXxJIEQS5Z4NA==";
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
+
+#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
         private readonly ICryptographicKey rsaSha1SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
             .CreateKeyPair(512);
@@ -27,6 +29,7 @@
         private readonly ICryptographicKey rsaEncryptingKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1)
             .CreateKeyPair(512);
+#endif
 
         private readonly ICryptographicKey macKey = WinRTCrypto.MacAlgorithmProvider
             .OpenAlgorithm(MacAlgorithm.HmacSha1)
@@ -37,6 +40,8 @@
             .CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
 
         private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
+
+        #if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
 
         [TestMethod]
         public void Sign_NullInputs()
@@ -246,6 +251,8 @@
             }
         }
 
+#endif
+
         [TestMethod]
         public void SignAndVerifySignatureMac()
         {
@@ -293,6 +300,8 @@
             CollectionAssertEx.AreEqual(this.data, plainText);
         }
 
+#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
+
         [TestMethod]
         public void EncryptAndDecrypt_RSA()
         {
@@ -305,6 +314,8 @@
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.rsaEncryptingKey, cipherText, null);
             CollectionAssertEx.AreEqual(keyMaterialBytes, plainText);
         }
+
+#endif
 
         [TestMethod]
         public void CreateEncryptor_InvalidInputs()

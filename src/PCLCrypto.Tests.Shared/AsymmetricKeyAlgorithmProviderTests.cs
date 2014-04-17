@@ -9,6 +9,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using PCLTesting;
 
+#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
     [TestClass]
     public class AsymmetricKeyAlgorithmProviderTests
     {
@@ -275,4 +276,5 @@
 
         ////}
     }
+#endif
 }
