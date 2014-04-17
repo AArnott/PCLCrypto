@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.Reflection;
     using global::Android.App;
     using global::Android.Content;
     using global::Android.OS;
@@ -27,7 +28,7 @@
             // Set our view from the "main" layout resource
             this.SetContentView(Resource.Layout.Main);
 
-            this.runner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
+            this.runner = new TestRunner(Assembly.GetExecutingAssembly());
             this.viewModel = new TestRunnerViewModel(this.runner);
 
             // Get our button from the layout resource,

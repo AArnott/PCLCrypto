@@ -100,10 +100,6 @@
       <Project>{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}</Project>
       <Name>PCLCrypto.iOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PCLCrypto.Tests\PCLCrypto.Tests.csproj">
-      <Project>{4c9991d2-526e-476a-b81d-cfec533e2f24}</Project>
-      <Name>PCLCrypto.Tests</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">

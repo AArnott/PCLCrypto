@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
 
-  <Identity Name="93355f03-7339-486d-8800-3048f349c0f8"
+  <Identity Name="15dfc6aa-7ff2-4b94-89fc-e63022ce0139"
             Publisher="CN=Andrew"
             Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="93355f03-7339-486d-8800-3048f349c0f8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="15dfc6aa-7ff2-4b94-89fc-e63022ce0139" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>PCLCrypto.Tests.WinRT.Phone</DisplayName>

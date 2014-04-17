@@ -8,6 +8,7 @@ namespace PCLCrypto.Tests.iOS
     using System.Globalization;
     using System.Threading.Tasks;
     using System.Security.Cryptography;
+    using System.Reflection;
 
     public class MyViewController : UIViewController
     {
@@ -70,7 +71,7 @@ namespace PCLCrypto.Tests.iOS
                 this.runTestsButton.Enabled = false;
                 try
                 {
-                    var testRunner = new TestRunner(typeof(RandomNumberGeneratorTests).Assembly);
+                    var testRunner = new TestRunner(Assembly.GetExecutingAssembly());
                     await Task.Run(() => testRunner.RunTestsAsync());
                     this.summaryTextView.Text = string.Format(
                         CultureInfo.CurrentCulture,

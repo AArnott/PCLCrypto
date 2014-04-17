@@ -148,10 +148,6 @@
       <Project>{d9c82a2b-e296-4902-a479-0e93f06ebddc}</Project>
       <Name>PCLCrypto.Silverlight</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PCLCrypto.Tests\PCLCrypto.Tests.csproj">
-      <Project>{4c9991d2-526e-476a-b81d-cfec533e2f24}</Project>
-      <Name>PCLCrypto.Tests</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

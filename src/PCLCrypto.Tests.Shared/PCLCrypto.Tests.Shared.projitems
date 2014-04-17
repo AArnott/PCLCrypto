@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AsymmetricKeyAlgorithmProviderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionAssertEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicBufferTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngineTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptoStreamTests.cs" />
@@ -18,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithmProviderTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacAlgorithmProviderTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PclCryptoStreamTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PclTestUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RandomNumberGeneratorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricKeyAlgorithmProviderTests.cs" />
   </ItemGroup>

@@ -126,12 +126,8 @@
       <Project>{7D334182-70A1-4F0A-A6A9-96E40E731240}</Project>
       <Name>PCLCrypto.Abstractions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PCLCrypto.Tests\PCLCrypto.Tests.csproj">
-      <Project>{4C9991D2-526E-476A-B81D-CFEC533E2F24}</Project>
-      <Name>PCLCrypto.Tests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PCLCrypto.WindowsPhone\PCLCrypto.WindowsPhone.csproj">
-      <Project>{EF6F2D0C-B8AD-4BF2-A87B-C07BB37EF0C2}</Project>
+      <Project>{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}</Project>
       <Name>PCLCrypto.WindowsPhone</Name>
     </ProjectReference>
   </ItemGroup>
@@ -155,10 +151,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\PCLTesting.0.1.2\lib\wp8\PCLTesting.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting.Portable, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2\lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLTesting.Portable.dll</HintPath>
-    </Reference>
     <Reference Include="PCLTesting.Runner">
       <HintPath>..\packages\PCLTesting.0.1.2\lib\wp8\PCLTesting.Runner.dll</HintPath>
     </Reference>
@@ -166,6 +158,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Validation.2.0.4.14103\lib\portable-windows8+net40+sl5+wp8+wpa81+wp81+MonoAndroid+MonoTouch\Validation.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
@@ -183,4 +178,5 @@
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
     <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
+  <Import Project="..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems')" />
 </Project>
