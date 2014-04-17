@@ -19,13 +19,13 @@
         {
 #pragma warning disable 0436
             // Initialize the "Known Good" RSAParameters.
-            byte[] capi1Blob = Convert.FromBase64String(AsymmetricKeyAlgorithmProviderTests.PrivateKeyFormatsAndBlobs[CryptographicPrivateKeyBlobType.Capi1PrivateKey]);
+            byte[] capi1Blob = Convert.FromBase64String(AsymmetricKeyAlgorithmProviderTests.Helper.PrivateKeyFormatsAndBlobs[CryptographicPrivateKeyBlobType.Capi1PrivateKey]);
             var rsa = new RSACryptoServiceProvider();
             rsa.ImportCspBlob(capi1Blob);
             RSAParameters rsaCapi = rsa.ExportParameters(true);
 
             // Now load up the tested one.
-            byte[] pkcs1KeyBlob = Convert.FromBase64String(AsymmetricKeyAlgorithmProviderTests.PrivateKeyFormatsAndBlobs[CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey]);
+            byte[] pkcs1KeyBlob = Convert.FromBase64String(AsymmetricKeyAlgorithmProviderTests.Helper.PrivateKeyFormatsAndBlobs[CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey]);
             RSAParameters homeReadPkcs1 = KeyFormatter.Pkcs1.Read(pkcs1KeyBlob);
 #pragma warning restore 0436
             Assert.AreEqual(WinRTCrypto.CryptographicBuffer.EncodeToHexString(rsaCapi.Modulus), WinRTCrypto.CryptographicBuffer.EncodeToHexString(homeReadPkcs1.Modulus), "Modulus");
