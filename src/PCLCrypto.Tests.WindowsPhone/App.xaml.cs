@@ -1,36 +1,39 @@
-﻿namespace PCLCrypto.Tests.WindowsPhone
-{
-    using System;
-    using System.Diagnostics;
-    using System.Resources;
-    using System.Windows;
-    using System.Windows.Markup;
-    using System.Windows.Navigation;
-    using Microsoft.Phone.Controls;
-    using Microsoft.Phone.Shell;
-    using PCLCrypto.Tests.WindowsPhone.Resources;
+﻿using System;
+using System.Diagnostics;
+using System.Resources;
+using System.Windows;
+using System.Windows.Markup;
+using System.Windows.Navigation;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+using PCLCrypto.Tests.WindowsPhone.Resources;
 
+namespace PCLCrypto.Tests.WindowsPhone
+{
     public partial class App : Application
     {
-        // Avoid double-initialization
-        private bool phoneApplicationInitialized;
+        /// <summary>
+        /// Provides easy access to the root frame of the Phone Application.
+        /// </summary>
+        /// <returns>The root frame of the Phone Application.</returns>
+        public static PhoneApplicationFrame RootFrame { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
+        /// Constructor for the Application object.
         /// </summary>
         public App()
         {
             // Global handler for uncaught exceptions.
-            this.UnhandledException += this.Application_UnhandledException;
+            UnhandledException += Application_UnhandledException;
 
             // Standard XAML initialization
-            this.InitializeComponent();
+            InitializeComponent();
 
             // Phone-specific initialization
-            this.InitializePhoneApplication();
+            InitializePhoneApplication();
 
             // Language display initialization
-            this.InitializeLanguage();
+            InitializeLanguage();
 
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
@@ -39,11 +42,11 @@
                 Application.Current.Host.Settings.EnableFrameRateCounter = true;
 
                 // Show the areas of the app that are being redrawn in each frame.
-                ////Application.Current.Host.Settings.EnableRedrawRegions = true;
+                //Application.Current.Host.Settings.EnableRedrawRegions = true;
 
                 // Enable non-production analysis visualization mode,
                 // which shows areas of a page that are handed off to GPU with a colored overlay.
-                ////Application.Current.Host.Settings.EnableCacheVisualization = true;
+                //Application.Current.Host.Settings.EnableCacheVisualization = true;
 
                 // Prevent the screen from turning off while under the debugger by disabling
                 // the application's idle detection.
@@ -51,13 +54,8 @@
                 // and consume battery power when the user is not using the phone.
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
-        }
 
-        /// <summary>
-        /// Gets the root frame of the Phone Application.
-        /// </summary>
-        /// <returns>The root frame of the Phone Application.</returns>
-        public static PhoneApplicationFrame RootFrame { get; private set; }
+        }
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
@@ -105,40 +103,39 @@
 
         #region Phone application initialization
 
+        // Avoid double-initialization
+        private bool phoneApplicationInitialized = false;
+
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
         {
-            if (this.phoneApplicationInitialized)
-            {
+            if (phoneApplicationInitialized)
                 return;
-            }
 
             // Create the frame but don't set it as RootVisual yet; this allows the splash
             // screen to remain active until the application is ready to render.
             RootFrame = new PhoneApplicationFrame();
-            RootFrame.Navigated += this.CompleteInitializePhoneApplication;
+            RootFrame.Navigated += CompleteInitializePhoneApplication;
 
             // Handle navigation failures
-            RootFrame.NavigationFailed += this.RootFrame_NavigationFailed;
+            RootFrame.NavigationFailed += RootFrame_NavigationFailed;
 
             // Handle reset requests for clearing the backstack
-            RootFrame.Navigated += this.CheckForResetNavigation;
+            RootFrame.Navigated += CheckForResetNavigation;
 
             // Ensure we don't initialize again
-            this.phoneApplicationInitialized = true;
+            phoneApplicationInitialized = true;
         }
 
         // Do not add any additional code to this method
         private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
         {
             // Set the root visual to allow the application to render
-            if (this.RootVisual != RootFrame)
-            {
-                this.RootVisual = RootFrame;
-            }
+            if (RootVisual != RootFrame)
+                RootVisual = RootFrame;
 
             // Remove this handler since it is no longer needed
-            RootFrame.Navigated -= this.CompleteInitializePhoneApplication;
+            RootFrame.Navigated -= CompleteInitializePhoneApplication;
         }
 
         private void CheckForResetNavigation(object sender, NavigationEventArgs e)
@@ -146,48 +143,44 @@
             // If the app has received a 'reset' navigation, then we need to check
             // on the next navigation to see if the page stack should be reset
             if (e.NavigationMode == NavigationMode.Reset)
-            {
-                RootFrame.Navigated += this.ClearBackStackAfterReset;
-            }
+                RootFrame.Navigated += ClearBackStackAfterReset;
         }
 
         private void ClearBackStackAfterReset(object sender, NavigationEventArgs e)
         {
             // Unregister the event so it doesn't get called again
-            RootFrame.Navigated -= this.ClearBackStackAfterReset;
+            RootFrame.Navigated -= ClearBackStackAfterReset;
 
             // Only clear the stack for 'new' (forward) and 'refresh' navigations
             if (e.NavigationMode != NavigationMode.New && e.NavigationMode != NavigationMode.Refresh)
-            {
                 return;
-            }
 
             // For UI consistency, clear the entire page stack
             while (RootFrame.RemoveBackEntry() != null)
             {
-                // do nothing
+                ; // do nothing
             }
         }
 
         #endregion
 
-        //// Initialize the app's font and flow direction as defined in its localized resource strings.
-        ////
-        //// To ensure that the font of your application is aligned with its supported languages and that the
-        //// FlowDirection for each of those languages follows its traditional direction, ResourceLanguage
-        //// and ResourceFlowDirection should be initialized in each resx file to match these values with that
-        //// file's culture. For example:
-        ////
-        //// AppResources.es-ES.resx
-        ////    ResourceLanguage's value should be "es-ES"
-        ////    ResourceFlowDirection's value should be "LeftToRight"
-        ////
-        //// AppResources.ar-SA.resx
-        ////     ResourceLanguage's value should be "ar-SA"
-        ////     ResourceFlowDirection's value should be "RightToLeft"
-        ////
-        //// For more info on localizing Windows Phone apps see http://go.microsoft.com/fwlink/?LinkId=262072.
-        ////
+        // Initialize the app's font and flow direction as defined in its localized resource strings.
+        //
+        // To ensure that the font of your application is aligned with its supported languages and that the
+        // FlowDirection for each of those languages follows its traditional direction, ResourceLanguage
+        // and ResourceFlowDirection should be initialized in each resx file to match these values with that
+        // file's culture. For example:
+        //
+        // AppResources.es-ES.resx
+        //    ResourceLanguage's value should be "es-ES"
+        //    ResourceFlowDirection's value should be "LeftToRight"
+        //
+        // AppResources.ar-SA.resx
+        //     ResourceLanguage's value should be "ar-SA"
+        //     ResourceFlowDirection's value should be "RightToLeft"
+        //
+        // For more info on localizing Windows Phone apps see http://go.microsoft.com/fwlink/?LinkId=262072.
+        //
         private void InitializeLanguage()
         {
             try
@@ -217,6 +210,7 @@
                 // ResourceLangauge not being correctly set to a supported language
                 // code or ResourceFlowDirection is set to a value other than LeftToRight
                 // or RightToLeft.
+
                 if (Debugger.IsAttached)
                 {
                     Debugger.Break();
