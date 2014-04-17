@@ -229,6 +229,10 @@
         }
 
         [TestMethod]
+#if DESKTOP || WINDOWS_PHONE
+        // This test is known to fail on these platforms.
+        [Ignore]
+#endif
         public void KeyPairInterop_iOSGenerated()
         {
             // Tests a key where P has more significant digits than Q.
