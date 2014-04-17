@@ -231,11 +231,9 @@
             Assert.IsTrue(false, "No supported formats.");
         }
 
-        [TestMethod]
-#if DESKTOP || WINDOWS_PHONE
         // This test is known to fail on these platforms.
-        [Ignore]
-#endif
+#if !(DESKTOP || WINDOWS_PHONE)
+        [TestMethod]
         public void KeyPairInterop_iOSGenerated()
         {
             // Tests a key where P has more significant digits than Q.
@@ -249,6 +247,7 @@
             byte[] plaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, ciphertext);
             Assert.AreEqual(Convert.ToBase64String(data), Convert.ToBase64String(plaintext));
         }
+#endif
 
         [TestMethod]
         public void RSAParametersNotOverlyTrimmed()
