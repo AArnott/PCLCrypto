@@ -70,7 +70,7 @@ namespace PCLCrypto
 #endif
             }
 
-            return new SymmetricCryptographicKey(platform);
+            return new SymmetricCryptographicKey(platform, this.Algorithm);
         }
 
 #if !SILVERLIGHT
@@ -81,11 +81,11 @@ namespace PCLCrypto
         /// <returns>The platform-specific enum value describing the block mode.</returns>
         private static Platform.CipherMode GetMode(SymmetricAlgorithm algorithm)
         {
-            switch (SymmetricKeyAlgorithmProviderFactory.GetMode(algorithm))
+            switch (algorithm.GetMode())
             {
-                case SymmetricKeyAlgorithmProviderFactory.SymmetricAlgorithmMode.Cbc:
+                case SymmetricAlgorithmMode.Cbc:
                     return Platform.CipherMode.CBC;
-                case SymmetricKeyAlgorithmProviderFactory.SymmetricAlgorithmMode.Ecb:
+                case SymmetricAlgorithmMode.Ecb:
                     return Platform.CipherMode.ECB;
                 default:
                     throw new NotSupportedException();
@@ -99,11 +99,11 @@ namespace PCLCrypto
         /// <returns>The platform-specific enum value for the padding.</returns>
         private static Platform.PaddingMode GetPadding(SymmetricAlgorithm algorithm)
         {
-            switch (SymmetricKeyAlgorithmProviderFactory.GetPadding(algorithm))
+            switch (algorithm.GetPadding())
             {
-                case SymmetricKeyAlgorithmProviderFactory.SymmetricAlgorithmPadding.None:
+                case SymmetricAlgorithmPadding.None:
                     return Platform.PaddingMode.None;
-                case SymmetricKeyAlgorithmProviderFactory.SymmetricAlgorithmPadding.PKCS7:
+                case SymmetricAlgorithmPadding.PKCS7:
                     return Platform.PaddingMode.PKCS7;
                 default:
                     throw new ArgumentException();
@@ -130,7 +130,7 @@ namespace PCLCrypto
             }
 #else
             Platform.SymmetricAlgorithm platform = Platform.SymmetricAlgorithm.Create(
-                SymmetricKeyAlgorithmProviderFactory.GetTitleName(algorithm));
+                algorithm.GetName().GetString());
             if (platform == null)
             {
                 throw new NotSupportedException();

@@ -13,6 +13,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
+    using Windows.Storage.Streams;
     using Platform = Windows.Security.Cryptography;
 
     /// <summary>
@@ -26,10 +27,24 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
             Requires.NotNull(data, "data");
 
-            return Platform.Core.CryptographicEngine.Encrypt(
-                ((CryptographicKey)key).Key,
-                data.ToBuffer(),
-                iv.ToBuffer()).ToArray();
+            var keyClass = (CryptographicKey)key;
+            if (keyClass.SymmetricAlgorithmProvider != null)
+            {
+                bool paddingInUse = keyClass.SymmetricAlgorithmProvider.Algorithm.GetPadding() != SymmetricAlgorithmPadding.None;
+                Requires.Argument(paddingInUse || this.IsValidInputSize(keyClass, data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            }
+
+            try
+            {
+                return Platform.Core.CryptographicEngine.Encrypt(
+                    keyClass.Key,
+                    data.ToBuffer(),
+                    iv.ToBuffer()).ToArray();
+            }
+            catch (NotImplementedException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
         }
 
         /// <inheritdoc />
@@ -37,8 +52,8 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, "key");
 
-            return new BufferingCryptoTransform(
-                data => this.Encrypt(key, data, iv));
+            var ownKey = (CryptographicKey)key;
+            return GetTransformForBlockMode(ownKey, iv, true);
         }
 
         /// <inheritdoc />
@@ -47,8 +62,14 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
             Requires.NotNull(data, "data");
 
+            var keyClass = (CryptographicKey)key;
+            if (keyClass.SymmetricAlgorithmProvider != null)
+            {
+                Requires.Argument(this.IsValidInputSize(keyClass, data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            }
+
             return Platform.Core.CryptographicEngine.Decrypt(
-                ((CryptographicKey)key).Key,
+                keyClass.Key,
                 data.ToBuffer(),
                 iv.ToBuffer()).ToArray();
         }
@@ -58,8 +79,8 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, "key");
 
-            return new BufferingCryptoTransform(
-                data => this.Decrypt(key, data, iv));
+            var ownKey = (CryptographicKey)key;
+            return GetTransformForBlockMode(ownKey, iv, false);
         }
 
         /// <inheritdoc />
@@ -133,6 +154,54 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Gets an <see cref="ICryptoTransform"/> instance to use for a given cryptographic key.
+        /// </summary>
+        /// <param name="key">The cryptographic key to use in the transform.</param>
+        /// <param name="iv">The initialization vector to use, when applicable.</param>
+        /// <param name="encrypting"><c>true</c> if encrypting; <c>false</c> if decrypting.</param>
+        /// <returns>An instance of <see cref="ICryptoTransform"/>.</returns>
+        private static ICryptoTransform GetTransformForBlockMode(CryptographicKey key, byte[] iv, bool encrypting)
+        {
+            Requires.NotNull(key, "key");
+
+            if (key.SymmetricAlgorithmProvider != null && key.SymmetricAlgorithmProvider.Algorithm.IsBlockCipher())
+            {
+                switch (key.SymmetricAlgorithmProvider.Algorithm.GetMode())
+                {
+                    case SymmetricAlgorithmMode.Cbc:
+                        var cbcOperation = encrypting
+                            ? new Func<IBuffer, IBuffer, IBuffer>((input, iv2) => Platform.Core.CryptographicEngine.Encrypt(key.Key, input, iv2))
+                            : new Func<IBuffer, IBuffer, IBuffer>((input, iv2) => Platform.Core.CryptographicEngine.Decrypt(key.Key, input, iv2));
+                        return new CbcModeTransform(cbcOperation, iv, key.SymmetricAlgorithmProvider.BlockLength);
+                    case SymmetricAlgorithmMode.Ecb:
+                    case SymmetricAlgorithmMode.Ccm:
+                    case SymmetricAlgorithmMode.Gcm:
+                    default:
+                        break;
+                }
+            }
+
+            var bufferOperation = encrypting
+               ? new Func<byte[], byte[]>(input => Platform.Core.CryptographicEngine.Encrypt(key.Key, input.ToBuffer(), iv.ToBuffer()).ToArray())
+               : new Func<byte[], byte[]>(input => Platform.Core.CryptographicEngine.Decrypt(key.Key, input.ToBuffer(), iv.ToBuffer()).ToArray());
+            return new BufferingCryptoTransform(bufferOperation);
+        }
+
+        /// <summary>
+        /// Checks whether the given length is a valid one for an input buffer to the symmetric algorithm.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="lengthInBytes">The length of the input buffer in bytes.</param>
+        /// <returns>
+        ///   <c>true</c> if the size is allowed; <c>false</c> otherwise.
+        /// </returns>
+        private bool IsValidInputSize(CryptographicKey key, int lengthInBytes)
+        {
+            Requires.NotNull(key, "key");
+            return lengthInBytes > 0 && lengthInBytes % key.SymmetricAlgorithmProvider.BlockLength == 0;
+        }
+
+        /// <summary>
         /// A crypto transform that can do no work incrementally, but does it all at the end.
         /// </summary>
         /// <remarks>
@@ -203,6 +272,118 @@ namespace PCLCrypto
             public void Dispose()
             {
                 this.bufferingStream.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Enables streaming crypto operations for CBC block modes.
+        /// </summary>
+        /// <remarks>
+        /// WinRT lacks streaming encryption/decryption support.
+        /// For certain block modes we can simulate the behavior. CBC is one of them.
+        /// </remarks>
+        private class CbcModeTransform : ICryptoTransform
+        {
+            /// <summary>
+            /// The cipher function to invoke (encrypt or decrypt). First arg is input buffer, second arg is IV.
+            /// </summary>
+            private readonly Func<IBuffer, IBuffer, IBuffer> inputIVFunc;
+
+            /// <summary>
+            /// The block length in bytes.
+            /// </summary>
+            private readonly int blockLength;
+
+            /// <summary>
+            /// The initialization vector to pass to the next execution of the block.
+            /// </summary>
+            private IBuffer iv;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CbcModeTransform"/> class.
+            /// </summary>
+            /// <param name="inputIVFunc">The cipher function to invoke (encrypt or decrypt). First arg is input buffer, second arg is IV.</param>
+            /// <param name="iv">The initialization vector.</param>
+            /// <param name="blockLengthInBytes">The block length in bytes.</param>
+            internal CbcModeTransform(Func<IBuffer, IBuffer, IBuffer> inputIVFunc, byte[] iv, int blockLengthInBytes)
+            {
+                Requires.NotNull(inputIVFunc, "inputIVFunc");
+
+                this.inputIVFunc = inputIVFunc;
+                this.iv = iv.ToBuffer();
+                this.blockLength = blockLengthInBytes;
+            }
+
+            /// <inheritdoc />
+            public bool CanReuseTransform
+            {
+                get { return false; }
+            }
+
+            /// <inheritdoc />
+            public bool CanTransformMultipleBlocks
+            {
+                get { return false; }
+            }
+
+            /// <inheritdoc />
+            public int InputBlockSize
+            {
+                get { return this.blockLength; }
+            }
+
+            /// <inheritdoc />
+            public int OutputBlockSize
+            {
+                get { return this.blockLength; }
+            }
+
+            /// <inheritdoc />
+            public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+            {
+                var ciphertext = this.inputIVFunc(inputBuffer.ToBuffer(), this.iv);
+
+                if (ciphertext.Length == this.blockLength * 2)
+                {
+                    // We ignore the ciphertext.Length and use inputCount instead because if padding is on,
+                    // and if inputCount == blockLength, we might end up with a whole extra block of ciphertext
+                    // that we want to drop since this isn't really the last block.
+                    var ciphertextArray = ciphertext.ToArray();
+                    Array.Resize(ref ciphertextArray, this.blockLength);
+                    ciphertext = ciphertextArray.ToBuffer();
+                }
+
+                System.Buffer.BlockCopy(ciphertext.ToArray(), 0, outputBuffer, outputOffset, (int)ciphertext.Length);
+
+                // Store off the ciphertext for use as the IV of the next block.
+                this.iv = ciphertext;
+
+                return (int)ciphertext.Length;
+            }
+
+            /// <inheritdoc />
+            public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+            {
+                if (inputCount < inputBuffer.Length || inputOffset > 0)
+                {
+                    var trimmedBuffer = new byte[inputCount];
+                    System.Buffer.BlockCopy(inputBuffer, inputOffset, trimmedBuffer, 0, inputCount);
+                    inputBuffer = trimmedBuffer;
+                }
+
+                var ciphertext = this.inputIVFunc(inputBuffer.ToBuffer(), this.iv);
+
+                // Null this out to save memory and also to 'break' this so that 
+                // future calls after this one will fail.
+                this.iv = null;
+
+                return ciphertext.ToArray();
+            }
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+                this.iv = null;
             }
         }
     }

@@ -25,13 +25,20 @@ namespace PCLCrypto
         private readonly Platform.SymmetricAlgorithm algorithm;
 
         /// <summary>
+        /// The PCL algorithm enum.
+        /// </summary>
+        private readonly SymmetricAlgorithm pclAlgorithm;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm, initialized with the key.</param>
-        internal SymmetricCryptographicKey(Platform.SymmetricAlgorithm algorithm)
+        /// <param name="pclAlgorithm">The PCL enum of the algorithm in use.</param>
+        internal SymmetricCryptographicKey(Platform.SymmetricAlgorithm algorithm, SymmetricAlgorithm pclAlgorithm)
         {
             Requires.NotNull(algorithm, "algorithm");
             this.algorithm = algorithm;
+            this.pclAlgorithm = pclAlgorithm;
         }
 
         /// <inheritdoc />
@@ -65,6 +72,10 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
+            bool paddingInUse = this.pclAlgorithm.GetPadding() != SymmetricAlgorithmPadding.None;
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(iv == null || this.pclAlgorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+
             var encryptor = this.algorithm.CreateEncryptor(this.algorithm.Key, this.ThisOrDefaultIV(iv));
             return encryptor.TransformFinalBlock(data, 0, data.Length);
         }
@@ -72,6 +83,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
+            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
             var decryptor = this.algorithm.CreateDecryptor(this.algorithm.Key, this.ThisOrDefaultIV(iv));
             return decryptor.TransformFinalBlock(data, 0, data.Length);
         }
@@ -98,6 +110,16 @@ namespace PCLCrypto
         private byte[] ThisOrDefaultIV(byte[] iv)
         {
             return iv ?? new byte[this.algorithm.BlockSize / 8];
+        }
+
+        /// <summary>
+        /// Checks whether the given length is a valid one for an input buffer to the symmetric algorithm.
+        /// </summary>
+        /// <param name="lengthInBytes">The length of the input buffer in bytes.</param>
+        /// <returns><c>true</c> if the size is allowed; <c>false</c> otherwise.</returns>
+        private bool IsValidInputSize(int lengthInBytes)
+        {
+            return lengthInBytes > 0 && (lengthInBytes * 8) % this.algorithm.BlockSize == 0;
         }
 
         /// <summary>

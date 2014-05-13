@@ -41,7 +41,7 @@ namespace PCLCrypto
             Requires.NotNull(keyMaterial, "keyMaterial");
 
             this.algorithm = algorithm;
-            this.key = new SecretKeySpec(keyMaterial, SymmetricKeyAlgorithmProviderFactory.GetTitleName(this.algorithm));
+            this.key = new SecretKeySpec(keyMaterial, this.algorithm.GetName().GetString());
         }
 
         /// <inheritdoc />
@@ -100,11 +100,11 @@ namespace PCLCrypto
         /// <returns>A value such as "PKCS7Padding", or <c>null</c> if no padding.</returns>
         private static string GetPadding(SymmetricAlgorithm algorithm)
         {
-            switch (SymmetricKeyAlgorithmProviderFactory.GetPadding(algorithm))
+            switch (algorithm.GetPadding())
             {
-                case SymmetricKeyAlgorithmProviderFactory.SymmetricAlgorithmPadding.None:
+                case SymmetricAlgorithmPadding.None:
                     return null;
-                case SymmetricKeyAlgorithmProviderFactory.SymmetricAlgorithmPadding.PKCS7:
+                case SymmetricAlgorithmPadding.PKCS7:
                     return "PKCS7Padding";
                 default:
                     throw new NotSupportedException();
@@ -131,7 +131,7 @@ namespace PCLCrypto
             }
             else
             {
-                using (cipher = Cipher.GetInstance(SymmetricKeyAlgorithmProviderFactory.GetTitleName(this.algorithm)))
+                using (cipher = Cipher.GetInstance(this.algorithm.GetName().GetString()))
                 {
                     return new byte[cipher.BlockSize];
                 }
@@ -173,9 +173,9 @@ namespace PCLCrypto
         /// <returns>A string such as "AES/CBC/PKCS7Padding</returns>
         private StringBuilder GetCipherAcquisitionName()
         {
-            var cipherName = new StringBuilder(SymmetricKeyAlgorithmProviderFactory.GetTitleName(this.algorithm));
+            var cipherName = new StringBuilder(this.algorithm.GetName().GetString());
             cipherName.Append("/");
-            cipherName.Append(SymmetricKeyAlgorithmProviderFactory.GetMode(this.algorithm));
+            cipherName.Append(this.algorithm.GetMode());
             string paddingString = GetPadding(this.algorithm);
             if (paddingString != null)
             {

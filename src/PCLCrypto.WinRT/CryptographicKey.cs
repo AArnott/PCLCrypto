@@ -25,6 +25,11 @@ namespace PCLCrypto
         private readonly Platform.CryptographicKey key;
 
         /// <summary>
+        /// The symmetric algorithm used when creating this key, when applicable.
+        /// </summary>
+        private readonly SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CryptographicKey" /> class.
         /// </summary>
         /// <param name="key">The WinRT cryptographic key.</param>
@@ -33,6 +38,19 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
 
             this.key = key;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CryptographicKey" /> class.
+        /// </summary>
+        /// <param name="key">The WinRT cryptographic key.</param>
+        /// <param name="symmetricAlgorithmProvider">The symmetric algorithm of the provider creating this key.</param>
+        internal CryptographicKey(Platform.CryptographicKey key, SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider)
+        {
+            Requires.NotNull(key, "key");
+
+            this.key = key;
+            this.symmetricAlgorithmProvider = symmetricAlgorithmProvider;
         }
 
         /// <inheritdoc />
@@ -47,6 +65,14 @@ namespace PCLCrypto
         internal Platform.CryptographicKey Key
         {
             get { return this.key; }
+        }
+
+        /// <summary>
+        /// Gets the symmetric algorithm provider that created this key, if applicable.
+        /// </summary>
+        internal SymmetricKeyAlgorithmProvider SymmetricAlgorithmProvider
+        {
+            get { return this.symmetricAlgorithmProvider; }
         }
 
         /// <inheritdoc />

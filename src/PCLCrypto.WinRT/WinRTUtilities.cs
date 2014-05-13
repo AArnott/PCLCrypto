@@ -17,9 +17,14 @@ namespace PCLCrypto
     internal static class WinRTUtilities
     {
         /// <summary>
+        /// An empty byte array.
+        /// </summary>
+        private static readonly byte[] EmptyByteArray = new byte[0];
+
+        /// <summary>
         /// An empty buffer.
         /// </summary>
-        private static readonly byte[] EmptyBuffer = new byte[0];
+        private static readonly IBuffer EmptyBuffer = new Windows.Storage.Streams.Buffer(0);
 
         /// <summary>
         /// Converts a WinRT buffer to a .NET buffer.
@@ -35,7 +40,7 @@ namespace PCLCrypto
 
             if (buffer.Length == 0)
             {
-                return EmptyBuffer; // CopyToByteArray produces a null array in this case, so we fix it here.
+                return EmptyByteArray; // CopyToByteArray produces a null array in this case, so we fix it here.
             }
 
             byte[] result;
@@ -53,6 +58,11 @@ namespace PCLCrypto
             if (array == null)
             {
                 return null;
+            }
+
+            if (array.Length == 0)
+            {
+                return EmptyBuffer; // CreateFromByteArray returns null in this case, so we fix it here.
             }
 
             return Platform.CryptographicBuffer.CreateFromByteArray(array);

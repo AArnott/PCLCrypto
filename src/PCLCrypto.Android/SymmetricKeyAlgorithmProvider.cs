@@ -44,7 +44,7 @@ namespace PCLCrypto
         {
             get
             {
-                using (var platform = Cipher.GetInstance(SymmetricKeyAlgorithmProviderFactory.GetTitleName(this.algorithm)))
+                using (var platform = Cipher.GetInstance(this.algorithm.GetName().GetString()))
                 {
                     return platform.BlockSize;
                 }

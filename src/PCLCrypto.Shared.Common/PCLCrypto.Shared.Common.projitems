@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CryptoStream.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetFxCrypto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithmExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WinRTCrypto.cs" />
   </ItemGroup>
 </Project>
