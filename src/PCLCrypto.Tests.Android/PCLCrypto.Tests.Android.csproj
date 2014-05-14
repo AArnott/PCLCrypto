@@ -114,10 +114,6 @@
     <Content Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
-      <Project>{7d334182-70a1-4f0a-a6a9-96e40e731240}</Project>
-      <Name>PCLCrypto.Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PCLCrypto.Android\PCLCrypto.Android.csproj">
       <Project>{338c45b2-b125-40b6-adda-754b20231cd9}</Project>
       <Name>PCLCrypto.Android</Name>

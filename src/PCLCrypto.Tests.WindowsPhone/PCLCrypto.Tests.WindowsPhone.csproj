@@ -107,10 +107,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
-      <Project>{7d334182-70a1-4f0a-a6a9-96e40e731240}</Project>
-      <Name>PCLCrypto.Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PCLCrypto.WindowsPhone\PCLCrypto.WindowsPhone.csproj">
       <Project>{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}</Project>
       <Name>PCLCrypto.WindowsPhone</Name>

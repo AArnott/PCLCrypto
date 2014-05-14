@@ -44,12 +44,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
-      <Project>{7D334182-70A1-4F0A-A6A9-96E40E731240}</Project>
-      <Name>PCLCrypto.Abstractions</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>

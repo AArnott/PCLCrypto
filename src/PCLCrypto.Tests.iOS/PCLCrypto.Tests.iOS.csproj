@@ -103,10 +103,6 @@
     <BundleResource Include="Resources\Default-568h@2x.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
-      <Project>{7d334182-70a1-4f0a-a6a9-96e40e731240}</Project>
-      <Name>PCLCrypto.Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PCLCrypto.iOS\PCLCrypto.iOS.csproj">
       <Project>{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}</Project>
       <Name>PCLCrypto.iOS</Name>

@@ -4,7 +4,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto\PCLCrypto.csproj" />
-		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.Desktop\PCLCrypto.Desktop.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.Android\PCLCrypto.Android.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.iOS\PCLCrypto.iOS.csproj" />

@@ -49,12 +49,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
-      <Project>{7d334182-70a1-4f0a-a6a9-96e40e731240}</Project>
-      <Name>PCLCrypto.Abstractions</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="KSec.cs" />
     <Compile Include="RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="RsaCryptographicKey.cs" />

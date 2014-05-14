@@ -141,10 +141,6 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Abstractions\PCLCrypto.Abstractions.csproj">
-      <Project>{7d334182-70a1-4f0a-a6a9-96e40e731240}</Project>
-      <Name>PCLCrypto.Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PCLCrypto.Silverlight\PCLCrypto.Silverlight.csproj">
       <Project>{d9c82a2b-e296-4902-a479-0e93f06ebddc}</Project>
       <Name>PCLCrypto.Silverlight</Name>
