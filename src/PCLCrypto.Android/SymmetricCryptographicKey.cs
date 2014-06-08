@@ -101,7 +101,10 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
+            bool paddingInUse = this.algorithm.GetPadding() != SymmetricAlgorithmPadding.None;
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
             Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+
             this.InitializeCipher(CipherMode.EncryptMode, iv);
             return this.algorithm.IsBlockCipher()
                 ? this.cipher.DoFinal(data)
@@ -111,6 +114,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
+            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
             Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
             this.InitializeCipher(CipherMode.DecryptMode, iv);
             try
@@ -236,15 +240,22 @@ namespace PCLCrypto
             {
                 cipherName.Append("/");
                 cipherName.Append(this.algorithm.GetMode());
-                string paddingString = GetPadding(this.algorithm);
-                if (paddingString != null)
-                {
-                    cipherName.Append("/");
-                    cipherName.Append(paddingString);
-                }
+                cipherName.Append("/");
+                cipherName.Append(GetPadding(this.algorithm) ?? "NoPadding");
             }
 
             return cipherName;
+        }
+
+        /// <summary>
+        /// Checks whether the given length is a valid one for an input buffer to the symmetric algorithm.
+        /// </summary>
+        /// <param name="lengthInBytes">The length of the input buffer in bytes.</param>
+        /// <returns><c>true</c> if the size is allowed; <c>false</c> otherwise.</returns>
+        private bool IsValidInputSize(int lengthInBytes)
+        {
+            int blockSizeInBytes = SymmetricKeyAlgorithmProvider.GetBlockSize(this.algorithm, this.cipher);
+            return lengthInBytes > 0 && lengthInBytes % blockSizeInBytes == 0;
         }
 
         /// <summary>

@@ -68,7 +68,7 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Gets the block size for the specified algorithm.
+        /// Gets the block size (in bytes) for the specified algorithm.
         /// </summary>
         internal static int GetBlockSize(SymmetricAlgorithm pclAlgorithm, Cipher algorithm)
         {
