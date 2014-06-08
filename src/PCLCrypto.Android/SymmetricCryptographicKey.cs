@@ -27,19 +27,19 @@ namespace PCLCrypto
         private readonly SymmetricAlgorithm algorithm;
 
         /// <summary>
-        /// The cipher.
+        /// The cipher to use for encryption.
         /// </summary>
-        private readonly Cipher cipher;
+        private Cipher encryptingCipher;
+
+        /// <summary>
+        /// The cipher to use for decryption.
+        /// </summary>
+        private Cipher decryptingCipher;
 
         /// <summary>
         /// The symmetric key.
         /// </summary>
         private readonly IKey key;
-
-        /// <summary>
-        /// A value indicating whether <see cref="cipher"/> has already been initialized.
-        /// </summary>
-        private bool cipherInitialized;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
@@ -56,27 +56,8 @@ namespace PCLCrypto
                 throw new NotSupportedException();
             }
 
-            try
-            {
-                this.algorithm = algorithm;
-                this.key = new SecretKeySpec(keyMaterial, this.algorithm.GetName().GetString());
-
-                try
-                {
-                    var cipherName = this.GetCipherAcquisitionName();
-                    this.cipher = Cipher.GetInstance(cipherName.ToString());
-                }
-                catch (NoSuchAlgorithmException ex)
-                {
-                    throw new NotSupportedException("Algorithm not supported.", ex);
-                }
-            }
-            catch
-            {
-                this.key.DisposeIfNotNull();
-                this.cipher.DisposeIfNotNull();
-                throw;
-            }
+            this.algorithm = algorithm;
+            this.key = new SecretKeySpec(keyMaterial, this.algorithm.GetName().GetString());
         }
 
         /// <inheritdoc />
@@ -101,33 +82,37 @@ namespace PCLCrypto
         public void Dispose()
         {
             this.key.Dispose();
-            this.cipher.Dispose();
+            this.encryptingCipher.DisposeIfNotNull();
+            this.decryptingCipher.DisposeIfNotNull();
         }
 
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
             bool paddingInUse = this.algorithm.GetPadding() != SymmetricAlgorithmPadding.None;
-            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
             Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
 
-            this.InitializeCipher(CipherMode.EncryptMode, iv);
+            this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+
             return this.algorithm.IsBlockCipher()
-                ? this.cipher.DoFinal(data)
-                : this.cipher.Update(data);
+                ? this.encryptingCipher.DoFinal(data)
+                : this.encryptingCipher.Update(data);
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
             Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
-            this.InitializeCipher(CipherMode.DecryptMode, iv);
+
+            this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
+            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+
             try
             {
                 return this.algorithm.IsBlockCipher()
-                    ? this.cipher.DoFinal(data)
-                    : this.cipher.Update(data);
+                    ? this.decryptingCipher.DoFinal(data)
+                    : this.decryptingCipher.Update(data);
             }
             catch (IllegalBlockSizeException ex)
             {
@@ -138,15 +123,15 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateEncryptor(byte[] iv)
         {
-            this.InitializeCipher(CipherMode.EncryptMode, iv);
-            return new CryptoTransformAdaptor(this.algorithm, this.cipher);
+            this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
+            return new CryptoTransformAdaptor(this.algorithm, this.encryptingCipher);
         }
 
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
-            this.InitializeCipher(CipherMode.DecryptMode, iv);
-            return new CryptoTransformAdaptor(this.algorithm, this.cipher);
+            this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
+            return new CryptoTransformAdaptor(this.algorithm, this.decryptingCipher);
         }
 
         /// <summary>
@@ -188,7 +173,8 @@ namespace PCLCrypto
             }
             else
             {
-                return new byte[this.cipher.BlockSize];
+                var cipher = this.encryptingCipher ?? this.decryptingCipher;
+                return new byte[cipher.BlockSize];
             }
         }
 
@@ -200,29 +186,44 @@ namespace PCLCrypto
         /// <returns>
         /// The initialized cipher.
         /// </returns>
-        private void InitializeCipher(CipherMode mode, byte[] iv)
+        private Cipher GetInitializedCipher(CipherMode mode, byte[] iv)
         {
-            if (this.cipherInitialized && !this.algorithm.IsBlockCipher())
+            switch (mode)
             {
-                // Avoid reseting the state of a streaming cipher.
-                return;
+                case CipherMode.DecryptMode:
+                    InitializeCipher(mode, iv, ref this.decryptingCipher);
+                    return this.decryptingCipher;
+                case CipherMode.EncryptMode:
+                    InitializeCipher(mode, iv, ref this.encryptingCipher);
+                    return this.encryptingCipher;
+                default:
+                    throw new ArgumentException();
             }
+        }
 
+        private void InitializeCipher(CipherMode mode, byte[] iv, ref Cipher cipher)
+        {
             try
             {
-                iv = this.ThisOrDefaultIV(iv);
-                using (var ivspec = iv != null ? new IvParameterSpec(iv) : null)
+                bool newCipher = false;
+                if (cipher == null)
                 {
-                    try
+                    cipher = Cipher.GetInstance(this.GetCipherAcquisitionName().ToString());
+                    newCipher = true;
+                }
+
+                if (this.algorithm.IsBlockCipher() || newCipher)
+                {
+                    iv = this.ThisOrDefaultIV(iv);
+                    using (var ivspec = iv != null ? new IvParameterSpec(iv) : null)
                     {
                         cipher.Init(mode, this.key, ivspec);
-                        this.cipherInitialized = true;
-                    }
-                    catch (Java.Security.InvalidKeyException ex)
-                    {
-                        throw new ArgumentException(ex.Message, ex);
                     }
                 }
+            }
+            catch (InvalidKeyException ex)
+            {
+                throw new ArgumentException(ex.Message, ex);
             }
             catch (NoSuchAlgorithmException ex)
             {
@@ -260,7 +261,8 @@ namespace PCLCrypto
         /// <returns><c>true</c> if the size is allowed; <c>false</c> otherwise.</returns>
         private bool IsValidInputSize(int lengthInBytes)
         {
-            int blockSizeInBytes = SymmetricKeyAlgorithmProvider.GetBlockSize(this.algorithm, this.cipher);
+            var cipher = this.encryptingCipher ?? this.decryptingCipher;
+            int blockSizeInBytes = SymmetricKeyAlgorithmProvider.GetBlockSize(this.algorithm, cipher);
             return lengthInBytes > 0 && lengthInBytes % blockSizeInBytes == 0;
         }
 
