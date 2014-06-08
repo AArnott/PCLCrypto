@@ -50,6 +50,12 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
 
+            if (algorithm == SymmetricAlgorithm.AesCcm)
+            {
+                // On Android encryption misbehaves causing our unit tests to fail.
+                throw new NotSupportedException();
+            }
+
             try
             {
                 this.algorithm = algorithm;
