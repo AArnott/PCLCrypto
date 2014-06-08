@@ -307,13 +307,15 @@ namespace PCLCrypto
             /// <inheritdoc />
             public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
             {
-                return this.transform.DoFinal(inputBuffer, inputOffset, inputCount);
+                return this.algorithm.IsBlockCipher()
+                    ? this.transform.DoFinal(inputBuffer, inputOffset, inputCount)
+                    : this.transform.Update(inputBuffer, inputOffset, inputCount);
             }
 
             /// <inheritdoc />
             public void Dispose()
             {
-                this.transform.Dispose();
+                // Don't dispose of the transform because we share it with the instance of our parent class.
             }
         }
     }
