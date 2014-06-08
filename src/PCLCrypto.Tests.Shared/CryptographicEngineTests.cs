@@ -307,7 +307,13 @@
         [TestMethod]
         public void Encrypt_PartialBlockInput()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv));
+            try
+            {
+                WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv);
+                Assert.IsTrue(false, "Expected exception not thrown.");
+            }
+            catch (ArgumentException) { }
+            catch (NotSupportedException) { }
 
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[4], this.iv);
             Assert.AreEqual(16, ciphertext.Length); // 16 is the block size for AES
@@ -316,14 +322,27 @@
         [TestMethod]
         public void Decrypt_PartialBlockInput()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv));
+            try
+            {
+                WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv);
+                Assert.IsTrue(false, "Expected exception not thrown.");
+            }
+            catch (ArgumentException) { }
+            catch (NotSupportedException) { }
+
             ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[4], this.iv));
         }
 
         [TestMethod]
         public void Encrypt_EmptyInput()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv));
+            try
+            {
+                WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv);
+                Assert.IsTrue(false, "Expected exception not thrown.");
+            }
+            catch (ArgumentException) { }
+            catch (NotSupportedException) { }
 
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[0], this.iv);
             Assert.AreEqual(16, ciphertext.Length); // 16 is the block size for AES
@@ -332,7 +351,14 @@
         [TestMethod]
         public void Decrypt_EmptyInput()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv));
+            try
+            {
+                WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv);
+                Assert.IsTrue(false, "Expected exception not thrown.");
+            }
+            catch (ArgumentException) { }
+            catch (NotSupportedException) { }
+
             ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[0], this.iv));
         }
 

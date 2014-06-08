@@ -65,6 +65,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
+            Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
             using (var cipher = this.GetInitializedCipher(CipherMode.EncryptMode, iv))
             {
                 return cipher.DoFinal(data);
@@ -76,7 +77,14 @@ namespace PCLCrypto
         {
             using (var cipher = this.GetInitializedCipher(CipherMode.DecryptMode, iv))
             {
-                return cipher.DoFinal(data);
+                try
+                {
+                    return cipher.DoFinal(data);
+                }
+                catch (IllegalBlockSizeException ex)
+                {
+                    throw new ArgumentException("Illegal block size.", ex);
+                }
             }
         }
 
@@ -102,12 +110,12 @@ namespace PCLCrypto
         {
             switch (algorithm.GetPadding())
             {
-                case SymmetricAlgorithmPadding.None:
-                    return null;
-                case SymmetricAlgorithmPadding.PKCS7:
-                    return "PKCS7Padding";
-                default:
-                    throw new NotSupportedException();
+            case SymmetricAlgorithmPadding.None:
+                return null;
+            case SymmetricAlgorithmPadding.PKCS7:
+                return "PKCS7Padding";
+            default:
+                throw new NotSupportedException();
             }
         }
 
@@ -124,6 +132,11 @@ namespace PCLCrypto
             if (iv != null)
             {
                 return iv;
+            }
+            else if (!this.algorithm.UsesIV())
+            {
+                // Don't create an IV when it doesn't apply.
+                return null;
             }
             else if (cipher != null)
             {
@@ -148,21 +161,33 @@ namespace PCLCrypto
         /// </returns>
         private Cipher GetInitializedCipher(CipherMode mode, byte[] iv)
         {
-            var cipherName = this.GetCipherAcquisitionName();
-
-            var cipher = Cipher.GetInstance(cipherName.ToString());
-            using (var ivspec = new IvParameterSpec(this.ThisOrDefaultIV(iv, cipher)))
+            try
             {
-                try
-                {
-                    cipher.Init(mode, this.key, ivspec);
-                }
-                catch (Java.Security.InvalidKeyException ex)
-                {
-                    throw new ArgumentException(ex.Message, ex);
-                }
+                var cipherName = this.GetCipherAcquisitionName();
 
-                return cipher;
+                var cipher = Cipher.GetInstance(cipherName.ToString());
+                iv = this.ThisOrDefaultIV(iv, cipher);
+                using (var ivspec = iv != null ? new IvParameterSpec(iv) : null)
+                {
+                    try
+                    {
+                        cipher.Init(mode, this.key, ivspec);
+                    }
+                    catch (Java.Security.InvalidKeyException ex)
+                    {
+                        throw new ArgumentException(ex.Message, ex);
+                    }
+
+                    return cipher;
+                }
+            }
+            catch (NoSuchAlgorithmException ex)
+            {
+                throw new NotSupportedException("Algorithm not supported.", ex);
+            }
+            catch (InvalidAlgorithmParameterException ex)
+            {
+                throw new ArgumentException("Invalid algorithm parameter.", ex);
             }
         }
 
@@ -174,13 +199,16 @@ namespace PCLCrypto
         private StringBuilder GetCipherAcquisitionName()
         {
             var cipherName = new StringBuilder(this.algorithm.GetName().GetString());
-            cipherName.Append("/");
-            cipherName.Append(this.algorithm.GetMode());
-            string paddingString = GetPadding(this.algorithm);
-            if (paddingString != null)
+            if (this.algorithm.IsBlockCipher())
             {
                 cipherName.Append("/");
-                cipherName.Append(paddingString);
+                cipherName.Append(this.algorithm.GetMode());
+                string paddingString = GetPadding(this.algorithm);
+                if (paddingString != null)
+                {
+                    cipherName.Append("/");
+                    cipherName.Append(paddingString);
+                }
             }
 
             return cipherName;

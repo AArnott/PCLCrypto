@@ -11,6 +11,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Java.Security;
     using Javax.Crypto;
     using Validation;
 
@@ -44,9 +45,22 @@ namespace PCLCrypto
         {
             get
             {
-                using (var platform = Cipher.GetInstance(this.algorithm.GetName().GetString()))
+                try
                 {
-                    return platform.BlockSize;
+                    using (var platform = Cipher.GetInstance(this.algorithm.GetName().GetString()))
+                    {
+                        if (platform.BlockSize == 0 && this.algorithm.GetName() == SymmetricAlgorithmName.Rc4)
+                        {
+                            // This is a streaming cipher without a block size. Return 1 to emulate behavior of other platforms.
+                            return 1;
+                        }
+
+                        return platform.BlockSize;
+                    }
+                }
+                catch (NoSuchAlgorithmException ex)
+                {
+                    throw new NotSupportedException("Algorithm not supported.", ex);
                 }
             }
         }
