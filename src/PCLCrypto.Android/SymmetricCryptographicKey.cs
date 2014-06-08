@@ -129,14 +129,14 @@ namespace PCLCrypto
         protected internal override ICryptoTransform CreateEncryptor(byte[] iv)
         {
             this.InitializeCipher(CipherMode.EncryptMode, iv);
-            return new CryptoTransformAdaptor(this.cipher);
+            return new CryptoTransformAdaptor(this.algorithm, this.cipher);
         }
 
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
             this.InitializeCipher(CipherMode.DecryptMode, iv);
-            return new CryptoTransformAdaptor(this.cipher);
+            return new CryptoTransformAdaptor(this.algorithm, this.cipher);
         }
 
         /// <summary>
@@ -258,12 +258,19 @@ namespace PCLCrypto
             private readonly Cipher transform;
 
             /// <summary>
+            /// The algorithm.
+            /// </summary>
+            private readonly SymmetricAlgorithm algorithm;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="CryptoTransformAdaptor"/> class.
             /// </summary>
+            /// <param name="algorithm">The algorithm.</param>
             /// <param name="transform">The transform.</param>
-            internal CryptoTransformAdaptor(Cipher transform)
+            internal CryptoTransformAdaptor(SymmetricAlgorithm algorithm, Cipher transform)
             {
                 Requires.NotNull(transform, "transform");
+                this.algorithm = algorithm;
                 this.transform = transform;
             }
 
@@ -282,7 +289,7 @@ namespace PCLCrypto
             /// <inheritdoc />
             public int InputBlockSize
             {
-                get { return this.transform.BlockSize; }
+                get { return SymmetricKeyAlgorithmProvider.GetBlockSize(this.algorithm, this.transform); }
             }
 
             /// <inheritdoc />

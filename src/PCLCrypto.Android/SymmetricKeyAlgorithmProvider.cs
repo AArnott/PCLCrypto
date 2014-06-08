@@ -49,13 +49,7 @@ namespace PCLCrypto
                 {
                     using (var platform = Cipher.GetInstance(this.algorithm.GetName().GetString()))
                     {
-                        if (platform.BlockSize == 0 && this.algorithm.GetName() == SymmetricAlgorithmName.Rc4)
-                        {
-                            // This is a streaming cipher without a block size. Return 1 to emulate behavior of other platforms.
-                            return 1;
-                        }
-
-                        return platform.BlockSize;
+                        return GetBlockSize(this.algorithm, platform);
                     }
                 }
                 catch (NoSuchAlgorithmException ex)
@@ -71,6 +65,22 @@ namespace PCLCrypto
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
             return new SymmetricCryptographicKey(this.Algorithm, keyMaterial);
+        }
+
+        /// <summary>
+        /// Gets the block size for the specified algorithm.
+        /// </summary>
+        internal static int GetBlockSize(SymmetricAlgorithm pclAlgorithm, Cipher algorithm)
+        {
+            Requires.NotNull(algorithm, "algorithm");
+
+            if (algorithm.BlockSize == 0 && pclAlgorithm.GetName() == SymmetricAlgorithmName.Rc4)
+            {
+                // This is a streaming cipher without a block size. Return 1 to emulate behavior of other platforms.
+                return 1;
+            }
+
+            return algorithm.BlockSize;
         }
     }
 }
