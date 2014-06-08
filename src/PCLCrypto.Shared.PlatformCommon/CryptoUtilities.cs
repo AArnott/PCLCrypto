@@ -45,5 +45,16 @@ namespace PCLCrypto
 
             return !mismatchFound;
         }
+
+        /// <summary>
+        /// Disposes a value if it is not null.
+        /// </summary>
+        internal static void DisposeIfNotNull(this IDisposable value)
+        {
+            if (value != null)
+            {
+                value.Dispose();
+            }
+        }
     }
 }

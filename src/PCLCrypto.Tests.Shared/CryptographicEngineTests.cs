@@ -39,9 +39,7 @@
             .OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7)
             .CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
 
-        private readonly ICryptographicKey aesKeyNoPadding = WinRTCrypto.SymmetricKeyAlgorithmProvider
-            .OpenAlgorithm(SymmetricAlgorithm.AesCbc)
-            .CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
+        private readonly ICryptographicKey aesKeyNoPadding = CreateKey(SymmetricAlgorithm.AesCbc, AesKeyMaterial);
 
         private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
 
@@ -307,13 +305,10 @@
         [TestMethod]
         public void Encrypt_PartialBlockInput()
         {
-            try
+            if (this.aesKeyNoPadding != null)
             {
-                WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv);
-                Assert.IsTrue(false, "Expected exception not thrown.");
+                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv));
             }
-            catch (ArgumentException) { }
-            catch (NotSupportedException) { }
 
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[4], this.iv);
             Assert.AreEqual(16, ciphertext.Length); // 16 is the block size for AES
@@ -322,13 +317,10 @@
         [TestMethod]
         public void Decrypt_PartialBlockInput()
         {
-            try
+            if (this.aesKeyNoPadding != null)
             {
-                WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv);
-                Assert.IsTrue(false, "Expected exception not thrown.");
+                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv));
             }
-            catch (ArgumentException) { }
-            catch (NotSupportedException) { }
 
             ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[4], this.iv));
         }
@@ -336,13 +328,10 @@
         [TestMethod]
         public void Encrypt_EmptyInput()
         {
-            try
+            if (this.aesKeyNoPadding != null)
             {
-                WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv);
-                Assert.IsTrue(false, "Expected exception not thrown.");
+                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv));
             }
-            catch (ArgumentException) { }
-            catch (NotSupportedException) { }
 
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[0], this.iv);
             Assert.AreEqual(16, ciphertext.Length); // 16 is the block size for AES
@@ -351,13 +340,10 @@
         [TestMethod]
         public void Decrypt_EmptyInput()
         {
-            try
+            if (this.aesKeyNoPadding != null)
             {
-                WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv);
-                Assert.IsTrue(false, "Expected exception not thrown.");
+                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv));
             }
-            catch (ArgumentException) { }
-            catch (NotSupportedException) { }
 
             ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[0], this.iv));
         }
@@ -403,7 +389,7 @@
         }
 
         [TestMethod]
-        public void StreamingCipherKeyRetainsStateAcrossOperations()
+        public void StreamingCipherKeyRetainsStateAcrossOperations_Encrypt()
         {
             // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
             // this test should be modified to use that cipher to test the NetFx PCL wrapper for
@@ -424,6 +410,42 @@
                 for (int i = 0; i < allData.Length; i++)
                 {
                     byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[] { allData[i] });
+                    cipherStream.Write(cipherText, 0, cipherText.Length);
+                }
+
+                byte[] incrementalResult = cipherStream.ToArray();
+                Assert.AreEqual(
+                    Convert.ToBase64String(allCiphertext),
+                    Convert.ToBase64String(incrementalResult));
+            }
+            catch (NotSupportedException)
+            {
+                Debug.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
+            }
+        }
+
+        [TestMethod]
+        public void StreamingCipherKeyRetainsStateAcrossOperations_Decrypt()
+        {
+            // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
+            // this test should be modified to use that cipher to test the NetFx PCL wrapper for
+            // streaming cipher behavior.
+            SymmetricAlgorithm symmetricAlgorithm = SymmetricAlgorithm.Rc4;
+            try
+            {
+                var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
+                uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
+                byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
+                var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+                var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+
+                byte[] allData = new byte[] { 1, 2, 3 };
+                byte[] allCiphertext = WinRTCrypto.CryptographicEngine.Decrypt(key1, allData);
+
+                var cipherStream = new MemoryStream();
+                for (int i = 0; i < allData.Length; i++)
+                {
+                    byte[] cipherText = WinRTCrypto.CryptographicEngine.Decrypt(key2, new byte[] { allData[i] });
                     cipherStream.Write(cipherText, 0, cipherText.Length);
                 }
 
@@ -539,6 +561,20 @@
             }
 
             return keyLength;
+        }
+
+        private static ICryptographicKey CreateKey(SymmetricAlgorithm algorithm, string keyMaterialBase64)
+        {
+            try
+            {
+                return WinRTCrypto.SymmetricKeyAlgorithmProvider
+                    .OpenAlgorithm(algorithm)
+                    .CreateSymmetricKey(Convert.FromBase64String(keyMaterialBase64));
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
         }
     }
 }
