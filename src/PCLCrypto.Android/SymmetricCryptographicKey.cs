@@ -19,12 +19,22 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of <see cref="ICryptographicKey"/> for use with symmetric algorithms.
     /// </summary>
-    internal class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey
+    internal class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey, IDisposable
     {
         /// <summary>
         /// The symmetric algorithm.
         /// </summary>
         private readonly SymmetricAlgorithm algorithm;
+
+        /// <summary>
+        /// The cipher to use for encryption.
+        /// </summary>
+        private Cipher encryptingCipher;
+
+        /// <summary>
+        /// The cipher to use for decryption.
+        /// </summary>
+        private Cipher decryptingCipher;
 
         /// <summary>
         /// The symmetric key.
@@ -39,6 +49,12 @@ namespace PCLCrypto
         internal SymmetricCryptographicKey(SymmetricAlgorithm algorithm, byte[] keyMaterial)
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
+
+            if (algorithm == SymmetricAlgorithm.AesCcm)
+            {
+                // On Android encryption misbehaves causing our unit tests to fail.
+                throw new NotSupportedException();
+            }
 
             this.algorithm = algorithm;
             this.key = new SecretKeySpec(keyMaterial, this.algorithm.GetName().GetString());
@@ -63,33 +79,59 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        public void Dispose()
+        {
+            this.key.Dispose();
+            this.encryptingCipher.DisposeIfNotNull();
+            this.decryptingCipher.DisposeIfNotNull();
+        }
+
+        /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
-            using (var cipher = this.GetInitializedCipher(CipherMode.EncryptMode, iv))
-            {
-                return cipher.DoFinal(data);
-            }
+            bool paddingInUse = this.algorithm.GetPadding() != SymmetricAlgorithmPadding.None;
+            Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+
+            this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+
+            return this.algorithm.IsBlockCipher()
+                ? this.encryptingCipher.DoFinal(data)
+                : this.encryptingCipher.Update(data);
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            using (var cipher = this.GetInitializedCipher(CipherMode.DecryptMode, iv))
+            Requires.Argument(iv == null || this.algorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+
+            this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
+            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+
+            try
             {
-                return cipher.DoFinal(data);
+                return this.algorithm.IsBlockCipher()
+                    ? this.decryptingCipher.DoFinal(data)
+                    : this.decryptingCipher.Update(data);
+            }
+            catch (IllegalBlockSizeException ex)
+            {
+                throw new ArgumentException("Illegal block size.", ex);
             }
         }
 
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateEncryptor(byte[] iv)
         {
-            return new CryptoTransformAdaptor(this.GetInitializedCipher(CipherMode.EncryptMode, iv));
+            this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
+            return new CryptoTransformAdaptor(this.algorithm, this.encryptingCipher);
         }
 
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
-            return new CryptoTransformAdaptor(this.GetInitializedCipher(CipherMode.DecryptMode, iv));
+            this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
+            return new CryptoTransformAdaptor(this.algorithm, this.decryptingCipher);
         }
 
         /// <summary>
@@ -115,26 +157,24 @@ namespace PCLCrypto
         /// Creates a zero IV buffer.
         /// </summary>
         /// <param name="iv">The IV supplied by the caller.</param>
-        /// <param name="cipher">The cipher, if already created.</param>
         /// <returns>
         ///   <paramref name="iv" /> if not null; otherwise a zero-filled buffer.
         /// </returns>
-        private byte[] ThisOrDefaultIV(byte[] iv, Cipher cipher = null)
+        private byte[] ThisOrDefaultIV(byte[] iv)
         {
             if (iv != null)
             {
                 return iv;
             }
-            else if (cipher != null)
+            else if (!this.algorithm.UsesIV())
             {
-                return new byte[cipher.BlockSize];
+                // Don't create an IV when it doesn't apply.
+                return null;
             }
             else
             {
-                using (cipher = Cipher.GetInstance(this.algorithm.GetName().GetString()))
-                {
-                    return new byte[cipher.BlockSize];
-                }
+                var cipher = this.encryptingCipher ?? this.decryptingCipher;
+                return new byte[cipher.BlockSize];
             }
         }
 
@@ -148,21 +188,50 @@ namespace PCLCrypto
         /// </returns>
         private Cipher GetInitializedCipher(CipherMode mode, byte[] iv)
         {
-            var cipherName = this.GetCipherAcquisitionName();
-
-            var cipher = Cipher.GetInstance(cipherName.ToString());
-            using (var ivspec = new IvParameterSpec(this.ThisOrDefaultIV(iv, cipher)))
+            switch (mode)
             {
-                try
+                case CipherMode.DecryptMode:
+                    InitializeCipher(mode, iv, ref this.decryptingCipher);
+                    return this.decryptingCipher;
+                case CipherMode.EncryptMode:
+                    InitializeCipher(mode, iv, ref this.encryptingCipher);
+                    return this.encryptingCipher;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private void InitializeCipher(CipherMode mode, byte[] iv, ref Cipher cipher)
+        {
+            try
+            {
+                bool newCipher = false;
+                if (cipher == null)
                 {
-                    cipher.Init(mode, this.key, ivspec);
-                }
-                catch (Java.Security.InvalidKeyException ex)
-                {
-                    throw new ArgumentException(ex.Message, ex);
+                    cipher = Cipher.GetInstance(this.GetCipherAcquisitionName().ToString());
+                    newCipher = true;
                 }
 
-                return cipher;
+                if (this.algorithm.IsBlockCipher() || newCipher)
+                {
+                    iv = this.ThisOrDefaultIV(iv);
+                    using (var ivspec = iv != null ? new IvParameterSpec(iv) : null)
+                    {
+                        cipher.Init(mode, this.key, ivspec);
+                    }
+                }
+            }
+            catch (InvalidKeyException ex)
+            {
+                throw new ArgumentException(ex.Message, ex);
+            }
+            catch (NoSuchAlgorithmException ex)
+            {
+                throw new NotSupportedException("Algorithm not supported.", ex);
+            }
+            catch (InvalidAlgorithmParameterException ex)
+            {
+                throw new ArgumentException("Invalid algorithm parameter.", ex);
             }
         }
 
@@ -174,16 +243,27 @@ namespace PCLCrypto
         private StringBuilder GetCipherAcquisitionName()
         {
             var cipherName = new StringBuilder(this.algorithm.GetName().GetString());
-            cipherName.Append("/");
-            cipherName.Append(this.algorithm.GetMode());
-            string paddingString = GetPadding(this.algorithm);
-            if (paddingString != null)
+            if (this.algorithm.IsBlockCipher())
             {
                 cipherName.Append("/");
-                cipherName.Append(paddingString);
+                cipherName.Append(this.algorithm.GetMode());
+                cipherName.Append("/");
+                cipherName.Append(GetPadding(this.algorithm) ?? "NoPadding");
             }
 
             return cipherName;
+        }
+
+        /// <summary>
+        /// Checks whether the given length is a valid one for an input buffer to the symmetric algorithm.
+        /// </summary>
+        /// <param name="lengthInBytes">The length of the input buffer in bytes.</param>
+        /// <returns><c>true</c> if the size is allowed; <c>false</c> otherwise.</returns>
+        private bool IsValidInputSize(int lengthInBytes)
+        {
+            var cipher = this.encryptingCipher ?? this.decryptingCipher;
+            int blockSizeInBytes = SymmetricKeyAlgorithmProvider.GetBlockSize(this.algorithm, cipher);
+            return lengthInBytes > 0 && lengthInBytes % blockSizeInBytes == 0;
         }
 
         /// <summary>
@@ -197,12 +277,19 @@ namespace PCLCrypto
             private readonly Cipher transform;
 
             /// <summary>
+            /// The algorithm.
+            /// </summary>
+            private readonly SymmetricAlgorithm algorithm;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="CryptoTransformAdaptor"/> class.
             /// </summary>
+            /// <param name="algorithm">The algorithm.</param>
             /// <param name="transform">The transform.</param>
-            internal CryptoTransformAdaptor(Cipher transform)
+            internal CryptoTransformAdaptor(SymmetricAlgorithm algorithm, Cipher transform)
             {
                 Requires.NotNull(transform, "transform");
+                this.algorithm = algorithm;
                 this.transform = transform;
             }
 
@@ -221,7 +308,7 @@ namespace PCLCrypto
             /// <inheritdoc />
             public int InputBlockSize
             {
-                get { return this.transform.BlockSize; }
+                get { return SymmetricKeyAlgorithmProvider.GetBlockSize(this.algorithm, this.transform); }
             }
 
             /// <inheritdoc />
@@ -239,13 +326,15 @@ namespace PCLCrypto
             /// <inheritdoc />
             public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
             {
-                return this.transform.DoFinal(inputBuffer, inputOffset, inputCount);
+                return this.algorithm.IsBlockCipher()
+                    ? this.transform.DoFinal(inputBuffer, inputOffset, inputCount)
+                    : this.transform.Update(inputBuffer, inputOffset, inputCount);
             }
 
             /// <inheritdoc />
             public void Dispose()
             {
-                this.transform.Dispose();
+                // Don't dispose of the transform because we share it with the instance of our parent class.
             }
         }
     }

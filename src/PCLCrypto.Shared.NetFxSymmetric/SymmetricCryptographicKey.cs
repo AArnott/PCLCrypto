@@ -109,7 +109,19 @@ namespace PCLCrypto
         /// <returns><paramref name="iv"/> if not null; otherwise a zero-filled buffer.</returns>
         private byte[] ThisOrDefaultIV(byte[] iv)
         {
-            return iv ?? new byte[this.algorithm.BlockSize / 8];
+            if (iv != null)
+            {
+                return iv;
+            }
+            else if (!this.pclAlgorithm.UsesIV())
+            {
+                // Don't create an IV when it doesn't apply.
+                return null;
+            }
+            else
+            {
+                return new byte[this.algorithm.BlockSize / 8];
+            }
         }
 
         /// <summary>
