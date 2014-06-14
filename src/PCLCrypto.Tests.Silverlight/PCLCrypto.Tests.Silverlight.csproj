@@ -82,7 +82,7 @@
     </Reference>
     <Reference Include="PCLTesting, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta1\lib\sl5\PCLTesting.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\sl5\PCLTesting.dll</HintPath>
     </Reference>
     <Reference Include="PCLTesting.Portable, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -90,7 +90,7 @@
     </Reference>
     <Reference Include="PCLTesting.Runner, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta1\lib\sl5\PCLTesting.Runner.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\sl5\PCLTesting.Runner.dll</HintPath>
     </Reference>
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

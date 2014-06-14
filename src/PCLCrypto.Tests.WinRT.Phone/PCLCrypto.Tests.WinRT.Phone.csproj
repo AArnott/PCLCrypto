@@ -72,11 +72,11 @@
     </Reference>
     <Reference Include="PCLTesting, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta1\lib\wpa81\PCLTesting.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\wpa81\PCLTesting.dll</HintPath>
     </Reference>
     <Reference Include="PCLTesting.Runner, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta1\lib\wpa81\PCLTesting.Runner.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\wpa81\PCLTesting.Runner.dll</HintPath>
     </Reference>
     <Reference Include="Validation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
