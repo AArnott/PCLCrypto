@@ -12,6 +12,7 @@ namespace PCLCrypto.Formatters
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
+    using Validation;
 
     /// <summary>
     /// Formats keys in the CAPI file format.
@@ -19,6 +20,36 @@ namespace PCLCrypto.Formatters
     /// </summary>
     internal class CapiKeyFormatter : KeyFormatter
     {
+        /// <summary>
+        /// An identifier that the contents of this blob conform to the PUBLICKEYBLOB specification.
+        /// </summary>
+        private const byte PublicKeyBlobHeader = 0x06;
+
+        /// <summary>
+        /// An identifier that the contents of this blob conform to the PRIVATEKEYBLOB specification.
+        /// </summary>
+        private const byte PrivateKeyBlobHeader = 0x07;
+
+        /// <summary>
+        /// A byte indicating the blob version.
+        /// </summary>
+        private const byte CurrentBlobVersion = 0x02;
+
+        /// <summary>
+        /// A magic string: "RSA1"
+        /// </summary>
+        private const string PublicKeyMagicHeader = "RSA1"; // 0x31415352
+
+        /// <summary>
+        /// A magic string: "RSA2"
+        /// </summary>
+        private const string PrivateKeyMagicHeader = "RSA2"; // 0x32415352
+
+        /// <summary>
+        /// A magic header that indicates key exchange use.
+        /// </summary>
+        private const int KeySpecKeyExchange = 0x0000a400;
+
         /// <summary>
         /// Determines whether the specified RSA parameters
         /// can be represented in the CAPI format.
@@ -76,11 +107,53 @@ namespace PCLCrypto.Formatters
         /// </returns>
         protected override RSAParameters ReadCore(Stream stream)
         {
-            byte[] keyBlob = new byte[stream.Length];
-            stream.Read(keyBlob, 0, keyBlob.Length);
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportCspBlob(keyBlob);
-            return rsa.ExportParameters(!rsa.PublicOnly);
+            var parameters = new RSAParameters();
+
+            var reader = new BinaryReader(stream);
+
+            bool hasPrivateKey;
+            byte keyBlobHeader = reader.ReadByte();
+            switch (keyBlobHeader)
+            {
+                case PrivateKeyBlobHeader:
+                    hasPrivateKey = true;
+                    break;
+                case PublicKeyBlobHeader:
+                    hasPrivateKey = false;
+                    break;
+                default:
+                    throw KeyFormatter.FailFormat();
+            }
+
+            byte currentBlobVersion = reader.ReadByte();
+            KeyFormatter.VerifyFormat(currentBlobVersion == CurrentBlobVersion);
+
+            short reserved = reader.ReadInt16();
+            KeyFormatter.VerifyFormat(reserved == 0);
+
+            int keySpec = reader.ReadInt32();
+            KeyFormatter.VerifyFormat(keySpec == KeySpecKeyExchange);
+
+            string magicHeader = Encoding.UTF8.GetString(reader.ReadBytes(4), 0, 4);
+            KeyFormatter.VerifyFormat(hasPrivateKey ? (magicHeader == PrivateKeyMagicHeader) : (magicHeader == PublicKeyMagicHeader));
+
+            int bitlen = reader.ReadInt32();
+            int bytelen = bitlen / 8;
+
+            parameters.Exponent = ReadReversed(reader, 4);
+            parameters.Modulus = ReadReversed(reader, bytelen);
+
+            if (hasPrivateKey)
+            {
+                parameters.P = ReadReversed(reader, bytelen / 2);
+                parameters.Q = ReadReversed(reader, bytelen / 2);
+                parameters.DP = ReadReversed(reader, bytelen / 2);
+                parameters.DQ = ReadReversed(reader, bytelen / 2);
+                parameters.InverseQ = ReadReversed(reader, bytelen / 2);
+                parameters.D = ReadReversed(reader, bytelen);
+            }
+
+            return parameters;
         }
 
         /// <summary>
@@ -91,10 +164,83 @@ namespace PCLCrypto.Formatters
         protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
             VerifyCapiCompatibleParameters(parameters);
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(parameters);
-            byte[] keyBlob = rsa.ExportCspBlob(!rsa.PublicOnly);
-            stream.Write(keyBlob, 0, keyBlob.Length);
+
+            var writer = new BinaryWriter(stream);
+
+            int bytelen = parameters.Modulus[0] == 0     // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
+                ? parameters.Modulus.Length - 1
+                : parameters.Modulus.Length;
+            int bitlen = 8 * bytelen;
+
+            writer.Write(HasPrivateKey(parameters) ? PrivateKeyBlobHeader : PublicKeyBlobHeader);
+            writer.Write(CurrentBlobVersion);
+            writer.Write((short)0); // reserved
+            writer.Write(KeySpecKeyExchange);
+            writer.Write(Encoding.UTF8.GetBytes(HasPrivateKey(parameters) ? PrivateKeyMagicHeader : PublicKeyMagicHeader));
+            writer.Write(bitlen);
+
+            // Ensure that the exponent occupies 4 bytes in the serialized stream,
+            // even if in the parameters structure it does not.
+            // We cannot use BitConverter.ToInt32 to help us do this because
+            // its behavior varies based on the endianness of the platform,
+            // yet RSAParameters is defined to always be Big Endian, and the 
+            // key blob format is defined to always be Little Endian, so we have to be careful.
+            byte[] exponentPadding = new byte[4 - parameters.Exponent.Length];
+            WriteReversed(writer, parameters.Exponent);
+            writer.Write(exponentPadding);
+
+            // bytelen drops the sign byte if it is present (which is good)
+            WriteReversed(writer, parameters.Modulus, bytelen);
+
+            if (HasPrivateKey(parameters))
+            {
+                WriteReversed(writer, parameters.P, bytelen / 2);
+                WriteReversed(writer, parameters.Q, bytelen / 2);
+                WriteReversed(writer, parameters.DP, bytelen / 2);
+                WriteReversed(writer, parameters.DQ, bytelen / 2);
+                WriteReversed(writer, parameters.InverseQ, bytelen / 2);
+                WriteReversed(writer, parameters.D, bytelen);
+            }
+
+            writer.Flush();
+            writer.Close();
+        }
+
+        /// <summary>
+        /// Returns a copy of the specified buffer where the copy has its byte order reversed.
+        /// </summary>
+        /// <param name="data">The buffer to copy and reverse.</param>
+        /// <returns>The new buffer with the contents of the original buffer reversed.</returns>
+        private static byte[] CopyAndReverse(byte[] data)
+        {
+            byte[] reversed = new byte[data.Length];
+            Array.Copy(data, 0, reversed, 0, data.Length);
+            Array.Reverse(reversed);
+            return reversed;
+        }
+
+        /// <summary>
+        /// Writes a buffer to a stream in reverse byte order.
+        /// </summary>
+        /// <param name="writer">The writer to copy <paramref name="data"/> to.</param>
+        /// <param name="data">The data to copy, reverse and write to the stream. This buffer instance is not modified.</param>
+        /// <param name="length">The number of bytes to write to the stream after the order reversal. A negative value means to copy the entire buffer.</param>
+        private static void WriteReversed(BinaryWriter writer, byte[] data, int length = -1)
+        {
+            writer.Write(CopyAndReverse(data), 0, length < 0 ? data.Length : length);
+        }
+
+        /// <summary>
+        /// Reads data from a stream and reverses the byte order.
+        /// </summary>
+        /// <param name="reader">The reader to use to read from the stream.</param>
+        /// <param name="length">The number of bytes to read.</param>
+        /// <returns>The buffer read from the stream, after reversing its byte order.</returns>
+        private static byte[] ReadReversed(BinaryReader reader, int length)
+        {
+            byte[] buffer = reader.ReadBytes(length);
+            Array.Reverse(buffer);
+            return buffer;
         }
     }
 }
