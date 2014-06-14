@@ -148,15 +148,15 @@
     </Reference>
     <Reference Include="PCLTesting, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\wp8\PCLTesting.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\wp8\PCLTesting.dll</HintPath>
     </Reference>
     <Reference Include="PCLTesting.Forms, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\wp8\PCLTesting.Forms.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\wp8\PCLTesting.Forms.dll</HintPath>
     </Reference>
     <Reference Include="PCLTesting.Runner, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\wp8\PCLTesting.Runner.dll</HintPath>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\wp8\PCLTesting.Runner.dll</HintPath>
     </Reference>
     <Reference Include="Validation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
