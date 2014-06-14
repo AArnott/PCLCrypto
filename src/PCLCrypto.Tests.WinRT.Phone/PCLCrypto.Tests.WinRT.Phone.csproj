@@ -62,22 +62,24 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Threading.Tasks">
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\wpa81\Microsoft.Threading.Tasks.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\wpa81\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="PCLCommandBase">
-      <HintPath>..\packages\PCLCommandBase.0.2.1\lib\portable-net45+sl50+win+wp80+wpa81+MonoAndroid10+MonoTouch10\PCLCommandBase.dll</HintPath>
+    <Reference Include="PCLTesting, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta1\lib\wpa81\PCLTesting.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting">
-      <HintPath>..\packages\PCLTesting.0.1.2\lib\wpa81\PCLTesting.dll</HintPath>
+    <Reference Include="PCLTesting.Runner, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta1\lib\wpa81\PCLTesting.Runner.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting.Runner">
-      <HintPath>..\packages\PCLTesting.0.1.2\lib\wpa81\PCLTesting.Runner.dll</HintPath>
-    </Reference>
-    <Reference Include="Validation">
+    <Reference Include="Validation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Validation.2.0.4.14103\lib\portable-windows8+net40+sl5+wp8+wpa81+wp81+MonoAndroid+MonoTouch\Validation.dll</HintPath>
     </Reference>
   </ItemGroup>
