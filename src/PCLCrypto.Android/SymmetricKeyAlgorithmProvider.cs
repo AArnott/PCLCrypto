@@ -70,6 +70,9 @@ namespace PCLCrypto
         /// <summary>
         /// Gets the block size (in bytes) for the specified algorithm.
         /// </summary>
+        /// <param name="pclAlgorithm">The PCL algorithm.</param>
+        /// <param name="algorithm">The platform-specific algorithm.</param>
+        /// <returns>The block size (in bytes).</returns>
         internal static int GetBlockSize(SymmetricAlgorithm pclAlgorithm, Cipher algorithm)
         {
             Requires.NotNull(algorithm, "algorithm");

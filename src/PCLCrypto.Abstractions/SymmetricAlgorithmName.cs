@@ -7,7 +7,7 @@
 namespace PCLCrypto
 {
     /// <summary>
-    /// A PCL-compatible enum describing symmetric algorithms.
+    /// A PCL-compatible enumeration describing symmetric algorithms.
     /// </summary>
     public enum SymmetricAlgorithmName
     {

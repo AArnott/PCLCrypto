@@ -7,7 +7,7 @@
 namespace PCLCrypto
 {
     /// <summary>
-    /// A PCL-compatible enum describing cipher block padding options.
+    /// A PCL-compatible enumeration describing cipher block padding options.
     /// </summary>
     public enum SymmetricAlgorithmPadding
     {

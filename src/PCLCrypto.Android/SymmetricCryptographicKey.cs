@@ -27,6 +27,11 @@ namespace PCLCrypto
         private readonly SymmetricAlgorithm algorithm;
 
         /// <summary>
+        /// The symmetric key.
+        /// </summary>
+        private readonly IKey key;
+
+        /// <summary>
         /// The cipher to use for encryption.
         /// </summary>
         private Cipher encryptingCipher;
@@ -35,11 +40,6 @@ namespace PCLCrypto
         /// The cipher to use for decryption.
         /// </summary>
         private Cipher decryptingCipher;
-
-        /// <summary>
-        /// The symmetric key.
-        /// </summary>
-        private readonly IKey key;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
@@ -191,16 +191,26 @@ namespace PCLCrypto
             switch (mode)
             {
                 case CipherMode.DecryptMode:
-                    InitializeCipher(mode, iv, ref this.decryptingCipher);
+                    this.InitializeCipher(mode, iv, ref this.decryptingCipher);
                     return this.decryptingCipher;
                 case CipherMode.EncryptMode:
-                    InitializeCipher(mode, iv, ref this.encryptingCipher);
+                    this.InitializeCipher(mode, iv, ref this.encryptingCipher);
                     return this.encryptingCipher;
                 default:
                     throw new ArgumentException();
             }
         }
 
+        /// <summary>
+        /// Initializes the cipher if it has not yet been initialized.
+        /// </summary>
+        /// <param name="mode">The mode.</param>
+        /// <param name="iv">The iv.</param>
+        /// <param name="cipher">The cipher.</param>
+        /// <exception cref="System.ArgumentException">
+        /// Invalid algorithm parameter.
+        /// </exception>
+        /// <exception cref="System.NotSupportedException">Algorithm not supported.</exception>
         private void InitializeCipher(CipherMode mode, byte[] iv, ref Cipher cipher)
         {
             try
