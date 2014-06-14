@@ -10,7 +10,6 @@ namespace PCLCrypto.Formatters
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Security.Cryptography;
     using System.Text;
     using Validation;
 
@@ -172,11 +171,11 @@ namespace PCLCrypto.Formatters
                 : parameters.Modulus.Length;
             int bitlen = 8 * bytelen;
 
-            writer.Write(HasPrivateKey(parameters) ? PrivateKeyBlobHeader : PublicKeyBlobHeader);
+            writer.Write(KeyFormatter.HasPrivateKey(parameters) ? PrivateKeyBlobHeader : PublicKeyBlobHeader);
             writer.Write(CurrentBlobVersion);
             writer.Write((short)0); // reserved
             writer.Write(KeySpecKeyExchange);
-            writer.Write(Encoding.UTF8.GetBytes(HasPrivateKey(parameters) ? PrivateKeyMagicHeader : PublicKeyMagicHeader));
+            writer.Write(Encoding.UTF8.GetBytes(KeyFormatter.HasPrivateKey(parameters) ? PrivateKeyMagicHeader : PublicKeyMagicHeader));
             writer.Write(bitlen);
 
             // Ensure that the exponent occupies 4 bytes in the serialized stream,
@@ -192,7 +191,7 @@ namespace PCLCrypto.Formatters
             // bytelen drops the sign byte if it is present (which is good)
             WriteReversed(writer, parameters.Modulus, bytelen);
 
-            if (HasPrivateKey(parameters))
+            if (KeyFormatter.HasPrivateKey(parameters))
             {
                 WriteReversed(writer, parameters.P, bytelen / 2);
                 WriteReversed(writer, parameters.Q, bytelen / 2);
@@ -203,7 +202,7 @@ namespace PCLCrypto.Formatters
             }
 
             writer.Flush();
-            writer.Close();
+            writer.Dispose();
         }
 
         /// <summary>

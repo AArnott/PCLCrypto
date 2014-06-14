@@ -73,7 +73,7 @@ namespace PCLCrypto
 #endif
             }
 
-            rsa.ImportParameters(parameters);
+            rsa.ImportParameters(KeyFormatter.ToPlatformParameters(parameters));
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
@@ -83,7 +83,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var rsa = new Platform.RSACryptoServiceProvider();
-            rsa.ImportParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
+            rsa.ImportParameters(KeyFormatter.ToPlatformParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob)));
             return new RsaCryptographicKey(rsa, this.algorithm);
         }
     }

@@ -13,5 +13,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)NetFxCrypto.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithmExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WinRTCrypto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WinRTExtensions.cs" />
   </ItemGroup>
 </Project>

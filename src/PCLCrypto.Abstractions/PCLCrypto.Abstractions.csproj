@@ -51,6 +51,7 @@
     <Compile Include="ISymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="KeyDerivationAlgorithm.cs" />
     <Compile Include="MacAlgorithm.cs" />
+    <Compile Include="RSAParameters.cs" />
     <Compile Include="SymmetricAlgorithm.cs" />
     <Compile Include="SymmetricAlgorithmMode.cs" />
     <Compile Include="SymmetricAlgorithmName.cs" />

@@ -56,6 +56,57 @@
         }
 
         [TestMethod]
+        public void RSAParametersPrivateKeyRoundtrip()
+        {
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var keyPair = rsa.CreateKeyPair(512);
+            RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: true);
+            ICryptographicKey keyPair2 = rsa.ImportParameters(parameters);
+
+            var blob1 = keyPair.Export();
+            var blob2 = keyPair2.Export();
+            CollectionAssertEx.AreEqual(blob1, blob2);
+        }
+
+        [TestMethod]
+        public void RSAParametersPublicKeyRoundtrip()
+        {
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var keyPair = rsa.CreateKeyPair(512);
+            RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: false);
+            Assert.IsNull(parameters.P, "Private key should have been omitted.");
+            Assert.IsNull(parameters.InverseQ, "Private key should have been omitted.");
+            Assert.IsNull(parameters.D, "Private key should have been omitted.");
+            Assert.IsNull(parameters.Q, "Private key should have been omitted.");
+            Assert.IsNull(parameters.DP, "Private key should have been omitted.");
+            Assert.IsNull(parameters.DQ, "Private key should have been omitted.");
+            ICryptographicKey publicKey = rsa.ImportParameters(parameters);
+
+            var blob1 = keyPair.ExportPublicKey();
+            var blob2 = publicKey.ExportPublicKey();
+            CollectionAssertEx.AreEqual(blob1, blob2);
+        }
+
+        [TestMethod]
+        public void ExportParametersThrowsOnPublicKeyMismatch()
+        {
+            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+            var keyPair = rsa.CreateKeyPair(512);
+            var publicKey = rsa.ImportPublicKey(keyPair.ExportPublicKey());
+
+            // This should throw because we can't export a private key when only the public key is known.
+            ExceptionAssert.Throws<InvalidOperationException>(() => publicKey.ExportParameters(includePrivateParameters: true));
+        }
+
+        [TestMethod]
+        public void ExportParametersThrowsOnSymmetricKey()
+        {
+            var keyProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
+            var key = keyProvider.CreateSymmetricKey(new byte[keyProvider.BlockLength]);
+            ExceptionAssert.Throws<NotSupportedException>(() => key.ExportParameters(includePrivateParameters: false));
+        }
+
+        [TestMethod]
         public void KeyPairRoundTrip()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);

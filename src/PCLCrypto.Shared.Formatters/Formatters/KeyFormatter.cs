@@ -10,7 +10,6 @@ namespace PCLCrypto.Formatters
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Security.Cryptography;
     using System.Text;
     using Validation;
 
@@ -229,10 +228,56 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="parameters">The parameters.</param>
         /// <returns><c>true</c> if a private key is included; <c>false</c> otherwise.</returns>
-        protected static bool HasPrivateKey(RSAParameters parameters)
+        protected internal static bool HasPrivateKey(RSAParameters parameters)
         {
             return parameters.P != null;
         }
+
+#if !WinRT && (!SILVERLIGHT || WINDOWS_PHONE) // we just want SL5 excluded
+
+        /// <summary>
+        /// Converts the PCLCrypto <see cref="RSAParameters"/> struct to the type
+        /// offered by the .NET Framework.
+        /// </summary>
+        /// <param name="value">The PCLCrypto parameters.</param>
+        /// <returns>The .NET Framework parameters.</returns>
+        protected internal static System.Security.Cryptography.RSAParameters ToPlatformParameters(RSAParameters value)
+        {
+            return new System.Security.Cryptography.RSAParameters
+            {
+                D = value.D,
+                Q = value.Q,
+                P = value.P,
+                DP = value.DP,
+                DQ = value.DQ,
+                Exponent = value.Exponent,
+                InverseQ = value.InverseQ,
+                Modulus = value.Modulus,
+            };
+        }
+
+        /// <summary>
+        /// Converts the .NET Framework <see cref="RSAParameters"/> struct to the type
+        /// offered by the PCLCrypto library.
+        /// </summary>
+        /// <param name="value">The .NET Framework parameters.</param>
+        /// <returns>The PCLCrypto parameters.</returns>
+        protected internal static RSAParameters ToPCLParameters(System.Security.Cryptography.RSAParameters value)
+        {
+            return new RSAParameters
+            {
+                D = value.D,
+                Q = value.Q,
+                P = value.P,
+                DP = value.DP,
+                DQ = value.DQ,
+                Exponent = value.Exponent,
+                InverseQ = value.InverseQ,
+                Modulus = value.Modulus,
+            };
+        }
+
+#endif
 
         /// <summary>
         /// Checks whether two buffers have equal contents.
