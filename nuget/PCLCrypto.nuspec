@@ -19,7 +19,6 @@
 		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
 		<dependencies>
 			<group targetFramework="net40-Client">
-				<dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
 				<dependency id="Validation" version="[2.0.4,3.0)"/>
 			</group>
 			<group>
