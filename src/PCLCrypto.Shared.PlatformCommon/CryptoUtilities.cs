@@ -49,6 +49,7 @@ namespace PCLCrypto
         /// <summary>
         /// Disposes a value if it is not null.
         /// </summary>
+        /// <param name="value">The value to be disposed of.</param>
         internal static void DisposeIfNotNull(this IDisposable value)
         {
             if (value != null)

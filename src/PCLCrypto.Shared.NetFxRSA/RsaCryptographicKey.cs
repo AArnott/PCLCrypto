@@ -69,13 +69,20 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            return KeyFormatter.GetFormatter(blobType).Write(this.key.ExportParameters(true));
+            try
+            {
+                return KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.ToPCLParameters(this.key.ExportParameters(true)));
+            }
+            catch (CryptographicException ex)
+            {
+                throw new InvalidOperationException("Private key not available.", ex);
+            }
         }
 
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            return KeyFormatter.GetFormatter(blobType).Write(this.key.ExportParameters(false));
+            return KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.ToPCLParameters(this.key.ExportParameters(false)));
         }
 
         /// <inheritdoc />

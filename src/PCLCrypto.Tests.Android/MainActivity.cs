@@ -25,7 +25,7 @@
             Xamarin.Forms.Forms.Init(this, bundle);
 
             var runner = new TestRunner(Assembly.GetExecutingAssembly());
-            SetPage(new NavigationPage(new TestRunnerPage(runner)));
+            this.SetPage(new NavigationPage(new TestRunnerPage(runner)));
         }
     }
 }

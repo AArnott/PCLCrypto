@@ -37,11 +37,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithm.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacAlgorithm.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetFxCrypto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RSAParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithm.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithmExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithmMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithmName.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricAlgorithmPadding.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WinRTCrypto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WinRTExtensions.cs" />
   </ItemGroup>
 </Project>

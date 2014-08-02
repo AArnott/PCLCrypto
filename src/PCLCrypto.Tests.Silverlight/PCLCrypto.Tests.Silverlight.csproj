@@ -80,17 +80,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\PCLCommandBase.0.2.1\lib\portable-net45+sl50+win+wp80+wpa81+MonoAndroid10+MonoTouch10\PCLCommandBase.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\sl5\PCLTesting.dll</HintPath>
+    <Reference Include="PCLTesting">
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\sl5\PCLTesting.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting.Portable, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2\lib\portable-net45+sl5+wp8+win8+monoandroid+monotouch\PCLTesting.Portable.dll</HintPath>
+    <Reference Include="PCLTesting.Portable">
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\sl5\PCLTesting.Portable.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting.Runner, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta2\lib\sl5\PCLTesting.Runner.dll</HintPath>
+    <Reference Include="PCLTesting.Runner">
+      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\sl5\PCLTesting.Runner.dll</HintPath>
     </Reference>
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

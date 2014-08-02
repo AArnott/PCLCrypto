@@ -26,7 +26,7 @@
 
             // Now load up the tested one.
             byte[] pkcs1KeyBlob = Convert.FromBase64String(AsymmetricKeyAlgorithmProviderTests.Helper.PrivateKeyFormatsAndBlobs[CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey]);
-            RSAParameters homeReadPkcs1 = KeyFormatter.Pkcs1.Read(pkcs1KeyBlob);
+            RSAParameters homeReadPkcs1 = KeyFormatter.ToPlatformParameters(KeyFormatter.Pkcs1.Read(pkcs1KeyBlob));
 #pragma warning restore 0436
             Assert.AreEqual(WinRTCrypto.CryptographicBuffer.EncodeToHexString(rsaCapi.Modulus), WinRTCrypto.CryptographicBuffer.EncodeToHexString(homeReadPkcs1.Modulus), "Modulus");
             Assert.AreEqual(WinRTCrypto.CryptographicBuffer.EncodeToHexString(rsaCapi.Exponent), WinRTCrypto.CryptographicBuffer.EncodeToHexString(homeReadPkcs1.Exponent), "Exponent");

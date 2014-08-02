@@ -95,6 +95,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
+            Verify.Operation(KeyFormatter.HasPrivateKey(this.parameters), "Private key not available.");
             return KeyFormatter.GetFormatter(blobType).Write(this.parameters);
         }
 

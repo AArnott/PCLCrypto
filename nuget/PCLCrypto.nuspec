@@ -23,8 +23,6 @@
 				<dependency id="Validation" version="[2.0.4,3.0)"/>
 			</group>
 			<group>
-				<!--<dependency id="Microsoft.Bcl.Async" version="1.0.165" />
-				<dependency id="Microsoft.Bcl" version="1.0.19" />-->
 				<dependency id="Validation" version="[2.0.4,3.0)"/>
 			</group>
 		</dependencies>

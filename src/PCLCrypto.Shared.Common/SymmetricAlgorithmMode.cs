@@ -7,7 +7,7 @@
 namespace PCLCrypto
 {
     /// <summary>
-    /// A PCL-compatible enum describing symmetric cipher block modes.
+    /// A PCL-compatible enumeration describing symmetric cipher block modes.
     /// </summary>
     public enum SymmetricAlgorithmMode
     {

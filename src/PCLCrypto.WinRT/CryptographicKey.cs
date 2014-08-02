@@ -86,6 +86,10 @@ namespace PCLCrypto
             {
                 throw new NotSupportedException(ex.Message, ex);
             }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOperationException(ex.Message, ex);
+            }
         }
 
         /// <inheritdoc />
