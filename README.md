@@ -1,6 +1,6 @@
 PCLCrypto
 =========
-This provides portable class library authors with a PCL-compatible crypto library that invokes platform-specific crypto automatically.
+PCLCrypto is an [open source library][7] that provides portable class library authors with cryptographic APIs that invoke platform-specific crypto automatically.
 
 ### Features
 
@@ -26,9 +26,17 @@ Installing via NuGet is important because we use facade assemblies and platform-
 
 Online documentation is available on our [project wiki site][6].
 
+### Donations
+
+If you appreciate this library and/or find it useful, please consider [donating cash or bitcoins][8] to its author.
+
 ### FAQ
 
-1. How does this differ from the cryptography offered to PCLs in the [PCLContrib][1] project?
+1. Can I trust the crypto implemented in this library?
+
+   This library does not implement crypto. It merely provides PCL-compatible APIs to invoke crypto, and at runtime the crypto offered by the platform is invoked. So you should be able to trust the crypto available through this library almost as much as you can trust the crypto in the operating system you're already running on.
+
+2. How does this differ from the cryptography offered to PCLs in the [PCLContrib][1] project?
 
  * PCLCrypto is focused on just delivering cryptography, with a good level of unit testing that runs on all supported platforms.
  * PCLCrypto follows the NuGet consumption patterns of [PCLStorage][3], which makes it very easy to consume from both PCLs and your platform-specific apps.
@@ -40,3 +48,5 @@ Online documentation is available on our [project wiki site][6].
  [4]: http://nuget.org/packages/pclcrypto
  [5]: http://log.paulbetts.org/the-bait-and-switch-pcl-trick/
  [6]: https://github.com/aarnott/pclcrypto/wiki
+ [7]: http://github.com/aarnott/pclcrypto
+ [8]: https://coinbase.com/checkouts/3668d9513f82bf70516fc29b75afa6c0
