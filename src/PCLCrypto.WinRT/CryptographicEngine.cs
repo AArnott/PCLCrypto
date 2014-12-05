@@ -343,17 +343,17 @@ namespace PCLCrypto
             {
                 var ciphertext = this.inputIVFunc(inputBuffer.ToBuffer(), this.iv);
 
+                byte[] ciphertextArray = ciphertext.ToArray();
                 if (ciphertext.Length == this.blockLength * 2)
                 {
                     // We ignore the ciphertext.Length and use inputCount instead because if padding is on,
                     // and if inputCount == blockLength, we might end up with a whole extra block of ciphertext
                     // that we want to drop since this isn't really the last block.
-                    var ciphertextArray = ciphertext.ToArray();
                     Array.Resize(ref ciphertextArray, this.blockLength);
                     ciphertext = ciphertextArray.ToBuffer();
                 }
 
-                System.Buffer.BlockCopy(ciphertext.ToArray(), 0, outputBuffer, outputOffset, (int)ciphertext.Length);
+                System.Buffer.BlockCopy(ciphertextArray, 0, outputBuffer, outputOffset, ciphertextArray.Length);
 
                 // Store off the ciphertext for use as the IV of the next block.
                 this.iv = ciphertext;
