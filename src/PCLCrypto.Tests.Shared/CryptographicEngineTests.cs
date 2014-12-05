@@ -15,7 +15,16 @@
     {
         private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
         private const string DataAesCiphertextBase64 = "3ChRgsiJ0mXxJIEQS5Z4NA==";
+
+        /// <summary>
+        /// Data the fits within a single cryptographic block.
+        /// </summary>
         private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
+
+        /// <summary>
+        /// Data that exceeds the length of a cryptographic block.
+        /// </summary>
+        private readonly byte[] bigData = new byte[] { 0x3, 0x5, 0x8, 0x11, 0x13, 0x15, 0x17, 0x19, 0x21, 0x23, 0x25, 0x27, 0x29, 0x31, 0x33, 0x35, 0x37, 0x39, 0x41, 0x43, 0x45 };
 
 #if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
         private readonly ICryptographicKey rsaSha1SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
@@ -529,19 +538,14 @@
         [TestMethod]
         public void EncryptDecryptStreamChain()
         {
-            var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey);
-            var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey);
+            byte[] data = this.data;
+            this.EncryptDecryptStreamChain(data);
+        }
 
-            var decryptedStream = new MemoryStream();
-            using (var decryptingStream = new CryptoStream(decryptedStream, decryptor, CryptoStreamMode.Write))
-            {
-                using (var encryptingStream = new CryptoStream(decryptingStream, encryptor, CryptoStreamMode.Write))
-                {
-                    encryptingStream.Write(this.data, 0, this.data.Length);
-                }
-            }
-
-            CollectionAssertEx.AreEqual(this.data, decryptedStream.ToArray());
+        [TestMethod]
+        public void EncryptDecryptStreamChain_Multiblock()
+        {
+            this.EncryptDecryptStreamChain(this.bigData);
         }
 
         private static uint GetKeyLength(SymmetricAlgorithm symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
@@ -575,6 +579,23 @@
             {
                 return null;
             }
+        }
+
+        private void EncryptDecryptStreamChain(byte[] data)
+        {
+            var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey);
+            var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey);
+
+            var decryptedStream = new MemoryStream();
+            using (var decryptingStream = new CryptoStream(decryptedStream, decryptor, CryptoStreamMode.Write))
+            {
+                using (var encryptingStream = new CryptoStream(decryptingStream, encryptor, CryptoStreamMode.Write))
+                {
+                    encryptingStream.Write(data, 0, data.Length);
+                }
+            }
+
+            CollectionAssertEx.AreEqual(data, decryptedStream.ToArray());
         }
     }
 }
