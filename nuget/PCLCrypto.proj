@@ -50,7 +50,7 @@
 			Version="%(NuGetSpecifications.Version)"
 			OutputPackageDirectory="%(NuGetSpecifications.OutputPackageDirectory)"
 			Symbols="%(NuGetSpecifications.Symbols)"
-			ToolPath="$(ProjectRoot)src\.nuget\"
+			ToolPath="$(ProjectRoot)src\packages\NuGet.CommandLine.2.8.3\tools\"
 			/>
 	</Target>
 
