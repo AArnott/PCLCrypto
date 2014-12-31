@@ -13,10 +13,16 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Mono.Security.Cryptography;
+#if __UNIFIED__
+    using Foundation;
+    using ObjCRuntime;
+    using Security;
+#else
     using MonoTouch;
     using MonoTouch.Foundation;
     using MonoTouch.ObjCRuntime;
     using MonoTouch.Security;
+#endif
     using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;

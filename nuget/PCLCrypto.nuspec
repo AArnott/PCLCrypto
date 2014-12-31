@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-	<metadata minClientVersion="2.7.2">
+	<metadata minClientVersion="2.8.3">
 		<id>PCLCrypto</id>
 		<version>0.0.1</version>
 		<title>PCL Crypto - Portable Crypto APIs</title>
@@ -39,6 +39,7 @@
 		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" />
 		<file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
 		<file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
+		<file target="lib\Xamarin.iOS" src="$OutputPath$PCLCrypto.iOS-Unified\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.iOS-Unified\*.mdb" />
 
 		<file target="src\src" src="..\src\**\*.cs" />
 		<file target="src\obj" src="$IntermediatePath$**\*.cs" />

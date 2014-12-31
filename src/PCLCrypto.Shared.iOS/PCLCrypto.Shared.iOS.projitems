@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>5af6d785-99f8-43af-bde6-53370177629a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PCLCrypto.Shared.iOS</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)KSec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RsaAsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RsaCryptographicKey.cs" />
+  </ItemGroup>
+</Project>
