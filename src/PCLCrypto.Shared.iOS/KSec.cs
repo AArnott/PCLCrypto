@@ -10,10 +10,15 @@ namespace PCLCrypto
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+#if __UNIFIED__
+    using Foundation;
+    using ObjCRuntime;
+#else
     using MonoTouch;
     using MonoTouch.Foundation;
     using MonoTouch.ObjCRuntime;
     using MonoTouch.UIKit;
+#endif
     using Validation;
 
     /// <summary>

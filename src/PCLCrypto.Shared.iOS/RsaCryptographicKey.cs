@@ -16,11 +16,18 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Mono.Security.Cryptography;
+
+#if __UNIFIED__
+    using Foundation;
+    using ObjCRuntime;
+    using Security;
+#else
     using MonoTouch;
     using MonoTouch.CoreFoundation;
     using MonoTouch.Foundation;
     using MonoTouch.ObjCRuntime;
     using MonoTouch.Security;
+#endif
     using PCLCrypto.Formatters;
     using Validation;
 
@@ -338,7 +345,9 @@ namespace PCLCrypto
 
             IntPtr typeRef;
             int code = SecItemCopyMatching(queryKey.Handle, out typeRef);
-            var keyData = new NSData(typeRef);
+
+            var keyData = Runtime.GetNSObject<NSData>(typeRef);
+
             return keyData;
         }
 
