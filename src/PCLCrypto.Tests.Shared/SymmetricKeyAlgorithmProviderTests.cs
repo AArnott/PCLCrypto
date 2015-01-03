@@ -38,11 +38,15 @@
         }
 
         [TestMethod]
-        public void CreateSymmetricKey()
+        public void CreateSymmetricKey_AesCbcPkcs7()
         {
-            var provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
-            ICryptographicKey key = provider.CreateSymmetricKey(this.keyMaterial);
-            Assert.IsNotNull(key);
+            this.CreateSymmetricKeyHelper(SymmetricAlgorithm.AesCbcPkcs7);
+        }
+
+        [TestMethod]
+        public void CreateSymmetricKey_AesEcbPkcs7()
+        {
+            this.CreateSymmetricKeyHelper(SymmetricAlgorithm.AesEcbPkcs7);
         }
 
         [TestMethod]
@@ -61,6 +65,14 @@
             ICryptographicKey key = provider.CreateSymmetricKey(this.keyMaterial);
             ExceptionAssert.Throws<NotSupportedException>(
                 () => key.ExportPublicKey());
+        }
+
+        private void CreateSymmetricKeyHelper(SymmetricAlgorithm algorithm)
+        {
+            var provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm);
+            ICryptographicKey key = provider.CreateSymmetricKey(this.keyMaterial);
+            Assert.IsNotNull(key);
+            Assert.Equals(this.keyMaterial.Length * 8, key.KeySize);
         }
     }
 }

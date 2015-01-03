@@ -58,13 +58,11 @@ namespace PCLCrypto
 
             this.algorithm = algorithm;
             this.key = new SecretKeySpec(keyMaterial, this.algorithm.GetName().GetString());
+            this.KeySize = keyMaterial.Length * 8;
         }
 
         /// <inheritdoc />
-        public int KeySize
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public int KeySize { get; private set; }
 
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo)
