@@ -31,14 +31,14 @@
 	<files>
 		<!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
 				 the platform-specific lib folder will indicate Windows 8.1 is required. -->
-		<file target="lib\portable-net40+sl50+win+wpa81+wp80" src="$OutputPath$PCLCrypto\PCLCrypto.*" />
-		<file target="lib\net40-Client" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.*" />
-		<file target="lib\sl5" src="$OutputPath$PCLCrypto.Silverlight\PCLCrypto.*" />
-		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.*" />
-		<file target="lib\wpa81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" />
-		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.*" />
-		<file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
-		<file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.*" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
+		<file target="lib\portable-net40+sl50+win+wpa81+wp80" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
+		<file target="lib\net40-Client" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.???" />
+		<file target="lib\sl5" src="$OutputPath$PCLCrypto.Silverlight\PCLCrypto.???" />
+		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.???" />
+		<file target="lib\wpa81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
+		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
+		<file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
+		<file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
 
 		<file target="src\src" src="..\src\**\*.cs" />
 		<file target="src\obj" src="$IntermediatePath$**\*.cs" />
