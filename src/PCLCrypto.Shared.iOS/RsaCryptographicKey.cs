@@ -108,6 +108,7 @@ namespace PCLCrypto
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
             NSData data = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier));
+            Verify.Operation(data != null, "Private key not available.");
             byte[] keyData;
             try
             {
