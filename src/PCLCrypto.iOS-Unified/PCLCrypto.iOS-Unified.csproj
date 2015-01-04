@@ -16,23 +16,15 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>    
-    <DefineConstants>DEBUG;__UNIFIED__;__MOBILE__;__IOS__;Xamarin</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <DefineConstants>$(DefineConstants);__UNIFIED__;__MOBILE__;__IOS__;Xamarin</DefineConstants>
     <ConsolePause>false</ConsolePause>
     <MtouchDebug>true</MtouchDebug>
-    <CodesignKey>iPhone Developer</CodesignKey>    
+    <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>    
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;Xamarin</DefineConstants>    
+    <DefineConstants>$(DefineConstants);__UNIFIED__;__MOBILE__;__IOS__;Xamarin</DefineConstants>    
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Security" />
