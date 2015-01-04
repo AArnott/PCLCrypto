@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22310.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{9701D978-72F1-4CF6-B695-2447651A6F96}"
 EndProject
@@ -71,55 +71,58 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.iOS-Unified", "PC
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.iOS", "PCLCrypto.Shared.iOS\PCLCrypto.Shared.iOS.shproj", "{5AF6D785-99F8-43AF-BDE6-53370177629A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.iOS-Unified", "PCLCrypto.Tests.iOS-Unified\PCLCrypto.Tests.iOS-Unified.csproj", "{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
-		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{7c7e2d50-036f-4e08-b4e0-f09889501cfd}*SharedItemsImports = 4
 		PCLCrypto.Shared.iOS\PCLCrypto.Shared.iOS.projitems*{5af6d785-99f8-43af-bde6-53370177629a}*SharedItemsImports = 13
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
-		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{ef6f2d0c-b8ad-4bf2-a87b-c07bb37ef0c2}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems*{9aabbe87-236e-43af-8bc9-268ac7b3ac2b}*SharedItemsImports = 13
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{3b79d2b0-680a-493d-80fd-ebd8b24432fa}*SharedItemsImports = 13
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{90a54774-0083-48b4-b8a1-2fccc24cbe86}*SharedItemsImports = 4
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{bdbcb22f-d740-4c54-9fe5-abb6baa92aa0}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{bdbcb22f-d740-4c54-9fe5-abb6baa92aa0}*SharedItemsImports = 4
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
-		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{bdbcb22f-d740-4c54-9fe5-abb6baa92aa0}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
+		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
 		PCLCrypto.Shared.iOS\PCLCrypto.Shared.iOS.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
-		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{b244682c-9c7d-4a71-9c3b-e9c1ca1ed747}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
+		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
 		PCLCrypto.Shared.iOS\PCLCrypto.Shared.iOS.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{6c7bc24f-31c2-4081-abb0-8b3426ddb08d}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{3b2d4380-8bcb-4626-8e9e-6958e0a34115}*SharedItemsImports = 13
+		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{abe87d5e-af6e-413c-8a06-de9b2da30eba}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{150eb22b-db53-4954-bc06-3996b91bfb7a}*SharedItemsImports = 4
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
+		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
 		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
 		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
-		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{a6080690-bd84-454f-b1ab-091f9d0e4dce}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{338c45b2-b125-40b6-adda-754b20231cd9}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{a6080690-bd84-454f-b1ab-091f9d0e4dce}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{a6080690-bd84-454f-b1ab-091f9d0e4dce}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{1b396c98-0eb8-461c-8b00-0d52c262f377}*SharedItemsImports = 4
 		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{2649b02a-7fdc-43fa-8a0c-755bbd74dbdd}*SharedItemsImports = 13
-		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
-		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
-		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
-		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
+		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
+		PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems*{d9c82a2b-e296-4902-a479-0e93f06ebddc}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
+		PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
+		PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems*{4879ee8f-2740-498d-b401-560f4ee66167}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{d50a6ec5-b1f4-4352-bbc5-2a956a55f2ae}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{7c1f893f-c83d-481e-9466-e769c3b45fce}*SharedItemsImports = 4
 		PCLCrypto.Shared.Common\PCLCrypto.Shared.Common.projitems*{802098cc-e489-4fc0-b115-30cc967b7b38}*SharedItemsImports = 13
@@ -578,6 +581,34 @@ Global
 		{6C7BC24F-31C2-4081-ABB0-8B3426DDB08D}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{6C7BC24F-31C2-4081-ABB0-8B3426DDB08D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6C7BC24F-31C2-4081-ABB0-8B3426DDB08D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|Any CPU.ActiveCfg = Ad-Hoc|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|iPhone.ActiveCfg = Ad-Hoc|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Ad-Hoc|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|iPhoneSimulator.Build.0 = Ad-Hoc|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|Mixed Platforms.ActiveCfg = Ad-Hoc|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Ad-Hoc|Mixed Platforms.Build.0 = Ad-Hoc|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|Any CPU.ActiveCfg = AppStore|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|iPhone.Build.0 = AppStore|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|iPhoneSimulator.ActiveCfg = AppStore|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|iPhoneSimulator.Build.0 = AppStore|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|Mixed Platforms.ActiveCfg = AppStore|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.AppStore|Mixed Platforms.Build.0 = AppStore|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|Any CPU.ActiveCfg = Debug|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|iPhone.Build.0 = Debug|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|Mixed Platforms.ActiveCfg = Debug|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Debug|Mixed Platforms.Build.0 = Debug|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|Any CPU.ActiveCfg = Release|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|iPhone.ActiveCfg = Release|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|iPhone.Build.0 = Release|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|Mixed Platforms.ActiveCfg = Release|iPhone
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}.Release|Mixed Platforms.Build.0 = Release|iPhone
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -606,5 +637,6 @@ Global
 		{D50A6EC5-B1F4-4352-BBC5-2A956A55F2AE} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{6C7BC24F-31C2-4081-ABB0-8B3426DDB08D} = {9701D978-72F1-4CF6-B695-2447651A6F96}
 		{5AF6D785-99F8-43AF-BDE6-53370177629A} = {9701D978-72F1-4CF6-B695-2447651A6F96}
+		{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 	EndGlobalSection
 EndGlobal
