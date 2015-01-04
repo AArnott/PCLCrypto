@@ -7,6 +7,7 @@
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.Desktop\PCLCrypto.Desktop.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.Android\PCLCrypto.Android.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.iOS\PCLCrypto.iOS.csproj" />
+		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.iOS-Unified\PCLCrypto.iOS-Unified.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.Silverlight\PCLCrypto.Silverlight.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.WinRT\PCLCrypto.WinRT.csproj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.WindowsPhone\PCLCrypto.WindowsPhone.csproj" />
