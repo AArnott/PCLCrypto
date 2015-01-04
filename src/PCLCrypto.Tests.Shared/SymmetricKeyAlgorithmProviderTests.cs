@@ -43,11 +43,13 @@
             this.CreateSymmetricKeyHelper(SymmetricAlgorithm.AesCbcPkcs7);
         }
 
+#if !(SILVERLIGHT || __IOS__)
         [TestMethod]
         public void CreateSymmetricKey_AesEcbPkcs7()
         {
             this.CreateSymmetricKeyHelper(SymmetricAlgorithm.AesEcbPkcs7);
         }
+#endif
 
         [TestMethod]
         public void CreateSymmetricKey_Export()
