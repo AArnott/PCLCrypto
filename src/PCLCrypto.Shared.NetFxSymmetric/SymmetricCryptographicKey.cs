@@ -44,7 +44,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public int KeySize
         {
-            get { throw new NotImplementedException(); }
+            get { return this.algorithm.KeySize; }
         }
 
         /// <inheritdoc />
