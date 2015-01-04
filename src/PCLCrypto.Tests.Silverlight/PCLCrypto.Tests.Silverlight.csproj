@@ -35,6 +35,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <NonShipping>true</NonShipping>
     <SignAssembly>false</SignAssembly>
+    <NuGetPackageImportStamp>34f2f0d5</NuGetPackageImportStamp>
   </PropertyGroup>
   <!-- This property group is only here to support building this project using the 
        MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
@@ -75,18 +76,21 @@
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\sl4\Microsoft.Threading.Tasks.Extensions.Silverlight.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="PCLCommandBase, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PCLCommandBase, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLCommandBase.0.2.1\lib\portable-net45+sl50+win+wp80+wpa81+MonoAndroid10+MonoTouch10\PCLCommandBase.dll</HintPath>
+      <HintPath>..\packages\PCLCommandBase.0.2.2\lib\portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10\PCLCommandBase.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting">
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\sl5\PCLTesting.dll</HintPath>
+    <Reference Include="PCLTesting, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PCLTesting.0.2.2\lib\sl5\PCLTesting.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting.Portable">
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\sl5\PCLTesting.Portable.dll</HintPath>
+    <Reference Include="PCLTesting.Portable, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PCLTesting.0.2.2\lib\sl5\PCLTesting.Portable.dll</HintPath>
     </Reference>
-    <Reference Include="PCLTesting.Runner">
-      <HintPath>..\packages\PCLTesting.0.1.2-Beta3\lib\sl5\PCLTesting.Runner.dll</HintPath>
+    <Reference Include="PCLTesting.Runner, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PCLTesting.0.2.2\lib\sl5\PCLTesting.Runner.dll</HintPath>
     </Reference>
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -108,10 +112,6 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Browser" />
-    <Reference Include="Validation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Validation.2.0.4.14103\lib\portable-windows8+net40+sl5+wp8+wpa81+wp81+MonoAndroid+MonoTouch\Validation.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -133,7 +133,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -159,9 +161,11 @@
   </ProjectExtensions>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))\EnlistmentInfo.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))' != '' " />
   <Import Project="..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems')" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
 </Project>
