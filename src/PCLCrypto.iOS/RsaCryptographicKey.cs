@@ -100,7 +100,18 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            byte[] keyData = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier)).ToArray();
+            NSData data = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier));
+            byte[] keyData;
+            try
+            {
+                keyData = data.ToArray();
+            }
+            catch (ArgumentNullException ex)
+            {
+                // MonoTouch throws this when the private key is missing.
+                throw new InvalidOperationException("Private key not available.", ex);
+            }
+
             var parameters = KeyFormatter.Pkcs1.Read(keyData);
             return KeyFormatter.GetFormatter(blobType).Write(parameters);
         }
