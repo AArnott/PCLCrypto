@@ -42,6 +42,52 @@ If you appreciate this library and/or find it useful, please consider [donating 
  * PCLCrypto follows the NuGet consumption patterns of [PCLStorage][3], which makes it very easy to consume from both PCLs and your platform-specific apps.
  * PCLCrypto is under active development. PCLContrib [hasn't been updated in a while][2].
 
+### C# 6 Tip
+
+One of the new features of C# 6 is [using static][9], which bring static members of static classes into scope. You can take advantage of this feature with PCLCrypto to simplify your code:
+
+Before:
+
+```csharp
+...
+using PCLCrypto;
+
+class TwitterClient 
+{
+  private static string GenerateHash(string input, string key)
+  {
+        public static string GenerateHash(string input, string key)
+        {
+            var mac = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+            var keyMaterial = WinRTCrypto.CryptographicBuffer.ConvertStringToBinary(key, Encoding.UTF8);
+            var cryptoKey = mac.CreateKey(keyMaterial);
+            var hash = WinRTCrypto.CryptographicEngine.Sign(cryptoKey, WinRTCrypto.CryptographicBuffer.ConvertStringToBinary(input, Encoding.UTF8));
+            return WinRTCrypto.CryptographicBuffer.EncodeToBase64String(hash);
+        }
+  }
+}
+```
+
+After:
+
+```csharp
+...
+using PCLCrypto;
+using PCLCrypto.WinRTCrypto;
+
+class TwitterClient 
+{
+  private static string GenerateHash(string input, string key)
+  {
+      var mac = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+      var keyMaterial = CryptographicBuffer.ConvertStringToBinary(key, Encoding.UTF8);
+      var cryptoKey = mac.CreateKey(keyMaterial);
+      var hash = CryptographicEngine.Sign(cryptoKey, CryptographicBuffer.ConvertStringToBinary(input, Encoding.UTF8));
+      return CryptographicBuffer.EncodeToBase64String(hash);
+  }
+}
+```
+
  [1]: https://pclcontrib.codeplex.com/
  [2]: https://pclcontrib.codeplex.com/SourceControl/list/changesets
  [3]: https://pclstorage.codeplex.com/
@@ -50,3 +96,4 @@ If you appreciate this library and/or find it useful, please consider [donating 
  [6]: https://github.com/aarnott/pclcrypto/wiki
  [7]: http://github.com/aarnott/pclcrypto
  [8]: https://coinbase.com/checkouts/3668d9513f82bf70516fc29b75afa6c0
+ [9]: http://intellitect.com/static-using-statement-in-c-6-0/
