@@ -73,7 +73,7 @@ After:
 ```csharp
 ...
 using PCLCrypto;
-using PCLCrypto.WinRTCrypto;
+using static PCLCrypto.WinRTCrypto;
 
 class TwitterClient 
 {
