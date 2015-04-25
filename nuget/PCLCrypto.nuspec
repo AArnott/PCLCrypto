@@ -21,10 +21,10 @@
 		<dependencies>
 			<group targetFramework="net40-Client">
 				<dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
-				<dependency id="Validation" version="[2.0.4,3.0)"/>
+				<dependency id="Validation" version="[2.0.6,3.0)"/>
 			</group>
 			<group>
-				<dependency id="Validation" version="[2.0.4,3.0)"/>
+				<dependency id="Validation" version="[2.0.6,3.0)"/>
 			</group>
 		</dependencies>
 	</metadata>
