@@ -153,6 +153,12 @@ namespace PCLCrypto
             return tag + ".publicKey";
         }
 
+        /// <summary>
+        /// Add a security item.
+        /// </summary>
+        /// <param name="query">The handle to the dictionary.</param>
+        /// <param name="result">Receives the handle to the added item.</param>
+        /// <returns>The status of the operation.</returns>
         [DllImport(Constants.SecurityLibrary)]
         internal static extern int SecItemAdd(IntPtr query, out IntPtr result);
 
