@@ -27,7 +27,7 @@ namespace PCLCrypto
         Pkcs1RsaPrivateKey,
 
         /// <summary>
-        /// Microsoft private key format defined by Cryptography API: Next Generation (CNG). 
+        /// Microsoft private key format defined by Cryptography API: Next Generation (CNG).
         /// </summary>
         BCryptPrivateKey,
 

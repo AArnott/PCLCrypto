@@ -27,12 +27,12 @@ namespace PCLCrypto
         Pkcs1RsaPublicKey,
 
         /// <summary>
-        /// Microsoft public key format defined by Cryptography API: Next Generation (CNG). 
+        /// Microsoft public key format defined by Cryptography API: Next Generation (CNG).
         /// </summary>
         BCryptPublicKey,
 
         /// <summary>
-        /// Microsoft public key format defined by the legacy Cryptography API (CAPI). 
+        /// Microsoft public key format defined by the legacy Cryptography API (CAPI).
         /// </summary>
         Capi1PublicKey,
     }

@@ -207,7 +207,7 @@ namespace PCLCrypto
         /// <summary>
         /// Gets the service for buffers.
         /// </summary>
-        public static ICryptographicBuffer CryptographicBuffer 
+        public static ICryptographicBuffer CryptographicBuffer
         {
             get
             {

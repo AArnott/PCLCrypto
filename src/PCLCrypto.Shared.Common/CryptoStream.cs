@@ -91,7 +91,7 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Gets a value indicating whether the final buffer block has been written to the underlying stream. 
+        /// Gets a value indicating whether the final buffer block has been written to the underlying stream.
         /// </summary>
         public bool HasFlushedFinalBlock { get; private set; }
 
