@@ -54,17 +54,14 @@ using PCLCrypto;
 
 class TwitterClient 
 {
-  private static string GenerateHash(string input, string key)
-  {
-        public static string GenerateHash(string input, string key)
-        {
-            var mac = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
-            var keyMaterial = WinRTCrypto.CryptographicBuffer.ConvertStringToBinary(key, Encoding.UTF8);
-            var cryptoKey = mac.CreateKey(keyMaterial);
-            var hash = WinRTCrypto.CryptographicEngine.Sign(cryptoKey, WinRTCrypto.CryptographicBuffer.ConvertStringToBinary(input, Encoding.UTF8));
-            return WinRTCrypto.CryptographicBuffer.EncodeToBase64String(hash);
-        }
-  }
+    private static string GenerateHash(string input, string key)
+    {
+        var mac = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
+        var keyMaterial = WinRTCrypto.CryptographicBuffer.ConvertStringToBinary(key, Encoding.UTF8);
+        var cryptoKey = mac.CreateKey(keyMaterial);
+        var hash = WinRTCrypto.CryptographicEngine.Sign(cryptoKey, WinRTCrypto.CryptographicBuffer.ConvertStringToBinary(input, Encoding.UTF8));
+        return WinRTCrypto.CryptographicBuffer.EncodeToBase64String(hash);
+    }
 }
 ```
 
@@ -73,7 +70,7 @@ After:
 ```csharp
 ...
 using PCLCrypto;
-using PCLCrypto.WinRTCrypto;
+using static PCLCrypto.WinRTCrypto;
 
 class TwitterClient 
 {
