@@ -21,8 +21,8 @@
     <NonShipping>true</NonShipping>
     <SignAssembly>false</SignAssembly>
     <NuGetPackageImportStamp>d9ac9910</NuGetPackageImportStamp>
-    <AndroidUseLatestPlatformSdk />
-    <TargetFrameworkVersion>v4.3</TargetFrameworkVersion>
+    <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
+    <TargetFrameworkVersion>v4.0.3</TargetFrameworkVersion>
     <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
     <MandroidI18n />
