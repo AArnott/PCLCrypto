@@ -151,6 +151,9 @@
                     byte[] key2Blob = key2.ExportPublicKey(format);
 
                     CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+
+                    WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[0]);
+
                     Debug.WriteLine("Format {0} supported.", format);
                     Debug.WriteLine(Convert.ToBase64String(keyBlob));
                     supportedFormats++;

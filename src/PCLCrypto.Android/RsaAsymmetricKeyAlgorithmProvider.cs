@@ -81,12 +81,12 @@ namespace PCLCrypto
             IPrivateKey privateKey;
             IPublicKey publicKey;
 
-            var spec = new RSAPrivateKeySpec(new BigInteger(parameters.Modulus), new BigInteger(parameters.D));
+            var spec = new RSAPrivateKeySpec(new BigInteger(1, parameters.Modulus), new BigInteger(1, parameters.D));
             var factory = KeyFactory.GetInstance("RSA");
             privateKey = factory.GeneratePrivate(spec);
 
             var privateRsaKey = privateKey.JavaCast<IRSAPrivateKey>();
-            var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, new BigInteger(parameters.Exponent));
+            var publicKeySpec = new RSAPublicKeySpec(privateRsaKey.Modulus, new BigInteger(1, parameters.Exponent));
             publicKey = factory.GeneratePublic(publicKeySpec);
 
             return new RsaCryptographicKey(publicKey, privateKey, parameters, this.algorithm);
@@ -98,7 +98,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
-            var spec = new RSAPublicKeySpec(new BigInteger(parameters.Modulus), new BigInteger(parameters.Exponent));
+            var spec = new RSAPublicKeySpec(new BigInteger(1, parameters.Modulus), new BigInteger(1, parameters.Exponent));
             KeyFactory factory = KeyFactory.GetInstance("RSA");
             IPublicKey publicKey = factory.GeneratePublic(spec);
             return new RsaCryptographicKey(publicKey, parameters, this.algorithm);
