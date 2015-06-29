@@ -41,7 +41,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public ICryptographicKey CreateKey(byte[] keyMaterial)
         {
-            return new KeyDerivationCryptographicKey(keyMaterial);
+            return new KeyDerivationCryptographicKey(this.Algorithm, keyMaterial);
         }
     }
 }

@@ -102,10 +102,18 @@ namespace PCLCrypto
             // in RFC2898. When our KeyDerivationParametersFactory class supports
             // more parameter types than just BuildForPbkdf2, we might need to adjust this code
             // to handle each type of parameter.
-            var keyMaterial = ((KeyDerivationCryptographicKey)key).Key;
+            var keyDerivation = (KeyDerivationCryptographicKey)key;
             byte[] salt = parameters.KdfGenericBinary;
-            var deriveBytes = new Platform.Rfc2898DeriveBytes(keyMaterial, salt, parameters.IterationCount);
-            return deriveBytes.GetBytes(desiredKeySize);
+            switch (keyDerivation.Algorithm)
+            {
+                case KeyDerivationAlgorithm.Pbkdf2Sha1:
+                    var deriveBytes = new Platform.Rfc2898DeriveBytes(keyDerivation.Key, salt, parameters.IterationCount);
+                    return deriveBytes.GetBytes(desiredKeySize);
+                default:
+                    // TODO: consider using Platform.PasswordDeriveBytes if it can
+                    // support some more of these algorithms.
+                    throw new NotSupportedException();
+            }
         }
 
         /// <summary>
