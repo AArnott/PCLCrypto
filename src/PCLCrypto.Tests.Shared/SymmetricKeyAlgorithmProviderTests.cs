@@ -74,7 +74,7 @@
             var provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm);
             ICryptographicKey key = provider.CreateSymmetricKey(this.keyMaterial);
             Assert.IsNotNull(key);
-            Assert.Equals(this.keyMaterial.Length * 8, key.KeySize);
+            Assert.AreEqual(this.keyMaterial.Length * 8, key.KeySize);
         }
     }
 }
