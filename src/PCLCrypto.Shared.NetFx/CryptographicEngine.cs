@@ -112,7 +112,7 @@ namespace PCLCrypto
                 default:
                     // TODO: consider using Platform.PasswordDeriveBytes if it can
                     // support some more of these algorithms.
-                    throw new NotSupportedException();
+                    throw new NotSupportedException("Only KeyDerivationAlgorithm.Pbkdf2Sha1 is supported for this platform.");
             }
         }
 
