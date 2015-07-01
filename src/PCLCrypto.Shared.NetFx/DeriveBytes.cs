@@ -27,8 +27,10 @@ namespace PCLCrypto
             Requires.Range(iterations > 0, "iterations");
             Requires.Range(countBytes > 0, "countBytes");
 
-            var keyStrengthening = new Rfc2898DeriveBytes(keyMaterial, salt, iterations);
-            return keyStrengthening.GetBytes(countBytes);
+            using (var keyStrengthening = new Rfc2898DeriveBytes(keyMaterial, salt, iterations))
+            {
+                return keyStrengthening.GetBytes(countBytes);
+            }
         }
 
         /// <inheritdoc/>
@@ -39,8 +41,10 @@ namespace PCLCrypto
             Requires.Range(iterations > 0, "iterations");
             Requires.Range(countBytes > 0, "countBytes");
 
-            var keyStrengthening = new Rfc2898DeriveBytes(keyMaterial, salt, iterations);
-            return keyStrengthening.GetBytes(countBytes);
+            using (var keyStrengthening = new Rfc2898DeriveBytes(keyMaterial, salt, iterations))
+            {
+                return keyStrengthening.GetBytes(countBytes);
+            }
         }
     }
 }
