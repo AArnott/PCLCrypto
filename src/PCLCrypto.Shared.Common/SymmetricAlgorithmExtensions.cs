@@ -225,7 +225,11 @@ namespace PCLCrypto
                 case SymmetricAlgorithmName.Rc4:
                     return "RC4";
                 case SymmetricAlgorithmName.TripleDes:
+#if Android
+                    return "DESede";
+#else
                     return "TRIPLEDES";
+#endif
                 default:
                     throw new ArgumentException();
             }
