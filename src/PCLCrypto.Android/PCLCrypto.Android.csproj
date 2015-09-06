@@ -51,6 +51,9 @@
     <Compile Include="SymmetricKeyAlgorithmProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
     <None Include="packages.config" />
     <None Include="PCLCrypto.Android.ruleset" />
     <None Include="Resources\AboutResources.txt" />

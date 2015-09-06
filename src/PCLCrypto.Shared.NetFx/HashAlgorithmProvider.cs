@@ -88,7 +88,7 @@ namespace PCLCrypto
         }
 
 #if Android
-        
+
         /// <summary>
         /// Creates the hash algorithm.
         /// </summary>

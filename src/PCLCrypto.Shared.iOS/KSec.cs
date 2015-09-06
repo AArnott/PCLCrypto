@@ -115,7 +115,7 @@ namespace PCLCrypto
         /// Gets the kSecAttrAccessible value.
         /// </summary>
         public static NSString AttrAccessible { get; private set; }
-        
+
         /// <summary>
         /// Gets the kSecAttrAccessibleWhenUnlocked value.
         /// </summary>

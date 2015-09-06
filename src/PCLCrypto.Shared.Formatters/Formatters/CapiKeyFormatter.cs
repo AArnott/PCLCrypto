@@ -166,7 +166,7 @@ namespace PCLCrypto.Formatters
 
             var writer = new BinaryWriter(stream);
 
-            int bytelen = parameters.Modulus[0] == 0     // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
+            int bytelen = parameters.Modulus[0] == 0 // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
                 ? parameters.Modulus.Length - 1
                 : parameters.Modulus.Length;
             int bitlen = 8 * bytelen;
@@ -182,7 +182,7 @@ namespace PCLCrypto.Formatters
             // even if in the parameters structure it does not.
             // We cannot use BitConverter.ToInt32 to help us do this because
             // its behavior varies based on the endianness of the platform,
-            // yet RSAParameters is defined to always be Big Endian, and the 
+            // yet RSAParameters is defined to always be Big Endian, and the
             // key blob format is defined to always be Little Endian, so we have to be careful.
             byte[] exponentPadding = new byte[4 - parameters.Exponent.Length];
             WriteReversed(writer, parameters.Exponent);

@@ -34,7 +34,9 @@ namespace PCLCrypto
             this.algorithm = algorithm;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the algorithm supported by this provider.
+        /// </summary>
         public SymmetricAlgorithm Algorithm
         {
             get { return this.algorithm; }
