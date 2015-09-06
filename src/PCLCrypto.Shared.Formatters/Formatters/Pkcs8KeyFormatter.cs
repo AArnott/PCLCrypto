@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#pragma warning disable SA1118 // ParameterMustNotSpanMultipleLines
+
 namespace PCLCrypto.Formatters
 {
     using System;

@@ -47,7 +47,7 @@ namespace PCLCrypto
             get { return this.platform.KdfGenericBinary.ToArray(); }
             set { this.platform.KdfGenericBinary = value.ToBuffer(); }
         }
- 
+
         /// <summary>
         /// Gets the platform parameters.
         /// </summary>

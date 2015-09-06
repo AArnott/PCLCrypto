@@ -39,7 +39,9 @@ namespace PCLCrypto
             this.platform = Platform.SymmetricKeyAlgorithmProvider.OpenAlgorithm(GetAlgorithmName(algorithm));
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the algorithm supported by this provider.
+        /// </summary>
         public SymmetricAlgorithm Algorithm
         {
             get { return this.algorithm; }
