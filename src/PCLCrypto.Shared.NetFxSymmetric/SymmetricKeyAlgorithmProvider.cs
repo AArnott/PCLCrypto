@@ -120,7 +120,7 @@ namespace PCLCrypto
         /// </returns>
         private static Platform.SymmetricAlgorithm GetAlgorithm(SymmetricAlgorithm algorithm)
         {
-#if SILVERLIGHT || __IOS__
+#if SILVERLIGHT
             switch (algorithm)
             {
                 case SymmetricAlgorithm.AesCbcPkcs7:
@@ -129,8 +129,32 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 #else
+#if __IOS__
+            // On iOS we have to create the algorithms explicitly.
+            // I suspect it's because the AOT linker won't include them
+            // if we just use SymmetricAlgorithm.Create.
+            Platform.SymmetricAlgorithm platform;
+            switch (algorithm.GetName())
+            {
+                case SymmetricAlgorithmName.Aes:
+                    platform = new Platform.AesCryptoServiceProvider();
+                    break;
+                case SymmetricAlgorithmName.Des:
+                    platform = new Platform.DESCryptoServiceProvider();
+                    break;
+                case SymmetricAlgorithmName.Rc2:
+                    platform = new Platform.RC2CryptoServiceProvider();
+                    break;
+                case SymmetricAlgorithmName.TripleDes:
+                    platform = new Platform.TripleDESCryptoServiceProvider();
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+#else
             Platform.SymmetricAlgorithm platform = Platform.SymmetricAlgorithm.Create(
                 algorithm.GetName().GetString());
+#endif
             if (platform == null)
             {
                 throw new NotSupportedException();
