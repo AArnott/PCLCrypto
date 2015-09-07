@@ -52,6 +52,12 @@
 #endif
 
         [TestMethod]
+        public void CreateSymmetricKey_TripleDES()
+        {
+            this.CreateSymmetricKeyHelper(SymmetricAlgorithm.TripleDesCbc);
+        }
+
+        [TestMethod]
         public void CreateSymmetricKey_Export()
         {
             var provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
