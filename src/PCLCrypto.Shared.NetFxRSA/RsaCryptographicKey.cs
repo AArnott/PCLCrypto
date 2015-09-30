@@ -90,7 +90,7 @@ namespace PCLCrypto
         {
             using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
             {
-                var formatter = new RSAPKCS1SignatureFormatter(this.Rsa);
+                AsymmetricSignatureFormatter formatter = this.GetSignatureFormatter();
                 formatter.SetHashAlgorithm(hash.ToString());
                 return formatter.CreateSignature(hash.ComputeHash(data));
             }
@@ -101,7 +101,7 @@ namespace PCLCrypto
         {
             using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
             {
-                var deformatter = new RSAPKCS1SignatureDeformatter(this.Rsa);
+                var deformatter = this.GetSignatureDeformatter();
                 deformatter.SetHashAlgorithm(hash.ToString());
                 return deformatter.VerifySignature(hash.ComputeHash(data), signature);
             }
@@ -112,7 +112,7 @@ namespace PCLCrypto
         {
             using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
             {
-                var formatter = new RSAPKCS1SignatureFormatter(this.Rsa);
+                var formatter = this.GetSignatureFormatter();
                 formatter.SetHashAlgorithm(hash.ToString());
                 return formatter.CreateSignature(data);
             }
@@ -125,7 +125,7 @@ namespace PCLCrypto
             {
                 using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
                 {
-                    var deformatter = new RSAPKCS1SignatureDeformatter(this.Rsa);
+                    var deformatter = this.GetSignatureDeformatter();
                     deformatter.SetHashAlgorithm(hash.ToString());
                     return deformatter.VerifySignature(data, signature);
                 }
@@ -139,15 +139,99 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
-            var keyExchange = new RSAOAEPKeyExchangeFormatter(this.Rsa);
+            AsymmetricKeyExchangeFormatter keyExchange;
+            switch (this.Algorithm)
+            {
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                    keyExchange = new RSAOAEPKeyExchangeFormatter(this.Rsa);
+                    break;
+                case AsymmetricAlgorithm.RsaPkcs1:
+                    keyExchange = new RSAPKCS1KeyExchangeFormatter(this.Rsa);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
             return keyExchange.CreateKeyExchange(data);
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            var keyExchange = new RSAOAEPKeyExchangeDeformatter(this.Rsa);
+            AsymmetricKeyExchangeDeformatter keyExchange;
+            switch (this.Algorithm)
+            {
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                    keyExchange = new RSAOAEPKeyExchangeDeformatter(this.Rsa);
+                    break;
+                case AsymmetricAlgorithm.RsaPkcs1:
+                    keyExchange = new RSAPKCS1KeyExchangeDeformatter(this.Rsa);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
             return keyExchange.DecryptKeyExchange(data);
+        }
+
+        /// <summary>
+        /// Gets the signature formatter for the selected algorithm.
+        /// </summary>
+        /// <returns>A signature formatter.</returns>
+        /// <exception cref="NotSupportedException">Thrown if the platform does not support the selected algorithm.</exception>
+        private AsymmetricSignatureFormatter GetSignatureFormatter()
+        {
+            AsymmetricSignatureFormatter formatter;
+            switch (this.Algorithm)
+            {
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                    formatter = new RSAPKCS1SignatureFormatter(this.Rsa);
+                    break;
+                case AsymmetricAlgorithm.RsaSignPssSha1:
+                case AsymmetricAlgorithm.RsaSignPssSha256:
+                case AsymmetricAlgorithm.RsaSignPssSha384:
+                case AsymmetricAlgorithm.RsaSignPssSha512:
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return formatter;
+        }
+
+        /// <summary>
+        /// Gets the signature deformatter for the selected algorithm.
+        /// </summary>
+        /// <returns>A signature deformatter.</returns>
+        /// <exception cref="NotSupportedException">Thrown if the platform does not support the selected algorithm.</exception>
+        private AsymmetricSignatureDeformatter GetSignatureDeformatter()
+        {
+            AsymmetricSignatureDeformatter formatter;
+            switch (this.Algorithm)
+            {
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                    formatter = new RSAPKCS1SignatureDeformatter(this.Rsa);
+                    break;
+                case AsymmetricAlgorithm.RsaSignPssSha1:
+                case AsymmetricAlgorithm.RsaSignPssSha256:
+                case AsymmetricAlgorithm.RsaSignPssSha384:
+                case AsymmetricAlgorithm.RsaSignPssSha512:
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return formatter;
         }
     }
 }
