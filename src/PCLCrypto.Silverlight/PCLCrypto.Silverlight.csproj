@@ -61,7 +61,7 @@
     <Reference Include="System.Windows.Browser" />
     <Reference Include="Validation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Validation.2.0.6.15003\lib\portable-net40+sl50+win+wpa81+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10\Validation.dll</HintPath>
+      <HintPath>..\..\packages\Validation.2.0.6.15003\lib\portable-net40+sl50+win+wpa81+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10\Validation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -75,8 +75,8 @@
     <None Include="PCLCrypto.Silverlight.ruleset" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0-beta009\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
-    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0-beta009\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0-beta009\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0-beta009\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
@@ -91,11 +91,11 @@
   <Import Project="..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFx\PCLCrypto.Shared.NetFx.projitems')" />
   <Import Project="..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems')" />
   <Import Project="..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems')" />
-  <Import Project="..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets" Condition="Exists('..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets'))" />
   </Target>
 </Project>
