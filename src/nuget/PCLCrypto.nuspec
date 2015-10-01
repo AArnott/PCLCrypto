@@ -41,7 +41,7 @@
 		<file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
 		<file target="lib\Xamarin.iOS" src="$OutputPath$PCLCrypto.iOS-Unified\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS-Unified\*.mdb" />
 
-		<file target="src\src" src="..\src\**\*.cs" />
+		<file target="src\src" src="..\**\*.cs" />
 		<file target="src\obj" src="$IntermediatePath$**\*.cs" />
 	</files>
 </package>

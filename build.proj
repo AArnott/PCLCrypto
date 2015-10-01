@@ -3,7 +3,7 @@
 	<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))\EnlistmentInfo.props" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))' != '' " />
 
 	<ItemGroup>
-		<ProjectReference Include="$(ProjectRoot)NuGet\PCLCrypto.proj" />
+		<ProjectReference Include="$(ProjectRoot)src\NuGet\PCLCrypto.proj" />
 		<ProjectReference Include="$(ProjectRoot)src\PCLCrypto.sln" />
 	</ItemGroup>
 
