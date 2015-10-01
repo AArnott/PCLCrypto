@@ -4,8 +4,6 @@
 		<MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
 	</PropertyGroup>
 
-	<Import Project="Tools\Versioning.targets"/>
-
 	<PropertyGroup>
 		<DocumentationFile Condition=" '$(NonShipping)' != 'true' and '$(NoDocumentationFile)' != 'true' ">$(OutputPath)$(AssemblyName).xml</DocumentationFile>
 	  <SignAssembly Condition=" '$(NonShipping)' == 'true' ">false</SignAssembly>
