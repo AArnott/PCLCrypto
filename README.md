@@ -3,7 +3,7 @@ PCLCrypto
 
 PCLCrypto is an [open source library][7] that provides portable class library authors with cryptographic APIs that invoke platform-specific crypto automatically.
 
-[![Join the chat at https://gitter.im/AArnott/PCLCrypto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AArnott/PCLCrypto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build status](https://ci.appveyor.com/api/projects/status/0xtawuc0qg50vf2p/branch/master?svg=true)](https://ci.appveyor.com/project/AArnott/pclcrypto/branch/master) [![Join the chat at https://gitter.im/AArnott/PCLCrypto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AArnott/PCLCrypto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Features
 
