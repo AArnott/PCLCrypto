@@ -261,8 +261,6 @@
             Assert.IsTrue(false, "No supported formats.");
         }
 
-        // This test is known to fail on these platforms.
-#if !(DESKTOP || WINDOWS_PHONE)
         [TestMethod]
         public void KeyPairInterop_iOSGenerated()
         {
@@ -277,7 +275,6 @@
             byte[] plaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, ciphertext);
             Assert.AreEqual(Convert.ToBase64String(data), Convert.ToBase64String(plaintext));
         }
-#endif
 
         [TestMethod]
         public void RSAParametersNotOverlyTrimmed()
