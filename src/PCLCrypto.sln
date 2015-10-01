@@ -393,8 +393,6 @@ Global
 		{90A54774-0083-48B4-B8A1-2FCCC24CBE86}.Release|iPhone.ActiveCfg = Release|Any CPU
 		{90A54774-0083-48B4-B8A1-2FCCC24CBE86}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{90A54774-0083-48B4-B8A1-2FCCC24CBE86}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{90A54774-0083-48B4-B8A1-2FCCC24CBE86}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{90A54774-0083-48B4-B8A1-2FCCC24CBE86}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
 		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Ad-Hoc|Any CPU.ActiveCfg = Release|Any CPU
 		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Ad-Hoc|Any CPU.Build.0 = Release|Any CPU
 		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Ad-Hoc|Any CPU.Deploy.0 = Release|Any CPU
@@ -423,8 +421,6 @@ Global
 		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Release|iPhone.ActiveCfg = Release|Any CPU
 		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{1B396C98-0EB8-461C-8B00-0D52C262F377}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
 		{7C1F893F-C83D-481E-9466-E769C3B45FCE}.Ad-Hoc|Any CPU.ActiveCfg = Release|Any CPU
 		{7C1F893F-C83D-481E-9466-E769C3B45FCE}.Ad-Hoc|Any CPU.Build.0 = Release|Any CPU
 		{7C1F893F-C83D-481E-9466-E769C3B45FCE}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
@@ -517,8 +513,6 @@ Global
 		{150EB22B-DB53-4954-BC06-3996B91BFB7A}.Release|iPhone.ActiveCfg = Release|Any CPU
 		{150EB22B-DB53-4954-BC06-3996B91BFB7A}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{150EB22B-DB53-4954-BC06-3996B91BFB7A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{150EB22B-DB53-4954-BC06-3996B91BFB7A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{150EB22B-DB53-4954-BC06-3996B91BFB7A}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
 		{D50A6EC5-B1F4-4352-BBC5-2A956A55F2AE}.Ad-Hoc|Any CPU.ActiveCfg = Release|Any CPU
 		{D50A6EC5-B1F4-4352-BBC5-2A956A55F2AE}.Ad-Hoc|Any CPU.Build.0 = Release|Any CPU
 		{D50A6EC5-B1F4-4352-BBC5-2A956A55F2AE}.Ad-Hoc|Any CPU.Deploy.0 = Release|Any CPU
