@@ -14,10 +14,6 @@
 		<IntermediatePath>$(BaseIntermediateOutputPath)</IntermediatePath>
 		<OutputPath>$(ProjectRoot)bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
 
-		<!-- Release builds should break when StyleCop warnings exist. -->
-		<StyleCopTreatErrorsAsWarnings Condition=" '$(StyleCopTreatErrorsAsWarnings)' == '' and '$(Configuration)' == 'Release' ">false</StyleCopTreatErrorsAsWarnings>
-		<StyleCopTreatErrorsAsWarnings Condition=" '$(StyleCopTreatErrorsAsWarnings)' == '' ">true</StyleCopTreatErrorsAsWarnings>
-
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 
@@ -37,12 +33,4 @@
 		<Optimize>true</Optimize>
 		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
-
-	<Target Name="ExcludeGeneratedFilesFromStyleCop" BeforeTargets="StyleCop">
-		<ItemGroup>
-			<Compile Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FileName)', '^TemporaryGeneratedFile')) ">
-				<ExcludeFromStyleCop>true</ExcludeFromStyleCop>
-			</Compile>
-		</ItemGroup>
-	</Target>
 </Project>

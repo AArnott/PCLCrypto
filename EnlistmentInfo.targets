@@ -4,7 +4,6 @@
 		<MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
 	</PropertyGroup>
 
-	<Import Project="Tools\StyleCop\StyleCop.targets"/>
 	<Import Project="Tools\Versioning.targets"/>
 
 	<PropertyGroup>
