@@ -10,11 +10,12 @@
 		<RestorePackages>true</RestorePackages>
 
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<BaseIntermediateOutputPath>$(ProjectRoot)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+		<BaseIntermediateOutputPath>$(ProjectRoot)obj\$(Platform)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
 		<IntermediatePath>$(BaseIntermediateOutputPath)</IntermediatePath>
-		<OutputPath>$(ProjectRoot)bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+    <OutputPath>$(ProjectRoot)bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+    <OutputPath Condition=" '$(Platform)' != 'AnyCPU' ">$(ProjectRoot)bin\$(Configuration)\$(Platform)\$(MSBuildProjectName)\</OutputPath>
 
-		<ErrorReport>prompt</ErrorReport>
+    <ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 
 		<SignAssembly>true</SignAssembly>
