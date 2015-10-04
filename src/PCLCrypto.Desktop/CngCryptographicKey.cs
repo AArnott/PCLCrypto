@@ -45,7 +45,19 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            return this.key.Export(CngAsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType));
+            try
+            {
+                return this.key.Export(CngAsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType));
+            }
+            catch (CryptographicException ex)
+            {
+                if (ex.IsNotSupportedException())
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
+            }
         }
 
         /// <inheritdoc />

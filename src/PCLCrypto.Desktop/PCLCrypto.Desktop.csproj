@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CngCryptographicKey.cs" />
+    <Compile Include="CryptographicExceptionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
