@@ -35,5 +35,10 @@ namespace PCLCrypto
         /// Microsoft public key format defined by the legacy Cryptography API (CAPI).
         /// </summary>
         Capi1PublicKey,
+
+        /// <summary>
+        /// A public key BLOB for an elliptic curve cryptography (ECC) key.
+        /// </summary>
+        BCryptEccFullPublicKey,
     }
 }

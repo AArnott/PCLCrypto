@@ -77,6 +77,8 @@ namespace PCLCrypto
             {
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return CngKeyBlobFormat.Pkcs8PrivateBlob;
+                case CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey:
+                    return CngKeyBlobFormat.EccPrivateBlob;
                 default:
                     throw new NotSupportedException();
             }
@@ -93,6 +95,8 @@ namespace PCLCrypto
             {
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
                     return CngKeyBlobFormat.GenericPublicBlob;
+                case CryptographicPublicKeyBlobType.BCryptEccFullPublicKey:
+                    return CngKeyBlobFormat.EccPublicBlob;
                 default:
                     throw new NotSupportedException();
             }
