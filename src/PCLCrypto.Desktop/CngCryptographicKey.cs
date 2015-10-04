@@ -26,14 +26,21 @@ namespace PCLCrypto
         private readonly CngKey key;
 
         /// <summary>
+        /// The ECC Private key blob from which this key was imported, if applicable.
+        /// </summary>
+        private readonly byte[] eccPrivateKeyBlob;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CngCryptographicKey"/> class.
         /// </summary>
         /// <param name="key">The key.</param>
-        internal CngCryptographicKey(CngKey key)
+        /// <param name="eccPrivateKeyBlob">The ECC Private key blob from which this key was imported, if applicable.</param>
+        internal CngCryptographicKey(CngKey key, byte[] eccPrivateKeyBlob)
         {
             Requires.NotNull(key, "key");
 
             this.key = key;
+            this.eccPrivateKeyBlob = eccPrivateKeyBlob.CloneArray();
         }
 
         /// <inheritdoc />
@@ -47,6 +54,15 @@ namespace PCLCrypto
         {
             try
             {
+                if (blobType == CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey && this.eccPrivateKeyBlob != null)
+                {
+                    // Imported keys are always ephemeral and cannot be exported.
+                    // But we can make the API work if we have the private key data.
+                    // Copy the key data before returning it to avoid sharing an array
+                    // with the caller that would allow the caller to change our key data.
+                    return this.eccPrivateKeyBlob.CloneArray();
+                }
+
                 return this.key.Export(CngAsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType));
             }
             catch (CryptographicException ex)

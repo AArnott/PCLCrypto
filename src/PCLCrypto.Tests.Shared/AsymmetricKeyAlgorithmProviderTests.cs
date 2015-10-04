@@ -13,6 +13,15 @@
     [TestClass]
     public class AsymmetricKeyAlgorithmProviderTests
     {
+        /// <summary>
+        /// A dictionary of key algorithms to test with key sizes (in bits).
+        /// </summary>
+        private static readonly IReadOnlyDictionary<AsymmetricAlgorithm, int> KeyAlgorithmsToTest = new Dictionary<AsymmetricAlgorithm, int>
+        {
+            { AsymmetricAlgorithm.RsaOaepSha1, 512 },
+            { AsymmetricAlgorithm.EcdsaP256Sha256, 256 },
+        };
+
         [TestMethod]
         public void OpenAlgorithm_GetAlgorithmName()
         {
@@ -31,12 +40,21 @@
         }
 
         [TestMethod]
-        public void CreateKeyPair()
+        public void CreateKeyPair_RsaOaepSha1()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             var key = rsa.CreateKeyPair(512);
             Assert.IsNotNull(key);
             Assert.AreEqual(512, key.KeySize);
+        }
+
+        [TestMethod]
+        public void CreateKeyPair_EcdsaP256Sha256()
+        {
+            var ecdsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256);
+            var key = ecdsa.CreateKeyPair(256);
+            Assert.IsNotNull(key);
+            Assert.AreEqual(256, key.KeySize);
         }
 
         [TestMethod]
@@ -109,62 +127,80 @@
         [TestMethod]
         public void KeyPairRoundTrip()
         {
-            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            var key = rsa.CreateKeyPair(512);
-
-            int supportedFormats = 0;
-            foreach (CryptographicPrivateKeyBlobType format in Enum.GetValues(typeof(CryptographicPrivateKeyBlobType)))
+            foreach (var algorithm in KeyAlgorithmsToTest)
             {
-                try
+                Debug.WriteLine("** Algorithm: {0} **", algorithm.Key);
+                var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                using (ICryptographicKey key = keyAlgorithm.CreateKeyPair(algorithm.Value))
                 {
-                    byte[] keyBlob = key.Export(format);
-                    var key2 = rsa.ImportKeyPair(keyBlob, format);
-                    byte[] key2Blob = key2.Export(format);
+                    int supportedFormats = 0;
+                    foreach (CryptographicPrivateKeyBlobType format in Enum.GetValues(typeof(CryptographicPrivateKeyBlobType)))
+                    {
+                        try
+                        {
+                            byte[] keyBlob = key.Export(format);
+                            using (var key2 = keyAlgorithm.ImportKeyPair(keyBlob, format))
+                            {
+                                byte[] key2Blob = key2.Export(format);
 
-                    Assert.AreEqual(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
-                    Debug.WriteLine("Format {0} supported.", format);
-                    Debug.WriteLine(Convert.ToBase64String(keyBlob));
-                    supportedFormats++;
-                }
-                catch (NotSupportedException)
-                {
-                    Debug.WriteLine("Format {0} NOT supported.", format);
+                                Assert.AreEqual(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
+                                Debug.WriteLine("Format {0} supported.", format);
+                                Debug.WriteLine(Convert.ToBase64String(keyBlob));
+                                supportedFormats++;
+                            }
+                        }
+                        catch (NotSupportedException)
+                        {
+                            Debug.WriteLine("Format {0} NOT supported.", format);
+                        }
+                    }
+
+                    Assert.IsTrue(supportedFormats > 0, "No supported formats.");
                 }
             }
-
-            Assert.IsTrue(supportedFormats > 0, "No supported formats.");
         }
 
         [TestMethod]
         public void PublicKeyRoundTrip()
         {
-            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            var key = rsa.CreateKeyPair(512);
-
-            int supportedFormats = 0;
-            foreach (CryptographicPublicKeyBlobType format in Enum.GetValues(typeof(CryptographicPublicKeyBlobType)))
+            foreach (var algorithm in KeyAlgorithmsToTest)
             {
-                try
+                Debug.WriteLine("** Algorithm: {0} **", algorithm.Key);
+                var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                var key = keyAlgorithm.CreateKeyPair(algorithm.Value);
+
+                int supportedFormats = 0;
+                foreach (CryptographicPublicKeyBlobType format in Enum.GetValues(typeof(CryptographicPublicKeyBlobType)))
                 {
-                    byte[] keyBlob = key.ExportPublicKey(format);
-                    var key2 = rsa.ImportPublicKey(keyBlob, format);
-                    byte[] key2Blob = key2.ExportPublicKey(format);
+                    try
+                    {
+                        byte[] keyBlob = key.ExportPublicKey(format);
+                        var key2 = keyAlgorithm.ImportPublicKey(keyBlob, format);
+                        byte[] key2Blob = key2.ExportPublicKey(format);
 
-                    CollectionAssertEx.AreEqual(keyBlob, key2Blob);
+                        CollectionAssertEx.AreEqual(keyBlob, key2Blob);
 
-                    WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[0]);
+                        try
+                        {
+                            WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[0]);
+                        }
+                        catch (NotSupportedException)
+                        {
+                            // Some algorithms, such as ECDSA, only support signing/verifying.
+                        }
 
-                    Debug.WriteLine("Format {0} supported.", format);
-                    Debug.WriteLine(Convert.ToBase64String(keyBlob));
-                    supportedFormats++;
+                        Debug.WriteLine("Format {0} supported.", format);
+                        Debug.WriteLine(Convert.ToBase64String(keyBlob));
+                        supportedFormats++;
+                    }
+                    catch (NotSupportedException)
+                    {
+                        Debug.WriteLine("Format {0} NOT supported.", format);
+                    }
                 }
-                catch (NotSupportedException)
-                {
-                    Debug.WriteLine("Format {0} NOT supported.", format);
-                }
+
+                Assert.IsTrue(supportedFormats > 0, "No supported formats.");
             }
-
-            Assert.IsTrue(supportedFormats > 0, "No supported formats.");
         }
 
         [TestMethod]

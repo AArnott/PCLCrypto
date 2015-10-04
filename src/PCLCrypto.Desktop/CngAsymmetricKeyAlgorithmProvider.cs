@@ -44,8 +44,14 @@ namespace PCLCrypto
         {
             Requires.Range(keySize > 0, "keySize");
 
-            var key = CngKey.Create(GetCngAlgorithm(this.algorithm));
-            return new CngCryptographicKey(key);
+            var keyParameters = new CngKeyCreationParameters
+            {
+                ExportPolicy = CngExportPolicies.AllowExport | CngExportPolicies.AllowPlaintextExport,
+                KeyUsage = CngKeyUsages.AllUsages,
+            };
+            string keyName = Guid.NewGuid().ToString();
+            CngKey key = CngKey.Create(GetCngAlgorithm(this.algorithm), keyName, keyParameters);
+            return new CngCryptographicKey(key, null);
         }
 
         /// <inheritdoc/>
@@ -54,7 +60,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var key = CngKey.Import(keyBlob, GetPlatformKeyBlobType(blobType));
-            return new CngCryptographicKey(key);
+            return new CngCryptographicKey(key, blobType == CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey ? keyBlob : null);
         }
 
         /// <inheritdoc/>
@@ -63,7 +69,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var key = CngKey.Import(keyBlob, GetPlatformKeyBlobType(blobType));
-            return new CngCryptographicKey(key);
+            return new CngCryptographicKey(key, null);
         }
 
         /// <summary>

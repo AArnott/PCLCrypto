@@ -47,6 +47,23 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Creates a copy of a byte array.
+        /// </summary>
+        /// <param name="buffer">The array to be copied. May be null.</param>
+        /// <returns>The copy of the array, or null if <paramref name="buffer"/> was null.</returns>
+        internal static byte[] CloneArray(this byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                return null;
+            }
+
+            var result = new byte[buffer.Length];
+            Array.Copy(buffer, result, buffer.Length);
+            return result;
+        }
+
+        /// <summary>
         /// Disposes a value if it is not null.
         /// </summary>
         /// <param name="value">The value to be disposed of.</param>

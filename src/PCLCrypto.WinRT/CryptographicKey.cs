@@ -130,6 +130,10 @@ namespace PCLCrypto
             {
                 throw new NotSupportedException(ex.Message, ex);
             }
+            catch (ArgumentException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
         }
 
         /// <summary>
