@@ -38,6 +38,10 @@
         private readonly ICryptographicKey rsaEncryptingKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
             .OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1)
             .CreateKeyPair(512);
+
+        private readonly ICryptographicKey ecdsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+            .OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256)
+            .CreateKeyPair(256);
 #endif
 
         private readonly ICryptographicKey macKey = WinRTCrypto.MacAlgorithmProvider
@@ -81,6 +85,15 @@
             Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, this.data, signature));
             Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, PclTestUtilities.Tamper(this.data), signature));
             Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.rsaSha1SigningKey, this.data, PclTestUtilities.Tamper(signature)));
+        }
+
+        [TestMethod]
+        public void SignAndVerifySignatureECDsa()
+        {
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.ecdsaSigningKey, this.data);
+            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.ecdsaSigningKey, this.data, signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.ecdsaSigningKey, PclTestUtilities.Tamper(this.data), signature));
+            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.ecdsaSigningKey, this.data, PclTestUtilities.Tamper(signature)));
         }
 
         [TestMethod]

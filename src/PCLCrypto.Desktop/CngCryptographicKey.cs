@@ -93,5 +93,41 @@ namespace PCLCrypto
             this.key.Delete();
             this.key.Dispose();
         }
+
+        /// <inheritdoc />
+        protected internal override byte[] Sign(byte[] data)
+        {
+            using (var cng = new ECDsaCng(this.key))
+            {
+                return cng.SignData(data);
+            }
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] SignHash(byte[] data)
+        {
+            using (var cng = new ECDsaCng(this.key))
+            {
+                return cng.SignHash(data);
+            }
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifySignature(byte[] data, byte[] signature)
+        {
+            using (var cng = new ECDsaCng(this.key))
+            {
+                return cng.VerifyData(data, signature);
+            }
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifyHash(byte[] data, byte[] signature)
+        {
+            using (var cng = new ECDsaCng(this.key))
+            {
+                return cng.VerifyData(data, signature);
+            }
+        }
     }
 }
