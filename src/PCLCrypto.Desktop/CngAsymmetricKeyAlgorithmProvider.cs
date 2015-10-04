@@ -49,7 +49,7 @@ namespace PCLCrypto
                 ExportPolicy = CngExportPolicies.AllowExport | CngExportPolicies.AllowPlaintextExport,
                 KeyUsage = CngKeyUsages.AllUsages,
             };
-            string keyName = Guid.NewGuid().ToString();
+            string keyName = "PclCrypto_" + Guid.NewGuid().ToString();
             CngKey key = CngKey.Create(GetCngAlgorithm(this.algorithm), keyName, keyParameters);
             return new CngCryptographicKey(key, null);
         }
