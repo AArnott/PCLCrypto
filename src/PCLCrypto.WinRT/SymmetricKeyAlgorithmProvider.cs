@@ -59,7 +59,7 @@ namespace PCLCrypto
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
             var key = this.platform.CreateSymmetricKey(keyMaterial.ToBuffer());
-            return new CryptographicKey(key, this);
+            return new CryptographicKey(key, this, canExportPrivateKey: true);
         }
 
         /// <summary>

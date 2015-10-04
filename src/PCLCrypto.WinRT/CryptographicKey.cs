@@ -30,14 +30,25 @@ namespace PCLCrypto
         private readonly SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider;
 
         /// <summary>
+        /// A value indicating whether <see cref="Export(CryptographicPrivateKeyBlobType)"/>
+        /// can be expected to work.
+        /// </summary>
+        private readonly bool canExportPrivateKey;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CryptographicKey" /> class.
         /// </summary>
         /// <param name="key">The WinRT cryptographic key.</param>
-        internal CryptographicKey(Platform.CryptographicKey key)
+        /// <param name="canExportPrivateKey">
+        /// A value indicating whether <see cref="Export(CryptographicPrivateKeyBlobType)"/>
+        /// can be expected to work.
+        /// </param>
+        internal CryptographicKey(Platform.CryptographicKey key, bool canExportPrivateKey)
         {
             Requires.NotNull(key, "key");
 
             this.key = key;
+            this.canExportPrivateKey = canExportPrivateKey;
         }
 
         /// <summary>
@@ -45,11 +56,13 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="key">The WinRT cryptographic key.</param>
         /// <param name="symmetricAlgorithmProvider">The symmetric algorithm of the provider creating this key.</param>
-        internal CryptographicKey(Platform.CryptographicKey key, SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider)
+        /// <param name="canExportPrivateKey">
+        /// A value indicating whether <see cref="Export(CryptographicPrivateKeyBlobType)"/>
+        /// can be expected to work.
+        /// </param>
+        internal CryptographicKey(Platform.CryptographicKey key, SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider, bool canExportPrivateKey)
+            : this(key, canExportPrivateKey)
         {
-            Requires.NotNull(key, "key");
-
-            this.key = key;
             this.symmetricAlgorithmProvider = symmetricAlgorithmProvider;
         }
 
@@ -88,7 +101,21 @@ namespace PCLCrypto
             }
             catch (ArgumentException ex)
             {
-                throw new InvalidOperationException(ex.Message, ex);
+                // ArgumentException can be thrown when we don't have the private key,
+                // or when the key can't be serialized using the requested format.
+                // The first of these deserves an InvalidOperationException while
+                // the second one deserves a NotSupportedException. But we can't clearly
+                // discern each case from the exception. So we use internal state to assist.
+                if (this.canExportPrivateKey)
+                {
+                    // Exporting should work, so it must be an unsupported format.
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+                else
+                {
+                    // We can't have been expected to export regardless of the setting.
+                    throw new InvalidOperationException(ex.Message, ex);
+                }
             }
         }
 

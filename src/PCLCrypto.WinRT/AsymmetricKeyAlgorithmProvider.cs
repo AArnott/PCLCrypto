@@ -51,7 +51,7 @@ namespace PCLCrypto
             Requires.Range(keySize > 0, "keySize");
 
             var key = this.platform.CreateKeyPair((uint)keySize);
-            return new CryptographicKey(key);
+            return new CryptographicKey(key, canExportPrivateKey: true);
         }
 
         /// <inheritdoc/>
@@ -60,7 +60,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var key = this.platform.ImportKeyPair(keyBlob.ToBuffer(), GetPlatformKeyBlobType(blobType));
-            return new CryptographicKey(key);
+            return new CryptographicKey(key, canExportPrivateKey: true);
         }
 
         /// <inheritdoc/>
@@ -69,7 +69,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var key = this.platform.ImportPublicKey(keyBlob.ToBuffer(), GetPlatformKeyBlobType(blobType));
-            return new CryptographicKey(key);
+            return new CryptographicKey(key, canExportPrivateKey: false);
         }
 
         /// <summary>

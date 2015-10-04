@@ -62,7 +62,7 @@ namespace PCLCrypto
         public ICryptographicKey CreateKey(byte[] keyMaterial)
         {
             Requires.NotNull(keyMaterial, "keyMaterial");
-            return new CryptographicKey(this.platform.CreateKey(keyMaterial.ToBuffer()));
+            return new CryptographicKey(this.platform.CreateKey(keyMaterial.ToBuffer()), canExportPrivateKey: true);
         }
 
         /// <summary>
