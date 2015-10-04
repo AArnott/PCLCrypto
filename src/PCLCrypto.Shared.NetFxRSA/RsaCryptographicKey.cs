@@ -85,6 +85,14 @@ namespace PCLCrypto
             return KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.ToPCLParameters(this.key.ExportParameters(false)));
         }
 
+        /// <summary>
+        /// Disposes of managed resources associated with this object.
+        /// </summary>
+        public void Dispose()
+        {
+            this.key.Dispose();
+        }
+
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {

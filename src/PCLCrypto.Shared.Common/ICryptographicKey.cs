@@ -14,7 +14,7 @@ namespace PCLCrypto
     /// <summary>
     /// Represents a symmetric key or an asymmetric key pair.
     /// </summary>
-    public interface ICryptographicKey
+    public interface ICryptographicKey : IDisposable
     {
         /// <summary>
         /// Gets the size, in bits, of the key.

@@ -105,6 +105,15 @@ namespace PCLCrypto
             return KeyFormatter.GetFormatter(blobType).Write(this.parameters, includePrivateKey: false);
         }
 
+        /// <summary>
+        /// Disposes of managed resources associated with this object.
+        /// </summary>
+        public void Dispose()
+        {
+            this.publicKey.Dispose();
+            this.privateKey.Dispose();
+        }
+
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {

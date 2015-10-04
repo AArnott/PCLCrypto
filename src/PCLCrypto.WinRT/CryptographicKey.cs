@@ -104,5 +104,12 @@ namespace PCLCrypto
                 throw new NotSupportedException(ex.Message, ex);
             }
         }
+
+        /// <summary>
+        /// Disposes of managed resources associated with this object.
+        /// </summary>
+        public void Dispose()
+        {
+        }
     }
 }

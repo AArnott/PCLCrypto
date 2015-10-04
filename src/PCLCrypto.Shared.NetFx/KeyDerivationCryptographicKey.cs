@@ -77,5 +77,12 @@ namespace PCLCrypto
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Disposes of managed resources associated with this object.
+        /// </summary>
+        public void Dispose()
+        {
+        }
     }
 }
