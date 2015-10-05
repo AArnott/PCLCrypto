@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AsymmetricKeyAlgorithmProviderTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollectionAssertEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicBufferTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngine.AsymmetricTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngineTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptoStreamTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeriveBytesTests.cs" />
