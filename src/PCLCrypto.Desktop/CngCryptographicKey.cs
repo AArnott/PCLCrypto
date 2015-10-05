@@ -126,7 +126,7 @@ namespace PCLCrypto
         {
             using (var cng = new ECDsaCng(this.key))
             {
-                return cng.VerifyData(data, signature);
+                return cng.VerifyHash(data, signature);
             }
         }
     }
