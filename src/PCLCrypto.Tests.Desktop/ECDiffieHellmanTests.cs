@@ -45,6 +45,18 @@ public class ECDiffieHellmanTests
         Assert.IsTrue(alteredPublicKeyLength < originalPublicKeyLength);
     }
 
+    [TestMethod]
+    public void DeriveKeyMaterial()
+    {
+        var dh1 = NetFxCrypto.ECDiffieHellman.Create();
+        var dh2 = NetFxCrypto.ECDiffieHellman.Create();
+
+        byte[] secret1 = dh1.DeriveKeyMaterial(dh2.PublicKey);
+        byte[] secret2 = dh2.DeriveKeyMaterial(dh1.PublicKey);
+
+        CollectionAssertEx.AreEqual(secret1, secret2);
+    }
+
     /// <summary>
     /// Demonstrates the end-to-end process of ECDSA authentication,
     /// ECDH key exchange, and AES symmetric encryption.
