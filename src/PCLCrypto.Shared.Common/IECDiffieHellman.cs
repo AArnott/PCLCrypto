@@ -16,6 +16,12 @@ namespace PCLCrypto
     public interface IECDiffieHellman : IDisposable
     {
         /// <summary>
+        /// Gets or sets the size, in bits, of the key modulus used by the asymmetric algorithm.
+        /// </summary>
+        /// <value>The size, in bits, of the key modulus used by the asymmetric algorithm.</value>
+        int KeySize { get; set; }
+
+        /// <summary>
         /// Gets the public key to share with the other party in order to establish a shared secret.
         /// </summary>
         IECDiffieHellmanPublicKey PublicKey { get; }

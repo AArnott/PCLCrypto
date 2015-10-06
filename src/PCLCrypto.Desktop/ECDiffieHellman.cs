@@ -33,6 +33,21 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        public int KeySize
+        {
+            get
+            {
+                return this.platformAlgorithm.KeySize;
+            }
+
+            set
+            {
+                this.platformAlgorithm.KeySize = value;
+                this.publicKey = null;
+            }
+        }
+
+        /// <inheritdoc />
         public IECDiffieHellmanPublicKey PublicKey
         {
             get

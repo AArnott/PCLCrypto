@@ -16,6 +16,35 @@ public class ECDiffieHellmanTests
 {
     private static readonly byte[] SecretMessage = new byte[] { 0x1, 0x3, 0x2 };
 
+    [TestMethod]
+    public void ImportExportPublicKey()
+    {
+        var dh = NetFxCrypto.ECDiffieHellman.Create();
+        var publicKeyBytes = dh.PublicKey.ToByteArray();
+        var publicKey2 = NetFxCrypto.ECDiffieHellmanCngPublicKey.FromByteArray(publicKeyBytes);
+        Assert.IsNotNull(publicKey2);
+        var publicKey2Bytes = publicKey2.ToByteArray();
+        CollectionAssertEx.AreEqual(publicKeyBytes, publicKey2Bytes);
+    }
+
+    [TestMethod]
+    public void KeySize()
+    {
+        const int expectedDefaultKeySize = 521;
+        const int alternateLegalKeySize = 384;
+
+        // Verify default key size
+        var dh = NetFxCrypto.ECDiffieHellman.Create();
+        Assert.AreEqual(expectedDefaultKeySize, dh.KeySize);
+        int originalPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
+
+        // Verify effect of changing the key size.
+        dh.KeySize = alternateLegalKeySize;
+        Assert.AreEqual(alternateLegalKeySize, dh.KeySize);
+        int alteredPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
+        Assert.IsTrue(alteredPublicKeyLength < originalPublicKeyLength);
+    }
+
     /// <summary>
     /// Demonstrates the end-to-end process of ECDSA authentication,
     /// ECDH key exchange, and AES symmetric encryption.
