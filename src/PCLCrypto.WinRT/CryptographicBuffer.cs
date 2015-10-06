@@ -92,7 +92,7 @@ namespace PCLCrypto
             }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.Message, "value", ex);
+                throw new ArgumentException(ex.Message, nameof(value), ex);
             }
         }
 
