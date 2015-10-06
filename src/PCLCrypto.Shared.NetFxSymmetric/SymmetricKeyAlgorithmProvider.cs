@@ -68,7 +68,7 @@ namespace PCLCrypto
 #if SILVERLIGHT
                 throw new ArgumentException(ex.Message, ex);
 #else
-                throw new ArgumentException(ex.Message, "keyMaterial", ex);
+                throw new ArgumentException(ex.Message, nameof(keyMaterial), ex);
 #endif
             }
 

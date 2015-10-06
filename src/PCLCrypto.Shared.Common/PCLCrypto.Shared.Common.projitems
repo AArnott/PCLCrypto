@@ -23,6 +23,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)ICryptographicKey.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICryptoTransform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDeriveBytes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IECDiffieHellman.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IECDiffieHellmanCngPublicKeyFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IECDiffieHellmanFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IECDiffieHellmanPublicKey.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IHashAlgorithmProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IHashAlgorithmProviderFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IKeyDerivationAlgorithmProvider.cs" />

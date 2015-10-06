@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
+    <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="KeyDerivationAlgorithmProvider.cs" />
