@@ -59,5 +59,39 @@ namespace PCLCrypto
 #endif
             }
         }
+
+        /// <summary>
+        /// Gets the factory for <see cref="IECDiffieHellman"/> instances.
+        /// </summary>
+        public static IECDiffieHellmanFactory ECDiffieHellman
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#elif DESKTOP
+                return new ECDiffieHellmanFactory();
+#else
+                throw new NotSupportedException();
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets the factory for <see cref="IECDiffieHellmanPublicKey"/> instances.
+        /// </summary>
+        public static IECDiffieHellmanCngPublicKeyFactory ECDiffieHellmanCngPublicKey
+        {
+            get
+            {
+#if PCL
+                throw new NotImplementedException("Not implemented in reference assembly.");
+#elif DESKTOP
+                return new ECDiffieHellmanCngPublicKeyFactory();
+#else
+                throw new NotSupportedException();
+#endif
+            }
+        }
     }
 }

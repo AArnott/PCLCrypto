@@ -46,6 +46,10 @@
     <Compile Include="CngAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CngCryptographicKey.cs" />
     <Compile Include="CryptographicExceptionExtensions.cs" />
+    <Compile Include="ECDiffieHellman.cs" />
+    <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
+    <Compile Include="ECDiffieHellmanFactory.cs" />
+    <Compile Include="ECDiffieHellmanPublicKey.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
