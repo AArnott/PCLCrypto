@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,9 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using Nerdbank;
 using PCLCrypto;
 using PCLCrypto.Tests;
+using PCLTesting;
 
 [TestClass]
 public class ECDiffieHellmanTests
@@ -172,3 +176,5 @@ public class ECDiffieHellmanTests
         }
     }
 }
+
+#endif

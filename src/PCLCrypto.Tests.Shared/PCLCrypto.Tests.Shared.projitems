@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngineTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptoStreamTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeriveBytesTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ECDiffieHellmanTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HashAlgorithmProviderTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithmProviderTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacAlgorithmProviderTests.cs" />

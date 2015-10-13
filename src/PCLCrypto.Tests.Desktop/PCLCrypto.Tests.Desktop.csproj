@@ -51,8 +51,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
     </Reference>
-    <Reference Include="Nerdbank.FullDuplexStream, Version=0.1.0.0, Culture=neutral, PublicKeyToken=cac503e1823ce71c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Nerdbank.FullDuplexStream.0.1.24-beta\lib\dotnet\Nerdbank.FullDuplexStream.dll</HintPath>
+    <Reference Include="Nerdbank.FullDuplexStream, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cac503e1823ce71c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Nerdbank.FullDuplexStream.1.0.1\lib\dotnet\Nerdbank.FullDuplexStream.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PCLCommandBase, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -114,7 +114,6 @@
   <ItemGroup>
     <Compile Include="AsnTests.cs" />
     <Compile Include="DesktopCryptoStreamTests.cs" />
-    <Compile Include="ECDiffieHellmanTests.cs" />
     <Compile Include="Pkcs1KeyFormatterTests.cs" />
     <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
   </ItemGroup>
