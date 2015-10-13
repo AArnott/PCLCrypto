@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nerdbank;
 using PCLCrypto;
 using PCLCrypto.Tests;
 
@@ -70,23 +70,16 @@ public class ECDiffieHellmanTests
         string pipeName = Guid.NewGuid().ToString();
         var ecdsaAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256);
 
+        var streams = FullDuplexStream.CreateStreams();
+
         using (var bob = ecdsaAlgorithm.CreateKeyPair(256))
         using (var alice = ecdsaAlgorithm.CreateKeyPair(256))
-        using (var aliceStream = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, System.IO.Pipes.PipeOptions.Asynchronous))
-        using (var bobStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous))
         {
-            Task connectionTask = Task.Factory.FromAsync(
-                (cb, state) => aliceStream.BeginWaitForConnection(cb, state),
-                ar => aliceStream.EndWaitForConnection(ar),
-                null);
-            bobStream.Connect();
-            await connectionTask;
-
             var bobPublic = ecdsaAlgorithm.ImportPublicKey(bob.ExportPublicKey(publicBlobType), publicBlobType);
             var alicePublic = ecdsaAlgorithm.ImportPublicKey(alice.ExportPublicKey(publicBlobType), publicBlobType);
 
-            Task aliceRole = this.PlayAliceRoleAsync(alice, bobPublic, aliceStream, cancellationToken);
-            Task bobRole = this.PlayBobRoleAsync(bob, alicePublic, bobStream, cancellationToken);
+            Task aliceRole = this.PlayAliceRoleAsync(alice, bobPublic, streams.Item1, cancellationToken);
+            Task bobRole = this.PlayBobRoleAsync(bob, alicePublic, streams.Item2, cancellationToken);
             await Task.WhenAll(aliceRole, bobRole);
         }
     }
