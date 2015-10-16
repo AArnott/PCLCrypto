@@ -1,0 +1,11 @@
+﻿{
+  "dependencies": {
+    "Nerdbank.GitVersioning": "1.1.47-rc-g58708fcf8c",
+    "StyleCop.Analyzers": "1.0.0-beta009",
+    "Validation": "2.2.8"
+  },
+  "frameworks": {
+    "Silverlight,Version=v5.0": { }
+  },
+  "supports": { }
+}
