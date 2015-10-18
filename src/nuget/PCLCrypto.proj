@@ -53,7 +53,7 @@
 			Version="%(NuGetSpecifications.Version)"
 			OutputPackageDirectory="%(NuGetSpecifications.OutputPackageDirectory)"
 			Symbols="%(NuGetSpecifications.Symbols)"
-			ToolPath="$(ProjectRoot)src\packages\NuGet.CommandLine.2.8.3\tools\"
+			ToolPath="$(ProjectRoot)packages\NuGet.CommandLine.2.8.3\tools\"
 			/>
 
     <Message Importance="high" Text="$(MSBuildProjectName) -> %(NuGetSpecifications.OutputPackageDirectory)%(NuGetSpecifications.FileName).%(NuGetSpecifications.Version).nupkg" />
