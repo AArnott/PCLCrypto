@@ -38,7 +38,7 @@
             Assert.IsTrue(BitConverter.ToInt32(buffer1, 0) != BitConverter.ToInt32(buffer2, 0));
         }
 
-#if !WinRT && !PCL
+#if !WinRT && !PCL && !WINDOWS_UWP
         [TestMethod]
         public void DesktopBaseClass()
         {
