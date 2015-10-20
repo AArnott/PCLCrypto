@@ -1,6 +1,12 @@
 ﻿{
   "dependencies": {
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+    "Nerdbank.FullDuplexStream": "1.0.1",
+    "Nerdbank.GitVersioning": "1.1.47-rc-g58708fcf8c",
+    "PCLCommandBase": "0.2.2",
+    "PCLTesting": "0.2.2",
+    "Validation": "2.2.8",
+    "Xamarin.Forms": "1.1.0.6201",
     "xunit": "2.1.0",
     "xunit.runner.visualstudio": "2.1.0"
   },
