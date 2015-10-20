@@ -8,5 +8,8 @@
   "frameworks": {
     ".NETFramework,Version=v4.0,Profile=Client": { }
   },
+  "runtimes": {
+    "win-anycpu": {}
+  },
   "supports": { }
 }
