@@ -73,11 +73,11 @@
   <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems')" />
   <Import Project="..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems')" />
   <Import Project="..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems')" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.1.1.47-rc-g58708fcf8c\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets'))" />
   </Target>
 </Project>
