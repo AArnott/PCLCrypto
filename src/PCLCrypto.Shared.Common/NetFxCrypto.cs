@@ -69,7 +69,7 @@ namespace PCLCrypto
             {
 #if PCL
                 throw new NotImplementedException("Not implemented in reference assembly.");
-#elif DESKTOP
+#elif DESKTOP || WinRT
                 return new ECDiffieHellmanFactory();
 #else
                 throw new NotSupportedException();

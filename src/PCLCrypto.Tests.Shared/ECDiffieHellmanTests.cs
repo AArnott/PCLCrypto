@@ -1,4 +1,4 @@
-﻿#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
+﻿#if !(SILVERLIGHT && !WINDOWS_PHONE) && !WINDOWS_UWP // Silverlight 5 doesn't include asymmetric crypto
 
 using System;
 using System.Collections.Generic;
