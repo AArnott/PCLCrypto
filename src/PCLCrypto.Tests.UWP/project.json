@@ -6,9 +6,7 @@
     "PCLCommandBase": "0.2.2",
     "PCLTesting": "0.2.2",
     "Validation": "2.2.8",
-    "Xamarin.Forms": "1.1.0.6201",
-    "xunit": "2.1.0",
-    "xunit.runner.visualstudio": "2.1.0"
+    "Xamarin.Forms": "1.1.0.6201"
   },
   "frameworks": {
     "uap10.0": {}
