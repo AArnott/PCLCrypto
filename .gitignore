@@ -16,6 +16,7 @@ UpgradeLog*.htm
 .vs/
 
 # Build results
+BundleArtifacts/
 [Dd]ebug/
 [Rr]elease/
 x64/
