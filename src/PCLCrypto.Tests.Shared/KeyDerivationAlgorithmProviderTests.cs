@@ -15,7 +15,8 @@
         private readonly byte[] originalKey = new byte[] { 0x1, 0x2, 0x3, 0x5 };
         private readonly byte[] salt = new byte[8];
         private readonly int iterations = 100;
-        private readonly Dictionary<KeyDerivationAlgorithm, string> stretchedKeyBase64 = new Dictionary<KeyDerivationAlgorithm, string> {
+        private readonly Dictionary<KeyDerivationAlgorithm, string> stretchedKeyBase64 = new Dictionary<KeyDerivationAlgorithm, string>
+        {
             { KeyDerivationAlgorithm.Pbkdf2Sha1, "3HWzwI225INl7y6+G9Jv7Af8UGE=" },
             { KeyDerivationAlgorithm.Pbkdf2Sha256, "t420R6yC8H2CDK/0sSGmwKHLooM=" },
         };
