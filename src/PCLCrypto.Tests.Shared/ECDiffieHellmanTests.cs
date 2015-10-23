@@ -1,4 +1,4 @@
-﻿#if !(SILVERLIGHT && !WINDOWS_PHONE) && !WINDOWS_UWP // Silverlight 5 doesn't include asymmetric crypto
+﻿#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
 
 using System;
 using System.Collections.Generic;
@@ -23,12 +23,14 @@ public class ECDiffieHellmanTests
     [TestMethod]
     public void ImportExportPublicKey()
     {
-        var dh = NetFxCrypto.ECDiffieHellman.Create();
-        var publicKeyBytes = dh.PublicKey.ToByteArray();
-        var publicKey2 = NetFxCrypto.ECDiffieHellmanCngPublicKey.FromByteArray(publicKeyBytes);
-        Assert.IsNotNull(publicKey2);
-        var publicKey2Bytes = publicKey2.ToByteArray();
-        CollectionAssertEx.AreEqual(publicKeyBytes, publicKey2Bytes);
+        using (var dh = NetFxCrypto.ECDiffieHellman.Create())
+        {
+            var publicKeyBytes = dh.PublicKey.ToByteArray();
+            var publicKey2 = NetFxCrypto.ECDiffieHellmanCngPublicKey.FromByteArray(publicKeyBytes);
+            Assert.IsNotNull(publicKey2);
+            var publicKey2Bytes = publicKey2.ToByteArray();
+            CollectionAssertEx.AreEqual(publicKeyBytes, publicKey2Bytes);
+        }
     }
 
     [TestMethod]
@@ -38,15 +40,17 @@ public class ECDiffieHellmanTests
         const int alternateLegalKeySize = 384;
 
         // Verify default key size
-        var dh = NetFxCrypto.ECDiffieHellman.Create();
-        Assert.AreEqual(expectedDefaultKeySize, dh.KeySize);
-        int originalPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
+        using (var dh = NetFxCrypto.ECDiffieHellman.Create())
+        {
+            Assert.AreEqual(expectedDefaultKeySize, dh.KeySize);
+            int originalPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
 
-        // Verify effect of changing the key size.
-        dh.KeySize = alternateLegalKeySize;
-        Assert.AreEqual(alternateLegalKeySize, dh.KeySize);
-        int alteredPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
-        Assert.IsTrue(alteredPublicKeyLength < originalPublicKeyLength);
+            // Verify effect of changing the key size.
+            dh.KeySize = alternateLegalKeySize;
+            Assert.AreEqual(alternateLegalKeySize, dh.KeySize);
+            int alteredPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
+            Assert.IsTrue(alteredPublicKeyLength < originalPublicKeyLength);
+        }
     }
 
     [TestMethod]
