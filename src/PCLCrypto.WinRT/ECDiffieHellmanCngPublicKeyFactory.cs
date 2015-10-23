@@ -1,0 +1,50 @@
+﻿//-----------------------------------------------------------------------
+// <copyright file="ECDiffieHellmanCngPublicKeyFactory.cs" company="Andrew Arnott">
+//     Copyright (c) Andrew Arnott. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace PCLCrypto
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using System.Threading.Tasks;
+    using PInvoke;
+    using static PInvoke.BCrypt;
+
+    internal class ECDiffieHellmanCngPublicKeyFactory : IECDiffieHellmanCngPublicKeyFactory
+    {
+        public IECDiffieHellmanPublicKey FromByteArray(byte[] publicKey)
+        {
+            SafeAlgorithmHandle algorithm;
+            var keyBlob = new EccKeyBlob(publicKey);
+            switch (keyBlob.Magic)
+            {
+                case EccKeyBlobMagicNumbers.BCRYPT_ECDH_PUBLIC_P256_MAGIC:
+                    algorithm = ECDiffieHellmanFactory.BCryptOpenAlgorithmProvider(256);
+                    break;
+                case EccKeyBlobMagicNumbers.BCRYPT_ECDH_PUBLIC_P384_MAGIC:
+                    algorithm = ECDiffieHellmanFactory.BCryptOpenAlgorithmProvider(384);
+                    break;
+                case EccKeyBlobMagicNumbers.BCRYPT_ECDH_PUBLIC_P521_MAGIC:
+                    algorithm = ECDiffieHellmanFactory.BCryptOpenAlgorithmProvider(521);
+                    break;
+                default:
+                    throw new ArgumentException("Unexpected type of key blob.");
+            }
+
+            SafeKeyHandle keyHandle;
+            keyHandle = BCryptImportKeyPair(
+                algorithm,
+                AsymmetricKeyBlobTypes.EccPublic,
+                publicKey,
+                BCryptImportKeyPairFlags.None);
+            algorithm.Dispose();
+
+            return new ECDiffieHellmanPublicKey(keyHandle);
+        }
+    }
+}

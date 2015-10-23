@@ -89,8 +89,6 @@ namespace PCLCrypto
                     return Platform.CryptographicPublicKeyBlobType.BCryptPublicKey;
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     return Platform.CryptographicPublicKeyBlobType.Capi1PublicKey;
-                case CryptographicPublicKeyBlobType.BCryptEccFullPublicKey:
-                    return (Platform.CryptographicPublicKeyBlobType)4; // BCryptEccFullPublicKey
                 default:
                     throw new NotSupportedException();
             }
@@ -113,8 +111,6 @@ namespace PCLCrypto
                     return Platform.CryptographicPrivateKeyBlobType.BCryptPrivateKey;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return Platform.CryptographicPrivateKeyBlobType.Capi1PrivateKey;
-                case CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey:
-                    return (Platform.CryptographicPrivateKeyBlobType)4; // Platform.CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey
                 default:
                     throw new NotSupportedException();
             }

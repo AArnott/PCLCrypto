@@ -30,6 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>PCLCrypto.WinRT.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,6 +39,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>PCLCrypto.WinRT.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
@@ -46,7 +48,10 @@
   <ItemGroup>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
+    <Compile Include="ECDiffieHellman.cs" />
+    <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />
+    <Compile Include="ECDiffieHellmanPublicKey.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="KeyDerivationAlgorithmProvider.cs" />

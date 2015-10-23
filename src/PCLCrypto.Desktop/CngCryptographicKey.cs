@@ -54,7 +54,7 @@ namespace PCLCrypto
         {
             try
             {
-                if (blobType == CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey && this.eccPrivateKeyBlob != null)
+                if (blobType == CryptographicPrivateKeyBlobType.BCryptPrivateKey && this.eccPrivateKeyBlob != null)
                 {
                     // Imported keys are always ephemeral and cannot be exported.
                     // But we can make the API work if we have the private key data.

@@ -21,6 +21,7 @@
     <UnitTestPlatformVersion Condition="'$(UnitTestPlatformVersion)' == ''">14.0</UnitTestPlatformVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <NonShipping>true</NonShipping>
+    <CopyNuGetImplementations>true</CopyNuGetImplementations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;WinRT</DefineConstants>
