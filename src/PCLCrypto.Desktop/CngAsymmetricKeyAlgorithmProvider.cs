@@ -60,7 +60,7 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var key = CngKey.Import(keyBlob, GetPlatformKeyBlobType(blobType));
-            return new CngCryptographicKey(key, blobType == CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey ? keyBlob : null);
+            return new CngCryptographicKey(key, blobType == CryptographicPrivateKeyBlobType.BCryptPrivateKey ? keyBlob : null);
         }
 
         /// <inheritdoc/>
@@ -83,8 +83,8 @@ namespace PCLCrypto
             {
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return CngKeyBlobFormat.Pkcs8PrivateBlob;
-                case CryptographicPrivateKeyBlobType.BCryptEccFullPrivateKey:
-                    return CngKeyBlobFormat.EccPrivateBlob;
+                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
+                    return CngKeyBlobFormat.GenericPrivateBlob;
                 default:
                     throw new NotSupportedException();
             }
@@ -99,10 +99,8 @@ namespace PCLCrypto
         {
             switch (blobType)
             {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                case CryptographicPublicKeyBlobType.BCryptPublicKey:
                     return CngKeyBlobFormat.GenericPublicBlob;
-                case CryptographicPublicKeyBlobType.BCryptEccFullPublicKey:
-                    return CngKeyBlobFormat.EccPublicBlob;
                 default:
                     throw new NotSupportedException();
             }

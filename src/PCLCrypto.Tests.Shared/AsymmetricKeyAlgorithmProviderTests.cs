@@ -190,7 +190,7 @@
                         }
 
                         Debug.WriteLine("Format {0} supported.", format);
-                        Debug.WriteLine(Convert.ToBase64String(keyBlob));
+                        Debug.WriteLine("    " + Convert.ToBase64String(keyBlob));
                         supportedFormats++;
                     }
                     catch (NotSupportedException)
@@ -206,15 +206,15 @@
         [TestMethod]
         public void KeyPairInterop()
         {
-            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             int supportedFormats = 0;
             foreach (var formatAndBlob in Helper.PrivateKeyFormatsAndBlobs)
             {
                 try
                 {
-                    var key = rsa.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key);
-                    string exported = Convert.ToBase64String(key.Export(formatAndBlob.Key));
-                    if (formatAndBlob.Key == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == formatAndBlob.Value.Length - 20)
+                    var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
+                    var key = algorithm.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
+                    string exported = Convert.ToBase64String(key.Export(formatAndBlob.Key.Item2));
+                    if (formatAndBlob.Key.Item2 == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == formatAndBlob.Value.Length - 20)
                     {
                         // I'm not sure what the last 20 bytes are (perhaps the optional attributes)
                         // But Windows platforms produces them and Android doesn't seem to.
@@ -243,14 +243,14 @@
         [TestMethod]
         public void PublicKeyInterop()
         {
-            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             int supportedFormats = 0;
             foreach (var formatAndBlob in Helper.PublicKeyFormatsAndBlobs)
             {
+                var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
                 try
                 {
-                    var key = rsa.ImportPublicKey(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key);
-                    string exported = Convert.ToBase64String(key.ExportPublicKey(formatAndBlob.Key));
+                    var key = algorithm.ImportPublicKey(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
+                    string exported = Convert.ToBase64String(key.ExportPublicKey(formatAndBlob.Key.Item2));
                     Assert.AreEqual(formatAndBlob.Value, exported);
                     supportedFormats++;
                     Debug.WriteLine("Key format {0} supported.", formatAndBlob.Key);
@@ -267,15 +267,15 @@
         [TestMethod]
         public void EncryptionInterop()
         {
-            var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             byte[] data = new byte[] { 1, 2, 3 };
             byte[] cipherText = Convert.FromBase64String("EvnsqTK9tDemRIceCap4Yc5znXeb+nyBPsFRf6oT+OPqQ958RH7NXE3xLKsVJhOLJ4iJ2NM+AlrKRltIK8cTmw==");
             foreach (var formatAndBlob in Helper.PrivateKeyFormatsAndBlobs)
             {
+                var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
                 ICryptographicKey key;
                 try
                 {
-                    key = rsa.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key);
+                    key = algorithm.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
                 }
                 catch (NotSupportedException)
                 {
@@ -343,23 +343,24 @@
             /// <summary>
             /// All the available private key blob types and a single sample key (RsaOaepSha1) serialized into each format.
             /// </summary>
-            internal static readonly Dictionary<CryptographicPrivateKeyBlobType, string> PrivateKeyFormatsAndBlobs = new Dictionary<CryptographicPrivateKeyBlobType, string>
+            internal static readonly Dictionary<Tuple<AsymmetricAlgorithm, CryptographicPrivateKeyBlobType>, string> PrivateKeyFormatsAndBlobs = new Dictionary<Tuple<AsymmetricAlgorithm, CryptographicPrivateKeyBlobType>, string>
             {
-                { CryptographicPrivateKeyBlobType.BCryptPrivateKey, "UlNBMgACAAADAAAAQAAAACAAAAAgAAAAAQAB94rt9gMQH/izb02sdFQFJOFGf+J9mLETVOwlzj7WgPkvuSr5l5m91XLTjoxg5P6BZk8TicedMcR1cm3EZeQbk/n5fJGZGJ1n2b5qHjA6ybTwowbvAiii+iDO2pr/yqFL/YJvynOsnsxj5S69p6TGJev+fzzEn2ZoQjGk7y6JSdk=" },
-                { CryptographicPrivateKeyBlobType.Capi1PrivateKey, "BwIAAACkAABSU0EyAAIAAAEAAQCTG+RlxG1ydcQxnceJE09mgf7kYIyO03LVvZmX+Sq5L/mA1j7OJexUE7GYfeJ/RuEkBVR0rE1vs/gfEAP27Yr3S6HK/5raziD6oigC7waj8LTJOjAear7ZZ50YmZF8+fnZSYku76QxQmhmn8Q8f/7rJcakp70u5WPMnqxzym+C/XH4w8fVeWrH86kHPX/xCtVcj17ivLaIYxATl1lscp7YmSF20HSQyDDJSJjVQMhvoQlF21N//14q09xLaRzYxUD6p5DHUXoJaLb7p39VwHGO6BGhi5I+THOr/v85oCvvwEHvw64F2h3dN53P1uNcW8JnmPsooQQR6wvVBc6re20ZzNlpf96Gue4vx3N+TpYYytz32XtLRAqQ5OA9lgnzTA0=" },
-                { CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey, "MIIBOwIBAAJBAPeK7fYDEB/4s29NrHRUBSThRn/ifZixE1TsJc4+1oD5L7kq+ZeZvdVy046MYOT+gWZPE4nHnTHEdXJtxGXkG5MCAwEAAQJADUzzCZY94OSQCkRLe9n33MoYlk5+c8cv7rmG3n9p2cwZbXurzgXVC+sRBKEo+5hnwltc49bPnTfdHdoFrsPvQQIhAPn5fJGZGJ1n2b5qHjA6ybTwowbvAiii+iDO2pr/yqFLAiEA/YJvynOsnsxj5S69p6TGJev+fzzEn2ZoQjGk7y6JSdkCIQDYnnJsWZcTEGOItrziXo9c1Qrxfz0HqfPHannVx8P4cQIgQMXYHGlL3NMqXv9/U9tFCaFvyEDVmEjJMMiQdNB2IZkCIQDA7yugOf/+q3NMPpKLoRHojnHAVX+n+7ZoCXpRx5Cn+g==" },
-                { CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo, "MIIBZAIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEA94rt9gMQH/izb02sdFQFJOFGf+J9mLETVOwlzj7WgPkvuSr5l5m91XLTjoxg5P6BZk8TicedMcR1cm3EZeQbkwIDAQABAkANTPMJlj3g5JAKREt72ffcyhiWTn5zxy/uuYbef2nZzBlte6vOBdUL6xEEoSj7mGfCW1zj1s+dN90d2gWuw+9BAiEA+fl8kZkYnWfZvmoeMDrJtPCjBu8CKKL6IM7amv/KoUsCIQD9gm/Kc6yezGPlLr2npMYl6/5/PMSfZmhCMaTvLolJ2QIhANiecmxZlxMQY4i2vOJej1zVCvF/PQep88dqedXHw/hxAiBAxdgcaUvc0ype/39T20UJoW/IQNWYSMkwyJB00HYhmQIhAMDvK6A5//6rc0w+kouhEeiOccBVf6f7tmgJelHHkKf6oA0wCwYDVR0PMQQDAgAQ" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPrivateKeyBlobType.BCryptPrivateKey), "UlNBMgACAAADAAAAQAAAACAAAAAgAAAAAQAB94rt9gMQH/izb02sdFQFJOFGf+J9mLETVOwlzj7WgPkvuSr5l5m91XLTjoxg5P6BZk8TicedMcR1cm3EZeQbk/n5fJGZGJ1n2b5qHjA6ybTwowbvAiii+iDO2pr/yqFL/YJvynOsnsxj5S69p6TGJev+fzzEn2ZoQjGk7y6JSdk=" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPrivateKeyBlobType.Capi1PrivateKey), "BwIAAACkAABSU0EyAAIAAAEAAQCTG+RlxG1ydcQxnceJE09mgf7kYIyO03LVvZmX+Sq5L/mA1j7OJexUE7GYfeJ/RuEkBVR0rE1vs/gfEAP27Yr3S6HK/5raziD6oigC7waj8LTJOjAear7ZZ50YmZF8+fnZSYku76QxQmhmn8Q8f/7rJcakp70u5WPMnqxzym+C/XH4w8fVeWrH86kHPX/xCtVcj17ivLaIYxATl1lscp7YmSF20HSQyDDJSJjVQMhvoQlF21N//14q09xLaRzYxUD6p5DHUXoJaLb7p39VwHGO6BGhi5I+THOr/v85oCvvwEHvw64F2h3dN53P1uNcW8JnmPsooQQR6wvVBc6re20ZzNlpf96Gue4vx3N+TpYYytz32XtLRAqQ5OA9lgnzTA0=" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey), "MIIBOwIBAAJBAPeK7fYDEB/4s29NrHRUBSThRn/ifZixE1TsJc4+1oD5L7kq+ZeZvdVy046MYOT+gWZPE4nHnTHEdXJtxGXkG5MCAwEAAQJADUzzCZY94OSQCkRLe9n33MoYlk5+c8cv7rmG3n9p2cwZbXurzgXVC+sRBKEo+5hnwltc49bPnTfdHdoFrsPvQQIhAPn5fJGZGJ1n2b5qHjA6ybTwowbvAiii+iDO2pr/yqFLAiEA/YJvynOsnsxj5S69p6TGJev+fzzEn2ZoQjGk7y6JSdkCIQDYnnJsWZcTEGOItrziXo9c1Qrxfz0HqfPHannVx8P4cQIgQMXYHGlL3NMqXv9/U9tFCaFvyEDVmEjJMMiQdNB2IZkCIQDA7yugOf/+q3NMPpKLoRHojnHAVX+n+7ZoCXpRx5Cn+g==" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo), "MIIBZAIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEA94rt9gMQH/izb02sdFQFJOFGf+J9mLETVOwlzj7WgPkvuSr5l5m91XLTjoxg5P6BZk8TicedMcR1cm3EZeQbkwIDAQABAkANTPMJlj3g5JAKREt72ffcyhiWTn5zxy/uuYbef2nZzBlte6vOBdUL6xEEoSj7mGfCW1zj1s+dN90d2gWuw+9BAiEA+fl8kZkYnWfZvmoeMDrJtPCjBu8CKKL6IM7amv/KoUsCIQD9gm/Kc6yezGPlLr2npMYl6/5/PMSfZmhCMaTvLolJ2QIhANiecmxZlxMQY4i2vOJej1zVCvF/PQep88dqedXHw/hxAiBAxdgcaUvc0ype/39T20UJoW/IQNWYSMkwyJB00HYhmQIhAMDvK6A5//6rc0w+kouhEeiOccBVf6f7tmgJelHHkKf6oA0wCwYDVR0PMQQDAgAQ" },
             };
 
             /// <summary>
             /// All the available public key blob types and a single sample key (RsaOaepSha1) serialized into each format.
             /// </summary>
-            internal static readonly Dictionary<CryptographicPublicKeyBlobType, string> PublicKeyFormatsAndBlobs = new Dictionary<CryptographicPublicKeyBlobType, string>
+            internal static readonly Dictionary<Tuple<AsymmetricAlgorithm, CryptographicPublicKeyBlobType>, string> PublicKeyFormatsAndBlobs = new Dictionary<Tuple<AsymmetricAlgorithm, CryptographicPublicKeyBlobType>, string>
             {
-                { CryptographicPublicKeyBlobType.BCryptPublicKey, "UlNBMQACAAADAAAAQAAAAAAAAAAAAAAAAQABoetbetfLDOWmobkoUTBXEM9ImOqIV18ikFiJddccSqTAB28MdbKBVwv40Y40aJb3MO+mv5rlN0QO1iWfFGD/pw==" },
-                { CryptographicPublicKeyBlobType.Capi1PublicKey, "BgIAAACkAABSU0ExAAIAAAEAAQCn/2AUnyXWDkQ35Zq/pu8w95ZoNI7R+AtXgbJ1DG8HwKRKHNd1iViQIl9XiOqYSM8QVzBRKLmhpuUMy9d6W+uh" },
-                { CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey, "MEgCQQCh61t618sM5aahuShRMFcQz0iY6ohXXyKQWIl11xxKpMAHbwx1soFXC/jRjjRolvcw76a/muU3RA7WJZ8UYP+nAgMBAAE=" },
-                { CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo, "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHrW3rXywzlpqG5KFEwVxDPSJjqiFdfIpBYiXXXHEqkwAdvDHWygVcL+NGONGiW9zDvpr+a5TdEDtYlnxRg/6cCAwEAAQ==" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPublicKeyBlobType.BCryptPublicKey), "UlNBMQACAAADAAAAQAAAAAAAAAAAAAAAAQABoetbetfLDOWmobkoUTBXEM9ImOqIV18ikFiJddccSqTAB28MdbKBVwv40Y40aJb3MO+mv5rlN0QO1iWfFGD/pw==" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPublicKeyBlobType.Capi1PublicKey), "BgIAAACkAABSU0ExAAIAAAEAAQCn/2AUnyXWDkQ35Zq/pu8w95ZoNI7R+AtXgbJ1DG8HwKRKHNd1iViQIl9XiOqYSM8QVzBRKLmhpuUMy9d6W+uh" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey), "MEgCQQCh61t618sM5aahuShRMFcQz0iY6ohXXyKQWIl11xxKpMAHbwx1soFXC/jRjjRolvcw76a/muU3RA7WJZ8UYP+nAgMBAAE=" },
+                { Tuple.Create(AsymmetricAlgorithm.RsaOaepSha1, CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo), "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHrW3rXywzlpqG5KFEwVxDPSJjqiFdfIpBYiXXXHEqkwAdvDHWygVcL+NGONGiW9zDvpr+a5TdEDtYlnxRg/6cCAwEAAQ==" },
+                { Tuple.Create(AsymmetricAlgorithm.EcdsaP256Sha256, CryptographicPublicKeyBlobType.BCryptPublicKey), "RUNTMSAAAACRpP2lPrEj6EjfvGrB1P87zDfr0VmDnHzgUkZHBeIPw6JZ4otUCEQSYyHcuGd3+gsTfsiBDFIY1saBbmaoFiko" },
             };
         }
     }
