@@ -1,8 +1,5 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="CapiKeyFormatter.cs" company="Andrew Arnott">
-//     Copyright (c) Andrew Arnott. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright (c) Andrew Arnott. All rights reserved.
+// Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
 namespace PCLCrypto.Formatters
 {
@@ -106,7 +103,7 @@ namespace PCLCrypto.Formatters
         /// </returns>
         protected override RSAParameters ReadCore(Stream stream)
         {
-            var parameters = new RSAParameters();
+            var parameters = default(RSAParameters);
 
             var reader = new BinaryReader(stream);
 

@@ -3,7 +3,12 @@
   "settings": {
     "documentationRules": {
       "companyName": "Andrew Arnott",
-      "copyrightText": "Copyright (c) Andrew Arnott. All rights reserved."
+      "copyrightText": "Copyright (c) {companyName}. All rights reserved.\nLicensed under the {licenseName} license. See {licenseFile} file in the project root for full license information.",
+      "variables": {
+        "licenseName": "Microsoft Public License (Ms-PL)",
+        "licenseFile": "LICENSE"
+      },
+      "xmlHeader": false
     }
   }
 }
