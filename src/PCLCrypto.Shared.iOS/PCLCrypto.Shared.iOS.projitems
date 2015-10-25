@@ -9,6 +9,8 @@
     <Import_RootNamespace>PCLCrypto.Shared.iOS</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ECDiffieHellmanCngPublicKeyFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ECDiffieHellmanFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KSec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RsaAsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RsaCryptographicKey.cs" />

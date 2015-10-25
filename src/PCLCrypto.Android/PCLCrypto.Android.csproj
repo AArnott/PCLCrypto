@@ -39,6 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
+    <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="JavaCryptographicHashMac.cs" />
     <Compile Include="JavaCryptographicHash.cs" />
     <Compile Include="MacAlgorithmProvider.cs" />
