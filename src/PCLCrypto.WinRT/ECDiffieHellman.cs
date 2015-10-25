@@ -43,7 +43,7 @@ namespace PCLCrypto
             {
                 if (this.keySize != value)
                 {
-                    Requires.Range(ECDiffieHellmanFactory.ECDH_KeySizesAndAlgorithmNames.ContainsKey(value), nameof(value));
+                    Requires.Range(ECDiffieHellmanFactory.EcdhKeySizesAndAlgorithmNames.ContainsKey(value), nameof(value));
                     this.keySize = value;
                     this.Reset();
                 }

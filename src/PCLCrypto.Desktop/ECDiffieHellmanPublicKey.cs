@@ -21,7 +21,7 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="ECDiffieHellmanPublicKey"/> class.
         /// </summary>
         /// <param name="publicKey">The underlying platform public key.</param>
-        public ECDiffieHellmanPublicKey(Platform.ECDiffieHellmanPublicKey publicKey)
+        internal ECDiffieHellmanPublicKey(Platform.ECDiffieHellmanPublicKey publicKey)
         {
             Requires.NotNull(publicKey, nameof(publicKey));
 

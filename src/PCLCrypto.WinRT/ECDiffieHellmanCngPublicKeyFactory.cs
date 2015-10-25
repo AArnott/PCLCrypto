@@ -12,8 +12,12 @@ namespace PCLCrypto
     using PInvoke;
     using static PInvoke.BCrypt;
 
+    /// <summary>
+    /// The WinRT implementation of <see cref="IECDiffieHellmanCngPublicKeyFactory"/>.
+    /// </summary>
     internal class ECDiffieHellmanCngPublicKeyFactory : IECDiffieHellmanCngPublicKeyFactory
     {
+        /// <inheritdoc />
         public IECDiffieHellmanPublicKey FromByteArray(byte[] publicKey)
         {
             SafeAlgorithmHandle algorithm;

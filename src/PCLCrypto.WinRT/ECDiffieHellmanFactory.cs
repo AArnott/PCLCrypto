@@ -14,18 +14,21 @@ namespace PCLCrypto
     /// </summary>
     internal class ECDiffieHellmanFactory : IECDiffieHellmanFactory
     {
-        /// <inheritdoc />
-        public IECDiffieHellman Create()
-        {
-            return new ECDiffieHellman();
-        }
-
-        internal static readonly IReadOnlyDictionary<int, string> ECDH_KeySizesAndAlgorithmNames = new Dictionary<int, string>
+        /// <summary>
+        /// Key sizes and the name of the algorithm that supports them.
+        /// </summary>
+        internal static readonly IReadOnlyDictionary<int, string> EcdhKeySizesAndAlgorithmNames = new Dictionary<int, string>
         {
             { 256, "ECDH_P256" },
             { 384, "ECDH_P384" },
             { 521, "ECDH_P521" },
         };
+
+        /// <inheritdoc />
+        public IECDiffieHellman Create()
+        {
+            return new ECDiffieHellman();
+        }
 
         /// <summary>
         /// Opens a BCrypt algorithm.
@@ -37,7 +40,7 @@ namespace PCLCrypto
             SafeAlgorithmHandle algorithm;
             BCrypt.BCryptOpenAlgorithmProvider(
                 out algorithm,
-                ECDH_KeySizesAndAlgorithmNames[keySize],
+                EcdhKeySizesAndAlgorithmNames[keySize],
                 null,
                 BCryptOpenAlgorithmProviderFlags.None).ThrowOnError();
             return algorithm;
