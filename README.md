@@ -95,5 +95,5 @@ class TwitterClient
  [5]: http://log.paulbetts.org/the-bait-and-switch-pcl-trick/
  [6]: https://github.com/aarnott/pclcrypto/wiki
  [7]: http://github.com/aarnott/pclcrypto
- [8]: https://coinbase.com/checkouts/3668d9513f82bf70516fc29b75afa6c0
+ [8]: https://www.coinbase.com/checkouts/b3affe1c4e7b7b60028c3efcce2b1931
  [9]: http://intellitect.com/static-using-statement-in-c-6-0/
