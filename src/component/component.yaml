@@ -1,0 +1,28 @@
+id: PCLCrypto
+name: Cryptography Plugin
+publisher: Andrew Arnott
+publisher-url: https://twitter.com/aarnott
+summary: PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.
+version: 1.1.18-g36fd0b2956
+src-url: https://github.com/aarnott/pclcrypto/
+
+details: Details.md
+license: ../../LICENSE
+getting-started: Details.md
+
+is_shell: true
+no_build: true
+packages:
+  winphone-8.0: PCLCrypto, Version=0.0.0
+  winphone-8.1: PCLCrypto, Version=0.0.0
+  android: PCLCrypto, Version=0.0.0
+  ios: PCLCrypto, Version=0.0.0
+  ios-unified: PCLCrypto, Version=0.0.0
+local-nuget-repo: ../Output/
+
+icons: 
+  - ../../icons/icon_128x128.png
+
+samples: 
+  - name: Cryptography Sample
+    path: ../samples/PCLCryptoSample/PCLCryptoSample.sln

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))\EnlistmentInfo.props" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))' != '' " />
+
+	<UsingTask AssemblyFile="$(ProjectRoot)tools\VersioningTasks.dll" TaskName="NuGetPack" />
+	 
+	<UsingTask TaskName="DownloadFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+		<ParameterGroup>
+			<Address ParameterType="System.String" Required="true" />
+			<FileName ParameterType="System.String" Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Reference Include="System" />
+			<Using Namespace="System" />
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Net" />
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+					String dir = Path.GetDirectoryName(FileName);
+					if (!Directory.Exists(dir)) {
+						Directory.CreateDirectory(dir);
+					}
+					new WebClient().DownloadFile(Address, FileName);
+				]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+	<UsingTask TaskName="UnZip" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+		<ParameterGroup>
+			<Input ParameterType="System.String" Required="true" />
+			<TargetDirectory ParameterType="System.String" Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Reference Include="System" />
+			<Reference Include="System.IO.Compression" />
+			<Reference Include="System.IO.Compression.FileSystem" />
+			<Using Namespace="System.IO.Compression" />
+
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+					using (ZipArchive archive = ZipFile.OpenRead(Input)) {
+						foreach (ZipArchiveEntry entry in archive.Entries) {
+							entry.ExtractToFile(Path.Combine(TargetDirectory, entry.FullName));
+						}
+					}
+				]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+	<UsingTask TaskName="RegexTransform" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+		<ParameterGroup>
+			<Input ParameterType="System.String" Required="true" />
+			<Find ParameterType="System.String" Required="true" />
+			<Replace ParameterType="System.String" Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Reference Include="System" />
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Text.RegularExpressions" />
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+					File.WriteAllText(Input, Regex.Replace(File.ReadAllText(Input), Find, Replace));
+				]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+
+	<ItemGroup>
+		<ProjectReference Include="$(ProjectRoot)src\nuget\PCLCrypto.proj" />
+	</ItemGroup>
+
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+
+	<Target Name="Clean">
+		<MSBuild
+			Projects="@(ProjectReference)"
+			Targets="Clean"
+			BuildInParallel="$(BuildInParallel)"
+			/>
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="GetBuildVersion">
+
+		<PropertyGroup>
+			<XamarinComponentRoot>$(ProjectRoot)packages\xamarin-component\</XamarinComponentRoot>
+			<XamarinComponentZip>$(XamarinComponentRoot)xpkg.zip</XamarinComponentZip>
+			<XamarinComponent>$(XamarinComponentRoot)xamarin-component.exe</XamarinComponent>
+			<OutputPath>$(ProjectRoot)bin\$(Configuration)\</OutputPath>
+			<ComponentVersion>$(NuGetPackageVersion)</ComponentVersion>
+		</PropertyGroup>
+
+		<MSBuild
+			Projects="@(ProjectReference)"
+			Targets="Build"
+			BuildInParallel="$(BuildInParallel)"
+			/>
+
+		<DownloadFile Condition="!Exists($(XamarinComponentZip))" Address="https://components.xamarin.com/submit/xpkg" FileName="$(XamarinComponentZip)" />
+		<UnZip Condition="!Exists($(XamarinComponent))" Input="$(XamarinComponentZip)" TargetDirectory="$(XamarinComponentRoot)" />
+
+		<RegexTransform Input="component.yaml" Find="version: .*" Replace="version: $(ComponentVersion)" />
+		<RegexTransform Input="component.yaml" Find="PCLCrypto, Version=.*" Replace="PCLCrypto, Version=$(NuGetPackageVersion)" />
+
+		<Exec Command="&quot;$(XamarinComponent)&quot; package .\ " />
+        <Move SourceFiles="PCLCrypto-$(ComponentVersion).xam" DestinationFolder="$(OutputPath)" />
+
+		<Message Importance="high" Text="$(MSBuildProjectName) -> $(OutputPath)PCLCrypto-$(ComponentVersion).xam" />
+	</Target>
+
+	<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))\EnlistmentInfo.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))' != '' " />
+	<Import Project="..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets" />
+</Project>
