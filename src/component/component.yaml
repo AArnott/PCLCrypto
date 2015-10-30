@@ -1,0 +1,28 @@
+id: PCLCrypto
+name: Cryptography Plugin
+publisher: Andrew Arnott
+publisher-url: https://twitter.com/aarnott
+summary: PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.
+version: $componentversion$
+src-url: https://github.com/aarnott/pclcrypto/
+
+details: Details.md
+license: $projectroot$LICENSE
+getting-started: Details.md
+
+is_shell: true
+no_build: true
+packages:
+  winphone-8.0: PCLCrypto, Version=$packageversion$
+  winphone-8.1: PCLCrypto, Version=$packageversion$
+  android: PCLCrypto, Version=$packageversion$
+  ios: PCLCrypto, Version=$packageversion$
+  ios-unified: PCLCrypto, Version=$packageversion$
+local-nuget-repo: ../Output/
+
+icons: 
+  - $projectroot$icons/icon_128x128.png
+
+samples: 
+  - name: Cryptography Sample
+    path: $projectroot$samples/PCLCryptoSample/PCLCryptoSample.sln
