@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))\EnlistmentInfo.props" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))' != '' " />
 
 	<UsingTask AssemblyFile="$(ProjectRoot)tools\VersioningTasks.dll" TaskName="NuGetPack" />
@@ -67,47 +67,46 @@
 		</Task>
 	</UsingTask>
 
+  <PropertyGroup>
+    <XamarinComponentRoot>$(ProjectRoot)obj\xamarin-component\$(Configuration)\</XamarinComponentRoot>
+    <XamarinComponentToolsPath>$(ProjectRoot)obj\xamarin-component\tools\</XamarinComponentToolsPath>
+    <XamarinComponentZip>$(XamarinComponentToolsPath)xpkg.zip</XamarinComponentZip>
+    <XamarinComponent>$(XamarinComponentToolsPath)xamarin-component.exe</XamarinComponent>
+    <OutputPath>$(ProjectRoot)bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="$(ProjectRoot)src\nuget\PCLCrypto.proj" />
-	</ItemGroup>
+  <Target Name="PrepareForBuild" DependsOnTargets="GetBuildVersion">
+    <PropertyGroup>
+      <ComponentVersion>$(BuildVersion3Components)</ComponentVersion>
+      <TargetPath>$(OutputPath)PCLCrypto-$(ComponentVersion).xam</TargetPath>
+    </PropertyGroup>
+  </Target>
+  
+  <ItemGroup>
+    <_XamarinComponentSrc Include="component.yaml" />
+    <_XamarinComponentSrc Include="Details.md" />
+  </ItemGroup>
 
-	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
 
-	<Target Name="Clean">
-		<MSBuild
-			Projects="@(ProjectReference)"
-			Targets="Clean"
-			BuildInParallel="$(BuildInParallel)"
-			/>
-	</Target>
+	<Target Name="Clean" DependsOnTargets="PrepareForBuild">
+    <RemoveDir Directories="$(XamarinComponentRoot);$(XamarinComponentToolsPath)" />
+    <Delete Files="$(TargetPath)" />
+  </Target>
 
-	<Target Name="Build" DependsOnTargets="GetBuildVersion">
-
-		<PropertyGroup>
-			<XamarinComponentRoot>$(ProjectRoot)packages\xamarin-component\</XamarinComponentRoot>
-			<XamarinComponentZip>$(XamarinComponentRoot)xpkg.zip</XamarinComponentZip>
-			<XamarinComponent>$(XamarinComponentRoot)xamarin-component.exe</XamarinComponent>
-			<OutputPath>$(ProjectRoot)bin\$(Configuration)\</OutputPath>
-			<ComponentVersion>$(BuildVersion3Components)</ComponentVersion>
-		</PropertyGroup>
-
-		<MSBuild
-			Projects="@(ProjectReference)"
-			Targets="Build"
-			BuildInParallel="$(BuildInParallel)"
-			/>
+	<Target Name="Build" DependsOnTargets="PrepareForBuild">
 
 		<DownloadFile Condition="!Exists($(XamarinComponentZip))" Address="https://components.xamarin.com/submit/xpkg" FileName="$(XamarinComponentZip)" />
-		<UnZip Condition="!Exists($(XamarinComponent))" Input="$(XamarinComponentZip)" TargetDirectory="$(XamarinComponentRoot)" />
+		<UnZip Condition="!Exists($(XamarinComponent))" Input="$(XamarinComponentZip)" TargetDirectory="$(XamarinComponentToolsPath)" />
+    <Copy SourceFiles="@(_XamarinComponentSrc)" DestinationFolder="$(XamarinComponentRoot)" />
+		<RegexTransform Input="$(XamarinComponentRoot)component.yaml" Find="\$componentversion\$" Replace="$(ComponentVersion)" />
+		<RegexTransform Input="$(XamarinComponentRoot)component.yaml" Find="\$packageversion\$" Replace="$(NuGetPackageVersion)" />
+    <RegexTransform Input="$(XamarinComponentRoot)component.yaml" Find="\$projectroot\$" Replace="../../../" />
 
-		<RegexTransform Input="component.yaml" Find="version: .*" Replace="version: $(ComponentVersion)" />
-		<RegexTransform Input="component.yaml" Find="PCLCrypto, Version=.*" Replace="PCLCrypto, Version=$(NuGetPackageVersion)" />
+		<Exec Command="&quot;$(XamarinComponent)&quot; package &quot;$(XamarinComponentRoot)\&quot; " />
+    <Move SourceFiles="$(XamarinComponentRoot)PCLCrypto-$(ComponentVersion).xam" DestinationFiles="$(TargetPath)" />
 
-		<Exec Command="&quot;$(XamarinComponent)&quot; package .\ " />
-        <Move SourceFiles="PCLCrypto-$(ComponentVersion).xam" DestinationFolder="$(OutputPath)" />
-
-		<Message Importance="high" Text="$(MSBuildProjectName) -> $(OutputPath)PCLCrypto-$(ComponentVersion).xam" />
+		<Message Importance="high" Text="$(MSBuildProjectName) -> $(TargetPath)" />
 	</Target>
 
 	<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))\EnlistmentInfo.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))' != '' " />
