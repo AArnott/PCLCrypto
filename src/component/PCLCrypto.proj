@@ -89,7 +89,7 @@
 			<XamarinComponentZip>$(XamarinComponentRoot)xpkg.zip</XamarinComponentZip>
 			<XamarinComponent>$(XamarinComponentRoot)xamarin-component.exe</XamarinComponent>
 			<OutputPath>$(ProjectRoot)bin\$(Configuration)\</OutputPath>
-			<ComponentVersion>$(NuGetPackageVersion)</ComponentVersion>
+			<ComponentVersion>$(BuildVersion3Components)</ComponentVersion>
 		</PropertyGroup>
 
 		<MSBuild
