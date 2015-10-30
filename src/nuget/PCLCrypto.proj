@@ -36,6 +36,7 @@
 			<NuGetProperties Include="Version=$(NuGetPackageVersion)" />
 			<NuGetProperties Include="OutputPath=$(ProjectRoot)bin\$(Configuration)\" />
 			<NuGetProperties Include="IntermediatePath=$(ProjectRoot)obj\" />
+			<NuGetProperties Include="CommitId=$(GitCommitId)" />
 		</ItemGroup>
 
 		<ItemGroup>

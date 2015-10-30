@@ -6,8 +6,9 @@
 		<title>PCL Crypto - Portable Crypto APIs</title>
 		<authors>Andrew Arnott</authors>
 		<owners>Andrew Arnott</owners>
-		<licenseUrl>https://github.com/AArnott/PCLCrypto/blob/master/LICENSE</licenseUrl>
+		<licenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/LICENSE</licenseUrl>
 		<projectUrl>https://github.com/aarnott/pclcrypto/</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/icons/icon_64x64.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
 			PCL Crypto provides a consistent, portable set of crypto APIs for .NET, Windows Phone 8.0 &amp; 8.1, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.
