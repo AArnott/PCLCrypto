@@ -25,4 +25,4 @@ icons:
 
 samples: 
   - name: Cryptography Sample
-    path: ../samples/PCLCryptoSample/PCLCryptoSample.sln
+    path: ../../samples/PCLCryptoSample/PCLCryptoSample.sln
