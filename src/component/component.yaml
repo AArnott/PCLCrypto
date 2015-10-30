@@ -2,7 +2,7 @@ id: PCLCrypto
 name: Cryptography Plugin
 publisher: Andrew Arnott
 publisher-url: https://twitter.com/aarnott
-summary: PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.
+summary: PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.
 version: 1.1.18-g36fd0b2956
 src-url: https://github.com/aarnott/pclcrypto/
 
