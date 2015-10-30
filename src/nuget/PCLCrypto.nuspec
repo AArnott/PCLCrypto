@@ -15,7 +15,7 @@
 			Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation.
 			PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.
 		</description>
-		<summary>PCL Storage provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
+		<summary>PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
 		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
 		<releaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</releaseNotes>
 		<dependencies>
