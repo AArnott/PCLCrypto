@@ -4,10 +4,15 @@
 namespace PCLCrypto
 {
     /// <summary>
-    /// A PCL-compatible enumeration describing symmetric cipher block modes.
+    /// A PCL-compatible enumeration describing symmetric cipher modes.
     /// </summary>
     public enum SymmetricAlgorithmMode
     {
+        /// <summary>
+        /// The algorithm is a streaming cipher rather than a block cipher.
+        /// </summary>
+        Streaming,
+
         /// <summary>
         /// The CBC mode.
         /// </summary>

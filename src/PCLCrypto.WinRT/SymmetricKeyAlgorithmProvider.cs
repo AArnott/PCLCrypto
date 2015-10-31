@@ -14,7 +14,7 @@ namespace PCLCrypto
     /// <summary>
     /// A WinRT implementation of the <see cref="ISymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
+    internal partial class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
     {
         /// <summary>
         /// The WinRT platform implementation.
@@ -29,20 +29,27 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
-        public SymmetricKeyAlgorithmProvider(SymmetricAlgorithm algorithm)
+        /// <param name="name">The name of the base algorithm to use.</param>
+        /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
+        /// <param name="padding">The padding to use.</param>
+        public SymmetricKeyAlgorithmProvider(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
         {
-            this.algorithm = algorithm;
-            this.platform = Platform.SymmetricKeyAlgorithmProvider.OpenAlgorithm(GetAlgorithmName(algorithm));
+            this.Name = name;
+            this.Mode = mode;
+            this.Padding = padding;
+
+            if (!SymmetricAlgorithmExtensions.TryAssemblyAlgorithm(name, mode, padding, out this.algorithm))
+            {
+                throw new NotSupportedException();
+            }
+
+            this.platform = Platform.SymmetricKeyAlgorithmProvider.OpenAlgorithm(GetAlgorithmName(this.Algorithm));
         }
 
         /// <summary>
         /// Gets the algorithm supported by this provider.
         /// </summary>
-        public SymmetricAlgorithm Algorithm
-        {
-            get { return this.algorithm; }
-        }
+        public SymmetricAlgorithm Algorithm => this.algorithm;
 
         /// <inheritdoc/>
         public int BlockLength

@@ -4,6 +4,7 @@
 namespace PCLCrypto
 {
     using System;
+    using Validation;
 
     /// <summary>
     /// Extension methods for the <see cref="SymmetricAlgorithm"/> enum and related types.
@@ -17,33 +18,15 @@ namespace PCLCrypto
         /// <returns><c>true</c> if the cipher is a block cipher; <c>false</c> otherwise.</returns>
         public static bool IsBlockCipher(this SymmetricAlgorithm algorithm)
         {
-            switch (algorithm)
-            {
-                case SymmetricAlgorithm.Rc4:
-                    return false;
-                case SymmetricAlgorithm.AesCbc:
-                case SymmetricAlgorithm.AesCbcPkcs7:
-                case SymmetricAlgorithm.AesCcm:
-                case SymmetricAlgorithm.AesEcb:
-                case SymmetricAlgorithm.AesEcbPkcs7:
-                case SymmetricAlgorithm.AesGcm:
-                case SymmetricAlgorithm.DesCbc:
-                case SymmetricAlgorithm.DesCbcPkcs7:
-                case SymmetricAlgorithm.DesEcb:
-                case SymmetricAlgorithm.DesEcbPkcs7:
-                case SymmetricAlgorithm.Rc2Cbc:
-                case SymmetricAlgorithm.Rc2CbcPkcs7:
-                case SymmetricAlgorithm.Rc2Ecb:
-                case SymmetricAlgorithm.Rc2EcbPkcs7:
-                case SymmetricAlgorithm.TripleDesCbc:
-                case SymmetricAlgorithm.TripleDesCbcPkcs7:
-                case SymmetricAlgorithm.TripleDesEcb:
-                case SymmetricAlgorithm.TripleDesEcbPkcs7:
-                    return true;
-                default:
-                    throw new ArgumentException();
-            }
+            return algorithm.GetMode() != SymmetricAlgorithmMode.Streaming;
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the specified mode is implemented by a block cipher.
+        /// </summary>
+        /// <param name="mode">The mode to check.</param>
+        /// <returns><c>true</c> if the cipher is a block cipher; <c>false</c> otherwise.</returns>
+        public static bool IsBlockCipher(this SymmetricAlgorithmMode mode) => mode != SymmetricAlgorithmMode.Streaming;
 
         /// <summary>
         /// Returns a platform-specific algorithm that conforms to the prescribed platform-neutral algorithm.
@@ -116,9 +99,10 @@ namespace PCLCrypto
                     return SymmetricAlgorithmMode.Ccm;
                 case SymmetricAlgorithm.AesGcm:
                     return SymmetricAlgorithmMode.Gcm;
+                case SymmetricAlgorithm.Rc4:
+                    return SymmetricAlgorithmMode.Streaming;
                 default:
-                    // Not a block mode (or we're missing something above). RC4 is specifically not included above as that is a streaming cipher.
-                    throw new ArgumentException();
+                    throw Assumes.NotReachable();
             }
         }
 
@@ -158,6 +142,29 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Finds a composite <see cref="SymmetricAlgorithm"/> for the specified unit parts, if one exists.
+        /// </summary>
+        /// <param name="name">The name of the base algorithm to use.</param>
+        /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
+        /// <param name="padding">The padding to use.</param>
+        /// <param name="algorithm">Receives the composite algorithm enum value, if one exists.</param>
+        /// <returns><c>true</c> if a match was found; otherwise <c>false</c>.</returns>
+        public static bool TryAssemblyAlgorithm(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding, out SymmetricAlgorithm algorithm)
+        {
+            foreach (SymmetricAlgorithm assembled in Enum.GetValues(typeof(SymmetricAlgorithm)))
+            {
+                if (assembled.GetName() == name && assembled.GetMode() == mode && assembled.GetPadding() == padding)
+                {
+                    algorithm = assembled;
+                    return true;
+                }
+            }
+
+            algorithm = (SymmetricAlgorithm)0;
+            return false;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the specified block mode requires an initialization vector.
         /// </summary>
         /// <param name="mode">The block mode to check.</param>
@@ -172,6 +179,8 @@ namespace PCLCrypto
                     return true;
                 case SymmetricAlgorithmMode.Ecb:
                     return false;
+                case SymmetricAlgorithmMode.Streaming:
+                    return false;
                 default:
                     throw new ArgumentException();
             }
@@ -182,27 +191,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="algorithm">The algorithm to check.</param>
         /// <returns><c>true</c> if the block mode uses an initialization vector; <c>false</c> otherwise.</returns>
-        public static bool UsesIV(this SymmetricAlgorithm algorithm)
-        {
-            if (IsBlockCipher(algorithm))
-            {
-                switch (algorithm.GetMode())
-                {
-                    case SymmetricAlgorithmMode.Cbc:
-                    case SymmetricAlgorithmMode.Ccm:
-                    case SymmetricAlgorithmMode.Gcm:
-                        return true;
-                    case SymmetricAlgorithmMode.Ecb:
-                        return false;
-                    default:
-                        throw new ArgumentException();
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
+        public static bool UsesIV(this SymmetricAlgorithm algorithm) => UsesIV(algorithm.GetMode());
 
         /// <summary>
         /// Gets the string representation of an algorithm name.

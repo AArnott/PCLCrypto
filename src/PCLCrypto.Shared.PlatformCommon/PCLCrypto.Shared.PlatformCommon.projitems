@@ -11,5 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CryptoUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HashAlgorithmProviderFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SymmetricCryptographicKey.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SymmetricKeyAlgorithmProvider.cs" />
   </ItemGroup>
 </Project>

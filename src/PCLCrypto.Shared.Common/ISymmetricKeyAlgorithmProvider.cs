@@ -20,6 +20,21 @@ namespace PCLCrypto
         int BlockLength { get; }
 
         /// <summary>
+        /// Gets the algorithm used in this algorithm.
+        /// </summary>
+        SymmetricAlgorithmName Name { get; }
+
+        /// <summary>
+        /// Gets the mode used in this algorithm.
+        /// </summary>
+        SymmetricAlgorithmMode Mode { get; }
+
+        /// <summary>
+        /// Gets the padding used in this algorithm.
+        /// </summary>
+        SymmetricAlgorithmPadding Padding { get; }
+
+        /// <summary>
         /// Creates a symmetric key.
         /// </summary>
         /// <param name="keyMaterial">
