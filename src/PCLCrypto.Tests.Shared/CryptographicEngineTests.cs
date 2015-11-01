@@ -332,6 +332,11 @@
         [TestMethod]
         public void EncryptAndDecrypt_AES_ZerosPadding()
         {
+            if (this.aesKeyZerosPadding == null)
+            {
+                Assert.Inconclusive("Zeros padding not supported on this platform.");
+            }
+
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyZerosPadding, this.data, null);
             CollectionAssertEx.AreNotEqual(this.data, cipherText);
             Assert.AreEqual("eu0+YclmfT2hv+YEDO6gOA==", Convert.ToBase64String(cipherText));
