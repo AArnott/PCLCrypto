@@ -334,7 +334,11 @@
         {
             if (this.aesKeyZerosPadding == null)
             {
+#if WinRT
                 Assert.Inconclusive("Zeros padding not supported on this platform.");
+#else
+                Assert.IsTrue(false, "Not supported");
+#endif
             }
 
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyZerosPadding, this.data, null);
