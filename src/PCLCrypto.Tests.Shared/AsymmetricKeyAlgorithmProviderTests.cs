@@ -302,8 +302,9 @@
         {
             // Tests a key where P has more significant digits than Q.
             // This is incompatible with CAPI, which makes it worth testing.
-            byte[] rsaPrivateKey = Convert.FromBase64String(@"MIIBOgIBAAJBALx0Z0O1n/2E+Boyt7UEIQD62y8MQQPILJC2AguHvPfo8E5ScBBPa8dMCHVRCcKJJ868FJdebracYthqCHn19KMCAwEAAQJBAKAgsFXCD+2UfFOWYK44keqJPJBfcybJgcR8QoSVk6V40MkwgAmjVn4cumCLZgxwJ+O5fbS/xmzeRSBz8gdPfrECIQGbqLr8paSZLW80ixXQK9YCx76nkg4I2UdBq+h5taAwnQIgdTHt32eGkYjiVT81BnM6D9pmX508VulYsBalYtbmlj8CIEYX4dbZAYDPeqrwr8MlY6hPiIgR12/sRzTIZ6opoeAFAiAtESA6UuNKv+rZgU7wxgrD4eaQSjTT7zPtsyeyVJWjnQIhAONhytT6rHH9n3nE4K7Xxz3DjYodXzzM6Bm2C1jiGrEM");
+            byte[] rsaPrivateKey = Convert.FromBase64String(@"MIIBPQIBAAJBAKJJ2g6qhep28mB5ySYb44dk9ZE0H+JQug9Tq2/1BjebHtW+YP/1Ds3tK/rQvL1A+yhLkFWOaQD6043AwJpWDxMCAwEAAQJAGr0sTmpOMjly6e5m8/54WKCLzWbXMgS3Azt37bRjV9nFGDqoq6gbwSnB709oouNPmqc4hE/6AqEnplfBfHX7YQIiAAGX4W2H9Y+uATS4dwnHnE6ROezx5275HLAjfARLRPQ3OwIhAGXbnimLuplWSVQ9/wE2eaISn5lF2tF1vKtvNSL3anoJAiIAARHo7jBupPV6k9gJAMVO36hBWTC+ddTPAi5iO1P803A/AiAVMKUsu3bsY3kJ34Pneq+/OeSd/FxTawz/FTmWtqYeEQIhACR2PamFTCPoeZEf73/OQeEVmLbd/xwozz8UOqGejqlh");
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+
             ICryptographicKey key = rsa.ImportKeyPair(rsaPrivateKey, CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey);
 
             byte[] data = new byte[] { 1, 2, 3 };
