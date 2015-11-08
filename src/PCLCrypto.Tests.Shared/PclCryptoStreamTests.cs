@@ -46,7 +46,7 @@
                 () => CryptoStream.WriteTo(null, new MockCryptoTransform(5)));
             Assert.Throws<ArgumentException>(
                 () => CryptoStream.WriteTo(Stream.Null));
-            Assert.Throws<ArgumentException>(
+            Assert.Throws<ArgumentNullException>(
                 () => CryptoStream.WriteTo(Stream.Null, null));
         }
 
@@ -57,7 +57,7 @@
                 () => CryptoStream.ReadFrom(null, new MockCryptoTransform(5)));
             Assert.Throws<ArgumentException>(
                 () => CryptoStream.ReadFrom(Stream.Null));
-            Assert.Throws<ArgumentException>(
+            Assert.Throws<ArgumentNullException>(
                 () => CryptoStream.ReadFrom(Stream.Null, null));
         }
 

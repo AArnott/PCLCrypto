@@ -7,7 +7,8 @@
     "PInvoke.Windows.Core": "0.1.13-alpha",
     "Validation": "2.2.8",
     "Xamarin.Forms": "1.5.0.6447",
-    "xunit": "2.1.0"
+    "xunit": "2.1.0",
+    "xunit.runner.visualstudio": "2.1.0"
   },
   "frameworks": {
     "uap10.0": {}
