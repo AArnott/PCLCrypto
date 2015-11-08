@@ -4,28 +4,25 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
+    using Xunit;
 
-    [TestClass]
     public class RandomNumberGeneratorTests
     {
-        [TestMethod]
+        [Fact]
         public void GetBytes_Null()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => NetFxCrypto.RandomNumberGenerator.GetBytes(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void GetBytes_Empty()
         {
             var buffer = new byte[0];
             NetFxCrypto.RandomNumberGenerator.GetBytes(buffer);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetBytes()
         {
             var buffer1 = new byte[4];
@@ -35,14 +32,14 @@
             NetFxCrypto.RandomNumberGenerator.GetBytes(buffer2);
 
             // Verify that the two randomly filled buffers are not equal.
-            Assert.IsTrue(BitConverter.ToInt32(buffer1, 0) != BitConverter.ToInt32(buffer2, 0));
+            Assert.True(BitConverter.ToInt32(buffer1, 0) != BitConverter.ToInt32(buffer2, 0));
         }
 
 #if !WinRT && !PCL && !WINDOWS_UWP
-        [TestMethod]
+        [Fact]
         public void DesktopBaseClass()
         {
-            Assert.IsTrue(NetFxCrypto.RandomNumberGenerator is System.Security.Cryptography.RandomNumberGenerator);
+            Assert.True(NetFxCrypto.RandomNumberGenerator is System.Security.Cryptography.RandomNumberGenerator);
         }
 #endif
     }

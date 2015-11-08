@@ -6,16 +6,13 @@
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
     using Validation;
+    using Xunit;
 
     /// <summary>
     /// Ensures that our CryptoStream tests pass on the official
     /// .NET Framework's version of CryptoStream as well.
     /// </summary>
-    [TestClass]
 #pragma warning disable 0436
     public class DesktopCryptoStreamTests : CryptoStreamTests
 #pragma warning restore 0436

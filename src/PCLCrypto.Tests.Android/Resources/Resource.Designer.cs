@@ -28,6 +28,8 @@ namespace PCLCrypto.Tests.Android
 		{
 			global::PCLCrypto.Resource.String.ApplicationName = global::PCLCrypto.Tests.Android.Resource.String.ApplicationName;
 			global::PCLCrypto.Resource.String.Hello = global::PCLCrypto.Tests.Android.Resource.String.Hello;
+			global::Xamarin.Forms.Platform.Resource.String.ApplicationName = global::PCLCrypto.Tests.Android.Resource.String.ApplicationName;
+			global::Xamarin.Forms.Platform.Resource.String.Hello = global::PCLCrypto.Tests.Android.Resource.String.Hello;
 		}
 		
 		public partial class Attribute

@@ -4,29 +4,26 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
+    using Xunit;
 
-    [TestClass]
     public class RandomNumberGeneratorDesktopTests
     {
-        [TestMethod]
+        [Fact]
         public void GetNonZeroBytes()
         {
             var rng = NetFxCrypto.RandomNumberGenerator as System.Security.Cryptography.RandomNumberGenerator;
-            Assert.IsNotNull(rng);
+            Assert.NotNull(rng);
             byte[] buffer = new byte[15];
             rng.GetNonZeroBytes(buffer);
-            Assert.IsTrue(buffer.All(b => b != 0));
+            Assert.True(buffer.All(b => b != 0));
         }
 
-        [TestMethod]
+        [Fact]
         public void GetNonZeroBytes_Null()
         {
             var rng = NetFxCrypto.RandomNumberGenerator as System.Security.Cryptography.RandomNumberGenerator;
-            Assert.IsNotNull(rng);
-            ExceptionAssert.Throws<ArgumentNullException>(() => rng.GetNonZeroBytes(null));
+            Assert.NotNull(rng);
+            Assert.Throws<ArgumentNullException>(() => rng.GetNonZeroBytes(null));
         }
     }
 }

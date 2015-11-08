@@ -5,71 +5,68 @@
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
     using Validation;
+    using Xunit;
 
-    [TestClass]
     public abstract class CryptoStreamTests
     {
-        [TestMethod]
+        [Fact]
         public void IncompatibleStreamDirection()
         {
-            ExceptionAssert.Throws<ArgumentException>(
+            Assert.Throws<ArgumentException>(
                 () => this.CreateCryptoStream(new ErraticReaderStream(Stream.Null), new MockCryptoTransform(5), CryptoStreamMode.Write));
-            ExceptionAssert.Throws<ArgumentException>(
+            Assert.Throws<ArgumentException>(
                 () => this.CreateCryptoStream(new MockWriteOnlyStream(), new MockCryptoTransform(5), CryptoStreamMode.Read));
         }
 
-        [TestMethod]
+        [Fact]
         public void Properties()
         {
             var stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Write);
-            Assert.IsTrue(stream.CanWrite);
-            Assert.IsFalse(stream.CanRead);
-            Assert.IsFalse(stream.CanSeek);
-            Assert.IsFalse(stream.CanTimeout);
-            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Length; });
-            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Position; });
-            ExceptionAssert.Throws<NotSupportedException>(() => { stream.Position = 0; });
+            Assert.True(stream.CanWrite);
+            Assert.False(stream.CanRead);
+            Assert.False(stream.CanSeek);
+            Assert.False(stream.CanTimeout);
+            Assert.Throws<NotSupportedException>(() => { long dummy = stream.Length; });
+            Assert.Throws<NotSupportedException>(() => { long dummy = stream.Position; });
+            Assert.Throws<NotSupportedException>(() => { stream.Position = 0; });
 
             stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Read);
-            Assert.IsTrue(stream.CanRead);
-            Assert.IsFalse(stream.CanWrite);
-            Assert.IsFalse(stream.CanSeek);
-            Assert.IsFalse(stream.CanTimeout);
-            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Length; });
-            ExceptionAssert.Throws<NotSupportedException>(() => { long dummy = stream.Position; });
-            ExceptionAssert.Throws<NotSupportedException>(() => { stream.Position = 0; });
+            Assert.True(stream.CanRead);
+            Assert.False(stream.CanWrite);
+            Assert.False(stream.CanSeek);
+            Assert.False(stream.CanTimeout);
+            Assert.Throws<NotSupportedException>(() => { long dummy = stream.Length; });
+            Assert.Throws<NotSupportedException>(() => { long dummy = stream.Position; });
+            Assert.Throws<NotSupportedException>(() => { stream.Position = 0; });
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeAlsoDisposesTargetStream()
         {
             var transform = new MockCryptoTransform(5);
             var targetStream = new MemoryStream();
             this.CreateCryptoStream(targetStream, transform, CryptoStreamMode.Write).Dispose();
-            ExceptionAssert.Throws<ObjectDisposedException>(() => { long dummy = targetStream.Length; });
+            Assert.Throws<ObjectDisposedException>(() => { long dummy = targetStream.Length; });
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeDoesNotDisposeTransform()
         {
             var hasher = new MockCryptoTransform(5);
             this.CreateCryptoStream(Stream.Null, hasher, CryptoStreamMode.Write).Dispose();
-            Assert.IsFalse(hasher.IsDisposed);
+            Assert.False(hasher.IsDisposed);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeTransformsFinalBlock()
         {
             var hasher = new MockCryptoTransform(5);
             this.CreateCryptoStream(Stream.Null, hasher, CryptoStreamMode.Write).Dispose();
-            Assert.IsTrue(hasher.FinalBlockTransformed);
+            Assert.True(hasher.FinalBlockTransformed);
         }
 
-        [TestMethod]
+        [Fact]
         public void CannotReadFromWriteStream()
         {
             var transform = new MockCryptoTransform(5);
@@ -77,12 +74,12 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Write))
             {
                 byte[] buffer = new byte[1];
-                ExceptionAssert.Throws<NotSupportedException>(
+                Assert.Throws<NotSupportedException>(
                     () => stream.Read(buffer, 0, 1));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CannotWriteToReadStream()
         {
             var transform = new MockCryptoTransform(5);
@@ -90,36 +87,36 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 byte[] buffer = new byte[1];
-                ExceptionAssert.Throws<NotSupportedException>(
+                Assert.Throws<NotSupportedException>(
                     () => stream.Write(buffer, 0, 1));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Write_InvalidInputs()
         {
             using (var stream = this.CreateCryptoStream(Stream.Null, new MockCryptoTransform(5), CryptoStreamMode.Write))
             {
                 // .NET Framework version throws NRE for Read(null). We test it in PCL derived test class.
-                ////ExceptionAssert.Throws<ArgumentNullException>(() => stream.Write(null, 0, 0));
-                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Write(new byte[1], -1, 1));
-                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Write(new byte[1], 0, -1));
+                ////Assert.Throws<ArgumentNullException>(() => stream.Write(null, 0, 0));
+                Assert.Throws<ArgumentOutOfRangeException>(() => stream.Write(new byte[1], -1, 1));
+                Assert.Throws<ArgumentOutOfRangeException>(() => stream.Write(new byte[1], 0, -1));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Read_InvalidInputs()
         {
             using (var stream = this.CreateCryptoStream(new MemoryStream(), new MockCryptoTransform(5), CryptoStreamMode.Read))
             {
                 // .NET Framework version throws NRE for Read(null). We test it in PCL derived test class.
-                ////ExceptionAssert.Throws<ArgumentNullException>(() => stream.Read(null, 0, 0));
-                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Read(new byte[1], -1, 1));
-                ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => stream.Read(new byte[1], 0, -1));
+                ////Assert.Throws<ArgumentNullException>(() => stream.Read(null, 0, 0));
+                Assert.Throws<ArgumentOutOfRangeException>(() => stream.Read(new byte[1], -1, 1));
+                Assert.Throws<ArgumentOutOfRangeException>(() => stream.Read(new byte[1], 0, -1));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CryptoStreamWithEmptyFinalBlockViaWrite()
         {
             var transform = new MockCryptoTransform(5);
@@ -130,11 +127,11 @@
                 stream.Write(Encoding.UTF8.GetBytes("EFGHI"), 0, 4);
                 stream.Write(Encoding.UTF8.GetBytes("JKLMNOPQ"), 0, 8);
                 this.FlushFinalBlock(stream);
-                Assert.AreEqual("-BCDEF-GHJKL-MNOPQ_Z", Encoding.UTF8.GetString(target.ToArray()));
+                Assert.Equal("-BCDEF-GHJKL-MNOPQ_Z", Encoding.UTF8.GetString(target.ToArray()));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CryptoStreamWithNonEmptyFinalBlockViaWrite()
         {
             var transform = new MockCryptoTransform(5);
@@ -145,11 +142,11 @@
                 stream.Write(Encoding.UTF8.GetBytes("EFGHI"), 0, 4);
                 stream.Write(Encoding.UTF8.GetBytes("JKLMNOPQRS"), 0, 10);
                 this.FlushFinalBlock(stream);
-                Assert.AreEqual("-BCDEF-GHJKL-MNOPQ_RSZ", Encoding.UTF8.GetString(target.ToArray()));
+                Assert.Equal("-BCDEF-GHJKL-MNOPQ_RSZ", Encoding.UTF8.GetString(target.ToArray()));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CryptoStreamWithEmptyFinalBlockViaRead()
         {
             var transform = new MockCryptoTransform(5);
@@ -157,20 +154,20 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 byte[] buffer = new byte[100];
-                Assert.AreEqual(4, stream.Read(buffer, 0, 4));
-                Assert.AreEqual("-BCD", Encoding.UTF8.GetString(buffer, 0, 4));
-                Assert.AreEqual(5, stream.Read(buffer, 4, 5));
-                Assert.AreEqual("EF-GH", Encoding.UTF8.GetString(buffer, 4, 5));
-                Assert.AreEqual(11, stream.Read(buffer, 9, 12));
-                Assert.AreEqual("JKL-MNOPQ_Z", Encoding.UTF8.GetString(buffer, 9, 11));
-                Assert.AreEqual(0, stream.Read(buffer, 0, 10)); // EOF
+                Assert.Equal(4, stream.Read(buffer, 0, 4));
+                Assert.Equal("-BCD", Encoding.UTF8.GetString(buffer, 0, 4));
+                Assert.Equal(5, stream.Read(buffer, 4, 5));
+                Assert.Equal("EF-GH", Encoding.UTF8.GetString(buffer, 4, 5));
+                Assert.Equal(11, stream.Read(buffer, 9, 12));
+                Assert.Equal("JKL-MNOPQ_Z", Encoding.UTF8.GetString(buffer, 9, 11));
+                Assert.Equal(0, stream.Read(buffer, 0, 10)); // EOF
 
                 string expected = "-BCDEF-GHJKL-MNOPQ_Z";
-                Assert.AreEqual(expected, Encoding.UTF8.GetString(buffer, 0, expected.Length));
+                Assert.Equal(expected, Encoding.UTF8.GetString(buffer, 0, expected.Length));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CryptoStreamWithNonEmptyFinalBlockViaRead()
         {
             var transform = new MockCryptoTransform(5);
@@ -178,20 +175,20 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 byte[] buffer = new byte[100];
-                Assert.AreEqual(4, stream.Read(buffer, 0, 4));
-                Assert.AreEqual("-BCD", Encoding.UTF8.GetString(buffer, 0, 4));
-                Assert.AreEqual(5, stream.Read(buffer, 4, 5));
-                Assert.AreEqual("EF-GH", Encoding.UTF8.GetString(buffer, 4, 5));
-                Assert.AreEqual(13, stream.Read(buffer, 9, 14));
-                Assert.AreEqual("JKL-MNOPQ_RSZ", Encoding.UTF8.GetString(buffer, 9, 13));
-                Assert.AreEqual(0, stream.Read(buffer, 0, 10)); // EOF
+                Assert.Equal(4, stream.Read(buffer, 0, 4));
+                Assert.Equal("-BCD", Encoding.UTF8.GetString(buffer, 0, 4));
+                Assert.Equal(5, stream.Read(buffer, 4, 5));
+                Assert.Equal("EF-GH", Encoding.UTF8.GetString(buffer, 4, 5));
+                Assert.Equal(13, stream.Read(buffer, 9, 14));
+                Assert.Equal("JKL-MNOPQ_RSZ", Encoding.UTF8.GetString(buffer, 9, 13));
+                Assert.Equal(0, stream.Read(buffer, 0, 10)); // EOF
 
                 string expected = "-BCDEF-GHJKL-MNOPQ_RSZ";
-                Assert.AreEqual(expected, Encoding.UTF8.GetString(buffer, 0, expected.Length));
+                Assert.Equal(expected, Encoding.UTF8.GetString(buffer, 0, expected.Length));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CanTransformMultipleBlocksViaWrite()
         {
             var transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -203,7 +200,7 @@
                 stream.Write(Encoding.UTF8.GetBytes("nop"), 0, 3);
                 stream.Write(Encoding.UTF8.GetBytes("qrstuvwxyz"), 0, 10);
                 this.FlushFinalBlock(stream);
-                Assert.AreEqual("-abcdefghij-klmno-pqrst-uvwxy_zZ", Encoding.UTF8.GetString(target.ToArray()));
+                Assert.Equal("-abcdefghij-klmno-pqrst-uvwxy_zZ", Encoding.UTF8.GetString(target.ToArray()));
             }
 
             transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -213,7 +210,7 @@
                 stream.Write(Encoding.UTF8.GetBytes("abc"), 0, 3);
                 stream.Write(Encoding.UTF8.GetBytes("defghijklmnop"), 0, 13);
                 this.FlushFinalBlock(stream);
-                Assert.AreEqual("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(target.ToArray()));
+                Assert.Equal("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(target.ToArray()));
             }
 
             transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -222,11 +219,11 @@
             {
                 stream.Write(Encoding.UTF8.GetBytes("abcdefghijk"), 0, 11);
                 this.FlushFinalBlock(stream);
-                Assert.AreEqual("-abcdefghij_kZ", Encoding.UTF8.GetString(target.ToArray()));
+                Assert.Equal("-abcdefghij_kZ", Encoding.UTF8.GetString(target.ToArray()));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CanTransformMultipleBlocksViaRead()
         {
             var transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -234,15 +231,15 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 var buffer = new byte[100];
-                Assert.AreEqual(12, stream.Read(buffer, 0, 12));
-                Assert.AreEqual("-abcdefghij-", Encoding.UTF8.GetString(buffer, 0, 12));
-                Assert.AreEqual(3, stream.Read(buffer, 12, 3));
-                Assert.AreEqual("klm", Encoding.UTF8.GetString(buffer, 12, 3));
-                Assert.AreEqual(4, stream.Read(buffer, 15, 4));
-                Assert.AreEqual("no-p", Encoding.UTF8.GetString(buffer, 15, 4));
-                Assert.AreEqual(13, stream.Read(buffer, 19, 13));
-                Assert.AreEqual("qrst-uvwxy_zZ", Encoding.UTF8.GetString(buffer, 19, 13));
-                Assert.AreEqual("-abcdefghij-klmno-pqrst-uvwxy_zZ", Encoding.UTF8.GetString(buffer, 0, 32));
+                Assert.Equal(12, stream.Read(buffer, 0, 12));
+                Assert.Equal("-abcdefghij-", Encoding.UTF8.GetString(buffer, 0, 12));
+                Assert.Equal(3, stream.Read(buffer, 12, 3));
+                Assert.Equal("klm", Encoding.UTF8.GetString(buffer, 12, 3));
+                Assert.Equal(4, stream.Read(buffer, 15, 4));
+                Assert.Equal("no-p", Encoding.UTF8.GetString(buffer, 15, 4));
+                Assert.Equal(13, stream.Read(buffer, 19, 13));
+                Assert.Equal("qrst-uvwxy_zZ", Encoding.UTF8.GetString(buffer, 19, 13));
+                Assert.Equal("-abcdefghij-klmno-pqrst-uvwxy_zZ", Encoding.UTF8.GetString(buffer, 0, 32));
             }
 
             transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -250,11 +247,11 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 var buffer = new byte[100];
-                Assert.AreEqual(4, stream.Read(buffer, 0, 4));
-                Assert.AreEqual("-abc", Encoding.UTF8.GetString(buffer, 0, 4));
-                Assert.AreEqual(16, stream.Read(buffer, 4, 16));
-                Assert.AreEqual("de-fghijklmno_pZ", Encoding.UTF8.GetString(buffer, 4, 16));
-                Assert.AreEqual("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(buffer, 0, 20));
+                Assert.Equal(4, stream.Read(buffer, 0, 4));
+                Assert.Equal("-abc", Encoding.UTF8.GetString(buffer, 0, 4));
+                Assert.Equal(16, stream.Read(buffer, 4, 16));
+                Assert.Equal("de-fghijklmno_pZ", Encoding.UTF8.GetString(buffer, 4, 16));
+                Assert.Equal("-abcde-fghijklmno_pZ", Encoding.UTF8.GetString(buffer, 0, 20));
             }
 
             transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -262,8 +259,8 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 var buffer = new byte[100];
-                Assert.AreEqual(14, stream.Read(buffer, 0, 14));
-                Assert.AreEqual("-abcdefghij_kZ", Encoding.UTF8.GetString(buffer, 0, 14));
+                Assert.Equal(14, stream.Read(buffer, 0, 14));
+                Assert.Equal("-abcdefghij_kZ", Encoding.UTF8.GetString(buffer, 0, 14));
             }
 
             transform = new MockCryptoTransform(5, canTransformMultipleBlocks: true);
@@ -271,8 +268,8 @@
             using (var stream = this.CreateCryptoStream(target, transform, CryptoStreamMode.Read))
             {
                 var buffer = new byte[100];
-                Assert.AreEqual(2, stream.Read(buffer, 0, 12));
-                Assert.AreEqual("_Z", Encoding.UTF8.GetString(buffer, 0, 2));
+                Assert.Equal(2, stream.Read(buffer, 0, 12));
+                Assert.Equal("_Z", Encoding.UTF8.GetString(buffer, 0, 2));
             }
         }
 
@@ -308,11 +305,11 @@
             {
                 if (this.CanTransformMultipleBlocks)
                 {
-                    Assert.IsTrue(inputCount % this.InputBlockSize == 0);
+                    Assert.True(inputCount % this.InputBlockSize == 0);
                 }
                 else
                 {
-                    Assert.IsTrue(inputCount == this.InputBlockSize);
+                    Assert.True(inputCount == this.InputBlockSize);
                 }
 
                 outputBuffer[outputOffset] = (byte)'-';
