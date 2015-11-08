@@ -26,8 +26,6 @@ public class CryptographicEngineAsymmetricTests
 
     private static readonly ICryptographicKey ecdsaSigningKey;
 
-    private static object[][] signingAndHashParameters;
-
     /// <summary>
     /// Data the fits within a single cryptographic block.
     /// </summary>
@@ -60,27 +58,23 @@ public class CryptographicEngineAsymmetricTests
     {
         get
         {
-            if (signingAndHashParameters == null)
-            {
-                var result = new List<object[]>
+            // Do NOT cache the result of this because each test disposes of the keys we generate here.
+            var result = new List<object[]>
                 {
                     new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1).CreateKeyPair(512), HashAlgorithm.Sha1 },
                     new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256).CreateKeyPair(512), HashAlgorithm.Sha256 },
                 };
 
-                try
-                {
-                    result.Add(new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 });
-                    Debug.WriteLine("ECDSA tests skipped due to no support on the platform.");
-                }
-                catch (NotSupportedException)
-                {
-                }
-
-                signingAndHashParameters = result.ToArray();
+            try
+            {
+                result.Add(new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 });
+                Debug.WriteLine("ECDSA tests skipped due to no support on the platform.");
+            }
+            catch (NotSupportedException)
+            {
             }
 
-            return signingAndHashParameters;
+            return result.ToArray();
         }
     }
 
