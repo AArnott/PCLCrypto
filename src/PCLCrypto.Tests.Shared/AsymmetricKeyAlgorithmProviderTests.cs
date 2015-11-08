@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using Xunit;
+    using Xunit.Abstractions;
 
 #if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
     public class AsymmetricKeyAlgorithmProviderTests
@@ -18,6 +19,13 @@
             { AsymmetricAlgorithm.RsaOaepSha1, 512 },
             { AsymmetricAlgorithm.EcdsaP256Sha256, 256 },
         };
+
+        private readonly ITestOutputHelper logger;
+
+        public AsymmetricKeyAlgorithmProviderTests(ITestOutputHelper logger)
+        {
+            this.logger = logger;
+        }
 
         [Fact]
         public void OpenAlgorithm_GetAlgorithmName()
@@ -126,7 +134,7 @@
         {
             foreach (var algorithm in KeyAlgorithmsToTest)
             {
-                Debug.WriteLine("** Algorithm: {0} **", algorithm.Key);
+                this.logger.WriteLine("** Algorithm: {0} **", algorithm.Key);
                 var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
                 using (ICryptographicKey key = keyAlgorithm.CreateKeyPair(algorithm.Value))
                 {
@@ -141,14 +149,14 @@
                                 byte[] key2Blob = key2.Export(format);
 
                                 Assert.Equal(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
-                                Debug.WriteLine("Format {0} supported.", format);
-                                Debug.WriteLine(Convert.ToBase64String(keyBlob));
+                                this.logger.WriteLine("Format {0} supported.", format);
+                                this.logger.WriteLine(Convert.ToBase64String(keyBlob));
                                 supportedFormats++;
                             }
                         }
                         catch (NotSupportedException)
                         {
-                            Debug.WriteLine("Format {0} NOT supported.", format);
+                            this.logger.WriteLine("Format {0} NOT supported.", format);
                         }
                     }
 
@@ -162,7 +170,7 @@
         {
             foreach (var algorithm in KeyAlgorithmsToTest)
             {
-                Debug.WriteLine("** Algorithm: {0} **", algorithm.Key);
+                this.logger.WriteLine("** Algorithm: {0} **", algorithm.Key);
                 var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
                 var key = keyAlgorithm.CreateKeyPair(algorithm.Value);
 
@@ -186,13 +194,13 @@
                             // Some algorithms, such as ECDSA, only support signing/verifying.
                         }
 
-                        Debug.WriteLine("Format {0} supported.", format);
-                        Debug.WriteLine("    " + Convert.ToBase64String(keyBlob));
+                        this.logger.WriteLine("Format {0} supported.", format);
+                        this.logger.WriteLine("    " + Convert.ToBase64String(keyBlob));
                         supportedFormats++;
                     }
                     catch (NotSupportedException)
                     {
-                        Debug.WriteLine("Format {0} NOT supported.", format);
+                        this.logger.WriteLine("Format {0} NOT supported.", format);
                     }
                 }
 
@@ -226,11 +234,11 @@
                     }
 
                     supportedFormats++;
-                    Debug.WriteLine("Key format {0} supported.", formatAndBlob.Key);
+                    this.logger.WriteLine("Key format {0} supported.", formatAndBlob.Key);
                 }
                 catch (NotSupportedException)
                 {
-                    Debug.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
+                    this.logger.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
                 }
             }
 
@@ -250,11 +258,11 @@
                     string exported = Convert.ToBase64String(key.ExportPublicKey(formatAndBlob.Key.Item2));
                     Assert.Equal(formatAndBlob.Value, exported);
                     supportedFormats++;
-                    Debug.WriteLine("Key format {0} supported.", formatAndBlob.Key);
+                    this.logger.WriteLine("Key format {0} supported.", formatAndBlob.Key);
                 }
                 catch (NotSupportedException)
                 {
-                    Debug.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
+                    this.logger.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
                 }
             }
 

@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Text;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class CryptographicEngineTests
     {
@@ -34,6 +35,13 @@
         private readonly ICryptographicKey aesKeyNoPadding = CreateKey(SymmetricAlgorithm.AesCbc, AesKeyMaterial);
 
         private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
+
+        private readonly ITestOutputHelper logger;
+
+        public CryptographicEngineTests(ITestOutputHelper logger)
+        {
+            this.logger = logger;
+        }
 
         [Fact]
         public void SignAndVerifySignatureMac()
@@ -183,7 +191,7 @@
             }
             catch (NotSupportedException)
             {
-                Debug.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
+                this.logger.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
             }
         }
 
@@ -219,7 +227,7 @@
             }
             catch (NotSupportedException)
             {
-                Debug.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
+                this.logger.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
             }
         }
 
@@ -257,11 +265,11 @@
                         }
                     }
 
-                    Debug.WriteLine("Algorithm {0} passed.", symmetricAlgorithm);
+                    this.logger.WriteLine("Algorithm {0} passed.", symmetricAlgorithm);
                 }
                 catch (NotSupportedException)
                 {
-                    Debug.WriteLine("Algorithm {0} is not supported on this platform.", symmetricAlgorithm);
+                    this.logger.WriteLine("Algorithm {0} is not supported on this platform.", symmetricAlgorithm);
                 }
             }
         }

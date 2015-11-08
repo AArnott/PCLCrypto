@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class KeyDerivationAlgorithmProviderTests
     {
@@ -17,6 +18,13 @@
             { KeyDerivationAlgorithm.Pbkdf2Sha1, "3HWzwI225INl7y6+G9Jv7Af8UGE=" },
             { KeyDerivationAlgorithm.Pbkdf2Sha256, "t420R6yC8H2CDK/0sSGmwKHLooM=" },
         };
+
+        private readonly ITestOutputHelper logger;
+
+        public KeyDerivationAlgorithmProviderTests(ITestOutputHelper logger)
+        {
+            this.logger = logger;
+        }
 
         [Fact]
         public void OpenAlgorithm()
@@ -48,7 +56,7 @@
         {
             foreach (var algorithmAndExpectedResult in this.stretchedKeyBase64)
             {
-                Debug.WriteLine("Testing algorithm: {0}", algorithmAndExpectedResult.Key);
+                this.logger.WriteLine("Testing algorithm: {0}", algorithmAndExpectedResult.Key);
                 var algorithm = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(algorithmAndExpectedResult.Key);
                 ICryptographicKey key = algorithm.CreateKey(this.originalKey);
                 Assert.NotNull(key);
@@ -65,7 +73,7 @@
                 }
                 catch (NotSupportedException)
                 {
-                    Debug.WriteLine(" - Not supported on this platform");
+                    this.logger.WriteLine(" - Not supported on this platform");
                 }
             }
         }

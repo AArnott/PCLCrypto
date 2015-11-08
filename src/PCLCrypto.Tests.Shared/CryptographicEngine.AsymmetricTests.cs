@@ -7,6 +7,7 @@ using System.Text;
 using PCLCrypto;
 using PCLCrypto.Tests;
 using Xunit;
+using Xunit.Abstractions;
 
 public class CryptographicEngineAsymmetricTests
 {
@@ -43,6 +44,13 @@ public class CryptographicEngineAsymmetricTests
         {
             // ECDSA is not supported on this platform.
         }
+    }
+
+    private readonly ITestOutputHelper logger;
+
+    public CryptographicEngineAsymmetricTests(ITestOutputHelper logger)
+    {
+        this.logger = logger;
     }
 
     public static object[][] SigningParameters
@@ -125,7 +133,7 @@ public class CryptographicEngineAsymmetricTests
         }
         catch (NotSupportedException)
         {
-            Debug.WriteLine("Not supported by the platform.");
+            this.logger.WriteLine("Not supported by the platform.");
         }
     }
 
@@ -139,7 +147,7 @@ public class CryptographicEngineAsymmetricTests
         }
         catch (NotSupportedException)
         {
-            Debug.WriteLine("Not supported by the platform.");
+            this.logger.WriteLine("Not supported by the platform.");
         }
     }
 
@@ -195,7 +203,7 @@ public class CryptographicEngineAsymmetricTests
         catch (NotSupportedException)
         {
             // Not all platforms support this.
-            Debug.WriteLine("Skipped test for unsupported functionality on this platform.");
+            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
         }
     }
 
@@ -213,7 +221,7 @@ public class CryptographicEngineAsymmetricTests
         catch (NotSupportedException)
         {
             // Not all platforms support this.
-            Debug.WriteLine("Skipped test for unsupported functionality on this platform.");
+            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
         }
     }
 
@@ -231,7 +239,7 @@ public class CryptographicEngineAsymmetricTests
         catch (NotSupportedException)
         {
             // Not all platforms support this.
-            Debug.WriteLine("Skipped test for unsupported functionality on this platform.");
+            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
         }
     }
 
@@ -249,7 +257,7 @@ public class CryptographicEngineAsymmetricTests
         catch (NotSupportedException)
         {
             // Not all platforms support this.
-            Debug.WriteLine("Skipped test for unsupported functionality on this platform.");
+            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
         }
     }
 
