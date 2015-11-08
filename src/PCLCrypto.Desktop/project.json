@@ -6,10 +6,11 @@
     "Validation": "2.2.8"
   },
   "frameworks": {
-    ".NETFramework,Version=v4.0,Profile=Client": { }
+    ".NETFramework,Version=v4.5": { }
   },
   "runtimes": {
-    "win-anycpu": {}
+    "win-anycpu": { },
+    "win":  { }
   },
   "supports": { }
 }

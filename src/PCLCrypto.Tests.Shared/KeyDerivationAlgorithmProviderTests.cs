@@ -5,11 +5,8 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
+    using Xunit;
 
-    [TestClass]
     public class KeyDerivationAlgorithmProviderTests
     {
         private readonly byte[] originalKey = new byte[] { 0x1, 0x2, 0x3, 0x5 };
@@ -21,32 +18,32 @@
             { KeyDerivationAlgorithm.Pbkdf2Sha256, "t420R6yC8H2CDK/0sSGmwKHLooM=" },
         };
 
-        [TestMethod]
+        [Fact]
         public void OpenAlgorithm()
         {
             var algorithm = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Pbkdf2Sha1);
-            Assert.IsNotNull(algorithm);
+            Assert.NotNull(algorithm);
         }
 
-        [TestMethod]
+        [Fact]
         public void Algorithm()
         {
             var algorithm = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Pbkdf2Sha1);
-            Assert.AreEqual(KeyDerivationAlgorithm.Pbkdf2Sha1, algorithm.Algorithm);
+            Assert.Equal(KeyDerivationAlgorithm.Pbkdf2Sha1, algorithm.Algorithm);
 
             algorithm = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Pbkdf2Md5);
-            Assert.AreEqual(KeyDerivationAlgorithm.Pbkdf2Md5, algorithm.Algorithm);
+            Assert.Equal(KeyDerivationAlgorithm.Pbkdf2Md5, algorithm.Algorithm);
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateKey_InvalidInputs()
         {
             var algorithm = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Pbkdf2Sha1);
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => algorithm.CreateKey(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateKey()
         {
             foreach (var algorithmAndExpectedResult in this.stretchedKeyBase64)
@@ -54,17 +51,17 @@
                 Debug.WriteLine("Testing algorithm: {0}", algorithmAndExpectedResult.Key);
                 var algorithm = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(algorithmAndExpectedResult.Key);
                 ICryptographicKey key = algorithm.CreateKey(this.originalKey);
-                Assert.IsNotNull(key);
-                Assert.AreEqual(this.originalKey.Length * 8, key.KeySize);
+                Assert.NotNull(key);
+                Assert.Equal(this.originalKey.Length * 8, key.KeySize);
 
                 IKeyDerivationParameters parameters = WinRTCrypto.KeyDerivationParameters.BuildForPbkdf2(this.salt, this.iterations);
-                Assert.AreEqual(this.iterations, parameters.IterationCount);
+                Assert.Equal(this.iterations, parameters.IterationCount);
                 CollectionAssertEx.AreEqual(this.salt, parameters.KdfGenericBinary);
 
                 try
                 {
                     byte[] keyMaterial = WinRTCrypto.CryptographicEngine.DeriveKeyMaterial(key, parameters, 20);
-                    Assert.AreEqual(algorithmAndExpectedResult.Value, Convert.ToBase64String(keyMaterial));
+                    Assert.Equal(algorithmAndExpectedResult.Value, Convert.ToBase64String(keyMaterial));
                 }
                 catch (NotSupportedException)
                 {

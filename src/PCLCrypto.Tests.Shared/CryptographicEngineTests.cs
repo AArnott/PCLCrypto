@@ -6,11 +6,8 @@
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
+    using Xunit;
 
-    [TestClass]
     public class CryptographicEngineTests
     {
         private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
@@ -38,123 +35,123 @@
 
         private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
 
-        [TestMethod]
+        [Fact]
         public void SignAndVerifySignatureMac()
         {
             byte[] signature = WinRTCrypto.CryptographicEngine.Sign(this.macKey, this.data);
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, signature));
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, PclTestUtilities.Tamper(this.data), signature));
-            Assert.IsFalse(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, PclTestUtilities.Tamper(signature)));
+            Assert.True(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, signature));
+            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, PclTestUtilities.Tamper(this.data), signature));
+            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(this.macKey, this.data, PclTestUtilities.Tamper(signature)));
         }
 
-        [TestMethod]
+        [Fact]
         public void Encrypt_InvalidInputs()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.Encrypt(null, this.data, null));
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, null, null));
         }
 
-        [TestMethod]
+        [Fact]
         public void Decrypt_InvalidInputs()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.Decrypt(null, this.data, null));
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, null, null));
         }
 
-        [TestMethod]
+        [Fact]
         public void EncryptAndDecrypt_AES_NoIV()
         {
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, null);
             CollectionAssertEx.AreNotEqual(this.data, cipherText);
-            Assert.AreEqual("oCSAA4sUCGa5ukwSJdeKWw==", Convert.ToBase64String(cipherText));
+            Assert.Equal("oCSAA4sUCGa5ukwSJdeKWw==", Convert.ToBase64String(cipherText));
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, null);
             CollectionAssertEx.AreEqual(this.data, plainText);
         }
 
-        [TestMethod]
+        [Fact]
         public void EncryptAndDecrypt_AES_IV()
         {
             byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, this.iv);
             CollectionAssertEx.AreNotEqual(this.data, cipherText);
-            Assert.AreEqual(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
+            Assert.Equal(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
             byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, this.iv);
             CollectionAssertEx.AreEqual(this.data, plainText);
         }
 
-        [TestMethod]
+        [Fact]
         public void Encrypt_PartialBlockInput()
         {
             if (this.aesKeyNoPadding != null)
             {
-                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv));
+                Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv));
             }
 
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[4], this.iv);
-            Assert.AreEqual(16, ciphertext.Length); // 16 is the block size for AES
+            Assert.Equal(16, ciphertext.Length); // 16 is the block size for AES
         }
 
-        [TestMethod]
+        [Fact]
         public void Decrypt_PartialBlockInput()
         {
             if (this.aesKeyNoPadding != null)
             {
-                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv));
+                Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv));
             }
 
-            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[4], this.iv));
+            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[4], this.iv));
         }
 
-        [TestMethod]
+        [Fact]
         public void Encrypt_EmptyInput()
         {
             if (this.aesKeyNoPadding != null)
             {
-                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv));
+                Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv));
             }
 
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[0], this.iv);
-            Assert.AreEqual(16, ciphertext.Length); // 16 is the block size for AES
+            Assert.Equal(16, ciphertext.Length); // 16 is the block size for AES
         }
 
-        [TestMethod]
+        [Fact]
         public void Decrypt_EmptyInput()
         {
             if (this.aesKeyNoPadding != null)
             {
-                ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv));
+                Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv));
             }
 
-            ExceptionAssert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[0], this.iv));
+            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[0], this.iv));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateEncryptor_InvalidInputs()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.CreateEncryptor(null, this.iv));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateDecryptor_InvalidInputs()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => WinRTCrypto.CryptographicEngine.CreateDecryptor(null, this.iv));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateEncryptor()
         {
             var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey, this.iv);
             byte[] cipherText = encryptor.TransformFinalBlock(this.data, 0, this.data.Length);
 
-            Assert.AreEqual(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
+            Assert.Equal(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
         }
 
-        [TestMethod]
+        [Fact]
         public void StreamingCipherKeyRetainsStateAcrossOperations_Encrypt()
         {
             // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
@@ -180,7 +177,7 @@
                 }
 
                 byte[] incrementalResult = cipherStream.ToArray();
-                Assert.AreEqual(
+                Assert.Equal(
                     Convert.ToBase64String(allCiphertext),
                     Convert.ToBase64String(incrementalResult));
             }
@@ -190,7 +187,7 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void StreamingCipherKeyRetainsStateAcrossOperations_Decrypt()
         {
             // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
@@ -216,7 +213,7 @@
                 }
 
                 byte[] incrementalResult = cipherStream.ToArray();
-                Assert.AreEqual(
+                Assert.Equal(
                     Convert.ToBase64String(allCiphertext),
                     Convert.ToBase64String(incrementalResult));
             }
@@ -226,7 +223,7 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateEncryptor_SymmetricEncryptionEquivalence()
         {
             foreach (SymmetricAlgorithm symmetricAlgorithm in Enum.GetValues(typeof(SymmetricAlgorithm)))
@@ -254,7 +251,7 @@
                             cryptoStream.FlushFinalBlock();
 
                             byte[] actual = actualStream.ToArray();
-                            Assert.AreEqual(
+                            Assert.Equal(
                                 Convert.ToBase64String(expected),
                                 Convert.ToBase64String(actual));
                         }
@@ -269,21 +266,21 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateEncryptor_AcceptsNullIV()
         {
             var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey, null);
-            Assert.IsNotNull(encryptor);
+            Assert.NotNull(encryptor);
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateDecryptor_AcceptsNullIV()
         {
             var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey, null);
-            Assert.IsNotNull(decryptor);
+            Assert.NotNull(decryptor);
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateDecryptor()
         {
             byte[] cipherText = Convert.FromBase64String(DataAesCiphertextBase64);
@@ -292,14 +289,14 @@
             CollectionAssertEx.AreEqual(this.data, plaintext);
         }
 
-        [TestMethod]
+        [Fact]
         public void EncryptDecryptStreamChain()
         {
             byte[] data = this.data;
             this.EncryptDecryptStreamChain(data);
         }
 
-        [TestMethod]
+        [Fact]
         public void EncryptDecryptStreamChain_Multiblock()
         {
             this.EncryptDecryptStreamChain(this.bigData);

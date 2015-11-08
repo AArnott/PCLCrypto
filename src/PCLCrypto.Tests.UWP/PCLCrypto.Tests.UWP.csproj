@@ -90,9 +90,6 @@
     <!--A reference to the entire .Net Framework and Windows SDK are automatically included-->
     <None Include="PCLCrypto.Tests.UWP.ruleset" />
     <None Include="project.json" />
-    <SDKReference Include="MSTestFramework.Universal, Version=14.0">
-      <Name>MSTest for Managed Projects</Name>
-    </SDKReference>
     <SDKReference Include="TestPlatform.Universal, Version=$(UnitTestPlatformVersion)" />
   </ItemGroup>
   <ItemGroup>

@@ -5,12 +5,9 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
+    using Xunit;
 
 #if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
-    [TestClass]
     public class AsymmetricKeyAlgorithmProviderTests
     {
         /// <summary>
@@ -22,58 +19,58 @@
             { AsymmetricAlgorithm.EcdsaP256Sha256, 256 },
         };
 
-        [TestMethod]
+        [Fact]
         public void OpenAlgorithm_GetAlgorithmName()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            Assert.AreEqual(AsymmetricAlgorithm.RsaOaepSha1, rsa.Algorithm);
+            Assert.Equal(AsymmetricAlgorithm.RsaOaepSha1, rsa.Algorithm);
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateKeyPair_InvalidInputs()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
                 rsa.CreateKeyPair(-1));
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
                 rsa.CreateKeyPair(0));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateKeyPair_RsaOaepSha1()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             var key = rsa.CreateKeyPair(512);
-            Assert.IsNotNull(key);
-            Assert.AreEqual(512, key.KeySize);
+            Assert.NotNull(key);
+            Assert.Equal(512, key.KeySize);
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateKeyPair_EcdsaP256Sha256()
         {
             var ecdsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256);
             var key = ecdsa.CreateKeyPair(256);
-            Assert.IsNotNull(key);
-            Assert.AreEqual(256, key.KeySize);
+            Assert.NotNull(key);
+            Assert.Equal(256, key.KeySize);
         }
 
-        [TestMethod]
+        [Fact]
         public void ImportKeyPair_Null()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => rsa.ImportKeyPair(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void ImportPublicKey_Null()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
-            ExceptionAssert.Throws<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => rsa.ImportPublicKey(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void RSAParametersPrivateKeyRoundtrip()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
@@ -86,18 +83,18 @@
             CollectionAssertEx.AreEqual(blob1, blob2);
         }
 
-        [TestMethod]
+        [Fact]
         public void RSAParametersPublicKeyRoundtrip()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
             var keyPair = rsa.CreateKeyPair(512);
             RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: false);
-            Assert.IsNull(parameters.P, "Private key should have been omitted.");
-            Assert.IsNull(parameters.InverseQ, "Private key should have been omitted.");
-            Assert.IsNull(parameters.D, "Private key should have been omitted.");
-            Assert.IsNull(parameters.Q, "Private key should have been omitted.");
-            Assert.IsNull(parameters.DP, "Private key should have been omitted.");
-            Assert.IsNull(parameters.DQ, "Private key should have been omitted.");
+            Assert.Null(parameters.P);
+            Assert.Null(parameters.InverseQ);
+            Assert.Null(parameters.D);
+            Assert.Null(parameters.Q);
+            Assert.Null(parameters.DP);
+            Assert.Null(parameters.DQ);
             ICryptographicKey publicKey = rsa.ImportParameters(parameters);
 
             var blob1 = keyPair.ExportPublicKey();
@@ -105,7 +102,7 @@
             CollectionAssertEx.AreEqual(blob1, blob2);
         }
 
-        [TestMethod]
+        [Fact]
         public void ExportParametersThrowsOnPublicKeyMismatch()
         {
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
@@ -113,18 +110,18 @@
             var publicKey = rsa.ImportPublicKey(keyPair.ExportPublicKey());
 
             // This should throw because we can't export a private key when only the public key is known.
-            ExceptionAssert.Throws<InvalidOperationException>(() => publicKey.ExportParameters(includePrivateParameters: true));
+            Assert.Throws<InvalidOperationException>(() => publicKey.ExportParameters(includePrivateParameters: true));
         }
 
-        [TestMethod]
+        [Fact]
         public void ExportParametersThrowsOnSymmetricKey()
         {
             var keyProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
             var key = keyProvider.CreateSymmetricKey(new byte[keyProvider.BlockLength]);
-            ExceptionAssert.Throws<NotSupportedException>(() => key.ExportParameters(includePrivateParameters: false));
+            Assert.Throws<NotSupportedException>(() => key.ExportParameters(includePrivateParameters: false));
         }
 
-        [TestMethod]
+        [Fact]
         public void KeyPairRoundTrip()
         {
             foreach (var algorithm in KeyAlgorithmsToTest)
@@ -143,7 +140,7 @@
                             {
                                 byte[] key2Blob = key2.Export(format);
 
-                                Assert.AreEqual(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
+                                Assert.Equal(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
                                 Debug.WriteLine("Format {0} supported.", format);
                                 Debug.WriteLine(Convert.ToBase64String(keyBlob));
                                 supportedFormats++;
@@ -155,12 +152,12 @@
                         }
                     }
 
-                    Assert.IsTrue(supportedFormats > 0, "No supported formats.");
+                    Assert.True(supportedFormats > 0, "No supported formats.");
                 }
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void PublicKeyRoundTrip()
         {
             foreach (var algorithm in KeyAlgorithmsToTest)
@@ -199,11 +196,11 @@
                     }
                 }
 
-                Assert.IsTrue(supportedFormats > 0, "No supported formats.");
+                Assert.True(supportedFormats > 0, "No supported formats.");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void KeyPairInterop()
         {
             int supportedFormats = 0;
@@ -221,11 +218,11 @@
                         // Since the private key material seems to be elsewhere, we'll exclude
                         // the suffix from the comparison.
                         // The prefix is also mismatched, but that seems to also be ignorable.
-                        Assert.AreEqual(formatAndBlob.Value.Substring(6, exported.Length - 6), exported.Substring(6));
+                        Assert.Equal(formatAndBlob.Value.Substring(6, exported.Length - 6), exported.Substring(6));
                     }
                     else
                     {
-                        Assert.AreEqual(formatAndBlob.Value, exported);
+                        Assert.Equal(formatAndBlob.Value, exported);
                     }
 
                     supportedFormats++;
@@ -237,10 +234,10 @@
                 }
             }
 
-            Assert.IsTrue(supportedFormats > 0, "No supported formats.");
+            Assert.True(supportedFormats > 0, "No supported formats.");
         }
 
-        [TestMethod]
+        [Fact]
         public void PublicKeyInterop()
         {
             int supportedFormats = 0;
@@ -251,7 +248,7 @@
                 {
                     var key = algorithm.ImportPublicKey(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
                     string exported = Convert.ToBase64String(key.ExportPublicKey(formatAndBlob.Key.Item2));
-                    Assert.AreEqual(formatAndBlob.Value, exported);
+                    Assert.Equal(formatAndBlob.Value, exported);
                     supportedFormats++;
                     Debug.WriteLine("Key format {0} supported.", formatAndBlob.Key);
                 }
@@ -261,10 +258,10 @@
                 }
             }
 
-            Assert.IsTrue(supportedFormats > 0, "No supported formats.");
+            Assert.True(supportedFormats > 0, "No supported formats.");
         }
 
-        [TestMethod]
+        [Fact]
         public void EncryptionInterop()
         {
             byte[] data = new byte[] { 1, 2, 3 };
@@ -284,20 +281,20 @@
 
                 // Verify that we can decrypt something encrypted previously (on WinRT)
                 byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
-                Assert.AreEqual(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
+                Assert.Equal(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
 
                 // Now verify we can decrypt something we encrypted ourselves.
                 byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
                 byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
-                Assert.AreEqual(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
+                Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
 
                 return; // We only need one key format to work for the encryption test.
             }
 
-            Assert.IsTrue(false, "No supported formats.");
+            Assert.True(false, "No supported formats.");
         }
 
-        [TestMethod]
+        [Fact]
         public void KeyPairInterop_iOSGenerated()
         {
             // Tests a key where P has more significant digits than Q.
@@ -309,10 +306,10 @@
             byte[] data = new byte[] { 1, 2, 3 };
             byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
             byte[] plaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, ciphertext);
-            Assert.AreEqual(Convert.ToBase64String(data), Convert.ToBase64String(plaintext));
+            Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(plaintext));
         }
 
-        [TestMethod]
+        [Fact]
         public void RSAParametersNotOverlyTrimmed()
         {
             // Test a private key that has a most significant bit of zero in its D parameter.
@@ -326,13 +323,13 @@
             key.Export(CryptographicPrivateKeyBlobType.Capi1PrivateKey);
         }
 
-        ////[TestMethod]
+        ////[Fact]
         ////public void SignedDataVerifyInterop()
         ////{
 
         ////}
 
-        ////[TestMethod]
+        ////[Fact]
         ////public void SignedHashVerifyInterop()
         ////{
 
