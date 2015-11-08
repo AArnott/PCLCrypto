@@ -3,7 +3,6 @@
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "Nerdbank.FullDuplexStream": "1.0.1",
     "Nerdbank.GitVersioning": "1.1.52-rc",
-    "PCLCommandBase": "0.2.2",
     "PInvoke.Windows.Core": "0.1.13-alpha",
     "Validation": "2.2.8",
     "Xamarin.Forms": "1.5.0.6447",
