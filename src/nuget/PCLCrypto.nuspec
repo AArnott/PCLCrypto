@@ -11,7 +11,7 @@
 		<iconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/icons/icon_64x64.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
-			PCL Crypto provides a consistent, portable set of crypto APIs for .NET, Windows Phone 8.0 &amp; 8.1, Windows Store, Xamarin.iOS, Xamarin.Android, and Silverlight.
+			PCL Crypto provides a consistent, portable set of crypto APIs for .NET 4.5, Windows Phone 8.0 SL &amp; 8.1 Xaml, Windows Store, Xamarin.iOS, Xamarin.Android.
 			This makes it easier to create cross-platform .NET libraries and apps.
 			Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation.
 			PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.
@@ -20,14 +20,15 @@
 		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
 		<releaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</releaseNotes>
 		<dependencies>
-			<group targetFramework="net40-Client">
+			<group targetFramework="net45">
 				<dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
-				<dependency id="Validation" version="[2.0.6,3.0)"/>
+				<dependency id="Validation" version="2.2.8"/>
 			</group>
 			<group>
-				<dependency id="Validation" version="[2.0.6,3.0)"/>
+				<dependency id="Validation" version="2.2.8"/>
 			</group>
       <group targetFramework="win81">
+        <dependency id="Validation" version="2.2.8"/>
         <dependency id="PInvoke.BCrypt" version="0.1.13-alpha" />
       </group>
 		</dependencies>
@@ -35,9 +36,8 @@
 	<files>
 		<!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
 				 the platform-specific lib folder will indicate Windows 8.1 is required. -->
-		<file target="lib\portable-net40+sl50+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
-		<file target="lib\net40-Client" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.???" />
-		<file target="lib\sl5" src="$OutputPath$PCLCrypto.Silverlight\PCLCrypto.???" />
+		<file target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
+		<file target="lib\net45" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.???" />
 		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.???" />
 		<file target="lib\wpa81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
 		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
