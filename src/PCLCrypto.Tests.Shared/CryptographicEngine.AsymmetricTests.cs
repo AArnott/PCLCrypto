@@ -24,14 +24,28 @@ public class CryptographicEngineAsymmetricTests
         .OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1)
         .CreateKeyPair(512);
 
-    private static readonly ICryptographicKey ecdsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
-        .OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256)
-        .CreateKeyPair(256);
+    private static readonly ICryptographicKey ecdsaSigningKey;
+
+    private static object[][] signingAndHashParameters;
 
     /// <summary>
     /// Data the fits within a single cryptographic block.
     /// </summary>
     private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
+
+    static CryptographicEngineAsymmetricTests()
+    {
+        try
+        {
+            ecdsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+                .OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256)
+                .CreateKeyPair(256);
+        }
+        catch (NotSupportedException)
+        {
+            // ECDSA is not supported on this platform.
+        }
+    }
 
     public static object[][] SigningParameters
     {
@@ -46,12 +60,27 @@ public class CryptographicEngineAsymmetricTests
     {
         get
         {
-            return new object[][]
+            if (signingAndHashParameters == null)
             {
-                new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1).CreateKeyPair(512), HashAlgorithm.Sha1 },
-                new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256).CreateKeyPair(512), HashAlgorithm.Sha256 },
-                new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 },
-            };
+                var result = new List<object[]>
+                {
+                    new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1).CreateKeyPair(512), HashAlgorithm.Sha1 },
+                    new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256).CreateKeyPair(512), HashAlgorithm.Sha256 },
+                };
+
+                try
+                {
+                    result.Add(new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 });
+                    Debug.WriteLine("ECDSA tests skipped due to no support on the platform.");
+                }
+                catch (NotSupportedException)
+                {
+                }
+
+                signingAndHashParameters = result.ToArray();
+            }
+
+            return signingAndHashParameters;
         }
     }
 
