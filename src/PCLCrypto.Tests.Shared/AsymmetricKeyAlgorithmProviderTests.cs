@@ -310,11 +310,14 @@
             byte[] rsaPrivateKey = Convert.FromBase64String(@"MIIBPQIBAAJBAKJJ2g6qhep28mB5ySYb44dk9ZE0H+JQug9Tq2/1BjebHtW+YP/1Ds3tK/rQvL1A+yhLkFWOaQD6043AwJpWDxMCAwEAAQJAGr0sTmpOMjly6e5m8/54WKCLzWbXMgS3Azt37bRjV9nFGDqoq6gbwSnB709oouNPmqc4hE/6AqEnplfBfHX7YQIiAAGX4W2H9Y+uATS4dwnHnE6ROezx5275HLAjfARLRPQ3OwIhAGXbnimLuplWSVQ9/wE2eaISn5lF2tF1vKtvNSL3anoJAiIAARHo7jBupPV6k9gJAMVO36hBWTC+ddTPAi5iO1P803A/AiAVMKUsu3bsY3kJ34Pneq+/OeSd/FxTawz/FTmWtqYeEQIhACR2PamFTCPoeZEf73/OQeEVmLbd/xwozz8UOqGejqlh");
             var rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
 
-            ICryptographicKey key = rsa.ImportKeyPair(rsaPrivateKey, CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey);
-
             byte[] data = new byte[] { 1, 2, 3 };
-            byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
-            byte[] plaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, ciphertext);
+            byte[] ciphertext, plaintext;
+            using (ICryptographicKey key = rsa.ImportKeyPair(rsaPrivateKey, CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey))
+            {
+                ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
+                plaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, ciphertext);
+            }
+
             Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(plaintext));
         }
 
