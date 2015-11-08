@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\Xunit.SkippableFact.1.0.15200-beta\build\Xunit.SkippableFact.props" Condition="Exists('..\..\packages\Xunit.SkippableFact.1.0.15200-beta\build\Xunit.SkippableFact.props')" />
   <Import Project="..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.props" Condition="Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.props')" />
   <Import Project="..\..\packages\xunit.core.2.1.0\build\wpa81\xunit.core.props" Condition="Exists('..\..\packages\xunit.core.2.1.0\build\wpa81\xunit.core.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -92,6 +93,10 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.1.0\lib\wpa81\xunit.execution.dotnet.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Xunit.SkippableFact, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xunit.SkippableFact.1.0.15200-beta\lib\portable-net45+win+wpa81+wp80\Xunit.SkippableFact.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
@@ -132,6 +137,7 @@
     <Error Condition="!Exists('..\..\packages\xunit.core.2.1.0\build\wpa81\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.core.2.1.0\build\wpa81\xunit.core.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Xunit.SkippableFact.1.0.15200-beta\build\Xunit.SkippableFact.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xunit.SkippableFact.1.0.15200-beta\build\Xunit.SkippableFact.props'))" />
   </Target>
   <Import Project="..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.targets" Condition="Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\wpa81\xunit.runner.visualstudio.targets')" />
   <Import Project="..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\dotnet\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\dotnet\Nerdbank.GitVersioning.targets')" />
