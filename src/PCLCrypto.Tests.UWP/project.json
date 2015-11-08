@@ -6,7 +6,7 @@
     "PCLCommandBase": "0.2.2",
     "PInvoke.Windows.Core": "0.1.13-alpha",
     "Validation": "2.2.8",
-    "Xamarin.Forms": "1.1.0.6201",
+    "Xamarin.Forms": "1.5.0.6447",
     "xunit": "2.1.0"
   },
   "frameworks": {
