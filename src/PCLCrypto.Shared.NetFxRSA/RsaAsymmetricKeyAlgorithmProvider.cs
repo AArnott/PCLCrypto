@@ -55,6 +55,17 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
 
             var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            if (!CapiKeyFormatter.IsCapiCompatible(parameters))
+            {
+                // Try to make it CAPI compatible since it's faster on desktop,
+                // and the only thing that could possibly work on wp8.
+                RSAParameters adjustedParameters = KeyFormatter.NegotiateSizes(parameters);
+                if (CapiKeyFormatter.IsCapiCompatible(adjustedParameters))
+                {
+                    parameters = adjustedParameters;
+                }
+            }
+
             Platform.RSA rsa;
             if (CapiKeyFormatter.IsCapiCompatible(parameters))
             {
@@ -65,7 +76,11 @@ namespace PCLCrypto
 #if DESKTOP
                 rsa = new RSAManaged();
 #else
+                // Throw the exception explaining the problem.
                 CapiKeyFormatter.VerifyCapiCompatibleParameters(parameters);
+
+                // Make it obvious to the compiler that the buck stops here.
+                // er... on the line above.
                 throw new NotSupportedException();
 #endif
             }

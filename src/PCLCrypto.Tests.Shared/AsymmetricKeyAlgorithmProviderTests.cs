@@ -16,6 +16,12 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const string SkipIfECDsaNotSupported = "Not supported on this platform";
 #endif
 
+#if WP8
+    private const string SkipIfLimitedToCapi = "Not supported on WP8";
+#else
+    private const string SkipIfLimitedToCapi = null;
+#endif
+
     /// <summary>
     /// A dictionary of key algorithms to test with key sizes (in bits).
     /// </summary>
@@ -350,7 +356,7 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.True(false, "No supported formats.");
     }
 
-    [Fact]
+    [Fact(Skip = SkipIfLimitedToCapi)]
     public void KeyPairInterop_iOSGenerated()
     {
         // Tests a key where P has more significant digits than Q.
