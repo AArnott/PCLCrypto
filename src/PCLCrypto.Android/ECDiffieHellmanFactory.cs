@@ -17,7 +17,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public IECDiffieHellman Create()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }
