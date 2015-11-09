@@ -11,6 +11,12 @@
 #if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
     public class AsymmetricKeyAlgorithmProviderTests
     {
+#if DESKTOP || WinRT
+        private const string SkipIfECDsaNotSupported = null;
+#else
+        private const string SkipIfECDsaNotSupported = "Not supported on this platform";
+#endif
+
         /// <summary>
         /// A dictionary of key algorithms to test with key sizes (in bits).
         /// </summary>
@@ -53,7 +59,7 @@
             Assert.Equal(512, key.KeySize);
         }
 
-        [Fact]
+        [Fact(Skip = SkipIfECDsaNotSupported)]
         public void CreateKeyPair_EcdsaP256Sha256()
         {
             var ecdsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256);
@@ -132,10 +138,22 @@
         [Fact]
         public void KeyPairRoundTrip()
         {
+            int supportedAlgorithms = 0;
             foreach (var algorithm in KeyAlgorithmsToTest)
             {
                 this.logger.WriteLine("** Algorithm: {0} **", algorithm.Key);
-                var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                IAsymmetricKeyAlgorithmProvider keyAlgorithm;
+                try
+                {
+                    keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                    supportedAlgorithms++;
+                }
+                catch (NotSupportedException)
+                {
+                    this.logger.WriteLine("Algorithm {0} NOT supported.", algorithm.Key);
+                    continue;
+                }
+
                 using (ICryptographicKey key = keyAlgorithm.CreateKeyPair(algorithm.Value))
                 {
                     int supportedFormats = 0;
@@ -163,15 +181,28 @@
                     Assert.True(supportedFormats > 0, "No supported formats.");
                 }
             }
+
+            Assert.True(supportedAlgorithms > 0, "No supported algorithms.");
         }
 
         [Fact]
         public void PublicKeyRoundTrip()
         {
+            int supportedAlgorithms = 0;
             foreach (var algorithm in KeyAlgorithmsToTest)
             {
                 this.logger.WriteLine("** Algorithm: {0} **", algorithm.Key);
-                var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                IAsymmetricKeyAlgorithmProvider keyAlgorithm;
+                try
+                {
+                    keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                }
+                catch (NotSupportedException)
+                {
+                    this.logger.WriteLine("Algorithm {0} not supported.", algorithm);
+                    continue;
+                }
+
                 var key = keyAlgorithm.CreateKeyPair(algorithm.Value);
 
                 int supportedFormats = 0;
@@ -248,10 +279,22 @@
         [Fact]
         public void PublicKeyInterop()
         {
+            int supportedAlgorithms = 0;
             int supportedFormats = 0;
             foreach (var formatAndBlob in Helper.PublicKeyFormatsAndBlobs)
             {
-                var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
+                IAsymmetricKeyAlgorithmProvider algorithm;
+                try
+                {
+                    algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
+                    supportedAlgorithms++;
+                }
+                catch (NotSupportedException)
+                {
+                    this.logger.WriteLine("Algorithm {0} not supported.", formatAndBlob.Key.Item1);
+                    continue;
+                }
+
                 try
                 {
                     var key = algorithm.ImportPublicKey(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);

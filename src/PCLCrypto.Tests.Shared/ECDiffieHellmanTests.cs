@@ -15,9 +15,15 @@ using Xunit;
 
 public class ECDiffieHellmanTests
 {
+#if DESKTOP || WinRT
+    private const string SkipIfNotSupported = null;
+#else
+    private const string SkipIfNotSupported = "Not supported on this platform";
+#endif
+
     private static readonly byte[] SecretMessage = new byte[] { 0x1, 0x3, 0x2 };
 
-    [Fact]
+    [Fact(Skip = SkipIfNotSupported)]
     public void ImportExportPublicKey()
     {
         using (var dh = NetFxCrypto.ECDiffieHellman.Create())
@@ -30,7 +36,7 @@ public class ECDiffieHellmanTests
         }
     }
 
-    [Fact]
+    [Fact(Skip = SkipIfNotSupported)]
     public void KeySize()
     {
         const int expectedDefaultKeySize = 521;
@@ -50,7 +56,7 @@ public class ECDiffieHellmanTests
         }
     }
 
-    [Fact]
+    [Fact(Skip = SkipIfNotSupported)]
     public void DeriveKeyMaterial()
     {
         var dh1 = NetFxCrypto.ECDiffieHellman.Create();
@@ -67,7 +73,7 @@ public class ECDiffieHellmanTests
     /// ECDH key exchange, and AES symmetric encryption.
     /// </summary>
     /// <returns>A task for the async test.</returns>
-    [Fact]
+    [Fact(Skip = SkipIfNotSupported)]
     public async Task PerfectForwardSecrecy()
     {
         CryptographicPublicKeyBlobType publicBlobType = CryptographicPublicKeyBlobType.BCryptPublicKey;
