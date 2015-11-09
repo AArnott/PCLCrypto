@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using PCLCrypto.Tests.WindowsPhone.Resources;
-using System.Threading;
-using Microsoft.VisualStudio.TestPlatform.Core;
-using vstest_executionengine_platformbridge;
-using Microsoft.VisualStudio.TestPlatform.TestExecutor;
-using System.Reflection;
+﻿using System.Reflection;
+using Xunit.Runners.UI;
 
 namespace PCLCrypto.Tests.WindowsPhone
 {
-    public partial class MainPage : PhoneApplicationPage
+    public partial class MainPage : RunnerApplicationPage
     {
         // Constructor
         public MainPage()
         {
             InitializeComponent();
+        }
 
-            var wrapper = new TestExecutorServiceWrapper();
-            new Thread(new ServiceMain((param0, param1) => wrapper.SendMessage((ContractName)param0, param1)).Run).Start();
+        protected override void OnInitializeRunner()
+        {
+
+            // tests can be inside the main assembly
+            AddTestAssembly(Assembly.GetExecutingAssembly());
+            // otherwise you need to ensure that the test assemblies will 
+            // become part of the app bundle
+            //AddTestAssembly(typeof(PortableTests).Assembly);
 
         }
     }
 }
+
