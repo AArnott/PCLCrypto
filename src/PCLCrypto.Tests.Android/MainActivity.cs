@@ -12,7 +12,7 @@ using Xunit.Runners.UI;
 
 namespace PCLCrypto.Tests.Android
 {
-    [Activity(Label = "xUnit Android Runner", MainLauncher = true, Theme = "@android:style/Theme.Material.Light")]
+    [Activity(Label = "PCLCrypto Android Runner", MainLauncher = true, Theme = "@android:style/Theme.Material.Light")]
     public class MainActivity : RunnerActivity
     {
 
