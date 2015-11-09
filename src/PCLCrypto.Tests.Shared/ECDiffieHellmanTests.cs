@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nerdbank;
 using PCLCrypto;
-using PCLCrypto.Tests;
 using Xunit;
 
 public class ECDiffieHellmanTests
