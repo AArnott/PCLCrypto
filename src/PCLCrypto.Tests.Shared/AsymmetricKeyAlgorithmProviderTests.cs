@@ -13,7 +13,7 @@ public class AsymmetricKeyAlgorithmProviderTests
 #if DESKTOP || WinRT
     private const string SkipIfECDsaNotSupported = null;
 #else
-        private const string SkipIfECDsaNotSupported = "Not supported on this platform";
+    private const string SkipIfECDsaNotSupported = "Not supported on this platform";
 #endif
 
     /// <summary>
@@ -195,6 +195,7 @@ public class AsymmetricKeyAlgorithmProviderTests
             try
             {
                 keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
+                supportedAlgorithms++;
             }
             catch (NotSupportedException)
             {
@@ -236,6 +237,8 @@ public class AsymmetricKeyAlgorithmProviderTests
 
             Assert.True(supportedFormats > 0, "No supported formats.");
         }
+
+        Assert.True(supportedAlgorithms > 0, "No supported algorithms.");
     }
 
     [Fact]
