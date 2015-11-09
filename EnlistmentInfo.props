@@ -10,7 +10,8 @@
 		<RestorePackages>true</RestorePackages>
 
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<BaseIntermediateOutputPath>$(ProjectRoot)obj\$(Platform)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+		<!-- BaseIntermediateOutputPath must be a relative path or Xamarin.Android apps fail with a GenerateJavaStubs. -->
+		<BaseIntermediateOutputPath>..\..\obj\$(Platform)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
 		<IntermediatePath>$(BaseIntermediateOutputPath)</IntermediatePath>
     <OutputPath>$(ProjectRoot)bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
     <OutputPath Condition=" '$(Platform)' != 'AnyCPU' ">$(ProjectRoot)bin\$(Configuration)\$(Platform)\$(MSBuildProjectName)\</OutputPath>
