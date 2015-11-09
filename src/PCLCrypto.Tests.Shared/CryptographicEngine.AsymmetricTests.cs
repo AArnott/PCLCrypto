@@ -72,13 +72,16 @@ public class CryptographicEngineAsymmetricTests
                     new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256).CreateKeyPair(512), HashAlgorithm.Sha256 },
                 };
 
-            try
+            // Our static constructor has already determined whether this is supported.
+            // So avoid first chance exceptions being repeated for easier debugging of
+            // Xamarin platforms where exceptions really slow things down.
+            if (ecdsaSigningKey != null)
             {
                 result.Add(new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 });
-                Debug.WriteLine("ECDSA tests skipped due to no support on the platform.");
             }
-            catch (NotSupportedException)
+            else
             {
+                Debug.WriteLine("ECDSA tests skipped due to no support on the platform.");
             }
 
             return result.ToArray();
