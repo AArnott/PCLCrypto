@@ -218,7 +218,10 @@ public class AsymmetricKeyAlgorithmProviderTests
 
                     try
                     {
-                        WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[0]);
+                        // We use a non-empty buffer here because monotouch's
+                        // Security.SecKey.Encrypt method has a bug that throws
+                        // IndexOutOfRangeException when given empty buffers.
+                        WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[1]);
                     }
                     catch (NotSupportedException)
                     {
