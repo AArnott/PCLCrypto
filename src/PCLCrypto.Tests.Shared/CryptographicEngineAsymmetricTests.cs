@@ -12,30 +12,32 @@ public class CryptographicEngineAsymmetricTests
 {
     private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
 
-    private static readonly ICryptographicKey rsaSha1SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+    private static readonly ICryptographicKey RsaSha1SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
       .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha1)
       .CreateKeyPair(512);
 
-    private static readonly ICryptographicKey rsaSha256SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+    private static readonly ICryptographicKey RsaSha256SigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
         .OpenAlgorithm(AsymmetricAlgorithm.RsaSignPkcs1Sha256)
         .CreateKeyPair(512);
 
-    private static readonly ICryptographicKey rsaEncryptingKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+    private static readonly ICryptographicKey RsaEncryptingKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
         .OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1)
         .CreateKeyPair(512);
 
-    private static readonly ICryptographicKey ecdsaSigningKey;
+    private static readonly ICryptographicKey EcdsaSigningKey;
 
     /// <summary>
     /// Data the fits within a single cryptographic block.
     /// </summary>
     private readonly byte[] data = new byte[] { 0x3, 0x5, 0x8 };
 
+    private readonly ITestOutputHelper logger;
+
     static CryptographicEngineAsymmetricTests()
     {
         try
         {
-            ecdsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+            EcdsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
                 .OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256)
                 .CreateKeyPair(256);
         }
@@ -44,8 +46,6 @@ public class CryptographicEngineAsymmetricTests
             // ECDSA is not supported on this platform.
         }
     }
-
-    private readonly ITestOutputHelper logger;
 
     public CryptographicEngineAsymmetricTests(ITestOutputHelper logger)
     {
@@ -75,7 +75,7 @@ public class CryptographicEngineAsymmetricTests
             // Our static constructor has already determined whether this is supported.
             // So avoid first chance exceptions being repeated for easier debugging of
             // Xamarin platforms where exceptions really slow things down.
-            if (ecdsaSigningKey != null)
+            if (EcdsaSigningKey != null)
             {
                 result.Add(new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 });
             }
@@ -144,8 +144,8 @@ public class CryptographicEngineAsymmetricTests
     {
         try
         {
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(rsaSha1SigningKey, this.data);
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(rsaSha256SigningKey, this.data, signature));
+            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(RsaSha1SigningKey, this.data);
+            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(RsaSha256SigningKey, this.data, signature));
         }
         catch (NotSupportedException)
         {
@@ -252,9 +252,9 @@ public class CryptographicEngineAsymmetricTests
         {
             byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
             .HashData(this.data);
-            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(rsaSha1SigningKey, hash);
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(rsaSha256SigningKey, this.data, signature));
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(rsaSha256SigningKey, hash, signature));
+            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(RsaSha1SigningKey, hash);
+            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(RsaSha256SigningKey, this.data, signature));
+            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(RsaSha256SigningKey, hash, signature));
         }
         catch (NotSupportedException)
         {
@@ -268,11 +268,11 @@ public class CryptographicEngineAsymmetricTests
     {
         byte[] keyMaterialBytes = Convert.FromBase64String(AesKeyMaterial);
         byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(
-            rsaEncryptingKey,
+            RsaEncryptingKey,
             keyMaterialBytes,
             null);
         CollectionAssertEx.AreNotEqual(keyMaterialBytes, cipherText);
-        byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(rsaEncryptingKey, cipherText, null);
+        byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(RsaEncryptingKey, cipherText, null);
         CollectionAssertEx.AreEqual(keyMaterialBytes, plainText);
     }
 }
