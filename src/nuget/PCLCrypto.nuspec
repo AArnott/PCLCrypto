@@ -31,6 +31,10 @@
         <dependency id="Validation" version="2.2.8"/>
         <dependency id="PInvoke.BCrypt" version="0.1.13-alpha" />
       </group>
+      <group targetFramework="wpa81">
+        <dependency id="Validation" version="2.2.8"/>
+        <dependency id="PInvoke.BCrypt" version="0.1.13-alpha" />
+      </group>
     </dependencies>
   </metadata>
   <files>
