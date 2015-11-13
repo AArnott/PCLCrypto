@@ -1,51 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-	<metadata minClientVersion="2.8.3">
-		<id>PCLCrypto</id>
-		<version>0.0.1</version>
-		<title>PCL Crypto - Portable Crypto APIs</title>
-		<authors>Andrew Arnott</authors>
-		<owners>Andrew Arnott</owners>
-		<licenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/LICENSE</licenseUrl>
-		<projectUrl>https://github.com/aarnott/pclcrypto/</projectUrl>
-		<iconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/icons/icon_64x64.png</iconUrl>
-		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>
-			PCL Crypto provides a consistent, portable set of crypto APIs for .NET 4.5, Windows Phone 8.0 SL &amp; 8.1 Xaml, Windows Store, Xamarin.iOS, Xamarin.Android.
-			This makes it easier to create cross-platform .NET libraries and apps.
-			Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation.
-			PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.
-		</description>
-		<summary>PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
-		<tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
-		<releaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</releaseNotes>
-		<dependencies>
-			<group targetFramework="net45">
-				<dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
-				<dependency id="Validation" version="2.2.8"/>
-			</group>
-			<group>
-				<dependency id="Validation" version="2.2.8"/>
-			</group>
+  <metadata minClientVersion="2.8.3">
+    <id>PCLCrypto</id>
+    <version>0.0.1</version>
+    <title>PCL Crypto - Portable Crypto APIs</title>
+    <authors>Andrew Arnott</authors>
+    <owners>Andrew Arnott</owners>
+    <licenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/aarnott/pclcrypto/</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/icons/icon_64x64.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      PCL Crypto provides a consistent, portable set of crypto APIs for .NET 4.5, Windows Phone 8.0 SL &amp; 8.1 Xaml, Windows Store, Xamarin.iOS, Xamarin.Android.
+      This makes it easier to create cross-platform .NET libraries and apps.
+      Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation.
+      PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.
+    </description>
+    <summary>PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.</summary>
+    <tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
+    <releaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</releaseNotes>
+    <dependencies>
+      <group targetFramework="net45">
+        <dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
+        <dependency id="Validation" version="2.2.8"/>
+      </group>
+      <group>
+        <dependency id="Validation" version="2.2.8"/>
+      </group>
       <group targetFramework="win81">
         <dependency id="Validation" version="2.2.8"/>
         <dependency id="PInvoke.BCrypt" version="0.1.13-alpha" />
       </group>
-		</dependencies>
-	</metadata>
-	<files>
-		<!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
-				 the platform-specific lib folder will indicate Windows 8.1 is required. -->
-		<file target="lib\portable-net45+win+wpa81+wp80+uwp10+dnxcore50+MonoAndroid10+xamarinios10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
-		<file target="lib\net45" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.???" />
-		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.???" />
-		<file target="lib\wpa81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
-		<file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
-		<file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
-		<file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
-		<file target="lib\Xamarin.iOS" src="$OutputPath$PCLCrypto.iOS-Unified\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS-Unified\*.mdb" />
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
+         the platform-specific lib folder will indicate Windows 8.1 is required. -->
+    <file target="lib\portable-net45+win+wpa81+wp80+uwp10+dnxcore50+MonoAndroid10+xamarinios10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
+    <file target="lib\net45" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.???" />
+    <file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.???" />
+    <file target="lib\wpa81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
+    <file target="lib\win81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
+    <file target="lib\monoandroid" src="$OutputPath$PCLCrypto.Android\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.Android\*.mdb" />
+    <file target="lib\monotouch" src="$OutputPath$PCLCrypto.iOS\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS\*.mdb" />
+    <file target="lib\Xamarin.iOS" src="$OutputPath$PCLCrypto.iOS-Unified\PCLCrypto.???" exclude="$OutputPath$PCLCrypto.iOS-Unified\*.mdb" />
 
-		<file target="src\src" src="..\**\*.cs" />
-		<file target="src\obj" src="$IntermediatePath$**\*.cs" />
-	</files>
+    <file target="src\src" src="..\**\*.cs" />
+    <file target="src\obj" src="$IntermediatePath$**\*.cs" />
+  </files>
 </package>
