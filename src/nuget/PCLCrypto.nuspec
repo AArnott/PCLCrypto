@@ -36,7 +36,7 @@
 	<files>
 		<!-- PCLs can't target Windows 8.1, so just install on Windows 8.0 PCLs.
 				 the platform-specific lib folder will indicate Windows 8.1 is required. -->
-		<file target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
+		<file target="lib\portable-net45+win+wpa81+wp80+uwp10+dnxcore50+MonoAndroid10+xamarinios10+MonoTouch10" src="$OutputPath$PCLCrypto\PCLCrypto.???" />
 		<file target="lib\net45" src="$OutputPath$PCLCrypto.Desktop\PCLCrypto.???" />
 		<file target="lib\wp8" src="$OutputPath$PCLCrypto.WindowsPhone\PCLCrypto.???" />
 		<file target="lib\wpa81" src="$OutputPath$PCLCrypto.WinRT\PCLCrypto.???" />
