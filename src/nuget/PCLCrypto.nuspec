@@ -29,11 +29,11 @@
       </group>
       <group targetFramework="win81">
         <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.13-alpha" />
+        <dependency id="PInvoke.BCrypt" version="0.1.122-beta" />
       </group>
       <group targetFramework="wpa81">
         <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.13-alpha" />
+        <dependency id="PInvoke.BCrypt" version="0.1.122-beta" />
       </group>
     </dependencies>
   </metadata>
