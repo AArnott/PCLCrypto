@@ -20,11 +20,11 @@
     <tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</tags>
     <releaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</releaseNotes>
     <dependencies>
-      <group targetFramework="net45">
-        <dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
+      <group>
         <dependency id="Validation" version="2.2.8"/>
       </group>
-      <group>
+      <group targetFramework="net45">
+        <dependency id="Mono.Security" version="[3.2.3.0,4.0)" />
         <dependency id="Validation" version="2.2.8"/>
       </group>
       <group targetFramework="win81">
