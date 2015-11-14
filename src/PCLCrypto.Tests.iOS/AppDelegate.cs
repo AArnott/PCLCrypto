@@ -41,14 +41,15 @@ namespace PCLCrypto.Tests.iOS
             // become part of the app bundle
             //AddTestAssembly(typeof(PortableTests).Assembly);
 
-#if false
-			// you can use the default or set your own custom writer (e.g. save to web site and tweet it ;-)
-			Writer = new TcpTextWriter ("10.0.1.2", 16384);
-			// start running the test suites as soon as the application is loaded
-			AutoStart = true;
-			// crash the application (to ensure it's ended) and return to springboard
-			TerminateAfterExecution = true;
-#endif
+            // You can use the default or set your own custom writer (e.g. save to web site and tweet it ;-)
+            // Wire up a server with `nc -l 4444` on the Mac hosting the emulator to log to the terminal window.
+            ////Writer = new TcpTextWriter("10.0.0.47", 4444);
+
+            // start running the test suites as soon as the application is loaded
+            AutoStart = true;
+            // crash the application (to ensure it's ended) and return to springboard
+            TerminateAfterExecution = true;
+
             return base.FinishedLaunching(app, options);
         }
     }
