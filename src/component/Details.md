@@ -1,4 +1,3 @@
-
 PCLCrypto is an [open source library][1] that provides portable class library 
 authors with cryptographic APIs that invoke platform-specific crypto 
 automatically.
