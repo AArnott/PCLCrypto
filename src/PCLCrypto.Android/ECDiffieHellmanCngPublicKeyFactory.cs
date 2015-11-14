@@ -18,7 +18,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public IECDiffieHellmanPublicKey FromByteArray(byte[] publicKey)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

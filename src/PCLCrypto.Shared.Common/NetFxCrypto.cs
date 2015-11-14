@@ -30,7 +30,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (randomNumberGenerator == null)
                 {
@@ -50,7 +50,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 return new DeriveBytes();
 #endif
@@ -65,7 +65,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #elif !SILVERLIGHT
                 return new ECDiffieHellmanFactory();
 #else
@@ -82,7 +82,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #elif !SILVERLIGHT
                 return new ECDiffieHellmanCngPublicKeyFactory();
 #else

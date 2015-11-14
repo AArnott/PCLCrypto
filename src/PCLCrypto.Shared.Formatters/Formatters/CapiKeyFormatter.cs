@@ -159,6 +159,12 @@ namespace PCLCrypto.Formatters
         /// <param name="parameters">The RSA parameters of the key.</param>
         protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
+            if (!IsCapiCompatible(parameters))
+            {
+                // Try to get the RSA parameters to conform to CAPI's requirements.
+                parameters = NegotiateSizes(parameters);
+            }
+
             VerifyCapiCompatibleParameters(parameters);
 
             var writer = new BinaryWriter(stream);

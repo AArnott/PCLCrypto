@@ -1,96 +1,90 @@
-﻿namespace PCLCrypto.Tests
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Security.Cryptography;
-    using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using PCLTesting;
-    using Validation;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using Validation;
+using Xunit;
 
-    /// <summary>
-    /// Ensures that our CryptoStream tests pass on the official
-    /// .NET Framework's version of CryptoStream as well.
-    /// </summary>
-    [TestClass]
+/// <summary>
+/// Ensures that our CryptoStream tests pass on the official
+/// .NET Framework's version of CryptoStream as well.
+/// </summary>
 #pragma warning disable 0436
-    public class DesktopCryptoStreamTests : CryptoStreamTests
+public class DesktopCryptoStreamTests : CryptoStreamTests
 #pragma warning restore 0436
+{
+    protected override Stream CreateCryptoStream(Stream target, PCLCrypto.ICryptoTransform transform, PCLCrypto.CryptoStreamMode mode)
     {
-        protected override Stream CreateCryptoStream(Stream target, PCLCrypto.ICryptoTransform transform, PCLCrypto.CryptoStreamMode mode)
+        return new CryptoStream(target, CryptoTransformAdapter.Adapt(transform), ModeAdapter(mode));
+    }
+
+    protected override void FlushFinalBlock(Stream stream)
+    {
+        ((CryptoStream)stream).FlushFinalBlock();
+    }
+
+    private static CryptoStreamMode ModeAdapter(PCLCrypto.CryptoStreamMode mode)
+    {
+        switch (mode)
         {
-            return new CryptoStream(target, CryptoTransformAdapter.Adapt(transform), ModeAdapter(mode));
+            case PCLCrypto.CryptoStreamMode.Read:
+                return CryptoStreamMode.Read;
+            case PCLCrypto.CryptoStreamMode.Write:
+                return CryptoStreamMode.Write;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private class CryptoTransformAdapter : ICryptoTransform
+    {
+        private readonly PCLCrypto.ICryptoTransform transform;
+
+        private CryptoTransformAdapter(PCLCrypto.ICryptoTransform transform)
+        {
+            this.transform = transform;
         }
 
-        protected override void FlushFinalBlock(Stream stream)
+        public bool CanReuseTransform
         {
-            ((CryptoStream)stream).FlushFinalBlock();
+            get { return this.transform.CanReuseTransform; }
         }
 
-        private static CryptoStreamMode ModeAdapter(PCLCrypto.CryptoStreamMode mode)
+        public bool CanTransformMultipleBlocks
         {
-            switch (mode)
-            {
-                case PCLCrypto.CryptoStreamMode.Read:
-                    return CryptoStreamMode.Read;
-                case PCLCrypto.CryptoStreamMode.Write:
-                    return CryptoStreamMode.Write;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            get { return this.transform.CanTransformMultipleBlocks; }
         }
 
-        private class CryptoTransformAdapter : ICryptoTransform
+        public int InputBlockSize
         {
-            private readonly PCLCrypto.ICryptoTransform transform;
+            get { return this.transform.InputBlockSize; }
+        }
 
-            private CryptoTransformAdapter(PCLCrypto.ICryptoTransform transform)
-            {
-                this.transform = transform;
-            }
+        public int OutputBlockSize
+        {
+            get { return this.transform.OutputBlockSize; }
+        }
 
-            public bool CanReuseTransform
-            {
-                get { return this.transform.CanReuseTransform; }
-            }
+        public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+        {
+            return this.transform.TransformBlock(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset);
+        }
 
-            public bool CanTransformMultipleBlocks
-            {
-                get { return this.transform.CanTransformMultipleBlocks; }
-            }
+        public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+        {
+            return this.transform.TransformFinalBlock(inputBuffer, inputOffset, inputCount);
+        }
 
-            public int InputBlockSize
-            {
-                get { return this.transform.InputBlockSize; }
-            }
+        public void Dispose()
+        {
+            this.transform.Dispose();
+        }
 
-            public int OutputBlockSize
-            {
-                get { return this.transform.OutputBlockSize; }
-            }
-
-            public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
-            {
-                return this.transform.TransformBlock(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset);
-            }
-
-            public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
-            {
-                return this.transform.TransformFinalBlock(inputBuffer, inputOffset, inputCount);
-            }
-
-            public void Dispose()
-            {
-                this.transform.Dispose();
-            }
-
-            internal static ICryptoTransform Adapt(PCLCrypto.ICryptoTransform transform)
-            {
-                return transform != null ? new CryptoTransformAdapter(transform) : null;
-            }
+        internal static ICryptoTransform Adapt(PCLCrypto.ICryptoTransform transform)
+        {
+            return transform != null ? new CryptoTransformAdapter(transform) : null;
         }
     }
 }

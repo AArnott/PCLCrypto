@@ -2,14 +2,15 @@
   "dependencies": {
     "Mono.Security": "3.2.3",
     "Nerdbank.GitVersioning": "1.1.47-rc-g58708fcf8c",
-    "StyleCop.Analyzers": "1.0.0-beta014",
+    "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },
   "frameworks": {
-    ".NETFramework,Version=v4.0,Profile=Client": { }
+    ".NETFramework,Version=v4.5": { }
   },
   "runtimes": {
-    "win-anycpu": {}
+    "win-anycpu": { },
+    "win":  { }
   },
   "supports": { }
 }

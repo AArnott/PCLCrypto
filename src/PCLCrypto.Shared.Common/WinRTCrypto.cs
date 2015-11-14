@@ -69,7 +69,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (asymmetricKeyAlgorithmProvider == null)
                 {
@@ -89,7 +89,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (symmetricKeyAlgorithmProvider == null)
                 {
@@ -109,7 +109,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (hashAlgorithmProvider == null)
                 {
@@ -129,7 +129,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (macAlgorithmProvider == null)
                 {
@@ -149,7 +149,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (keyDerivationAlgorithmProvider == null)
                 {
@@ -169,7 +169,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (keyDerivationParametersFactory == null)
                 {
@@ -189,7 +189,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (cryptographicEngine == null)
                 {
@@ -209,7 +209,7 @@ namespace PCLCrypto
             get
             {
 #if PCL
-                throw new NotImplementedException("Not implemented in reference assembly.");
+                throw new NotImplementedByReferenceAssemblyException();
 #else
                 if (cryptographicBuffer == null)
                 {

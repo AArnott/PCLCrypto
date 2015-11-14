@@ -8,32 +8,34 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nerdbank;
 using PCLCrypto;
-using PCLCrypto.Tests;
-using PCLTesting;
+using Xunit;
 
-[TestClass]
 public class ECDiffieHellmanTests
 {
+#if DESKTOP || WinRT
+    private const string SkipIfNotSupported = null;
+#else
+    private const string SkipIfNotSupported = "Not supported on this platform";
+#endif
+
     private static readonly byte[] SecretMessage = new byte[] { 0x1, 0x3, 0x2 };
 
-    [TestMethod]
+    [Fact(Skip = SkipIfNotSupported)]
     public void ImportExportPublicKey()
     {
         using (var dh = NetFxCrypto.ECDiffieHellman.Create())
         {
             var publicKeyBytes = dh.PublicKey.ToByteArray();
             var publicKey2 = NetFxCrypto.ECDiffieHellmanCngPublicKey.FromByteArray(publicKeyBytes);
-            Assert.IsNotNull(publicKey2);
+            Assert.NotNull(publicKey2);
             var publicKey2Bytes = publicKey2.ToByteArray();
             CollectionAssertEx.AreEqual(publicKeyBytes, publicKey2Bytes);
         }
     }
 
-    [TestMethod]
+    [Fact(Skip = SkipIfNotSupported)]
     public void KeySize()
     {
         const int expectedDefaultKeySize = 521;
@@ -42,18 +44,18 @@ public class ECDiffieHellmanTests
         // Verify default key size
         using (var dh = NetFxCrypto.ECDiffieHellman.Create())
         {
-            Assert.AreEqual(expectedDefaultKeySize, dh.KeySize);
+            Assert.Equal(expectedDefaultKeySize, dh.KeySize);
             int originalPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
 
             // Verify effect of changing the key size.
             dh.KeySize = alternateLegalKeySize;
-            Assert.AreEqual(alternateLegalKeySize, dh.KeySize);
+            Assert.Equal(alternateLegalKeySize, dh.KeySize);
             int alteredPublicKeyLength = dh.PublicKey.ToByteArray().Length * 8;
-            Assert.IsTrue(alteredPublicKeyLength < originalPublicKeyLength);
+            Assert.True(alteredPublicKeyLength < originalPublicKeyLength);
         }
     }
 
-    [TestMethod]
+    [Fact(Skip = SkipIfNotSupported)]
     public void DeriveKeyMaterial()
     {
         var dh1 = NetFxCrypto.ECDiffieHellman.Create();
@@ -70,11 +72,13 @@ public class ECDiffieHellmanTests
     /// ECDH key exchange, and AES symmetric encryption.
     /// </summary>
     /// <returns>A task for the async test.</returns>
-    [TestMethod]
+    [Fact(Skip = SkipIfNotSupported)]
     public async Task PerfectForwardSecrecy()
     {
         CryptographicPublicKeyBlobType publicBlobType = CryptographicPublicKeyBlobType.BCryptPublicKey;
-        var cancellationToken = Debugger.IsAttached ? CancellationToken.None : new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+        var cancellationToken = Debugger.IsAttached
+            ? CancellationToken.None
+            : new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
         string pipeName = Guid.NewGuid().ToString();
         var ecdsaAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256);
 
@@ -116,7 +120,7 @@ public class ECDiffieHellmanTests
             byte[] bobSignedDH = await ReadAsync(channel, cancellationToken);
 
             // Alice verifies Bob's signature to be sure it's his key.
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(othersSigningPublicKey, bobPublicDH, bobSignedDH));
+            Assert.True(WinRTCrypto.CryptographicEngine.VerifySignature(othersSigningPublicKey, bobPublicDH, bobSignedDH));
 
             // Alice replies to Bob's public key by transmitting her own public key and signature.
             var ecdhPublicKey = ecdhKeyPair.PublicKey.ToByteArray();
@@ -158,7 +162,7 @@ public class ECDiffieHellmanTests
             byte[] aliceSignedDH = await ReadAsync(channel, cancellationToken);
 
             // Authenticate Alice's public key.
-            Assert.IsTrue(WinRTCrypto.CryptographicEngine.VerifySignature(othersSigningPublicKey, alicePublicDH, aliceSignedDH));
+            Assert.True(WinRTCrypto.CryptographicEngine.VerifySignature(othersSigningPublicKey, alicePublicDH, aliceSignedDH));
 
             // Deserialize Alice's public key and derive the shared secret from it.
             var aliceDHPK = NetFxCrypto.ECDiffieHellmanCngPublicKey.FromByteArray(alicePublicDH);
