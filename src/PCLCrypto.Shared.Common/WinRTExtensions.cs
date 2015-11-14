@@ -6,7 +6,7 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Text;
-#if !PCL && (!SILVERLIGHT || WINDOWS_PHONE)
+#if !PCL
     using PCLCrypto.Formatters;
 #endif
     using Validation;
@@ -16,7 +16,6 @@ namespace PCLCrypto
     /// </summary>
     public static class WinRTExtensions
     {
-#if !SILVERLIGHT || WINDOWS_PHONE // exclude SL5
         /// <summary>
         /// Creates a cryptographic key based on the specified RSA parameters.
         /// </summary>
@@ -57,7 +56,6 @@ namespace PCLCrypto
             return parameters;
 #endif
         }
-#endif
 
         /// <summary>
         /// Returns a crypto key management for a specified algorithm.
