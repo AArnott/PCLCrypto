@@ -16,7 +16,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const string SkipIfECDsaNotSupported = "Not supported on this platform";
 #endif
 
-#if WP8
+#if WP8 || DESKTOP // desktop relies on Mono.Security's RSAManaged, which is flakey. See https://bugzilla.xamarin.com/show_bug.cgi?id=35861
     private const string SkipIfLimitedToCapi = "Not supported on WP8";
 #else
     private const string SkipIfLimitedToCapi = null;
