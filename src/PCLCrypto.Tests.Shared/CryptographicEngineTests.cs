@@ -52,8 +52,6 @@ public class CryptographicEngineTests
         }
     }
 
-#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
-
     public CryptographicEngineTests(ITestOutputHelper logger)
     {
         this.logger = logger;
@@ -96,7 +94,7 @@ public class CryptographicEngineTests
         CollectionAssertEx.AreEqual(this.data, plainText);
     }
 
-    [TestMethod]
+    [Fact]
     public void EncryptAndDecrypt_AES_IV()
     {
         byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, this.iv);
