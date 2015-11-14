@@ -76,7 +76,9 @@ public class ECDiffieHellmanTests
     public async Task PerfectForwardSecrecy()
     {
         CryptographicPublicKeyBlobType publicBlobType = CryptographicPublicKeyBlobType.BCryptPublicKey;
-        var cancellationToken = Debugger.IsAttached ? CancellationToken.None : new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+        var cancellationToken = Debugger.IsAttached
+            ? CancellationToken.None
+            : new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
         string pipeName = Guid.NewGuid().ToString();
         var ecdsaAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256);
 
