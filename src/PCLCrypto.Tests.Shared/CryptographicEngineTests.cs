@@ -70,18 +70,18 @@ public class CryptographicEngineTests
     public void Encrypt_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.Encrypt(null, this.data, null));
+            () => WinRTCrypto.CryptographicEngine.Encrypt(null, this.data, null));
         Assert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, null, null));
+            () => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, null, null));
     }
 
     [Fact]
     public void Decrypt_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.Decrypt(null, this.data, null));
+            () => WinRTCrypto.CryptographicEngine.Decrypt(null, this.data, null));
         Assert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, null, null));
+            () => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, null, null));
     }
 
     [Fact]
@@ -154,14 +154,14 @@ public class CryptographicEngineTests
     public void CreateEncryptor_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.CreateEncryptor(null, this.iv));
+            () => WinRTCrypto.CryptographicEngine.CreateEncryptor(null, this.iv));
     }
 
     [Fact]
     public void CreateDecryptor_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(
-                () => WinRTCrypto.CryptographicEngine.CreateDecryptor(null, this.iv));
+            () => WinRTCrypto.CryptographicEngine.CreateDecryptor(null, this.iv));
     }
 
     [Fact]
@@ -202,8 +202,8 @@ public class CryptographicEngineTests
 
             byte[] incrementalResult = cipherStream.ToArray();
             Assert.Equal(
-                    Convert.ToBase64String(allCiphertext),
-                    Convert.ToBase64String(incrementalResult));
+                Convert.ToBase64String(allCiphertext),
+                Convert.ToBase64String(incrementalResult));
         }
         catch (NotSupportedException)
         {
@@ -238,8 +238,8 @@ public class CryptographicEngineTests
 
             byte[] incrementalResult = cipherStream.ToArray();
             Assert.Equal(
-                    Convert.ToBase64String(allCiphertext),
-                    Convert.ToBase64String(incrementalResult));
+                Convert.ToBase64String(allCiphertext),
+                Convert.ToBase64String(incrementalResult));
         }
         catch (NotSupportedException)
         {
@@ -276,8 +276,8 @@ public class CryptographicEngineTests
 
                         byte[] actual = actualStream.ToArray();
                         Assert.Equal(
-                                Convert.ToBase64String(expected),
-                                Convert.ToBase64String(actual));
+                            Convert.ToBase64String(expected),
+                            Convert.ToBase64String(actual));
                     }
                 }
 
