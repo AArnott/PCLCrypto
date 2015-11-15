@@ -39,8 +39,9 @@ public class CryptographicEngineTests
 
     private readonly ITestOutputHelper logger;
 
-    public CryptographicEngineTests()
+    public CryptographicEngineTests(ITestOutputHelper logger)
     {
+        this.logger = logger;
         try
         {
             this.aesKeyZerosPadding = WinRTCrypto.SymmetricKeyAlgorithmProvider
@@ -50,11 +51,6 @@ public class CryptographicEngineTests
         catch (NotSupportedException)
         {
         }
-    }
-
-    public CryptographicEngineTests(ITestOutputHelper logger)
-    {
-        this.logger = logger;
     }
 
     [Fact]
