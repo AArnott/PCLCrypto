@@ -1,0 +1,9 @@
+{
+  "supports": { },
+  "dependencies": {
+    "Xamarin.Android.Support.v4": "21.0.3"
+  },
+  "frameworks": {
+    "MonoAndroid,Version=v5.0": { }
+  }
+}
