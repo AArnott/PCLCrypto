@@ -24,6 +24,7 @@
     <SignAssembly>false</SignAssembly>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <CopyNuGetImplementations>true</CopyNuGetImplementations>
     <PackageCertificateThumbprint>6903DB6061DE6AC52DA116EC250B2C6A6330CE2D</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
