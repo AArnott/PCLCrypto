@@ -1,0 +1,11 @@
+﻿{
+  "dependencies": {
+    "Nerdbank.FullDuplexStream": "1.0.1",
+    "xunit": "2.1.0",
+    "Xunit.SkippableFact": "1.1.4"
+  },
+  "frameworks": {
+    ".NETCore,Version=v4.5.1": { }
+  },
+  "supports": { }
+}
