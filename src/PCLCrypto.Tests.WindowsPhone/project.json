@@ -1,7 +1,6 @@
 ﻿{
   "dependencies": {
     "Nerdbank.FullDuplexStream": "1.0.1",
-    "WPtoolkit": "4.2013.8.16",
     "xunit": "2.1.0",
     "xunit.runner.devices": "1.2.2",
     "Xunit.SkippableFact": "1.1.4"
