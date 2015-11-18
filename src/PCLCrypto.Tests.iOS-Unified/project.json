@@ -9,7 +9,8 @@
     "Xamarin.iOS,Version=v1.0": { }
   },
   "runtimes": {
-    "win": { }
+    "win": { },
+    "win-": { } // required on Dev14 RTM (no Update 1) machines
   },
   "supports": { }
 }

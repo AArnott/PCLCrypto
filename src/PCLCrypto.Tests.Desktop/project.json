@@ -10,7 +10,8 @@
   },
   "runtimes": {
     "win-anycpu": { },
-    "win":  { }
+    "win":  { },
+    "win-": { } // required on Dev14 RTM (no Update 1) machines
   },
   "supports": { }
 }
