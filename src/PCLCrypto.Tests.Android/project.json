@@ -8,5 +8,8 @@
   "frameworks": {
     "MonoAndroid,Version=v5.0": { }
   },
+  "runtimes": {
+    "win": { }
+  },
   "supports": { }
 }

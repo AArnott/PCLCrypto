@@ -89,12 +89,13 @@
     <Compile Include="..\PCLCrypto.Tests.iOS\AppDelegate.cs">
       <Link>AppDelegate.cs</Link>
     </Compile>
-    <Compile Include="Main.cs" />
+    <Compile Include="Application.cs" />
     <AdditionalFiles Include="..\stylecop.json">
       <Link>stylecop.json</Link>
     </AdditionalFiles>
     <None Include="app.config" />
     <None Include="Info.plist" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="project.json" />
   </ItemGroup>
