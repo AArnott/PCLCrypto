@@ -83,6 +83,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
     <None Include="app.config" />
     <None Include="project.json" />
     <None Include="Properties\AppManifest.xml" />

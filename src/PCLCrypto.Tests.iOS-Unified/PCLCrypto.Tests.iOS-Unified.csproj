@@ -90,6 +90,9 @@
       <Link>AppDelegate.cs</Link>
     </Compile>
     <Compile Include="Main.cs" />
+    <AdditionalFiles Include="..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
     <None Include="app.config" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />

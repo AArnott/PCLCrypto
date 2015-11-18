@@ -56,6 +56,9 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <AdditionalFiles Include="..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
     <None Include="app.config" />
     <None Include="PCLCrypto.Tests.WinRT_TemporaryKey.pfx" />
     <None Include="project.json" />
