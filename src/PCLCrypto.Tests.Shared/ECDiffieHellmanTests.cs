@@ -1,4 +1,7 @@
-﻿#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
+﻿// Copyright (c) Andrew Arnott. All rights reserved.
+// Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
+
+#if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
 
 using System;
 using System.Collections.Generic;
