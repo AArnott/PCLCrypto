@@ -21,7 +21,10 @@
 
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>$(SolutionDir)opensource.snk</AssemblyOriginatorKeyFile>
-	</PropertyGroup>
+
+    <CodeAnalysisRuleSet Condition=" $(MSBuildProjectName.Contains('Tests')) ">$(MSBuildThisFileDirectory)src\PCLCrypto.Tests.ruleset</CodeAnalysisRuleSet>
+
+  </PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 		<DebugSymbols>true</DebugSymbols>

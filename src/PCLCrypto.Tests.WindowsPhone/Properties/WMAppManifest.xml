@@ -29,14 +29,6 @@
         </TemplateFlip>
       </PrimaryToken>
     </Tokens>
-    <ActivatableClasses>
-      <InProcessServer>
-        <Path>vstest_executionengine_platformbridge.dll</Path>
-        <ActivatableClass ActivatableClassId="vstest_executionengine_platformbridge.ServiceMain" ThreadingModel="both" />
-        <ActivatableClass ActivatableClassId="vstest_executionengine_platformbridge.MessageTransmitter" ThreadingModel="both" />
-        <ActivatableClass ActivatableClassId="vstest_executionengine_platformbridge.NativeMethods" ThreadingModel="both" />
-      </InProcessServer>
-    </ActivatableClasses>
     <ScreenResolutions>
       <ScreenResolution Name="ID_RESOLUTION_WVGA"/>
       <ScreenResolution Name="ID_RESOLUTION_WXGA"/>
