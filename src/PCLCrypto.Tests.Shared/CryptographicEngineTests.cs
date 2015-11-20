@@ -94,6 +94,24 @@ public class CryptographicEngineTests
     }
 
     [Fact]
+    public void EncryptAndDecrypt_AES_ZerosPadding()
+    {
+        byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyZerosPadding, this.data, null);
+        CollectionAssertEx.AreNotEqual(this.data, cipherText);
+        Assert.Equal("eu0+YclmfT2hv+YEDO6gOA==", Convert.ToBase64String(cipherText));
+        byte[] actualPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyZerosPadding, cipherText, null);
+
+        // Zeros padding loses detail about the length of the original data.
+        // Therefore the expected decrypted value will have a length that is a multiple
+        // of the block length.
+        int blockLength = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, SymmetricAlgorithmPadding.Zeros)
+            .BlockLength;
+        byte[] expectedPlainText = new byte[blockLength];
+        Array.Copy(this.data, expectedPlainText, this.data.Length);
+        CollectionAssertEx.AreEqual(expectedPlainText, actualPlaintext);
+    }
+
+    [Fact]
     public void EncryptAndDecrypt_AES_IV()
     {
         byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, this.iv);
