@@ -21,7 +21,9 @@ namespace PCLCrypto.Tests.WindowsPhone
 
             // otherwise you need to ensure that the test assemblies will
             // become part of the app bundle
-            ////AddTestAssembly(typeof(PortableTests).Assembly);
+            ////this.AddTestAssembly(typeof(PortableTests).Assembly);
+
+            this.AutoStart = true;
         }
     }
 }

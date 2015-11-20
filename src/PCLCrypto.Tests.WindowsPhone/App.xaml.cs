@@ -15,6 +15,9 @@ namespace PCLCrypto.Tests.WindowsPhone
 
     public partial class App : Application
     {
+        // Avoid double-initialization
+        private bool phoneApplicationInitialized = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
@@ -104,9 +107,6 @@ namespace PCLCrypto.Tests.WindowsPhone
         }
 
         #region Phone application initialization
-
-        // Avoid double-initialization
-        private bool phoneApplicationInitialized = false;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
