@@ -14,8 +14,13 @@ namespace PCLCrypto
         None,
 
         /// <summary>
-        /// Use PKCS7 padding.
+        /// The PKCS #7 padding string consists of a sequence of bytes, each of which is equal to the total number of padding bytes added.
         /// </summary>
         PKCS7,
+
+        /// <summary>
+        /// The padding string consists of bytes set to zero.
+        /// </summary>
+        Zeros,
     }
 }

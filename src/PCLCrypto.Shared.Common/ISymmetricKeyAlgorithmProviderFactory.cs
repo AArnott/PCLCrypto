@@ -17,8 +17,10 @@ namespace PCLCrypto
         /// <summary>
         /// Returns a crypto key management for a specified algorithm.
         /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
+        /// <param name="name">The name of the base algorithm to use.</param>
+        /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
+        /// <param name="padding">The padding to use.</param>
         /// <returns>An instance of <see cref="ISymmetricKeyAlgorithmProvider"/>.</returns>
-        ISymmetricKeyAlgorithmProvider OpenAlgorithm(SymmetricAlgorithm algorithm);
+        ISymmetricKeyAlgorithmProvider OpenAlgorithm(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding);
     }
 }

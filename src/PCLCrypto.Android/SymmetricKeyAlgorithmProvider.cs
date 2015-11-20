@@ -15,28 +15,19 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of the <see cref="ISymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
+    internal partial class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
     {
-        /// <summary>
-        /// The algorithm used by this instance.
-        /// </summary>
-        private readonly SymmetricAlgorithm algorithm;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
-        public SymmetricKeyAlgorithmProvider(SymmetricAlgorithm algorithm)
+        /// <param name="name">The name of the base algorithm to use.</param>
+        /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
+        /// <param name="padding">The padding to use.</param>
+        public SymmetricKeyAlgorithmProvider(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
         {
-            this.algorithm = algorithm;
-        }
-
-        /// <summary>
-        /// Gets the algorithm supported by this provider.
-        /// </summary>
-        public SymmetricAlgorithm Algorithm
-        {
-            get { return this.algorithm; }
+            this.Name = name;
+            this.Mode = mode;
+            this.Padding = padding;
         }
 
         /// <inheritdoc/>
@@ -46,9 +37,9 @@ namespace PCLCrypto
             {
                 try
                 {
-                    using (var platform = Cipher.GetInstance(this.algorithm.GetName().GetString()))
+                    using (var platform = Cipher.GetInstance(this.Name.GetString()))
                     {
-                        return GetBlockSize(this.algorithm, platform);
+                        return GetBlockSize(this.Mode, platform);
                     }
                 }
                 catch (NoSuchAlgorithmException ex)
@@ -63,20 +54,20 @@ namespace PCLCrypto
         {
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
-            return new SymmetricCryptographicKey(this.Algorithm, keyMaterial);
+            return new SymmetricCryptographicKey(this.Name, this.Mode, this.Padding, keyMaterial);
         }
 
         /// <summary>
         /// Gets the block size (in bytes) for the specified algorithm.
         /// </summary>
-        /// <param name="pclAlgorithm">The PCL algorithm.</param>
+        /// <param name="mode">The algorithm mode.</param>
         /// <param name="algorithm">The platform-specific algorithm.</param>
         /// <returns>The block size (in bytes).</returns>
-        internal static int GetBlockSize(SymmetricAlgorithm pclAlgorithm, Cipher algorithm)
+        internal static int GetBlockSize(SymmetricAlgorithmMode mode, Cipher algorithm)
         {
             Requires.NotNull(algorithm, "algorithm");
 
-            if (algorithm.BlockSize == 0 && pclAlgorithm.GetName() == SymmetricAlgorithmName.Rc4)
+            if (algorithm.BlockSize == 0 && mode == SymmetricAlgorithmMode.Streaming)
             {
                 // This is a streaming cipher without a block size. Return 1 to emulate behavior of other platforms.
                 return 1;

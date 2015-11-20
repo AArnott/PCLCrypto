@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
-#if !SILVERLIGHT || WINDOWS_PHONE // exclude SL5
 namespace PCLCrypto
 {
     using System;
@@ -57,7 +56,18 @@ namespace PCLCrypto
             return parameters;
 #endif
         }
+
+        /// <summary>
+        /// Returns a crypto key management for a specified algorithm.
+        /// </summary>
+        /// <param name="factory">The factory.</param>
+        /// <param name="algorithm">The algorithm.</param>
+        /// <returns>An instance of <see cref="ISymmetricKeyAlgorithmProvider"/>.</returns>
+        public static ISymmetricKeyAlgorithmProvider OpenAlgorithm(this ISymmetricKeyAlgorithmProviderFactory factory, SymmetricAlgorithm algorithm)
+        {
+            Requires.NotNull(factory, nameof(factory));
+
+            return factory.OpenAlgorithm(algorithm.GetName(), algorithm.GetMode(), algorithm.GetPadding());
+        }
     }
 }
-
-#endif

@@ -14,28 +14,19 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of the <see cref="ISymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
+    internal partial class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
     {
-        /// <summary>
-        /// The algorithm used by this instance.
-        /// </summary>
-        private readonly SymmetricAlgorithm algorithm;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
-        public SymmetricKeyAlgorithmProvider(SymmetricAlgorithm algorithm)
+        /// <param name="name">The name of the base algorithm to use.</param>
+        /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
+        /// <param name="padding">The padding to use.</param>
+        public SymmetricKeyAlgorithmProvider(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
         {
-            this.algorithm = algorithm;
-        }
-
-        /// <summary>
-        /// Gets the algorithm supported by this provider.
-        /// </summary>
-        public SymmetricAlgorithm Algorithm
-        {
-            get { return this.algorithm; }
+            this.Name = name;
+            this.Mode = mode;
+            this.Padding = padding;
         }
 
         /// <inheritdoc/>
@@ -43,7 +34,7 @@ namespace PCLCrypto
         {
             get
             {
-                using (var platform = GetAlgorithm(this.algorithm))
+                using (var platform = this.GetAlgorithm())
                 {
                     return platform.BlockSize / 8;
                 }
@@ -55,7 +46,7 @@ namespace PCLCrypto
         {
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
-            var platform = GetAlgorithm(this.algorithm);
+            var platform = this.GetAlgorithm();
             try
             {
                 platform.Key = keyMaterial;
@@ -69,18 +60,18 @@ namespace PCLCrypto
 #endif
             }
 
-            return new SymmetricCryptographicKey(platform, this.Algorithm);
+            return new SymmetricCryptographicKey(platform, this.Name, this.Mode, this.Padding);
         }
 
 #if !SILVERLIGHT
         /// <summary>
         /// Gets the platform enum value for the block mode used by the specified algorithm.
         /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
+        /// <param name="mode">The algorithm mode.</param>
         /// <returns>The platform-specific enum value describing the block mode.</returns>
-        private static Platform.CipherMode GetMode(SymmetricAlgorithm algorithm)
+        private static Platform.CipherMode GetMode(SymmetricAlgorithmMode mode)
         {
-            switch (algorithm.GetMode())
+            switch (mode)
             {
                 case SymmetricAlgorithmMode.Cbc:
                     return Platform.CipherMode.CBC;
@@ -94,16 +85,18 @@ namespace PCLCrypto
         /// <summary>
         /// Gets the platform enum value for the padding used by the specified algorithm.
         /// </summary>
-        /// <param name="algorithm">The algorithm.</param>
+        /// <param name="padding">The algorithm padding.</param>
         /// <returns>The platform-specific enum value for the padding.</returns>
-        private static Platform.PaddingMode GetPadding(SymmetricAlgorithm algorithm)
+        private static Platform.PaddingMode GetPadding(SymmetricAlgorithmPadding padding)
         {
-            switch (algorithm.GetPadding())
+            switch (padding)
             {
                 case SymmetricAlgorithmPadding.None:
                     return Platform.PaddingMode.None;
                 case SymmetricAlgorithmPadding.PKCS7:
                     return Platform.PaddingMode.PKCS7;
+                case SymmetricAlgorithmPadding.Zeros:
+                    return Platform.PaddingMode.Zeros;
                 default:
                     throw new ArgumentException();
             }
@@ -113,30 +106,31 @@ namespace PCLCrypto
         /// <summary>
         /// Returns a platform-specific algorithm that conforms to the prescribed platform-neutral algorithm.
         /// </summary>
-        /// <param name="algorithm">The PCL algorithm.</param>
         /// <returns>
         /// The platform-specific algorithm.
         /// </returns>
-        private static Platform.SymmetricAlgorithm GetAlgorithm(SymmetricAlgorithm algorithm)
+        private Platform.SymmetricAlgorithm GetAlgorithm()
         {
 #if SILVERLIGHT || __IOS__
-            switch (algorithm)
+            if (this.Name == SymmetricAlgorithmName.Aes &&
+                this.Mode == SymmetricAlgorithmMode.Cbc &&
+                this.Padding == SymmetricAlgorithmPadding.PKCS7)
             {
-                case SymmetricAlgorithm.AesCbcPkcs7:
-                    return new Platform.AesManaged();
-                default:
-                    throw new NotSupportedException();
+                return new Platform.AesManaged();
+            }
+            else
+            {
+                throw new NotSupportedException();
             }
 #else
-            Platform.SymmetricAlgorithm platform = Platform.SymmetricAlgorithm.Create(
-                algorithm.GetName().GetString());
+            var platform = Platform.SymmetricAlgorithm.Create(this.Name.GetString());
             if (platform == null)
             {
                 throw new NotSupportedException();
             }
 
-            platform.Mode = GetMode(algorithm);
-            platform.Padding = GetPadding(algorithm);
+            platform.Mode = GetMode(this.Mode);
+            platform.Padding = GetPadding(this.Padding);
 
             return platform;
 #endif

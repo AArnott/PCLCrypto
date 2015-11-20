@@ -23,9 +23,9 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public ISymmetricKeyAlgorithmProvider OpenAlgorithm(SymmetricAlgorithm algorithm)
+        public ISymmetricKeyAlgorithmProvider OpenAlgorithm(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
         {
-            return new SymmetricKeyAlgorithmProvider(algorithm);
+            return new SymmetricKeyAlgorithmProvider(name, mode, padding);
         }
     }
 }

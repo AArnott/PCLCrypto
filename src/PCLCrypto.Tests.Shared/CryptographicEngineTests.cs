@@ -34,6 +34,8 @@ public class CryptographicEngineTests
         .OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7)
         .CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
 
+    private readonly ICryptographicKey aesKeyZerosPadding;
+
     private readonly ICryptographicKey aesKeyNoPadding = CreateKey(SymmetricAlgorithm.AesCbc, AesKeyMaterial);
 
     private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
@@ -43,6 +45,15 @@ public class CryptographicEngineTests
     public CryptographicEngineTests(ITestOutputHelper logger)
     {
         this.logger = logger;
+        try
+        {
+            this.aesKeyZerosPadding = WinRTCrypto.SymmetricKeyAlgorithmProvider
+                .OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, SymmetricAlgorithmPadding.Zeros)
+                .CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
+        }
+        catch (NotSupportedException)
+        {
+        }
     }
 
     [Fact]
@@ -167,10 +178,12 @@ public class CryptographicEngineTests
         // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
         // this test should be modified to use that cipher to test the NetFx PCL wrapper for
         // streaming cipher behavior.
-        SymmetricAlgorithm symmetricAlgorithm = SymmetricAlgorithm.Rc4;
+        var symmetricAlgorithm = SymmetricAlgorithmName.Rc4;
+        var mode = SymmetricAlgorithmMode.Streaming;
+        var padding = SymmetricAlgorithmPadding.None;
         try
         {
-            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
+            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, mode, padding);
             uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
             byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
             var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
@@ -203,10 +216,10 @@ public class CryptographicEngineTests
         // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
         // this test should be modified to use that cipher to test the NetFx PCL wrapper for
         // streaming cipher behavior.
-        SymmetricAlgorithm symmetricAlgorithm = SymmetricAlgorithm.Rc4;
+        var symmetricAlgorithm = SymmetricAlgorithmName.Rc4;
         try
         {
-            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
+            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, SymmetricAlgorithmMode.Streaming, SymmetricAlgorithmPadding.None);
             uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
             byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
             var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
@@ -241,7 +254,7 @@ public class CryptographicEngineTests
             try
             {
                 var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
-                uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
+                uint keyLength = GetKeyLength(symmetricAlgorithm.GetName(), algorithmProvider);
 
                 byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
                 var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
@@ -312,15 +325,12 @@ public class CryptographicEngineTests
         this.EncryptDecryptStreamChain(this.bigData);
     }
 
-    private static uint GetKeyLength(SymmetricAlgorithm symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
+    private static uint GetKeyLength(SymmetricAlgorithmName symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
     {
         uint keyLength;
         switch (symmetricAlgorithm)
         {
-            case SymmetricAlgorithm.TripleDesCbc:
-            case SymmetricAlgorithm.TripleDesCbcPkcs7:
-            case SymmetricAlgorithm.TripleDesEcb:
-            case SymmetricAlgorithm.TripleDesEcbPkcs7:
+            case SymmetricAlgorithmName.TripleDes:
                 keyLength = (uint)algorithmProvider.BlockLength * 3;
                 break;
             default:

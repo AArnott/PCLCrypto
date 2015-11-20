@@ -14,7 +14,7 @@ namespace PCLCrypto
     /// <summary>
     /// A .NET Framework implementation of <see cref="ICryptographicKey"/> for use with symmetric algorithms.
     /// </summary>
-    internal class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey, IDisposable
+    internal partial class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey, IDisposable
     {
         /// <summary>
         /// The platform's symmetric algorithm.
@@ -22,20 +22,19 @@ namespace PCLCrypto
         private readonly Platform.SymmetricAlgorithm algorithm;
 
         /// <summary>
-        /// The PCL algorithm enum.
-        /// </summary>
-        private readonly SymmetricAlgorithm pclAlgorithm;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm, initialized with the key.</param>
-        /// <param name="pclAlgorithm">The PCL enum of the algorithm in use.</param>
-        internal SymmetricCryptographicKey(Platform.SymmetricAlgorithm algorithm, SymmetricAlgorithm pclAlgorithm)
+        /// <param name="name">The name of the base algorithm to use.</param>
+        /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
+        /// <param name="padding">The padding to use.</param>
+        internal SymmetricCryptographicKey(Platform.SymmetricAlgorithm algorithm, SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
         {
             Requires.NotNull(algorithm, "algorithm");
             this.algorithm = algorithm;
-            this.pclAlgorithm = pclAlgorithm;
+            this.Name = name;
+            this.Mode = mode;
+            this.Padding = padding;
         }
 
         /// <inheritdoc />
@@ -69,9 +68,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
-            bool paddingInUse = this.pclAlgorithm.GetPadding() != SymmetricAlgorithmPadding.None;
+            bool paddingInUse = this.Padding != SymmetricAlgorithmPadding.None;
             Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
-            Requires.Argument(iv == null || this.pclAlgorithm.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+            Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
 
             var encryptor = this.algorithm.CreateEncryptor(this.algorithm.Key, this.ThisOrDefaultIV(iv));
             return encryptor.TransformFinalBlock(data, 0, data.Length);
@@ -110,7 +109,7 @@ namespace PCLCrypto
             {
                 return iv;
             }
-            else if (!this.pclAlgorithm.UsesIV())
+            else if (!this.Mode.UsesIV())
             {
                 // Don't create an IV when it doesn't apply.
                 return null;

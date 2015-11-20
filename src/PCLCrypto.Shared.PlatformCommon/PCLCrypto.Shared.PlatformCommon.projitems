@@ -12,5 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptoUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HashAlgorithmProviderFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SymmetricCryptographicKey.Shared.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SymmetricKeyAlgorithmProvider.Shared.cs" />
   </ItemGroup>
 </Project>
