@@ -63,6 +63,13 @@ namespace PCLCrypto
             return new SymmetricCryptographicKey(platform, this.Name, this.Mode, this.Padding);
         }
 
+        /// <summary>
+        /// Disposes resources associated with this instance.
+        /// </summary>
+        public void Dispose()
+        {
+        }
+
 #if !SILVERLIGHT
         /// <summary>
         /// Gets the platform enum value for the block mode used by the specified algorithm.

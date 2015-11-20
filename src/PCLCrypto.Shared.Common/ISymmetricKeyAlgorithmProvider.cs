@@ -11,7 +11,7 @@ namespace PCLCrypto
     /// <summary>
     /// Represents a provider of symmetric key algorithms.
     /// </summary>
-    public interface ISymmetricKeyAlgorithmProvider
+    public interface ISymmetricKeyAlgorithmProvider : IDisposable
     {
         /// <summary>
         /// Gets the size, in bytes, of the cipher block for the open algorithm.

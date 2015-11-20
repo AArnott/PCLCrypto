@@ -67,6 +67,13 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Disposes resources associated with this instance.
+        /// </summary>
+        public void Dispose()
+        {
+        }
+
+        /// <summary>
         /// Returns the string to pass to the platform APIs for a given algorithm.
         /// </summary>
         /// <param name="algorithm">The algorithm desired.</param>
