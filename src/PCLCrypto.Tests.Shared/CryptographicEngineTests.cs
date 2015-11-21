@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using PCLCrypto;
+using Validation;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -38,8 +39,6 @@ public class CryptographicEngineTests
 
     private readonly ICryptographicKey aesKeyNoPadding = CreateKey(SymmetricAlgorithm.AesCbc, AesKeyMaterial);
 
-    private readonly byte[] iv = Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
-
     private readonly ITestOutputHelper logger;
 
     public CryptographicEngineTests(ITestOutputHelper logger)
@@ -55,6 +54,8 @@ public class CryptographicEngineTests
         {
         }
     }
+
+    private static byte[] IV => Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
 
     [Fact]
     public void SignAndVerifySignatureMac()
@@ -94,97 +95,114 @@ public class CryptographicEngineTests
     }
 
     [Fact]
-    public void EncryptAndDecrypt_AES_ZerosPadding()
-    {
-        byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyZerosPadding, this.data, null);
-        CollectionAssertEx.AreNotEqual(this.data, cipherText);
-        Assert.Equal("eu0+YclmfT2hv+YEDO6gOA==", Convert.ToBase64String(cipherText));
-        byte[] actualPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyZerosPadding, cipherText, null);
-
-        // Zeros padding loses detail about the length of the original data.
-        // Therefore the expected decrypted value will have a length that is a multiple
-        // of the block length.
-        int blockLength = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, SymmetricAlgorithmPadding.Zeros)
-            .BlockLength;
-        byte[] expectedPlainText = new byte[blockLength];
-        Array.Copy(this.data, expectedPlainText, this.data.Length);
-        CollectionAssertEx.AreEqual(expectedPlainText, actualPlaintext);
-    }
-
-    [Fact]
     public void EncryptAndDecrypt_AES_IV()
     {
-        byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, this.iv);
+        byte[] iv = IV;
+        byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, this.data, iv);
         CollectionAssertEx.AreNotEqual(this.data, cipherText);
         Assert.Equal(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
-        byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, this.iv);
+        Assert.Equal<byte>(iv, IV); // ensure IV wasn't tampered with
+
+        byte[] plainText = WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, cipherText, iv);
         CollectionAssertEx.AreEqual(this.data, plainText);
+        Assert.Equal<byte>(iv, IV); // ensure IV wasn't tampered with
     }
 
-    [Fact]
-    public void Encrypt_PartialBlockInput()
+    [Theory]
+    [InlineData(0, SymmetricAlgorithmPadding.None, "")]
+    [InlineData(0, SymmetricAlgorithmPadding.PKCS7, "+4HMuhSFPVoZ8cmo4//fRw==")]
+    [InlineData(0, SymmetricAlgorithmPadding.Zeros, "")]
+    [InlineData(4, SymmetricAlgorithmPadding.None, null)]
+    [InlineData(4, SymmetricAlgorithmPadding.PKCS7, "nntSI7AkwvmbtLNSJoZlRg==")]
+    [InlineData(4, SymmetricAlgorithmPadding.Zeros, "SJZigEu6012wSKJ+u/203Q==")]
+    [InlineData(16, SymmetricAlgorithmPadding.None, "Kjgd8dnw3a9ZDcNxEzAj8A==")]
+    [InlineData(16, SymmetricAlgorithmPadding.PKCS7, "Kjgd8dnw3a9ZDcNxEzAj8LYap900oNM9hh1Kw06vzl0=")]
+    [InlineData(16, SymmetricAlgorithmPadding.Zeros, "Kjgd8dnw3a9ZDcNxEzAj8A==")]
+    [InlineData(18, SymmetricAlgorithmPadding.None, null)]
+    [InlineData(18, SymmetricAlgorithmPadding.PKCS7, "Kjgd8dnw3a9ZDcNxEzAj8IkJnj6bjxQM7ZJx8Nrxxjc=")]
+    [InlineData(18, SymmetricAlgorithmPadding.Zeros, "Kjgd8dnw3a9ZDcNxEzAj8Jg2Z+cLYaP28bM3geHNT3Q=")]
+    public void EncryptDecrypt_AES(int inputLength, SymmetricAlgorithmPadding padding, string expectedCiphertext)
     {
-        if (this.aesKeyNoPadding != null)
+        byte[] iv = IV;
+        byte[] plaintext = new byte[inputLength];
+        Array.Copy(this.bigData, plaintext, inputLength);
+        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, padding))
         {
-            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[4], this.iv));
-        }
+            using (var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+            {
+                if (expectedCiphertext == null)
+                {
+                    Assert.Throws<ArgumentException>(
+                        () => WinRTCrypto.CryptographicEngine.Encrypt(key, plaintext, iv));
+                }
+                else
+                {
+                    byte[] actualCipherText = WinRTCrypto.CryptographicEngine.Encrypt(key, plaintext, iv);
+                    Assert.Equal(
+                        expectedCiphertext,
+                        Convert.ToBase64String(actualCipherText));
 
-        byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[4], this.iv);
-        Assert.Equal(16, ciphertext.Length); // 16 is the block size for AES
+                    byte[] expectedPlainText = plaintext;
+                    if (!PaddingPreservesPlaintextLength(padding))
+                    {
+                        // Therefore the expected decrypted value will have a length that is a multiple
+                        // of the block length.
+                        int blockLength = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, SymmetricAlgorithmPadding.Zeros)
+                            .BlockLength;
+                        int bytesBeyondLastBlockLength = expectedPlainText.Length % blockLength;
+                        if (bytesBeyondLastBlockLength > 0)
+                        {
+                            int growBy = blockLength - bytesBeyondLastBlockLength;
+                            Array.Resize(ref expectedPlainText, expectedPlainText.Length + growBy);
+                        }
+                    }
+
+                    byte[] actualPlainText = WinRTCrypto.CryptographicEngine.Decrypt(key, actualCipherText, iv);
+
+                    Assert.Equal(
+                        Convert.ToBase64String(expectedPlainText),
+                        Convert.ToBase64String(actualPlainText));
+                }
+            }
+        }
     }
 
     [Fact]
     public void Decrypt_PartialBlockInput()
     {
-        if (this.aesKeyNoPadding != null)
-        {
-            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[4], this.iv));
-        }
-
-        Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[4], this.iv));
-    }
-
-    [Fact]
-    public void Encrypt_EmptyInput()
-    {
-        if (this.aesKeyNoPadding != null)
-        {
-            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Encrypt(this.aesKeyNoPadding, new byte[0], this.iv));
-        }
-
-        byte[] ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(this.aesKey, new byte[0], this.iv);
-        Assert.Equal(16, ciphertext.Length); // 16 is the block size for AES
+        byte[] data = new byte[4];
+        byte[] iv = IV;
+        Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv));
+        Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, data, iv));
     }
 
     [Fact]
     public void Decrypt_EmptyInput()
     {
-        if (this.aesKeyNoPadding != null)
-        {
-            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, new byte[0], this.iv));
-        }
-
-        Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, new byte[0], this.iv));
+        byte[] iv = IV;
+        var data = new byte[0];
+        Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv).Length);
+        Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, data, iv).Length);
     }
 
     [Fact]
     public void CreateEncryptor_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(
-            () => WinRTCrypto.CryptographicEngine.CreateEncryptor(null, this.iv));
+            () => WinRTCrypto.CryptographicEngine.CreateEncryptor(null, IV));
     }
 
     [Fact]
     public void CreateDecryptor_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(
-            () => WinRTCrypto.CryptographicEngine.CreateDecryptor(null, this.iv));
+            () => WinRTCrypto.CryptographicEngine.CreateDecryptor(null, IV));
     }
 
     [Fact]
     public void CreateEncryptor()
     {
-        var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey, this.iv);
+        var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey, IV);
         byte[] cipherText = encryptor.TransformFinalBlock(this.data, 0, this.data.Length);
 
         Assert.Equal(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
@@ -325,7 +343,7 @@ public class CryptographicEngineTests
     public void CreateDecryptor()
     {
         byte[] cipherText = Convert.FromBase64String(DataAesCiphertextBase64);
-        var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey, this.iv);
+        var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey, IV);
         byte[] plaintext = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
         CollectionAssertEx.AreEqual(this.data, plaintext);
     }
@@ -357,6 +375,11 @@ public class CryptographicEngineTests
         }
 
         return keyLength;
+    }
+
+    private static bool PaddingPreservesPlaintextLength(SymmetricAlgorithmPadding padding)
+    {
+        return padding != SymmetricAlgorithmPadding.Zeros;
     }
 
     private static ICryptographicKey CreateKey(SymmetricAlgorithm algorithm, string keyMaterialBase64)

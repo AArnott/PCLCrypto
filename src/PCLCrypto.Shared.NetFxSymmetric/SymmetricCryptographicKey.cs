@@ -127,7 +127,7 @@ namespace PCLCrypto
         /// <returns><c>true</c> if the size is allowed; <c>false</c> otherwise.</returns>
         private bool IsValidInputSize(int lengthInBytes)
         {
-            return lengthInBytes > 0 && (lengthInBytes * 8) % this.algorithm.BlockSize == 0;
+            return (lengthInBytes * 8) % this.algorithm.BlockSize == 0;
         }
 
         /// <summary>
