@@ -253,11 +253,11 @@ namespace PCLCrypto
                     BCryptSetProperty(this.Provider, PropertyNames.ChainingMode, GetChainingMode(key.Mode));
                     this.Key = BCryptGenerateSymmetricKey(this.Provider, key.keyMaterial);
                 }
-                catch
+                catch (Exception ex)
                 {
                     this.Key?.Dispose();
                     this.Provider?.Dispose();
-                    throw;
+                    throw new ArgumentException(ex.Message, ex);
                 }
 
                 this.Flags = BCryptEncryptFlags.None;
