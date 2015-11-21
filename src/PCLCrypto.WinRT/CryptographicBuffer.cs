@@ -9,7 +9,9 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
+    using PInvoke;
     using Platform = Windows.Security.Cryptography.CryptographicBuffer;
+    using static PInvoke.BCrypt;
 
     /// <summary>
     /// The WinRT implementation of the <see cref="ICryptographicBuffer"/> interface.
@@ -112,7 +114,12 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public byte[] GenerateRandom(uint length)
         {
-            return Platform.GenerateRandom(length).ToArray();
+            using (var provider = BCryptOpenAlgorithmProvider(AlgorithmIdentifiers.BCRYPT_RNG_ALGORITHM))
+            {
+                byte[] buffer = new byte[length];
+                BCryptGenRandom(provider, buffer, buffer.Length).ThrowOnError();
+                return buffer;
+            }
         }
 
         /// <inheritdoc/>
