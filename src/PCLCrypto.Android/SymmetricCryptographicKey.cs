@@ -89,9 +89,9 @@ namespace PCLCrypto
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
             Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
 
-            return this.Padding != SymmetricAlgorithmPadding.None
-                ? this.encryptingCipher.DoFinal(data)
-                : this.encryptingCipher.Update(data);
+            return this.CanStreamAcrossTopLevelCipherOperations
+                ? this.encryptingCipher.Update(data)
+                : this.encryptingCipher.DoFinal(data);
         }
 
         /// <inheritdoc />
@@ -104,9 +104,9 @@ namespace PCLCrypto
 
             try
             {
-                return this.Padding != SymmetricAlgorithmPadding.None
-                    ? this.decryptingCipher.DoFinal(data)
-                    : this.decryptingCipher.Update(data);
+                return this.CanStreamAcrossTopLevelCipherOperations
+                    ? this.encryptingCipher.Update(data)
+                    : this.encryptingCipher.DoFinal(data);
             }
             catch (IllegalBlockSizeException ex)
             {
@@ -195,7 +195,7 @@ namespace PCLCrypto
                     newCipher = true;
                 }
 
-                if (iv != null || this.Padding != SymmetricAlgorithmPadding.None || newCipher)
+                if (iv != null || !this.CanStreamAcrossTopLevelCipherOperations || newCipher)
                 {
                     iv = this.ThisOrDefaultIV(iv);
                     using (var ivspec = iv != null ? new IvParameterSpec(iv) : null)

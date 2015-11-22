@@ -162,13 +162,13 @@ namespace PCLCrypto
         {
             Requires.NotNull(transformCreator, nameof(transformCreator));
 
-            if (iv != null || this.Padding != SymmetricAlgorithmPadding.None || transformField == null)
+            if (iv != null || !this.CanStreamAcrossTopLevelCipherOperations || transformField == null)
             {
                 transformField?.Dispose();
                 transformField = transformCreator(this, iv);
             }
 
-            if (this.Padding == SymmetricAlgorithmPadding.None)
+            if (this.CanStreamAcrossTopLevelCipherOperations)
             {
                 byte[] outputBlock = new byte[data.Length];
                 int bytesOutput = transformField.TransformBlock(data, 0, data.Length, outputBlock, 0);

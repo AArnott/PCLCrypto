@@ -24,12 +24,14 @@ namespace PCLCrypto
         Ecb,
 
         /// <summary>
-        /// The CCM mode.
+        /// Counter with CBC-MAC.
+        /// It is an authenticated encryption algorithm designed to provide both authentication and confidentiality. CCM mode is only defined for block ciphers with a block length of 128 bits.
         /// </summary>
         Ccm,
 
         /// <summary>
-        /// The GCM mode.
+        /// Galois/Counter Mode.
+        /// An authenticated encryption algorithm designed to provide both data authenticity (integrity) and confidentiality. GCM is defined for block ciphers with a block size of 128 bits.
         /// </summary>
         Gcm,
     }
