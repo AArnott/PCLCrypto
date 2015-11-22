@@ -161,6 +161,12 @@ namespace PCLCrypto
         private byte[] CipherOperation(ref Platform.ICryptoTransform transformField, Func<SymmetricCryptographicKey, byte[], Platform.ICryptoTransform> transformCreator, byte[] data, byte[] iv)
         {
             Requires.NotNull(transformCreator, nameof(transformCreator));
+            Requires.NotNull(data, nameof(data));
+
+            if (this.Padding == SymmetricAlgorithmPadding.None && data.Length == 0)
+            {
+                return data;
+            }
 
             if (iv != null || !this.CanStreamAcrossTopLevelCipherOperations || transformField == null)
             {
