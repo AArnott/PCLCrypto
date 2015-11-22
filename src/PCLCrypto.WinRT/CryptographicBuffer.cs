@@ -110,9 +110,9 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
-        public byte[] GenerateRandom(uint length)
+        public byte[] GenerateRandom(int length)
         {
-            return Platform.GenerateRandom(length).ToArray();
+            return Platform.GenerateRandom((uint)length).ToArray();
         }
 
         /// <inheritdoc/>

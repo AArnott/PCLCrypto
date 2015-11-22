@@ -106,7 +106,7 @@ namespace PCLCrypto
         /// <returns>
         /// Output buffer that contains the random data.
         /// </returns>
-        byte[] GenerateRandom(uint length);
+        byte[] GenerateRandom(int length);
 
         /// <summary>
         /// Creates a random number.

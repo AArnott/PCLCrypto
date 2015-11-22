@@ -190,7 +190,7 @@ public class CryptographicEngineTests
         try
         {
             var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, mode, padding);
-            uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
+            int keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
             byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
             var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
             var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
@@ -227,7 +227,7 @@ public class CryptographicEngineTests
     public void KeyStateResetWithNullIVWhenPaddingIsPresent()
     {
         var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
-        var data = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
+        var data = WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithm.BlockLength);
         var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
 
         // When padding is used, the key always resets state for each operation,
@@ -246,16 +246,16 @@ public class CryptographicEngineTests
             try
             {
                 var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
-                uint keyLength = GetKeyLength(symmetricAlgorithm.GetName(), algorithmProvider);
+                int keyLength = GetKeyLength(symmetricAlgorithm.GetName(), algorithmProvider);
 
                 byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
                 var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
                 var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial); // create a second key so that streaming ciphers will be produce the same result when executed the second time
-                var iv = symmetricAlgorithm.UsesIV() ? WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithmProvider.BlockLength) : null;
+                var iv = symmetricAlgorithm.UsesIV() ? WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithmProvider.BlockLength) : null;
 
                 for (int dataLengthFactor = 1; dataLengthFactor <= 3; dataLengthFactor++)
                 {
-                    var data = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)(dataLengthFactor * algorithmProvider.BlockLength));
+                    var data = WinRTCrypto.CryptographicBuffer.GenerateRandom(dataLengthFactor * algorithmProvider.BlockLength);
                     var expected = WinRTCrypto.CryptographicEngine.Encrypt(key1, data, iv);
 
                     var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(key2, iv);
@@ -317,16 +317,16 @@ public class CryptographicEngineTests
         this.EncryptDecryptStreamChain(this.bigData);
     }
 
-    private static uint GetKeyLength(SymmetricAlgorithmName symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
+    private static int GetKeyLength(SymmetricAlgorithmName symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
     {
-        uint keyLength;
+        int keyLength;
         switch (symmetricAlgorithm)
         {
             case SymmetricAlgorithmName.TripleDes:
-                keyLength = (uint)algorithmProvider.BlockLength * 3;
+                keyLength = algorithmProvider.BlockLength * 3;
                 break;
             default:
-                keyLength = (uint)algorithmProvider.BlockLength;
+                keyLength = algorithmProvider.BlockLength;
                 break;
         }
 
@@ -350,8 +350,8 @@ public class CryptographicEngineTests
     private void KeyStateResetIfAndOnlyIfInitVectorIsSupplied(Func<ICryptographicKey, byte[], byte[], byte[]> cipherFunc)
     {
         var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbc);
-        var data1 = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
-        var data2 = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
+        var data1 = WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithm.BlockLength);
+        var data2 = WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithm.BlockLength);
         var data1and2 = new byte[data1.Length + data2.Length];
         Array.Copy(data1, data1and2, data1.Length);
         Array.Copy(data2, 0, data1and2, data1.Length, data2.Length);
