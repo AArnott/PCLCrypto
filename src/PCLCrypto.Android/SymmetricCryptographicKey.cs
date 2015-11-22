@@ -105,8 +105,8 @@ namespace PCLCrypto
             try
             {
                 return this.CanStreamAcrossTopLevelCipherOperations
-                    ? this.encryptingCipher.Update(data)
-                    : this.encryptingCipher.DoFinal(data);
+                    ? this.decryptingCipher.Update(data)
+                    : this.decryptingCipher.DoFinal(data);
             }
             catch (IllegalBlockSizeException ex)
             {
