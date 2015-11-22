@@ -8,10 +8,10 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using Validation;
     using PInvoke;
-    using Platform = Windows.Security.Cryptography.CryptographicBuffer;
+    using Validation;
     using static PInvoke.BCrypt;
+    using Platform = Windows.Security.Cryptography.CryptographicBuffer;
 
     /// <summary>
     /// The WinRT implementation of the <see cref="ICryptographicBuffer"/> interface.

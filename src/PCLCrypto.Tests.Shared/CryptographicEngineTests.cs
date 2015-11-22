@@ -398,16 +398,17 @@ public class CryptographicEngineTests
         Array.Copy(data2, 0, data1and2, data1.Length, data2.Length);
 
         var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
+        var iv = IV;
 
         // Encrypt the two blocks in separate operations, passing null for the IV the second time.
-        byte[] cipherText1 = cipherFunc(key, data1, this.iv);
+        byte[] cipherText1 = cipherFunc(key, data1, iv);
         byte[] cipherText2 = cipherFunc(key, data2, null);
         byte[] cipherText1and2Stitched = new byte[cipherText1.Length + cipherText2.Length];
         Array.Copy(cipherText1, cipherText1and2Stitched, cipherText1.Length);
         Array.Copy(cipherText2, 0, cipherText1and2Stitched, cipherText1.Length, cipherText2.Length);
 
         // Encrypt the two blocks at once, specifying the IV, which should have reset the state of the key.
-        byte[] cipherText1and2 = cipherFunc(key, data1and2, this.iv);
+        byte[] cipherText1and2 = cipherFunc(key, data1and2, iv);
 
         // Assert that both approaches produce the same result.
         Assert.Equal<byte>(cipherText1and2, cipherText1and2Stitched);

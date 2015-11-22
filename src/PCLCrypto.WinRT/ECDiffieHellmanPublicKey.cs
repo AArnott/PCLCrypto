@@ -4,6 +4,7 @@
 namespace PCLCrypto
 {
     using System;
+    using System.Linq;
     using Validation;
     using static PInvoke.BCrypt;
 
@@ -33,7 +34,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] ToByteArray()
         {
-            return BCryptExportKey(this.keyHandle, null, AsymmetricKeyBlobTypes.EccPublic);
+            return BCryptExportKey(this.keyHandle, null, AsymmetricKeyBlobTypes.EccPublic).ToArray();
         }
     }
 }

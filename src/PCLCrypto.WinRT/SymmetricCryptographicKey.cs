@@ -114,7 +114,7 @@ namespace PCLCrypto
                     plaintext,
                     IntPtr.Zero,
                     CopyBufferOrNull(iv), // shield our caller from mutations
-                    k.Flags);
+                    k.Flags).ToArray();
                 return cipherText;
             }
         }
@@ -149,7 +149,7 @@ namespace PCLCrypto
                     ciphertext,
                     IntPtr.Zero,
                     CopyBufferOrNull(iv), // shield our caller from mutations
-                    k.Flags);
+                    k.Flags).ToArray();
                 return plainText;
             }
         }
