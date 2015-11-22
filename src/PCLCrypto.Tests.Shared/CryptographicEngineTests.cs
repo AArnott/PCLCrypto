@@ -218,6 +218,21 @@ public class CryptographicEngineTests
     }
 
     [Fact]
+    public void KeyStateResetWithNullIVWhenPaddingIsPresent()
+    {
+        var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
+        var data = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
+        var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
+
+        // When padding is used, the key always resets state for each operation,
+        // even when IV is null.
+        byte[] cipherText1 = WinRTCrypto.CryptographicEngine.Encrypt(key, data, null);
+        byte[] cipherText2 = WinRTCrypto.CryptographicEngine.Encrypt(key, data, null);
+
+        Assert.Equal<byte>(cipherText1, cipherText2);
+    }
+
+    [Fact]
     public void CreateEncryptor_SymmetricEncryptionEquivalence()
     {
         foreach (SymmetricAlgorithm symmetricAlgorithm in Enum.GetValues(typeof(SymmetricAlgorithm)))
