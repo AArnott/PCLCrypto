@@ -22,6 +22,16 @@ namespace PCLCrypto
         private readonly Platform.SymmetricAlgorithm algorithm;
 
         /// <summary>
+        /// The transform used for the last encryption algorithm.
+        /// </summary>
+        private Platform.ICryptoTransform encryptor;
+
+        /// <summary>
+        /// The transform used for the last decryption algorithm.
+        /// </summary>
+        private Platform.ICryptoTransform decryptor;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm, initialized with the key.</param>
@@ -58,6 +68,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         public void Dispose()
         {
+            this.encryptor?.Dispose();
+            this.decryptor?.Dispose();
+
             var disposable = this.algorithm as IDisposable;
             if (disposable != null)
             {
@@ -72,16 +85,23 @@ namespace PCLCrypto
             Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
             Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
 
-            var encryptor = this.algorithm.CreateEncryptor(this.algorithm.Key, this.ThisOrDefaultIV(iv));
-            return encryptor.TransformFinalBlock(data, 0, data.Length);
+            return this.CipherOperation(
+                ref this.encryptor,
+                (me, initVector) => me.algorithm.CreateEncryptor(me.algorithm.Key, me.ThisOrDefaultIV(initVector)),
+                data,
+                iv);
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
             Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
-            var decryptor = this.algorithm.CreateDecryptor(this.algorithm.Key, this.ThisOrDefaultIV(iv));
-            return decryptor.TransformFinalBlock(data, 0, data.Length);
+
+            return this.CipherOperation(
+                ref this.decryptor,
+                (me, initVector) => me.algorithm.CreateDecryptor(me.algorithm.Key, me.ThisOrDefaultIV(initVector)),
+                data,
+                iv);
         }
 
         /// <inheritdoc />
@@ -128,6 +148,37 @@ namespace PCLCrypto
         private bool IsValidInputSize(int lengthInBytes)
         {
             return (lengthInBytes * 8) % this.algorithm.BlockSize == 0;
+        }
+
+        /// <summary>
+        /// Transforms an input block.
+        /// </summary>
+        /// <param name="transformField">Either the <see cref="encryptor"/> or <see cref="decryptor"/> field.</param>
+        /// <param name="transformCreator">The function to create a new transformer.</param>
+        /// <param name="data">The input data.</param>
+        /// <param name="iv">The initialization vector.</param>
+        /// <returns>The result of the transform.</returns>
+        private byte[] CipherOperation(ref Platform.ICryptoTransform transformField, Func<SymmetricCryptographicKey, byte[], Platform.ICryptoTransform> transformCreator, byte[] data, byte[] iv)
+        {
+            Requires.NotNull(transformCreator, nameof(transformCreator));
+
+            if (iv != null || !this.CanStreamAcrossTopLevelCipherOperations || transformField == null)
+            {
+                transformField?.Dispose();
+                transformField = transformCreator(this, iv);
+            }
+
+            if (this.CanStreamAcrossTopLevelCipherOperations)
+            {
+                byte[] outputBlock = new byte[data.Length];
+                int bytesOutput = transformField.TransformBlock(data, 0, data.Length, outputBlock, 0);
+                Array.Resize(ref outputBlock, bytesOutput);
+                return outputBlock;
+            }
+            else
+            {
+                return transformField.TransformFinalBlock(data, 0, data.Length);
+            }
         }
 
         /// <summary>

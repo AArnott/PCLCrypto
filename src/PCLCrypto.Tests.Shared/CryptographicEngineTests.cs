@@ -17,6 +17,12 @@ public class CryptographicEngineTests
     private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
     private const string DataAesCiphertextBase64 = "3ChRgsiJ0mXxJIEQS5Z4NA==";
 
+#if SILVERLIGHT
+    private const string SkipIfOnlyStandardAESSupported = "Only standard AES is supported.";
+#else
+    private const string SkipIfOnlyStandardAESSupported = null;
+#endif
+
     /// <summary>
     /// Data the fits within a single cryptographic block.
     /// </summary>
@@ -246,40 +252,26 @@ public class CryptographicEngineTests
         }
     }
 
-    [Fact]
-    public void StreamingCipherKeyRetainsStateAcrossOperations_Decrypt()
+    [Fact(Skip = SkipIfOnlyStandardAESSupported)]
+    public void KeyStateResetIfAndOnlyIfInitVectorIsSupplied()
     {
-        // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
-        // this test should be modified to use that cipher to test the NetFx PCL wrapper for
-        // streaming cipher behavior.
-        var symmetricAlgorithm = SymmetricAlgorithmName.Rc4;
-        try
-        {
-            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, SymmetricAlgorithmMode.Streaming, SymmetricAlgorithmPadding.None);
-            uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
-            byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
-            var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
-            var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+        this.KeyStateResetIfAndOnlyIfInitVectorIsSupplied(WinRTCrypto.CryptographicEngine.Encrypt);
+        this.KeyStateResetIfAndOnlyIfInitVectorIsSupplied(WinRTCrypto.CryptographicEngine.Decrypt);
+    }
 
-            byte[] allData = new byte[] { 1, 2, 3 };
-            byte[] allCiphertext = WinRTCrypto.CryptographicEngine.Decrypt(key1, allData);
+    [Fact]
+    public void KeyStateResetWithNullIVWhenPaddingIsPresent()
+    {
+        var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
+        var data = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
+        var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
 
-            var cipherStream = new MemoryStream();
-            for (int i = 0; i < allData.Length; i++)
-            {
-                byte[] cipherText = WinRTCrypto.CryptographicEngine.Decrypt(key2, new byte[] { allData[i] });
-                cipherStream.Write(cipherText, 0, cipherText.Length);
-            }
+        // When padding is used, the key always resets state for each operation,
+        // even when IV is null.
+        byte[] cipherText1 = WinRTCrypto.CryptographicEngine.Encrypt(key, data, null);
+        byte[] cipherText2 = WinRTCrypto.CryptographicEngine.Encrypt(key, data, null);
 
-            byte[] incrementalResult = cipherStream.ToArray();
-            Assert.Equal(
-                Convert.ToBase64String(allCiphertext),
-                Convert.ToBase64String(incrementalResult));
-        }
-        catch (NotSupportedException)
-        {
-            this.logger.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
-        }
+        Assert.Equal<byte>(cipherText1, cipherText2);
     }
 
     [Fact]
@@ -394,6 +386,31 @@ public class CryptographicEngineTests
         {
             return null;
         }
+    }
+
+    private void KeyStateResetIfAndOnlyIfInitVectorIsSupplied(Func<ICryptographicKey, byte[], byte[], byte[]> cipherFunc)
+    {
+        var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbc);
+        var data1 = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
+        var data2 = WinRTCrypto.CryptographicBuffer.GenerateRandom((uint)algorithm.BlockLength);
+        var data1and2 = new byte[data1.Length + data2.Length];
+        Array.Copy(data1, data1and2, data1.Length);
+        Array.Copy(data2, 0, data1and2, data1.Length, data2.Length);
+
+        var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial));
+
+        // Encrypt the two blocks in separate operations, passing null for the IV the second time.
+        byte[] cipherText1 = cipherFunc(key, data1, this.iv);
+        byte[] cipherText2 = cipherFunc(key, data2, null);
+        byte[] cipherText1and2Stitched = new byte[cipherText1.Length + cipherText2.Length];
+        Array.Copy(cipherText1, cipherText1and2Stitched, cipherText1.Length);
+        Array.Copy(cipherText2, 0, cipherText1and2Stitched, cipherText1.Length, cipherText2.Length);
+
+        // Encrypt the two blocks at once, specifying the IV, which should have reset the state of the key.
+        byte[] cipherText1and2 = cipherFunc(key, data1and2, this.iv);
+
+        // Assert that both approaches produce the same result.
+        Assert.Equal<byte>(cipherText1and2, cipherText1and2Stitched);
     }
 
     private void EncryptDecryptStreamChain(byte[] data)
