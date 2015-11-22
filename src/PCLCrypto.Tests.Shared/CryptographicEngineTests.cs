@@ -16,6 +16,12 @@ public class CryptographicEngineTests
     private const string AesKeyMaterial = "T1kMUiju2rHiRyhJKfo/Jg==";
     private const string DataAesCiphertextBase64 = "3ChRgsiJ0mXxJIEQS5Z4NA==";
 
+#if SILVERLIGHT
+    private const string SkipIfOnlyStandardAESSupported = "Only standard AES is supported.";
+#else
+    private const string SkipIfOnlyStandardAESSupported = null;
+#endif
+
     /// <summary>
     /// Data the fits within a single cryptographic block.
     /// </summary>
@@ -210,7 +216,7 @@ public class CryptographicEngineTests
         }
     }
 
-    [Fact]
+    [Fact(Skip = SkipIfOnlyStandardAESSupported)]
     public void KeyStateResetIfAndOnlyIfInitVectorIsSupplied()
     {
         this.KeyStateResetIfAndOnlyIfInitVectorIsSupplied(WinRTCrypto.CryptographicEngine.Encrypt);
