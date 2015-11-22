@@ -111,7 +111,7 @@ namespace PCLCrypto
         /// </returns>
         private Platform.SymmetricAlgorithm GetAlgorithm()
         {
-#if SILVERLIGHT || __IOS__
+#if SILVERLIGHT
             if (this.Name == SymmetricAlgorithmName.Aes &&
                 this.Mode == SymmetricAlgorithmMode.Cbc &&
                 this.Padding == SymmetricAlgorithmPadding.PKCS7)
@@ -123,7 +123,15 @@ namespace PCLCrypto
                 throw new NotSupportedException();
             }
 #else
-            var platform = Platform.SymmetricAlgorithm.Create(this.Name.GetString());
+            Platform.SymmetricAlgorithm platform = null;
+#if __IOS__
+            if (this.Name == SymmetricAlgorithmName.Aes)
+            {
+                platform = new Platform.AesManaged();
+            }
+#else
+            platform = Platform.SymmetricAlgorithm.Create(this.Name.GetString());
+#endif
             if (platform == null)
             {
                 throw new NotSupportedException();

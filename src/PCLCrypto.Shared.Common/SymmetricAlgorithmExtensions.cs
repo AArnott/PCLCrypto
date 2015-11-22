@@ -29,6 +29,14 @@ namespace PCLCrypto
         public static bool IsBlockCipher(this SymmetricAlgorithmMode mode) => mode != SymmetricAlgorithmMode.Streaming;
 
         /// <summary>
+        /// Gets a value indicating whether the specified mode offers authentication.
+        /// </summary>
+        /// <param name="mode">The mode to check.</param>
+        /// <returns><c>true</c> if the cipher is an authenticating block mode cipher; <c>false</c> otherwise.</returns>
+        public static bool IsAuthenticated(this SymmetricAlgorithmMode mode)
+            => mode == SymmetricAlgorithmMode.Gcm || mode == SymmetricAlgorithmMode.Ccm;
+
+        /// <summary>
         /// Returns a platform-specific algorithm that conforms to the prescribed platform-neutral algorithm.
         /// </summary>
         /// <param name="algorithm">The PCL algorithm.</param>

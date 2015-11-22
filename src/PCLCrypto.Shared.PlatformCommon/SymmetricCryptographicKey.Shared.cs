@@ -22,5 +22,12 @@ namespace PCLCrypto
         /// Gets the padding used by this instance.
         /// </summary>
         public SymmetricAlgorithmPadding Padding { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether multiple calls to encrypt/decrypt a block size
+        /// input is equivalent to the same operation but with all the input at once.
+        /// </summary>
+        private bool CanStreamAcrossTopLevelCipherOperations
+            => this.Padding == SymmetricAlgorithmPadding.None && !this.Mode.IsAuthenticated();
     }
 }
