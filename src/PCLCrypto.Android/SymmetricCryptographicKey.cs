@@ -89,7 +89,7 @@ namespace PCLCrypto
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
             Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
 
-            return this.Mode.IsBlockCipher()
+            return this.Padding != SymmetricAlgorithmPadding.None
                 ? this.encryptingCipher.DoFinal(data)
                 : this.encryptingCipher.Update(data);
         }
@@ -104,7 +104,7 @@ namespace PCLCrypto
 
             try
             {
-                return this.Mode.IsBlockCipher()
+                return this.Padding != SymmetricAlgorithmPadding.None
                     ? this.decryptingCipher.DoFinal(data)
                     : this.decryptingCipher.Update(data);
             }
@@ -175,29 +175,6 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Initializes a new cipher.
-        /// </summary>
-        /// <param name="mode">The mode.</param>
-        /// <param name="iv">The initialization vector to use.</param>
-        /// <returns>
-        /// The initialized cipher.
-        /// </returns>
-        private Cipher GetInitializedCipher(CipherMode mode, byte[] iv)
-        {
-            switch (mode)
-            {
-                case CipherMode.DecryptMode:
-                    this.InitializeCipher(mode, iv, ref this.decryptingCipher);
-                    return this.decryptingCipher;
-                case CipherMode.EncryptMode:
-                    this.InitializeCipher(mode, iv, ref this.encryptingCipher);
-                    return this.encryptingCipher;
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
-        /// <summary>
         /// Initializes the cipher if it has not yet been initialized.
         /// </summary>
         /// <param name="mode">The mode.</param>
@@ -218,7 +195,7 @@ namespace PCLCrypto
                     newCipher = true;
                 }
 
-                if (this.Mode.IsBlockCipher() || newCipher)
+                if (iv != null || this.Padding != SymmetricAlgorithmPadding.None || newCipher)
                 {
                     iv = this.ThisOrDefaultIV(iv);
                     using (var ivspec = iv != null ? new IvParameterSpec(iv) : null)
