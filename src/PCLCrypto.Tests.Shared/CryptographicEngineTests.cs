@@ -354,6 +354,12 @@ public class CryptographicEngineTests
     {
         foreach (SymmetricAlgorithm symmetricAlgorithm in Enum.GetValues(typeof(SymmetricAlgorithm)))
         {
+            if (symmetricAlgorithm.GetMode().IsAuthenticated())
+            {
+                // authenticated block modes require special caller code.
+                continue;
+            }
+
             try
             {
                 var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
