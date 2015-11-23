@@ -87,22 +87,36 @@ public class CryptographicEngineTests
         // WinRT itself throws NotImplementedException in these circumstances.
         // Authenticated block chaining modes such as CCM and GCM are required to use
         // the EncryptAndAuthenticate method.
-        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCcm))
+        try
         {
-            using (var aesCcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+            using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCcm))
             {
-                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesCcmKey, new byte[16]));
-                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesCcmKey, new byte[16]));
+                using (var aesCcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+                {
+                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesCcmKey, new byte[16]));
+                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesCcmKey, new byte[16]));
+                }
             }
         }
-
-        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesGcm))
+        catch (NotSupportedException)
         {
-            using (var aesGcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+            this.logger.WriteLine("AesCcm is not supported by this platform.");
+        }
+
+        try
+        {
+            using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesGcm))
             {
-                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesGcmKey, new byte[16]));
-                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesGcmKey, new byte[16]));
+                using (var aesGcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+                {
+                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesGcmKey, new byte[16]));
+                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesGcmKey, new byte[16]));
+                }
             }
+        }
+        catch (NotSupportedException)
+        {
+            this.logger.WriteLine("AesGcm is not supported by this platform.");
         }
     }
 
