@@ -29,6 +29,12 @@ namespace PCLCrypto
         private readonly SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider;
 
         /// <summary>
+        /// The IV returned from the last cryptographic operation, which may serve
+        /// as input into the next if the caller omits the IV.
+        /// </summary>
+        private byte[] iv;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
         /// </summary>
         /// <param name="keyMaterial">The symmetric key.</param>
@@ -107,13 +113,18 @@ namespace PCLCrypto
                         throw new NotSupportedException();
                 }
 
+                // We use the IV if the caller passes it in, or use
+                // the resulting IV of the last cipher operation if the caller
+                // did not specify an IV.
                 // Copy the IV because the native code changes it, and
                 // our contract with the caller is that we don't.
+                this.iv = CopyBufferOrNull(iv) ?? this.iv;
+
                 byte[] cipherText = BCryptEncrypt(
                     k.Key,
                     plaintext,
                     IntPtr.Zero,
-                    CopyBufferOrNull(iv), // shield our caller from mutations
+                    this.iv,
                     k.Flags).ToArray();
                 return cipherText;
             }
@@ -123,8 +134,8 @@ namespace PCLCrypto
         internal override byte[] Decrypt(byte[] ciphertext, byte[] iv)
         {
             Requires.NotNull(ciphertext, nameof(ciphertext));
-
             Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length does not a multiple of block size and no padding is selected.");
+
             using (var k = new ProviderAndKey(this))
             {
                 switch (this.Padding)
@@ -144,11 +155,18 @@ namespace PCLCrypto
                         throw new NotSupportedException();
                 }
 
+                // We use the IV if the caller passes it in, or use
+                // the resulting IV of the last cipher operation if the caller
+                // did not specify an IV.
+                // Copy the IV because the native code changes it, and
+                // our contract with the caller is that we don't.
+                this.iv = CopyBufferOrNull(iv) ?? this.iv;
+
                 byte[] plainText = BCryptDecrypt(
                     k.Key,
                     ciphertext,
                     IntPtr.Zero,
-                    CopyBufferOrNull(iv), // shield our caller from mutations
+                    this.iv,
                     k.Flags).ToArray();
                 return plainText;
             }
