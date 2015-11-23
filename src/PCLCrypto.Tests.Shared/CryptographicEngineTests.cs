@@ -82,6 +82,31 @@ public class CryptographicEngineTests
     }
 
     [Fact]
+    public void EncryptOrDecrypt_WithAuthenticatedMode()
+    {
+        // WinRT itself throws NotImplementedException in these circumstances.
+        // Authenticated block chaining modes such as CCM and GCM are required to use
+        // the EncryptAndAuthenticate method.
+        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCcm))
+        {
+            using (var aesCcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+            {
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesCcmKey, new byte[16]));
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesCcmKey, new byte[16]));
+            }
+        }
+
+        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesGcm))
+        {
+            using (var aesGcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+            {
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesGcmKey, new byte[16]));
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesGcmKey, new byte[16]));
+            }
+        }
+    }
+
+    [Fact]
     public void Decrypt_InvalidInputs()
     {
         Assert.Throws<ArgumentNullException>(

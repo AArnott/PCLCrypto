@@ -90,6 +90,8 @@ namespace PCLCrypto
         /// <inheritdoc />
         internal override byte[] Encrypt(byte[] plaintext, byte[] iv)
         {
+            Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
+
             using (var k = new ProviderAndKey(this))
             {
                 switch (this.Padding)
@@ -135,6 +137,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(ciphertext, nameof(ciphertext));
             Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length does not a multiple of block size and no padding is selected.");
+            Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             using (var k = new ProviderAndKey(this))
             {
