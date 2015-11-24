@@ -301,7 +301,7 @@ public class CryptographicEngineTests
         try
         {
             var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, SymmetricAlgorithmMode.Streaming, SymmetricAlgorithmPadding.None);
-            uint keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
+            int keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
             byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
             var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
             var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
