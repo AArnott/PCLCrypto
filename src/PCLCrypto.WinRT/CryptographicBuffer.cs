@@ -112,7 +112,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
-        public byte[] GenerateRandom(uint length)
+        public byte[] GenerateRandom(int length)
         {
             using (var provider = BCryptOpenAlgorithmProvider(AlgorithmIdentifiers.BCRYPT_RNG_ALGORITHM))
             {
