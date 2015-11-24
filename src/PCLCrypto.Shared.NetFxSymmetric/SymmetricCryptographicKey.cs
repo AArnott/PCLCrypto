@@ -97,6 +97,15 @@ namespace PCLCrypto
         {
             Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
 
+#if __IOS__ || SILVERLIGHT
+            // iOS and WP8 crypto implementation doesn't handle empty ciphertext for PKCS7
+            // like other platforms do. So we emulate it here.
+            if (this.Padding == SymmetricAlgorithmPadding.PKCS7 && data.Length == 0)
+            {
+                return data;
+            }
+#endif
+
             return this.CipherOperation(
                 ref this.decryptor,
                 (me, initVector) => me.algorithm.CreateDecryptor(me.algorithm.Key, me.ThisOrDefaultIV(initVector)),
@@ -147,7 +156,7 @@ namespace PCLCrypto
         /// <returns><c>true</c> if the size is allowed; <c>false</c> otherwise.</returns>
         private bool IsValidInputSize(int lengthInBytes)
         {
-            return lengthInBytes > 0 && (lengthInBytes * 8) % this.algorithm.BlockSize == 0;
+            return (lengthInBytes * 8) % this.algorithm.BlockSize == 0;
         }
 
         /// <summary>
@@ -161,6 +170,12 @@ namespace PCLCrypto
         private byte[] CipherOperation(ref Platform.ICryptoTransform transformField, Func<SymmetricCryptographicKey, byte[], Platform.ICryptoTransform> transformCreator, byte[] data, byte[] iv)
         {
             Requires.NotNull(transformCreator, nameof(transformCreator));
+            Requires.NotNull(data, nameof(data));
+
+            if (this.Padding == SymmetricAlgorithmPadding.None && data.Length == 0)
+            {
+                return data;
+            }
 
             if (iv != null || !this.CanStreamAcrossTopLevelCipherOperations || transformField == null)
             {

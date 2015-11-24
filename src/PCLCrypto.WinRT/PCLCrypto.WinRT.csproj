@@ -45,10 +45,12 @@
   <ItemGroup>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="CryptographicBuffer.cs" />
+    <Compile Include="CryptographicKey.cs" />
     <Compile Include="ECDiffieHellman.cs" />
     <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="ECDiffieHellmanPublicKey.cs" />
+    <Compile Include="WinRTCryptographicKey.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />
     <Compile Include="KeyDerivationAlgorithmProvider.cs" />
@@ -60,7 +62,7 @@
     <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="CryptographicEngine.cs" />
-    <Compile Include="CryptographicKey.cs" />
+    <Compile Include="SymmetricCryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
     <Compile Include="SymmetricKeyAlgorithmProvider.cs" />

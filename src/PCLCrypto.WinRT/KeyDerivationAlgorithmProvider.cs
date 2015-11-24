@@ -42,7 +42,7 @@ namespace PCLCrypto
             Requires.NotNull(keyMaterial, "keyMaterial");
 
             var platform = Platform.Core.KeyDerivationAlgorithmProvider.OpenAlgorithm(GetAlgorithmName(this.Algorithm));
-            return new CryptographicKey(platform.CreateKey(keyMaterial.ToBuffer()), canExportPrivateKey: true);
+            return new WinRTCryptographicKey(platform.CreateKey(keyMaterial.ToBuffer()), canExportPrivateKey: true);
         }
 
         /// <summary>

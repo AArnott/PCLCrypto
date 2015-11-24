@@ -9,6 +9,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
+    using static PInvoke.BCrypt;
     using Platform = Windows.Security.Cryptography.Core;
 
     /// <summary>
@@ -16,16 +17,6 @@ namespace PCLCrypto
     /// </summary>
     internal partial class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
     {
-        /// <summary>
-        /// The WinRT platform implementation.
-        /// </summary>
-        private readonly Platform.SymmetricKeyAlgorithmProvider platform;
-
-        /// <summary>
-        /// The algorithm used by this instance.
-        /// </summary>
-        private readonly SymmetricAlgorithm algorithm;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
@@ -38,32 +29,35 @@ namespace PCLCrypto
             this.Mode = mode;
             this.Padding = padding;
 
-            if (!SymmetricAlgorithmExtensions.TryAssemblyAlgorithm(name, mode, padding, out this.algorithm))
-            {
-                throw new NotSupportedException();
-            }
-
-            this.platform = Platform.SymmetricKeyAlgorithmProvider.OpenAlgorithm(GetAlgorithmName(this.Algorithm));
+            this.Algorithm = BCryptOpenAlgorithmProvider(GetAlgorithmName(name));
+            BCryptSetProperty(this.Algorithm, PropertyNames.ChainingMode, GetChainingMode(mode));
         }
-
-        /// <summary>
-        /// Gets the algorithm supported by this provider.
-        /// </summary>
-        public SymmetricAlgorithm Algorithm => this.algorithm;
 
         /// <inheritdoc/>
         public int BlockLength
         {
-            get { return (int)this.platform.BlockLength; }
+            get { return BCryptGetProperty<int>(this.Algorithm, PropertyNames.BlockLength); }
         }
+
+        /// <summary>
+        /// Gets the BCrypt algorithm.
+        /// </summary>
+        internal SafeAlgorithmHandle Algorithm { get; }
 
         /// <inheritdoc/>
         public ICryptographicKey CreateSymmetricKey(byte[] keyMaterial)
         {
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
-            var key = this.platform.CreateSymmetricKey(keyMaterial.ToBuffer());
-            return new CryptographicKey(key, this, canExportPrivateKey: true);
+            return new SymmetricCryptographicKey(keyMaterial, this);
+        }
+
+        /// <summary>
+        /// Disposes resources associated with this instance.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Algorithm.Dispose();
         }
 
         /// <summary>
@@ -71,50 +65,40 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="algorithm">The algorithm desired.</param>
         /// <returns>The platform-specific string to pass to OpenAlgorithm.</returns>
-        private static string GetAlgorithmName(SymmetricAlgorithm algorithm)
+        private static string GetAlgorithmName(SymmetricAlgorithmName algorithm)
         {
             switch (algorithm)
             {
-                case SymmetricAlgorithm.AesCbc:
-                    return Platform.SymmetricAlgorithmNames.AesCbc;
-                case SymmetricAlgorithm.AesCbcPkcs7:
-                    return Platform.SymmetricAlgorithmNames.AesCbcPkcs7;
-                case SymmetricAlgorithm.AesCcm:
-                    return Platform.SymmetricAlgorithmNames.AesCcm;
-                case SymmetricAlgorithm.AesEcb:
-                    return Platform.SymmetricAlgorithmNames.AesEcb;
-                case SymmetricAlgorithm.AesEcbPkcs7:
-                    return Platform.SymmetricAlgorithmNames.AesEcbPkcs7;
-                case SymmetricAlgorithm.AesGcm:
-                    return Platform.SymmetricAlgorithmNames.AesGcm;
-                case SymmetricAlgorithm.DesCbc:
-                    return Platform.SymmetricAlgorithmNames.DesCbc;
-                case SymmetricAlgorithm.DesCbcPkcs7:
-                    return Platform.SymmetricAlgorithmNames.DesCbcPkcs7;
-                case SymmetricAlgorithm.DesEcb:
-                    return Platform.SymmetricAlgorithmNames.DesEcb;
-                case SymmetricAlgorithm.DesEcbPkcs7:
-                    return Platform.SymmetricAlgorithmNames.DesEcbPkcs7;
-                case SymmetricAlgorithm.Rc2Cbc:
-                    return Platform.SymmetricAlgorithmNames.Rc2Cbc;
-                case SymmetricAlgorithm.Rc2CbcPkcs7:
-                    return Platform.SymmetricAlgorithmNames.Rc2CbcPkcs7;
-                case SymmetricAlgorithm.Rc2Ecb:
-                    return Platform.SymmetricAlgorithmNames.Rc2Ecb;
-                case SymmetricAlgorithm.Rc2EcbPkcs7:
-                    return Platform.SymmetricAlgorithmNames.Rc2EcbPkcs7;
-                case SymmetricAlgorithm.Rc4:
-                    return Platform.SymmetricAlgorithmNames.Rc4;
-                case SymmetricAlgorithm.TripleDesCbc:
-                    return Platform.SymmetricAlgorithmNames.TripleDesCbc;
-                case SymmetricAlgorithm.TripleDesCbcPkcs7:
-                    return Platform.SymmetricAlgorithmNames.TripleDesCbcPkcs7;
-                case SymmetricAlgorithm.TripleDesEcb:
-                    return Platform.SymmetricAlgorithmNames.TripleDesEcb;
-                case SymmetricAlgorithm.TripleDesEcbPkcs7:
-                    return Platform.SymmetricAlgorithmNames.TripleDesEcbPkcs7;
+                case SymmetricAlgorithmName.Aes:
+                    return AlgorithmIdentifiers.BCRYPT_AES_ALGORITHM;
+                case SymmetricAlgorithmName.Des:
+                    return AlgorithmIdentifiers.BCRYPT_DES_ALGORITHM;
+                case SymmetricAlgorithmName.TripleDes:
+                    return AlgorithmIdentifiers.BCRYPT_3DES_ALGORITHM;
+                case SymmetricAlgorithmName.Rc2:
+                    return AlgorithmIdentifiers.BCRYPT_RC2_ALGORITHM;
+                case SymmetricAlgorithmName.Rc4:
+                    return AlgorithmIdentifiers.BCRYPT_RC4_ALGORITHM;
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the BCrypt chaining mode to pass to set as the <see cref="PropertyNames.ChainingMode"/> property.
+        /// </summary>
+        /// <param name="mode">The block chaining mode.</param>
+        /// <returns>The block chaining mode.</returns>
+        private static string GetChainingMode(SymmetricAlgorithmMode mode)
+        {
+            switch (mode)
+            {
+                case SymmetricAlgorithmMode.Streaming: return ChainingModes.NotApplicable;
+                case SymmetricAlgorithmMode.Cbc: return ChainingModes.Cbc;
+                case SymmetricAlgorithmMode.Ecb: return ChainingModes.Ecb;
+                case SymmetricAlgorithmMode.Ccm: return ChainingModes.Ccm;
+                case SymmetricAlgorithmMode.Gcm: return ChainingModes.Gcm;
+                default: throw new NotSupportedException();
             }
         }
     }

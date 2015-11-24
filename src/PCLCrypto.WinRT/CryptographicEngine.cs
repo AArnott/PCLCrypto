@@ -9,8 +9,10 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using PInvoke;
     using Validation;
     using Windows.Storage.Streams;
+    using static PInvoke.BCrypt;
     using Platform = Windows.Security.Cryptography;
 
     /// <summary>
@@ -24,24 +26,7 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
             Requires.NotNull(data, "data");
 
-            var keyClass = (CryptographicKey)key;
-            if (keyClass.SymmetricAlgorithmProvider != null)
-            {
-                bool paddingInUse = keyClass.SymmetricAlgorithmProvider.Algorithm.GetPadding() != SymmetricAlgorithmPadding.None;
-                Requires.Argument(paddingInUse || this.IsValidInputSize(keyClass, data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
-            }
-
-            try
-            {
-                return Platform.Core.CryptographicEngine.Encrypt(
-                    keyClass.Key,
-                    data.ToBuffer(),
-                    iv.ToBuffer()).ToArray();
-            }
-            catch (NotImplementedException ex)
-            {
-                throw new NotSupportedException(ex.Message, ex);
-            }
+            return ((CryptographicKey)key).Encrypt(data, iv);
         }
 
         /// <inheritdoc />
@@ -49,26 +34,16 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, "key");
 
-            var ownKey = (CryptographicKey)key;
-            return GetTransformForBlockMode(ownKey, iv, true);
+            return this.GetTransformForBlockMode(key, iv, true);
         }
 
         /// <inheritdoc />
         public byte[] Decrypt(ICryptographicKey key, byte[] data, byte[] iv)
         {
-            Requires.NotNull(key, "key");
-            Requires.NotNull(data, "data");
+            Requires.NotNull(key, nameof(key));
+            Requires.NotNull(data, nameof(data));
 
-            var keyClass = (CryptographicKey)key;
-            if (keyClass.SymmetricAlgorithmProvider != null)
-            {
-                Requires.Argument(this.IsValidInputSize(keyClass, data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
-            }
-
-            return Platform.Core.CryptographicEngine.Decrypt(
-                keyClass.Key,
-                data.ToBuffer(),
-                iv.ToBuffer()).ToArray();
+            return ((CryptographicKey)key).Decrypt(data, iv);
         }
 
         /// <inheritdoc />
@@ -76,8 +51,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, "key");
 
-            var ownKey = (CryptographicKey)key;
-            return GetTransformForBlockMode(ownKey, iv, false);
+            return this.GetTransformForBlockMode(key, iv, false);
         }
 
         /// <inheritdoc />
@@ -86,8 +60,9 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
             Requires.NotNull(data, "data");
 
+            var keyClass = (WinRTCryptographicKey)key;
             return Platform.Core.CryptographicEngine.Sign(
-                ExtractPlatformKey(key),
+                keyClass.Key,
                 data.ToBuffer()).ToArray();
         }
 
@@ -97,7 +72,7 @@ namespace PCLCrypto
             Requires.NotNull(key, "key");
             Requires.NotNull(data, "data");
 
-            var keyClass = (CryptographicKey)key;
+            var keyClass = (WinRTCryptographicKey)key;
             return Platform.Core.CryptographicEngine.SignHashedData(
                 keyClass.Key,
                 data.ToBuffer()).ToArray();
@@ -110,8 +85,9 @@ namespace PCLCrypto
             Requires.NotNull(data, "data");
             Requires.NotNull(signature, "signature");
 
+            var keyClass = (WinRTCryptographicKey)key;
             return Platform.Core.CryptographicEngine.VerifySignature(
-                ExtractPlatformKey(key),
+                keyClass.Key,
                 data.ToBuffer(),
                 signature.ToBuffer());
         }
@@ -123,7 +99,7 @@ namespace PCLCrypto
             Requires.NotNull(data, "data");
             Requires.NotNull(signature, "signature");
 
-            var keyClass = (CryptographicKey)key;
+            var keyClass = (WinRTCryptographicKey)key;
             return Platform.Core.CryptographicEngine.VerifySignatureWithHashInput(
                 keyClass.Key,
                 data.ToBuffer(),
@@ -133,21 +109,11 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] DeriveKeyMaterial(ICryptographicKey key, IKeyDerivationParameters parameters, int desiredKeySize)
         {
-            var platformKey = ((CryptographicKey)key).Key;
+            Requires.NotNull(key, nameof(key));
+
+            var platformKey = ((WinRTCryptographicKey)key).Key;
             var platformParameters = ((KeyDerivationParameters)parameters).Parameters;
             return Platform.Core.CryptographicEngine.DeriveKeyMaterial(platformKey, platformParameters, (uint)desiredKeySize).ToArray();
-        }
-
-        /// <summary>
-        /// Extracts the platform-specific key from the PCL version.
-        /// </summary>
-        /// <param name="key">The PCL key.</param>
-        /// <returns>The platform-specific key.</returns>
-        private static Platform.Core.CryptographicKey ExtractPlatformKey(ICryptographicKey key)
-        {
-            Requires.NotNull(key, "key");
-            var platformKey = ((CryptographicKey)key).Key;
-            return platformKey;
         }
 
         /// <summary>
@@ -157,28 +123,14 @@ namespace PCLCrypto
         /// <param name="iv">The initialization vector to use, when applicable.</param>
         /// <param name="encrypting"><c>true</c> if encrypting; <c>false</c> if decrypting.</param>
         /// <returns>An instance of <see cref="ICryptoTransform"/>.</returns>
-        private static ICryptoTransform GetTransformForBlockMode(CryptographicKey key, byte[] iv, bool encrypting)
+        private ICryptoTransform GetTransformForBlockMode(ICryptographicKey key, byte[] iv, bool encrypting)
         {
             Requires.NotNull(key, "key");
 
             var bufferOperation = encrypting
-               ? new Func<byte[], byte[]>(input => Platform.Core.CryptographicEngine.Encrypt(key.Key, input.ToBuffer(), iv.ToBuffer()).ToArray())
-               : new Func<byte[], byte[]>(input => Platform.Core.CryptographicEngine.Decrypt(key.Key, input.ToBuffer(), iv.ToBuffer()).ToArray());
+               ? new Func<byte[], byte[]>(input => this.Encrypt(key, input, iv))
+               : new Func<byte[], byte[]>(input => this.Decrypt(key, input, iv));
             return new BufferingCryptoTransform(bufferOperation);
-        }
-
-        /// <summary>
-        /// Checks whether the given length is a valid one for an input buffer to the symmetric algorithm.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="lengthInBytes">The length of the input buffer in bytes.</param>
-        /// <returns>
-        ///   <c>true</c> if the size is allowed; <c>false</c> otherwise.
-        /// </returns>
-        private bool IsValidInputSize(CryptographicKey key, int lengthInBytes)
-        {
-            Requires.NotNull(key, "key");
-            return lengthInBytes > 0 && lengthInBytes % key.SymmetricAlgorithmProvider.BlockLength == 0;
         }
 
         /// <summary>
