@@ -30,6 +30,7 @@ namespace PCLCrypto
             this.Padding = padding;
 
             this.Algorithm = BCryptOpenAlgorithmProvider(GetAlgorithmName(name));
+            BCryptSetProperty(this.Algorithm, PropertyNames.ChainingMode, GetChainingMode(mode));
         }
 
         /// <inheritdoc/>
@@ -80,6 +81,24 @@ namespace PCLCrypto
                     return AlgorithmIdentifiers.BCRYPT_RC4_ALGORITHM;
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the BCrypt chaining mode to pass to set as the <see cref="PropertyNames.ChainingMode"/> property.
+        /// </summary>
+        /// <param name="mode">The block chaining mode.</param>
+        /// <returns>The block chaining mode.</returns>
+        private static string GetChainingMode(SymmetricAlgorithmMode mode)
+        {
+            switch (mode)
+            {
+                case SymmetricAlgorithmMode.Streaming: return ChainingModes.NotApplicable;
+                case SymmetricAlgorithmMode.Cbc: return ChainingModes.Cbc;
+                case SymmetricAlgorithmMode.Ecb: return ChainingModes.Ecb;
+                case SymmetricAlgorithmMode.Ccm: return ChainingModes.Ccm;
+                case SymmetricAlgorithmMode.Gcm: return ChainingModes.Gcm;
+                default: throw new NotSupportedException();
             }
         }
     }

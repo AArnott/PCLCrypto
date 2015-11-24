@@ -29,10 +29,22 @@ namespace PCLCrypto
         private readonly SymmetricKeyAlgorithmProvider symmetricAlgorithmProvider;
 
         /// <summary>
+        /// The flags to use during encryption.
+        /// </summary>
+        private readonly BCryptEncryptFlags flags;
+
+        /// <summary>
         /// The IV returned from the last cryptographic operation, which may serve
         /// as input into the next if the caller omits the IV.
         /// </summary>
+        /// <seealso cref="platformKey"/>
         private byte[] iv;
+
+        /// <summary>
+        /// The key that may carry state from a prior crypto operation.
+        /// </summary>
+        /// <seealso cref="iv"/>
+        private SafeKeyHandle platformKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
@@ -53,6 +65,11 @@ namespace PCLCrypto
             this.Name = symmetricAlgorithmProvider.Name;
             this.Mode = symmetricAlgorithmProvider.Mode;
             this.Padding = symmetricAlgorithmProvider.Padding;
+
+            if (this.Padding == SymmetricAlgorithmPadding.PKCS7)
+            {
+                this.flags |= BCryptEncryptFlags.BCRYPT_BLOCK_PADDING;
+            }
         }
 
         /// <inheritdoc />
@@ -85,6 +102,7 @@ namespace PCLCrypto
         /// </summary>
         public void Dispose()
         {
+            this.platformKey?.Dispose();
         }
 
         /// <inheritdoc />
@@ -92,44 +110,41 @@ namespace PCLCrypto
         {
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
-            using (var k = new ProviderAndKey(this))
+            var key = this.GetInitializedKey(iv);
+            switch (this.Padding)
             {
-                switch (this.Padding)
-                {
-                    case SymmetricAlgorithmPadding.None:
-                        Requires.Argument(this.IsValidInputSize(plaintext.Length), nameof(plaintext), "Length is not a non-zero multiple of block size and no padding is selected.");
-                        break;
-                    case SymmetricAlgorithmPadding.PKCS7:
-                        k.Flags |= BCryptEncryptFlags.BCRYPT_BLOCK_PADDING;
-                        break;
-                    case SymmetricAlgorithmPadding.Zeros:
-                        // We have to implement this padding ourselves.
-                        if (plaintext.Length == 0)
-                        {
-                            return plaintext;
-                        }
+                case SymmetricAlgorithmPadding.None:
+                    Requires.Argument(this.IsValidInputSize(plaintext.Length), nameof(plaintext), "Length is not a non-zero multiple of block size and no padding is selected.");
+                    break;
+                case SymmetricAlgorithmPadding.PKCS7:
+                    break;
+                case SymmetricAlgorithmPadding.Zeros:
+                    // We have to implement this padding ourselves.
+                    if (plaintext.Length == 0)
+                    {
+                        return plaintext;
+                    }
 
-                        this.GrowToMultipleOfBlockSize(ref plaintext);
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
-
-                // We use the IV if the caller passes it in, or use
-                // the resulting IV of the last cipher operation if the caller
-                // did not specify an IV.
-                // Copy the IV because the native code changes it, and
-                // our contract with the caller is that we don't.
-                this.iv = CopyBufferOrNull(iv) ?? this.iv;
-
-                byte[] cipherText = BCryptEncrypt(
-                    k.Key,
-                    plaintext,
-                    IntPtr.Zero,
-                    this.iv,
-                    k.Flags).ToArray();
-                return cipherText;
+                    this.GrowToMultipleOfBlockSize(ref plaintext);
+                    break;
+                default:
+                    throw new NotSupportedException();
             }
+
+            // We use the IV if the caller passes it in, or use
+            // the resulting IV of the last cipher operation if the caller
+            // did not specify an IV.
+            // Copy the IV because the native code changes it, and
+            // our contract with the caller is that we don't.
+            this.iv = CopyBufferOrNull(iv) ?? this.iv;
+
+            byte[] cipherText = BCryptEncrypt(
+                key,
+                plaintext,
+                IntPtr.Zero,
+                this.iv,
+                this.flags).ToArray();
+            return cipherText;
         }
 
         /// <inheritdoc />
@@ -139,40 +154,37 @@ namespace PCLCrypto
             Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length does not a multiple of block size and no padding is selected.");
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
-            using (var k = new ProviderAndKey(this))
+            var key = this.GetInitializedKey(iv);
+            switch (this.Padding)
             {
-                switch (this.Padding)
-                {
-                    case SymmetricAlgorithmPadding.PKCS7:
-                        k.Flags |= BCryptEncryptFlags.BCRYPT_BLOCK_PADDING;
-                        break;
-                    case SymmetricAlgorithmPadding.None:
-                    case SymmetricAlgorithmPadding.Zeros:
-                        if (ciphertext.Length == 0)
-                        {
-                            return ciphertext;
-                        }
+                case SymmetricAlgorithmPadding.PKCS7:
+                    break;
+                case SymmetricAlgorithmPadding.None:
+                case SymmetricAlgorithmPadding.Zeros:
+                    if (ciphertext.Length == 0)
+                    {
+                        return ciphertext;
+                    }
 
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
-
-                // We use the IV if the caller passes it in, or use
-                // the resulting IV of the last cipher operation if the caller
-                // did not specify an IV.
-                // Copy the IV because the native code changes it, and
-                // our contract with the caller is that we don't.
-                this.iv = CopyBufferOrNull(iv) ?? this.iv;
-
-                byte[] plainText = BCryptDecrypt(
-                    k.Key,
-                    ciphertext,
-                    IntPtr.Zero,
-                    this.iv,
-                    k.Flags).ToArray();
-                return plainText;
+                    break;
+                default:
+                    throw new NotSupportedException();
             }
+
+            // We use the IV if the caller passes it in, or use
+            // the resulting IV of the last cipher operation if the caller
+            // did not specify an IV.
+            // Copy the IV because the native code changes it, and
+            // our contract with the caller is that we don't.
+            this.iv = CopyBufferOrNull(iv) ?? this.iv;
+
+            byte[] plainText = BCryptDecrypt(
+                key,
+                ciphertext,
+                IntPtr.Zero,
+                this.iv,
+                this.flags).ToArray();
+            return plainText;
         }
 
         /// <summary>
@@ -199,24 +211,6 @@ namespace PCLCrypto
             }
         }
 
-        /// <summary>
-        /// Gets the BCrypt chaining mode to pass to set as the <see cref="PropertyNames.ChainingMode"/> property.
-        /// </summary>
-        /// <param name="mode">The block chaining mode.</param>
-        /// <returns>The block chaining mode.</returns>
-        private static string GetChainingMode(SymmetricAlgorithmMode mode)
-        {
-            switch (mode)
-            {
-                case SymmetricAlgorithmMode.Streaming: return ChainingModes.NotApplicable;
-                case SymmetricAlgorithmMode.Cbc: return ChainingModes.Cbc;
-                case SymmetricAlgorithmMode.Ecb: return ChainingModes.Ecb;
-                case SymmetricAlgorithmMode.Ccm: return ChainingModes.Ccm;
-                case SymmetricAlgorithmMode.Gcm: return ChainingModes.Gcm;
-                default: throw new NotSupportedException();
-            }
-        }
-
         private static byte[] CopyBufferOrNull(byte[] buffer)
         {
             if (buffer == null)
@@ -227,6 +221,24 @@ namespace PCLCrypto
             var copy = new byte[buffer.Length];
             Array.Copy(buffer, copy, buffer.Length);
             return copy;
+        }
+
+        private SafeKeyHandle GetInitializedKey(byte[] iv)
+        {
+            if (this.platformKey == null || !this.CanStreamAcrossTopLevelCipherOperations || iv != null)
+            {
+                this.platformKey?.Dispose();
+                try
+                {
+                    this.platformKey = BCryptGenerateSymmetricKey(this.symmetricAlgorithmProvider.Algorithm, this.keyMaterial);
+                }
+                catch (Win32Exception ex)
+                {
+                    throw new ArgumentException(ex.Message, ex);
+                }
+            }
+
+            return this.platformKey;
         }
 
         /// <summary>
@@ -260,41 +272,6 @@ namespace PCLCrypto
                 this.symmetricAlgorithmProvider.Algorithm,
                 SymmetricKeyBlobTypes.BCRYPT_KEY_DATA_BLOB,
                 this.keyMaterial);
-        }
-
-        private class ProviderAndKey : IDisposable
-        {
-            public ProviderAndKey(SymmetricCryptographicKey key)
-            {
-                this.Provider = null;
-                this.Key = null;
-                try
-                {
-                    this.Provider = BCryptOpenAlgorithmProvider(GetAlgorithmIdentifier(key.Name));
-                    BCryptSetProperty(this.Provider, PropertyNames.ChainingMode, GetChainingMode(key.Mode));
-                    this.Key = BCryptGenerateSymmetricKey(this.Provider, key.keyMaterial);
-                }
-                catch (Exception ex)
-                {
-                    this.Key?.Dispose();
-                    this.Provider?.Dispose();
-                    throw new ArgumentException(ex.Message, ex);
-                }
-
-                this.Flags = BCryptEncryptFlags.None;
-            }
-
-            public SafeAlgorithmHandle Provider { get; private set; }
-
-            public SafeKeyHandle Key { get; private set; }
-
-            public BCryptEncryptFlags Flags { get; set; }
-
-            public void Dispose()
-            {
-                this.Key?.Dispose();
-                this.Provider?.Dispose();
-            }
         }
     }
 }
