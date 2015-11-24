@@ -102,7 +102,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
-        public byte[] GenerateRandom(uint length)
+        public byte[] GenerateRandom(int length)
         {
             var buffer = new byte[length];
             NetFxCrypto.RandomNumberGenerator.GetBytes(buffer);
