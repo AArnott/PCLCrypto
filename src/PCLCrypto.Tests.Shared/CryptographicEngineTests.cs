@@ -253,7 +253,7 @@ public class CryptographicEngineTests
         Assert.Equal(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
     }
 
-    [Fact]
+    [SkippableFact(typeof(NotSupportedException))]
     public void StreamingCipherKeyRetainsStateAcrossOperations_Encrypt()
     {
         // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
@@ -262,69 +262,55 @@ public class CryptographicEngineTests
         var symmetricAlgorithm = SymmetricAlgorithmName.Rc4;
         var mode = SymmetricAlgorithmMode.Streaming;
         var padding = SymmetricAlgorithmPadding.None;
-        try
+        var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, mode, padding);
+        int keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
+        byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
+        var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+        var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+
+        byte[] allData = new byte[] { 1, 2, 3 };
+        byte[] allCiphertext = WinRTCrypto.CryptographicEngine.Encrypt(key1, allData);
+
+        var cipherStream = new MemoryStream();
+        for (int i = 0; i < allData.Length; i++)
         {
-            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, mode, padding);
-            int keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
-            byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
-            var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
-            var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
-
-            byte[] allData = new byte[] { 1, 2, 3 };
-            byte[] allCiphertext = WinRTCrypto.CryptographicEngine.Encrypt(key1, allData);
-
-            var cipherStream = new MemoryStream();
-            for (int i = 0; i < allData.Length; i++)
-            {
-                byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[] { allData[i] });
-                cipherStream.Write(cipherText, 0, cipherText.Length);
-            }
-
-            byte[] incrementalResult = cipherStream.ToArray();
-            Assert.Equal(
-                Convert.ToBase64String(allCiphertext),
-                Convert.ToBase64String(incrementalResult));
+            byte[] cipherText = WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[] { allData[i] });
+            cipherStream.Write(cipherText, 0, cipherText.Length);
         }
-        catch (NotSupportedException)
-        {
-            this.logger.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
-        }
+
+        byte[] incrementalResult = cipherStream.ToArray();
+        Assert.Equal(
+            Convert.ToBase64String(allCiphertext),
+            Convert.ToBase64String(incrementalResult));
     }
 
-    [Fact]
+    [SkippableFact(typeof(NotSupportedException))]
     public void StreamingCipherKeyRetainsStateAcrossOperations_Decrypt()
     {
         // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
         // this test should be modified to use that cipher to test the NetFx PCL wrapper for
         // streaming cipher behavior.
         var symmetricAlgorithm = SymmetricAlgorithmName.Rc4;
-        try
+        var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, SymmetricAlgorithmMode.Streaming, SymmetricAlgorithmPadding.None);
+        int keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
+        byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
+        var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+        var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+
+        byte[] allData = new byte[] { 1, 2, 3 };
+        byte[] allCiphertext = WinRTCrypto.CryptographicEngine.Decrypt(key1, allData);
+
+        var cipherStream = new MemoryStream();
+        for (int i = 0; i < allData.Length; i++)
         {
-            var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm, SymmetricAlgorithmMode.Streaming, SymmetricAlgorithmPadding.None);
-            int keyLength = GetKeyLength(symmetricAlgorithm, algorithmProvider);
-            byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
-            var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
-            var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial);
-
-            byte[] allData = new byte[] { 1, 2, 3 };
-            byte[] allCiphertext = WinRTCrypto.CryptographicEngine.Decrypt(key1, allData);
-
-            var cipherStream = new MemoryStream();
-            for (int i = 0; i < allData.Length; i++)
-            {
-                byte[] cipherText = WinRTCrypto.CryptographicEngine.Decrypt(key2, new byte[] { allData[i] });
-                cipherStream.Write(cipherText, 0, cipherText.Length);
-            }
-
-            byte[] incrementalResult = cipherStream.ToArray();
-            Assert.Equal(
-                Convert.ToBase64String(allCiphertext),
-                Convert.ToBase64String(incrementalResult));
+            byte[] cipherText = WinRTCrypto.CryptographicEngine.Decrypt(key2, new byte[] { allData[i] });
+            cipherStream.Write(cipherText, 0, cipherText.Length);
         }
-        catch (NotSupportedException)
-        {
-            this.logger.WriteLine("{0} not supported by this platform.", symmetricAlgorithm);
-        }
+
+        byte[] incrementalResult = cipherStream.ToArray();
+        Assert.Equal(
+            Convert.ToBase64String(allCiphertext),
+            Convert.ToBase64String(incrementalResult));
     }
 
     [Fact(Skip = SkipIfOnlyStandardAESSupported)]
