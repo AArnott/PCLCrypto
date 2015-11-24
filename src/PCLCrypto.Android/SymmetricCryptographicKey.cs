@@ -85,6 +85,7 @@ namespace PCLCrypto
         {
             bool paddingInUse = this.Padding != SymmetricAlgorithmPadding.None;
             Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+            Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
             Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
@@ -97,10 +98,17 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+            Requires.Argument(iv == null || this.Mode.UsesIV(), nameof(iv), "IV supplied but does not apply to this cipher.");
+            Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
-            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(this.IsValidInputSize(data.Length), nameof(data), "Length is not a multiple of block size and no padding is selected.");
+
+            // Android returns null when given an empty input.
+            if (data.Length == 0)
+            {
+                return data;
+            }
 
             try
             {
@@ -246,7 +254,7 @@ namespace PCLCrypto
         {
             var cipher = this.encryptingCipher ?? this.decryptingCipher;
             int blockSizeInBytes = SymmetricKeyAlgorithmProvider.GetBlockSize(this.Mode, cipher);
-            return lengthInBytes > 0 && lengthInBytes % blockSizeInBytes == 0;
+            return lengthInBytes % blockSizeInBytes == 0;
         }
 
         /// <summary>
