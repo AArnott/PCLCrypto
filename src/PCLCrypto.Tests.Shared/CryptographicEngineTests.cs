@@ -153,7 +153,7 @@ public class CryptographicEngineTests
         Assert.Equal<byte>(iv, IV); // ensure IV wasn't tampered with
     }
 
-    [Theory]
+    [SkippableTheory(typeof(NotSupportedException))]
     [InlineData(0, SymmetricAlgorithmPadding.None, "")]
     [InlineData(0, SymmetricAlgorithmPadding.PKCS7, "+4HMuhSFPVoZ8cmo4//fRw==")]
     [InlineData(0, SymmetricAlgorithmPadding.Zeros, "")]
@@ -217,7 +217,11 @@ public class CryptographicEngineTests
     {
         byte[] data = new byte[4];
         byte[] iv = IV;
-        Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv));
+        if (this.aesKeyNoPadding != null)
+        {
+            Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv));
+        }
+
         Assert.Throws<ArgumentException>(() => WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, data, iv));
     }
 
@@ -226,7 +230,11 @@ public class CryptographicEngineTests
     {
         byte[] iv = IV;
         var data = new byte[0];
-        Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv).Length);
+        if (this.aesKeyNoPadding != null)
+        {
+            Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv).Length);
+        }
+
         Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, data, iv).Length);
     }
 
