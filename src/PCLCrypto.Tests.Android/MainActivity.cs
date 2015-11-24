@@ -23,6 +23,7 @@ namespace PCLCrypto.Tests.Android
             this.AddTestAssembly(Assembly.GetExecutingAssembly());
 
             this.AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
+            this.AddExecutionAssembly(typeof(SkippableFactDiscoverer).Assembly);
 
             // or in any reference assemblies
             // or in any assembly that you load (since JIT is available)

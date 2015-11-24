@@ -33,6 +33,7 @@ namespace PCLCrypto.Tests.iOS
         {
             // We need this to ensure the execution assembly is part of the app bundle
             this.AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
+            this.AddExecutionAssembly(typeof(SkippableFactDiscoverer).Assembly);
 
             // tests can be inside the main assembly
             this.AddTestAssembly(Assembly.GetExecutingAssembly());
