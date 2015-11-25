@@ -186,7 +186,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            using (var hasher = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            using (var hasher = this.GetHashAlgorithm())
             {
                 byte[] hash = hasher.ComputeHash(data);
                 return this.SignHash(hash);
@@ -196,7 +196,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            using (var hasher = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            using (var hasher = this.GetHashAlgorithm())
             {
                 byte[] hash = hasher.ComputeHash(data);
                 return this.VerifyHash(hash, signature);
@@ -390,6 +390,16 @@ namespace PCLCrypto
             int code = SecItemCopyMatching(queryKey.Handle, out typeRef);
             var keyRef = new SecKey(typeRef, owns: true);
             return keyRef;
+        }
+
+        /// <summary>
+        /// Creates a hash algorithm instance that is appropriate for the given algorithm.T
+        /// </summary>
+        /// <returns>The hash algorithm.</returns>
+        private System.Security.Cryptography.HashAlgorithm GetHashAlgorithm()
+        {
+            var hashAlgorithm = AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(this.Algorithm);
+            return HashAlgorithmProvider.CreateHashAlgorithm(hashAlgorithm);
         }
     }
 }

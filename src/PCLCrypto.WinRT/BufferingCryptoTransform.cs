@@ -10,6 +10,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
+
     /// <summary>
     /// A crypto transform that can do no work incrementally, but does it all at the end.
     /// </summary>
