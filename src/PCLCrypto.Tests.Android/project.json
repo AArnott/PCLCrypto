@@ -6,7 +6,7 @@
     "Xunit.SkippableFact": "1.2.5"
   },
   "frameworks": {
-    "MonoAndroid,Version=v5.0": { }
+    "MonoAndroid,Version=v6.0": { }
   },
   "runtimes": {
     "win": { }
