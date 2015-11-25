@@ -2,8 +2,8 @@
   "dependencies": {
     "Nerdbank.FullDuplexStream": "1.0.1",
     "xunit": "2.1.0",
-    "xunit.runner.devices": "1.2.2",
-    "Xunit.SkippableFact": "1.1.4"
+    "xunit.runner.devices": "1.2.3-build0010",
+    "Xunit.SkippableFact": "1.2.5"
   },
   "frameworks": {
     "Xamarin.iOS,Version=v1.0": { }

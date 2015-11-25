@@ -16,6 +16,23 @@ namespace PCLCrypto
     internal static class CryptoUtilities
     {
         /// <summary>
+        /// Grows a buffer as necessary to align with a block size.
+        /// </summary>
+        /// <param name="buffer">The buffer to grow.</param>
+        /// <param name="blockLength">The length (in bytes) of a block.</param>
+        internal static void ApplyZeroPadding(ref byte[] buffer, int blockLength)
+        {
+            Requires.NotNull(buffer, nameof(buffer));
+
+            int bytesBeyondLastBlockLength = buffer.Length % blockLength;
+            if (bytesBeyondLastBlockLength > 0)
+            {
+                int growBy = blockLength - bytesBeyondLastBlockLength;
+                Array.Resize(ref buffer, buffer.Length + growBy);
+            }
+        }
+
+        /// <summary>
         /// Performs a constant time comparison between two buffers.
         /// </summary>
         /// <param name="buffer1">The first buffer.</param>

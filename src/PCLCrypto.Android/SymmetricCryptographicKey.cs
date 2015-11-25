@@ -19,6 +19,11 @@ namespace PCLCrypto
     internal partial class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey, IDisposable
     {
         /// <summary>
+        /// The factory that created this instance.
+        /// </summary>
+        private readonly SymmetricKeyAlgorithmProvider provider;
+
+        /// <summary>
         /// The symmetric key.
         /// </summary>
         private readonly IKey key;
@@ -36,13 +41,15 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
         /// </summary>
+        /// <param name="provider">The provider that created this instance.</param>
         /// <param name="name">The name of the base algorithm to use.</param>
         /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
         /// <param name="padding">The padding to use.</param>
         /// <param name="keyMaterial">The key.</param>
-        internal SymmetricCryptographicKey(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding, byte[] keyMaterial)
+        internal SymmetricCryptographicKey(SymmetricKeyAlgorithmProvider provider, SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding, byte[] keyMaterial)
         {
-            Requires.NotNull(keyMaterial, "keyMaterial");
+            Requires.NotNull(provider, nameof(provider));
+            Requires.NotNull(keyMaterial, nameof(keyMaterial));
 
             if (name == SymmetricAlgorithmName.Aes && mode == SymmetricAlgorithmMode.Ccm && padding == SymmetricAlgorithmPadding.None)
             {
@@ -50,6 +57,7 @@ namespace PCLCrypto
                 throw new NotSupportedException();
             }
 
+            this.provider = provider;
             this.Name = name;
             this.Mode = mode;
             this.Padding = padding;
@@ -84,15 +92,22 @@ namespace PCLCrypto
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
             bool paddingInUse = this.Padding != SymmetricAlgorithmPadding.None;
-            Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+            Requires.Argument(iv == null || this.Mode.UsesIV(), nameof(iv), "IV supplied but does not apply to this cipher.");
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
-            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), nameof(data), "Length does not a multiple of block size and no padding is selected.");
 
-            return this.CanStreamAcrossTopLevelCipherOperations
-                ? this.encryptingCipher.Update(data)
-                : this.encryptingCipher.DoFinal(data);
+            if (this.Padding == SymmetricAlgorithmPadding.Zeros)
+            {
+                // We apply Zeros padding ourselves because BouncyCastle for some reason
+                // does it wrong. For example, if the input buffer is a block length already,
+                // it will return an extra block of ciphertext (as if it added a block of
+                // zeros, perhaps.)
+                CryptoUtilities.ApplyZeroPadding(ref data, this.encryptingCipher.BlockSize);
+            }
+
+            return this.DoCipherOperation(this.encryptingCipher, data);
         }
 
         /// <inheritdoc />
@@ -104,22 +119,15 @@ namespace PCLCrypto
             this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
             Requires.Argument(this.IsValidInputSize(data.Length), nameof(data), "Length is not a multiple of block size and no padding is selected.");
 
-            // Android returns null when given an empty input.
+            // Decrypting an empty buffer (even with PKCS7) leads to a null result,
+            // which no other platform does. So we emulate the behavior of other platforms
+            // by returning an empty buffer.
             if (data.Length == 0)
             {
                 return data;
             }
 
-            try
-            {
-                return this.CanStreamAcrossTopLevelCipherOperations
-                    ? this.decryptingCipher.Update(data)
-                    : this.decryptingCipher.DoFinal(data);
-            }
-            catch (IllegalBlockSizeException ex)
-            {
-                throw new ArgumentException("Illegal block size.", ex);
-            }
+            return this.DoCipherOperation(this.decryptingCipher, data);
         }
 
         /// <inheritdoc />
@@ -144,16 +152,40 @@ namespace PCLCrypto
         /// <returns>A value such as "PKCS7Padding", or "NoPadding" if no padding.</returns>
         private static string GetPaddingName(SymmetricAlgorithmPadding padding)
         {
+            // The constants used here come from
+            // http://www.bouncycastle.org/specifications.html
             switch (padding)
             {
+                case SymmetricAlgorithmPadding.Zeros: // we apply Zeros padding ourselves, since BC does it wrong (?!)
                 case SymmetricAlgorithmPadding.None:
                     return "NoPadding";
                 case SymmetricAlgorithmPadding.PKCS7:
                     return "PKCS7Padding";
-                case SymmetricAlgorithmPadding.Zeros:
-                    throw new NotImplementedException(); // TODO
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        private byte[] DoCipherOperation(Cipher cipher, byte[] data)
+        {
+            Requires.NotNull(cipher, nameof(cipher));
+            Requires.NotNull(data, nameof(data));
+
+            // Android returns null when given an empty input.
+            if (this.Padding != SymmetricAlgorithmPadding.PKCS7 && data.Length == 0)
+            {
+                return data;
+            }
+
+            try
+            {
+                return this.CanStreamAcrossTopLevelCipherOperations
+                    ? cipher.Update(data)
+                    : cipher.DoFinal(data);
+            }
+            catch (IllegalBlockSizeException ex)
+            {
+                throw new ArgumentException("Illegal block size.", ex);
             }
         }
 
