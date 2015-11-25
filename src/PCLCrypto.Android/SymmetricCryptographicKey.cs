@@ -19,6 +19,11 @@ namespace PCLCrypto
     internal partial class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey, IDisposable
     {
         /// <summary>
+        /// The factory that created this instance.
+        /// </summary>
+        private readonly SymmetricKeyAlgorithmProvider provider;
+
+        /// <summary>
         /// The symmetric key.
         /// </summary>
         private readonly IKey key;
@@ -36,13 +41,15 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
         /// </summary>
+        /// <param name="provider">The provider that created this instance.</param>
         /// <param name="name">The name of the base algorithm to use.</param>
         /// <param name="mode">The algorithm's mode (i.e. streaming or some block mode).</param>
         /// <param name="padding">The padding to use.</param>
         /// <param name="keyMaterial">The key.</param>
-        internal SymmetricCryptographicKey(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding, byte[] keyMaterial)
+        internal SymmetricCryptographicKey(SymmetricKeyAlgorithmProvider provider, SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding, byte[] keyMaterial)
         {
-            Requires.NotNull(keyMaterial, "keyMaterial");
+            Requires.NotNull(provider, nameof(provider));
+            Requires.NotNull(keyMaterial, nameof(keyMaterial));
 
             if (name == SymmetricAlgorithmName.Aes && mode == SymmetricAlgorithmMode.Ccm && padding == SymmetricAlgorithmPadding.None)
             {
@@ -50,6 +57,7 @@ namespace PCLCrypto
                 throw new NotSupportedException();
             }
 
+            this.provider = provider;
             this.Name = name;
             this.Mode = mode;
             this.Padding = padding;
@@ -89,6 +97,15 @@ namespace PCLCrypto
 
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
             Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), nameof(data), "Length does not a multiple of block size and no padding is selected.");
+
+            if (this.Padding == SymmetricAlgorithmPadding.Zeros)
+            {
+                // We apply Zeros padding ourselves because BouncyCastle for some reason
+                // does it wrong. For example, if the input buffer is a block length already,
+                // it will return an extra block of ciphertext (as if it added a block of
+                // zeros, perhaps.)
+                CryptoUtilities.ApplyZeroPadding(ref data, this.encryptingCipher.BlockSize);
+            }
 
             return this.DoCipherOperation(this.encryptingCipher, data);
         }
@@ -139,12 +156,11 @@ namespace PCLCrypto
             // http://www.bouncycastle.org/specifications.html
             switch (padding)
             {
+                case SymmetricAlgorithmPadding.Zeros: // we apply Zeros padding ourselves, since BC does it wrong (?!)
                 case SymmetricAlgorithmPadding.None:
                     return "NoPadding";
                 case SymmetricAlgorithmPadding.PKCS7:
                     return "PKCS7Padding";
-                case SymmetricAlgorithmPadding.Zeros:
-                    return "ZeroBytePadding";
                 default:
                     throw new NotSupportedException();
             }

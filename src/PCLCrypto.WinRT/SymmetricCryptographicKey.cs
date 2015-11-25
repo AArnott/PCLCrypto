@@ -125,7 +125,7 @@ namespace PCLCrypto
                         return plaintext;
                     }
 
-                    this.GrowToMultipleOfBlockSize(ref plaintext);
+                    CryptoUtilities.ApplyZeroPadding(ref plaintext, this.symmetricAlgorithmProvider.BlockLength);
                     break;
                 default:
                     throw new NotSupportedException();
@@ -251,19 +251,6 @@ namespace PCLCrypto
         private bool IsValidInputSize(int lengthInBytes)
         {
             return lengthInBytes % this.SymmetricAlgorithmProvider.BlockLength == 0;
-        }
-
-        private void GrowToMultipleOfBlockSize(ref byte[] buffer)
-        {
-            Requires.NotNull(buffer, nameof(buffer));
-
-            int blockLength = this.SymmetricAlgorithmProvider.BlockLength;
-            int bytesBeyondLastBlockLength = buffer.Length % blockLength;
-            if (bytesBeyondLastBlockLength > 0)
-            {
-                int growBy = blockLength - bytesBeyondLastBlockLength;
-                Array.Resize(ref buffer, buffer.Length + growBy);
-            }
         }
 
         private SafeKeyHandle CreateKey()

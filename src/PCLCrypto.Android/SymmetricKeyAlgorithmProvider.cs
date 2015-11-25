@@ -54,7 +54,7 @@ namespace PCLCrypto
         {
             Requires.NotNullOrEmpty(keyMaterial, "keyMaterial");
 
-            return new SymmetricCryptographicKey(this.Name, this.Mode, this.Padding, keyMaterial);
+            return new SymmetricCryptographicKey(this, this.Name, this.Mode, this.Padding, keyMaterial);
         }
 
         /// <summary>
