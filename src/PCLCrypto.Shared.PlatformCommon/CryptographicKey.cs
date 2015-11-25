@@ -12,7 +12,7 @@ namespace PCLCrypto
     /// <summary>
     /// Base class for implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal class CryptographicKey
+    internal abstract class CryptographicKey
     {
         /// <summary>
         /// Signs data with this key.

@@ -5,6 +5,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -107,7 +108,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        internal override byte[] Encrypt(byte[] plaintext, byte[] iv)
+        protected internal override byte[] Encrypt(byte[] plaintext, byte[] iv)
         {
             try
             {
@@ -120,9 +121,21 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        internal override byte[] Decrypt(byte[] ciphertext, byte[] iv)
+        protected internal override byte[] Decrypt(byte[] ciphertext, byte[] iv)
         {
             return Platform.CryptographicEngine.Decrypt(this.Key, ciphertext.ToBuffer(), iv.ToBuffer()).ToArray();
+        }
+
+        /// <inheritdoc />
+        protected internal override ICryptoTransform CreateEncryptor(byte[] iv)
+        {
+            return new BufferingCryptoTransform(input => this.Encrypt(input, iv));
+        }
+
+        /// <inheritdoc />
+        protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
+        {
+            return new BufferingCryptoTransform(input => this.Decrypt(input, iv));
         }
     }
 }

@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CryptographicKey.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptoUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HashAlgorithmProviderFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricCryptographicKey.Shared.cs" />

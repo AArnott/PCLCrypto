@@ -34,7 +34,8 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, "key");
 
-            return this.GetTransformForBlockMode(key, iv, true);
+            var keyClass = (CryptographicKey)key;
+            return keyClass.CreateEncryptor(iv);
         }
 
         /// <inheritdoc />
@@ -51,7 +52,8 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, "key");
 
-            return this.GetTransformForBlockMode(key, iv, false);
+            var keyClass = (CryptographicKey)key;
+            return keyClass.CreateDecryptor(iv);
         }
 
         /// <inheritdoc />
@@ -114,97 +116,6 @@ namespace PCLCrypto
             var platformKey = ((WinRTCryptographicKey)key).Key;
             var platformParameters = ((KeyDerivationParameters)parameters).Parameters;
             return Platform.Core.CryptographicEngine.DeriveKeyMaterial(platformKey, platformParameters, (uint)desiredKeySize).ToArray();
-        }
-
-        /// <summary>
-        /// Gets an <see cref="ICryptoTransform"/> instance to use for a given cryptographic key.
-        /// </summary>
-        /// <param name="key">The cryptographic key to use in the transform.</param>
-        /// <param name="iv">The initialization vector to use, when applicable.</param>
-        /// <param name="encrypting"><c>true</c> if encrypting; <c>false</c> if decrypting.</param>
-        /// <returns>An instance of <see cref="ICryptoTransform"/>.</returns>
-        private ICryptoTransform GetTransformForBlockMode(ICryptographicKey key, byte[] iv, bool encrypting)
-        {
-            Requires.NotNull(key, "key");
-
-            var bufferOperation = encrypting
-               ? new Func<byte[], byte[]>(input => this.Encrypt(key, input, iv))
-               : new Func<byte[], byte[]>(input => this.Decrypt(key, input, iv));
-            return new BufferingCryptoTransform(bufferOperation);
-        }
-
-        /// <summary>
-        /// A crypto transform that can do no work incrementally, but does it all at the end.
-        /// </summary>
-        /// <remarks>
-        /// Sadly, this is necessary because WinRT offers no incremental encryption/decryption
-        /// APIs.
-        /// </remarks>
-        private class BufferingCryptoTransform : ICryptoTransform
-        {
-            /// <summary>
-            /// The buffering stream.
-            /// </summary>
-            private readonly MemoryStream bufferingStream = new MemoryStream();
-
-            /// <summary>
-            /// The transform to run when all bytes are collected.
-            /// </summary>
-            private readonly Func<byte[], byte[]> transform;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="BufferingCryptoTransform"/> class.
-            /// </summary>
-            /// <param name="transform">The transform to run when all bytes are collected.</param>
-            internal BufferingCryptoTransform(Func<byte[], byte[]> transform)
-            {
-                Requires.NotNull(transform, "transform");
-                this.transform = transform;
-            }
-
-            /// <inheritdoc />
-            public bool CanReuseTransform
-            {
-                get { return false; }
-            }
-
-            /// <inheritdoc />
-            public bool CanTransformMultipleBlocks
-            {
-                get { return true; }
-            }
-
-            /// <inheritdoc />
-            public int InputBlockSize
-            {
-                get { return 1; }
-            }
-
-            /// <inheritdoc />
-            public int OutputBlockSize
-            {
-                get { return 1; }
-            }
-
-            /// <inheritdoc />
-            public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
-            {
-                this.bufferingStream.Write(inputBuffer, inputOffset, inputCount);
-                return 0;
-            }
-
-            /// <inheritdoc />
-            public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
-            {
-                this.bufferingStream.Write(inputBuffer, inputOffset, inputCount);
-                return this.transform(this.bufferingStream.ToArray());
-            }
-
-            /// <inheritdoc />
-            public void Dispose()
-            {
-                this.bufferingStream.Dispose();
-            }
         }
     }
 }

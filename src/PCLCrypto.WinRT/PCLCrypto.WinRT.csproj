@@ -44,8 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="BufferingCryptoTransform.cs" />
     <Compile Include="CryptographicBuffer.cs" />
-    <Compile Include="CryptographicKey.cs" />
     <Compile Include="ECDiffieHellman.cs" />
     <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />

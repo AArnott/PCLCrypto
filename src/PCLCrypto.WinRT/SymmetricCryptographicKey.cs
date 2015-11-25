@@ -106,7 +106,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        internal override byte[] Encrypt(byte[] plaintext, byte[] iv)
+        protected internal override byte[] Encrypt(byte[] plaintext, byte[] iv)
         {
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
@@ -148,7 +148,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        internal override byte[] Decrypt(byte[] ciphertext, byte[] iv)
+        protected internal override byte[] Decrypt(byte[] ciphertext, byte[] iv)
         {
             Requires.NotNull(ciphertext, nameof(ciphertext));
             Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length does not a multiple of block size and no padding is selected.");
@@ -185,6 +185,18 @@ namespace PCLCrypto
                 this.iv,
                 this.flags).ToArray();
             return plainText;
+        }
+
+        /// <inheritdoc />
+        protected internal override ICryptoTransform CreateEncryptor(byte[] iv)
+        {
+            return new BufferingCryptoTransform(input => this.Encrypt(input, iv));
+        }
+
+        /// <inheritdoc />
+        protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
+        {
+            return new BufferingCryptoTransform(input => this.Decrypt(input, iv));
         }
 
         /// <summary>
