@@ -84,15 +84,13 @@ namespace PCLCrypto
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
             bool paddingInUse = this.Padding != SymmetricAlgorithmPadding.None;
-            Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
+            Requires.Argument(iv == null || this.Mode.UsesIV(), nameof(iv), "IV supplied but does not apply to this cipher.");
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
-            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), nameof(data), "Length does not a multiple of block size and no padding is selected.");
 
-            return this.CanStreamAcrossTopLevelCipherOperations
-                ? this.encryptingCipher.Update(data)
-                : this.encryptingCipher.DoFinal(data);
+            return this.DoCipherOperation(this.encryptingCipher, data);
         }
 
         /// <inheritdoc />
@@ -104,22 +102,15 @@ namespace PCLCrypto
             this.InitializeCipher(CipherMode.DecryptMode, iv, ref this.decryptingCipher);
             Requires.Argument(this.IsValidInputSize(data.Length), nameof(data), "Length is not a multiple of block size and no padding is selected.");
 
-            // Android returns null when given an empty input.
+            // Decrypting an empty buffer (even with PKCS7) leads to a null result,
+            // which no other platform does. So we emulate the behavior of other platforms
+            // by returning an empty buffer.
             if (data.Length == 0)
             {
                 return data;
             }
 
-            try
-            {
-                return this.CanStreamAcrossTopLevelCipherOperations
-                    ? this.decryptingCipher.Update(data)
-                    : this.decryptingCipher.DoFinal(data);
-            }
-            catch (IllegalBlockSizeException ex)
-            {
-                throw new ArgumentException("Illegal block size.", ex);
-            }
+            return this.DoCipherOperation(this.decryptingCipher, data);
         }
 
         /// <inheritdoc />
@@ -144,6 +135,8 @@ namespace PCLCrypto
         /// <returns>A value such as "PKCS7Padding", or "NoPadding" if no padding.</returns>
         private static string GetPaddingName(SymmetricAlgorithmPadding padding)
         {
+            // The constants used here come from
+            // http://www.bouncycastle.org/specifications.html
             switch (padding)
             {
                 case SymmetricAlgorithmPadding.None:
@@ -151,9 +144,32 @@ namespace PCLCrypto
                 case SymmetricAlgorithmPadding.PKCS7:
                     return "PKCS7Padding";
                 case SymmetricAlgorithmPadding.Zeros:
-                    throw new NotImplementedException(); // TODO
+                    return "ZeroBytePadding";
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        private byte[] DoCipherOperation(Cipher cipher, byte[] data)
+        {
+            Requires.NotNull(cipher, nameof(cipher));
+            Requires.NotNull(data, nameof(data));
+
+            // Android returns null when given an empty input.
+            if (this.Padding != SymmetricAlgorithmPadding.PKCS7 && data.Length == 0)
+            {
+                return data;
+            }
+
+            try
+            {
+                return this.CanStreamAcrossTopLevelCipherOperations
+                    ? cipher.Update(data)
+                    : cipher.DoFinal(data);
+            }
+            catch (IllegalBlockSizeException ex)
+            {
+                throw new ArgumentException("Illegal block size.", ex);
             }
         }
 
