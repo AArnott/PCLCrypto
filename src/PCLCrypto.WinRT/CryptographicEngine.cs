@@ -63,9 +63,7 @@ namespace PCLCrypto
             Requires.NotNull(data, "data");
 
             var keyClass = (WinRTCryptographicKey)key;
-            return Platform.Core.CryptographicEngine.Sign(
-                keyClass.Key,
-                data.ToBuffer()).ToArray();
+            return keyClass.Sign(data);
         }
 
         /// <inheritdoc />
@@ -75,9 +73,7 @@ namespace PCLCrypto
             Requires.NotNull(data, "data");
 
             var keyClass = (WinRTCryptographicKey)key;
-            return Platform.Core.CryptographicEngine.SignHashedData(
-                keyClass.Key,
-                data.ToBuffer()).ToArray();
+            return keyClass.SignHash(data);
         }
 
         /// <inheritdoc />
@@ -88,10 +84,7 @@ namespace PCLCrypto
             Requires.NotNull(signature, "signature");
 
             var keyClass = (WinRTCryptographicKey)key;
-            return Platform.Core.CryptographicEngine.VerifySignature(
-                keyClass.Key,
-                data.ToBuffer(),
-                signature.ToBuffer());
+            return keyClass.VerifySignature(data, signature);
         }
 
         /// <inheritdoc />
@@ -102,10 +95,7 @@ namespace PCLCrypto
             Requires.NotNull(signature, "signature");
 
             var keyClass = (WinRTCryptographicKey)key;
-            return Platform.Core.CryptographicEngine.VerifySignatureWithHashInput(
-                keyClass.Key,
-                data.ToBuffer(),
-                signature.ToBuffer());
+            return keyClass.VerifyHash(data, signature);
         }
 
         /// <inheritdoc />
@@ -113,9 +103,7 @@ namespace PCLCrypto
         {
             Requires.NotNull(key, nameof(key));
 
-            var platformKey = ((WinRTCryptographicKey)key).Key;
-            var platformParameters = ((KeyDerivationParameters)parameters).Parameters;
-            return Platform.Core.CryptographicEngine.DeriveKeyMaterial(platformKey, platformParameters, (uint)desiredKeySize).ToArray();
+            return ((CryptographicKey)key).DeriveKeyMaterial(parameters, desiredKeySize);
         }
     }
 }

@@ -108,6 +108,38 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        protected internal override byte[] Sign(byte[] data)
+        {
+            return Platform.CryptographicEngine.Sign(this.key, data.ToBuffer())
+                .ToArray();
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifySignature(byte[] data, byte[] signature)
+        {
+            return Platform.CryptographicEngine.VerifySignature(
+                this.key,
+                data.ToBuffer(),
+                signature.ToBuffer());
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] SignHash(byte[] data)
+        {
+            return Platform.CryptographicEngine.SignHashedData(this.key, data.ToBuffer())
+                .ToArray();
+        }
+
+        /// <inheritdoc />
+        protected internal override bool VerifyHash(byte[] data, byte[] signature)
+        {
+            return Platform.CryptographicEngine.VerifySignatureWithHashInput(
+                this.key,
+                data.ToBuffer(),
+                signature.ToBuffer());
+        }
+
+        /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] plaintext, byte[] iv)
         {
             try
@@ -136,6 +168,13 @@ namespace PCLCrypto
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
             return new BufferingCryptoTransform(input => this.Decrypt(input, iv));
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] DeriveKeyMaterial(IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            var platformParameters = ((KeyDerivationParameters)parameters).Parameters;
+            return Platform.CryptographicEngine.DeriveKeyMaterial(this.key, platformParameters, (uint)desiredKeySize).ToArray();
         }
     }
 }

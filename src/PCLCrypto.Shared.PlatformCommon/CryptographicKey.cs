@@ -101,5 +101,19 @@ namespace PCLCrypto
         {
             throw new NotSupportedException();
         }
+
+        /// <summary>
+        /// Derives a key from another key by using a key derivation function.
+        /// </summary>
+        /// <param name="parameters">Derivation parameters. The parameters vary depending on the type of KDF algorithm
+        /// used.</param>
+        /// <param name="desiredKeySize">Requested size, in bits, of the derived key.</param>
+        /// <returns>
+        /// Buffer that contains the derived key.
+        /// </returns>
+        protected internal virtual byte[] DeriveKeyMaterial(IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
