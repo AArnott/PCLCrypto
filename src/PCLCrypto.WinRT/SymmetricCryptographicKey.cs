@@ -190,7 +190,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateEncryptor(byte[] iv)
         {
-            return new BufferingCryptoTransform(input => this.Encrypt(input, iv));
+            return new BCryptEncryptTransform(this, iv);
         }
 
         /// <inheritdoc />
@@ -235,6 +235,28 @@ namespace PCLCrypto
             return copy;
         }
 
+        /// <summary>
+        /// Creates a zero IV buffer or a copy of the specified buffer.
+        /// </summary>
+        /// <param name="iv">The IV supplied by the caller.</param>
+        /// <returns>A copy of <paramref name="iv"/> if not null; otherwise a zero-filled buffer.</returns>
+        private byte[] CopyOrZeroIV(byte[] iv)
+        {
+            if (iv != null)
+            {
+                return iv.ToArray();
+            }
+            else if (!this.Mode.UsesIV())
+            {
+                // Don't create an IV when it doesn't apply.
+                return null;
+            }
+            else
+            {
+                return new byte[this.symmetricAlgorithmProvider.BlockLength];
+            }
+        }
+
         private SafeKeyHandle GetInitializedKey(byte[] iv)
         {
             if (this.platformKey == null || !this.CanStreamAcrossTopLevelCipherOperations || iv != null)
@@ -271,6 +293,178 @@ namespace PCLCrypto
                 this.symmetricAlgorithmProvider.Algorithm,
                 SymmetricKeyBlobTypes.BCRYPT_KEY_DATA_BLOB,
                 this.keyMaterial);
+        }
+
+        private abstract class BCryptCipherTransform : ICryptoTransform
+        {
+            /// <summary>
+            /// An shareable, reusable empty byte array.
+            /// </summary>
+            protected static readonly byte[] EmptyBuffer = new byte[0];
+
+            /// <summary>
+            /// The cryptographic key that created this transform.
+            /// </summary>
+            protected readonly SymmetricCryptographicKey baseKey;
+
+            /// <summary>
+            /// The key that may carry state from a prior crypto operation.
+            /// </summary>
+            /// <seealso cref="iv"/>
+            protected readonly SafeKeyHandle platformKey;
+
+            /// <summary>
+            /// The IV to use for the next transform operation.
+            /// </summary>
+            protected readonly byte[] iv;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="BCryptCipherTransform"/> class.
+            /// </summary>
+            /// <param name="baseKey">The key that may carry state from a prior crypto operation.</param>
+            /// <param name="iv">The IV to use for the next transform operation.</param>
+            internal BCryptCipherTransform(SymmetricCryptographicKey baseKey, byte[] iv)
+            {
+                Requires.NotNull(baseKey, nameof(baseKey));
+
+                this.baseKey = baseKey;
+                this.iv = baseKey.CopyOrZeroIV(iv);
+                this.platformKey = baseKey.GetInitializedKey(iv);
+            }
+
+            /// <inheritdoc />
+            public bool CanReuseTransform => false;
+
+            /// <inheritdoc />
+            public bool CanTransformMultipleBlocks => true;
+
+            /// <inheritdoc />
+            public int InputBlockSize => this.baseKey.SymmetricAlgorithmProvider.BlockLength;
+
+            /// <inheritdoc />
+            public int OutputBlockSize => this.baseKey.SymmetricAlgorithmProvider.BlockLength;
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+                this.platformKey.Dispose();
+            }
+
+            /// <inheritdoc />
+            public abstract int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset);
+
+            /// <inheritdoc />
+            public abstract byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount);
+        }
+
+        private class BCryptEncryptTransform : BCryptCipherTransform
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="BCryptEncryptTransform"/> class.
+            /// </summary>
+            /// <param name="baseKey">The key that may carry state from a prior crypto operation.</param>
+            /// <param name="iv">The IV to use for the next transform operation.</param>
+            internal BCryptEncryptTransform(SymmetricCryptographicKey baseKey, byte[] iv)
+                : base(baseKey, iv)
+            {
+            }
+
+            /// <inheritdoc />
+            public override unsafe int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+            {
+                int cbResult;
+                BCryptEncrypt(
+                    this.platformKey,
+                    new ArraySegment<byte>(inputBuffer, inputOffset, inputCount),
+                    null,
+                    this.iv.AsArraySegment(),
+                    new ArraySegment<byte>(outputBuffer, outputOffset, outputBuffer.Length - outputOffset),
+                    out cbResult,
+                    BCryptEncryptFlags.None).ThrowOnError();
+                return cbResult;
+            }
+
+            /// <inheritdoc />
+            public override unsafe byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+            {
+                switch (this.baseKey.Padding)
+                {
+                    case SymmetricAlgorithmPadding.None:
+                        Requires.Argument(this.baseKey.IsValidInputSize(inputCount), nameof(inputCount), "Length is not a non-zero multiple of block size and no padding is selected.");
+
+                        if (inputCount == 0)
+                        {
+                            return EmptyBuffer;
+                        }
+
+                        break;
+                    case SymmetricAlgorithmPadding.PKCS7:
+                        break;
+                    case SymmetricAlgorithmPadding.Zeros:
+                        // We have to implement this padding ourselves.
+                        if (inputCount == 0)
+                        {
+                            return EmptyBuffer;
+                        }
+
+                        CryptoUtilities.ApplyZeroPadding(
+                            ref inputBuffer,
+                            this.baseKey.symmetricAlgorithmProvider.BlockLength,
+                            ref inputOffset,
+                            ref inputCount);
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                int cbResult;
+                BCryptEncrypt(
+                    this.platformKey,
+                    new ArraySegment<byte>(inputBuffer, inputOffset, inputCount),
+                    null,
+                    this.iv.AsArraySegment(),
+                    default(ArraySegment<byte>),
+                    out cbResult,
+                    this.baseKey.flags).ThrowOnError();
+
+                byte[] output = new byte[cbResult];
+                BCryptEncrypt(
+                    this.platformKey,
+                    new ArraySegment<byte>(inputBuffer, inputOffset, inputCount),
+                    null,
+                    this.iv.AsArraySegment(),
+                    new ArraySegment<byte>(output),
+                    out cbResult,
+                    this.baseKey.flags).ThrowOnError();
+
+                Array.Resize(ref output, cbResult);
+                return output;
+            }
+        }
+
+        private class BCryptDecryptTransform : BCryptCipherTransform
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="BCryptDecryptTransform"/> class.
+            /// </summary>
+            /// <param name="baseKey">The key that may carry state from a prior crypto operation.</param>
+            /// <param name="iv">The IV to use for the next transform operation.</param>
+            internal BCryptDecryptTransform(SymmetricCryptographicKey baseKey, byte[] iv)
+                : base(baseKey, iv)
+            {
+            }
+
+            /// <inheritdoc />
+            public override int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

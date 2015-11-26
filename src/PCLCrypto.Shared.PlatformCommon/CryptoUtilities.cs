@@ -33,6 +33,29 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Grows a buffer as necessary to align with a block size.
+        /// </summary>
+        /// <param name="buffer">The buffer to grow.</param>
+        /// <param name="blockLength">The length (in bytes) of a block.</param>
+        /// <param name="bufferOffset">The index of the first byte in <paramref name="buffer"/> that is part of the message.</param>
+        /// <param name="bufferCount">The number of bytes in <paramref name="buffer"/> that are part of the message.</param>
+        internal static void ApplyZeroPadding(ref byte[] buffer, int blockLength, ref int bufferOffset, ref int bufferCount)
+        {
+            Requires.NotNull(buffer, nameof(buffer));
+
+            int bytesBeyondLastBlockLength = bufferCount % blockLength;
+            if (bytesBeyondLastBlockLength > 0)
+            {
+                int growBy = blockLength - bytesBeyondLastBlockLength;
+                byte[] newBuffer = new byte[bufferCount + growBy];
+                Array.Copy(buffer, bufferOffset, newBuffer, 0, bufferCount);
+                buffer = newBuffer;
+                bufferOffset = 0;
+                bufferCount += growBy;
+            }
+        }
+
+        /// <summary>
         /// Performs a constant time comparison between two buffers.
         /// </summary>
         /// <param name="buffer1">The first buffer.</param>
@@ -75,6 +98,17 @@ namespace PCLCrypto
             var result = new byte[buffer.Length];
             Array.Copy(buffer, result, buffer.Length);
             return result;
+        }
+
+        /// <summary>
+        /// Gets an <see cref="ArraySegment{T}"/> for a given array, which may be null.
+        /// </summary>
+        /// <typeparam name="T">The type of element in the array.</typeparam>
+        /// <param name="buffer">The array, which may be null.</param>
+        /// <returns>The array segment.</returns>
+        internal static ArraySegment<T> AsArraySegment<T>(this T[] buffer)
+        {
+            return buffer != null ? new ArraySegment<T>(buffer) : default(ArraySegment<T>);
         }
 
         /// <summary>
