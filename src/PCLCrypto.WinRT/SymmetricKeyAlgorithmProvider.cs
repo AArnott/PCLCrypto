@@ -30,13 +30,13 @@ namespace PCLCrypto
             this.Padding = padding;
 
             this.Algorithm = BCryptOpenAlgorithmProvider(GetAlgorithmName(name));
-            BCryptSetProperty(this.Algorithm, PropertyNames.ChainingMode, GetChainingMode(mode));
+            BCryptSetProperty(this.Algorithm, PropertyNames.BCRYPT_CHAINING_MODE, GetChainingMode(mode));
         }
 
         /// <inheritdoc/>
         public int BlockLength
         {
-            get { return BCryptGetProperty<int>(this.Algorithm, PropertyNames.BlockLength); }
+            get { return BCryptGetProperty<int>(this.Algorithm, PropertyNames.BCRYPT_BLOCK_LENGTH); }
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Gets the BCrypt chaining mode to pass to set as the <see cref="PropertyNames.ChainingMode"/> property.
+        /// Gets the BCrypt chaining mode to pass to set as the <see cref="PropertyNames.BCRYPT_CHAINING_MODE"/> property.
         /// </summary>
         /// <param name="mode">The block chaining mode.</param>
         /// <returns>The block chaining mode.</returns>
