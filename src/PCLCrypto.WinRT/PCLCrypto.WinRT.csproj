@@ -44,8 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
+    <Compile Include="BufferingCryptoTransform.cs" />
     <Compile Include="CryptographicBuffer.cs" />
-    <Compile Include="CryptographicKey.cs" />
     <Compile Include="ECDiffieHellman.cs" />
     <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />
@@ -61,7 +61,6 @@
     <Compile Include="MacAlgorithmProviderFactory.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
-    <Compile Include="CryptographicEngine.cs" />
     <Compile Include="SymmetricCryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />

@@ -61,6 +61,27 @@ public class CryptographicEngineTests
         }
     }
 
+    /// <summary>
+    /// Gets a set of theory data that verifies IV and non-IV block modes against each type of padding.
+    /// No authenticated modes are produced.
+    /// </summary>
+    public static object[][] BlockModesAndPadding
+    {
+        get
+        {
+            var blockModes = new Tuple<SymmetricAlgorithmName, SymmetricAlgorithmMode>[]
+            {
+                Tuple.Create(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc), // IV
+                Tuple.Create(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Ecb), // no IV
+                Tuple.Create(SymmetricAlgorithmName.Rc4, SymmetricAlgorithmMode.Streaming), // streaming
+            };
+            var results = from tuple in blockModes
+                          from padding in Enum.GetValues(typeof(SymmetricAlgorithmPadding)).Cast<SymmetricAlgorithmPadding>()
+                          select new object[] { tuple.Item1, tuple.Item2, padding };
+            return results.ToArray();
+        }
+    }
+
     private static byte[] IV => Convert.FromBase64String("reCDYoG9G+4xr15Am15N+w==");
 
     [Fact]
@@ -343,51 +364,43 @@ public class CryptographicEngineTests
         Assert.Equal<byte>(cipherText1, cipherText2);
     }
 
-    [Fact]
-    public void CreateEncryptor_SymmetricEncryptionEquivalence()
+    // The InlineData attributes are designed to test block modes with IVs, without IVs, and streaming.
+    // It cross-products this set with various padding modes.
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(BlockModesAndPadding))]
+    public void CreateEncryptor_SymmetricEncryptionEquivalence(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
     {
-        foreach (SymmetricAlgorithm symmetricAlgorithm in Enum.GetValues(typeof(SymmetricAlgorithm)))
+        var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, mode, padding);
+        int keyLength = GetKeyLength(name, algorithmProvider);
+
+        byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
+        var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
+        var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial); // create a second key so that streaming ciphers will be produce the same result when executed the second time
+        var iv = mode.UsesIV() ? WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithmProvider.BlockLength) : null;
+
+        float incrementBy = padding == SymmetricAlgorithmPadding.None ? 1 : 0.5f;
+        for (float dataLengthFactor = 1; dataLengthFactor <= 3; dataLengthFactor += incrementBy)
         {
-            if (symmetricAlgorithm.GetMode().IsAuthenticated())
+            var data = WinRTCrypto.CryptographicBuffer.GenerateRandom((int)(dataLengthFactor * algorithmProvider.BlockLength));
+            var expected = WinRTCrypto.CryptographicEngine.Encrypt(key1, data, iv);
+
+            var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(key2, iv);
+            var actualStream = new MemoryStream();
+            using (var cryptoStream = CryptoStream.WriteTo(actualStream, encryptor))
             {
-                // authenticated block modes require special caller code.
-                continue;
-            }
-
-            try
-            {
-                var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(symmetricAlgorithm);
-                int keyLength = GetKeyLength(symmetricAlgorithm.GetName(), algorithmProvider);
-
-                byte[] keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
-                var key1 = algorithmProvider.CreateSymmetricKey(keyMaterial);
-                var key2 = algorithmProvider.CreateSymmetricKey(keyMaterial); // create a second key so that streaming ciphers will be produce the same result when executed the second time
-                var iv = symmetricAlgorithm.UsesIV() ? WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithmProvider.BlockLength) : null;
-
-                for (int dataLengthFactor = 1; dataLengthFactor <= 3; dataLengthFactor++)
+                // Write it in smaller than block length chunks so we're exercising more product code.
+                int chunkSize = Math.Max(1, (int)(data.Length / Math.Max(1, dataLengthFactor + 1)));
+                for (int dataOffset = 0; dataOffset < data.Length; dataOffset += chunkSize)
                 {
-                    var data = WinRTCrypto.CryptographicBuffer.GenerateRandom(dataLengthFactor * algorithmProvider.BlockLength);
-                    var expected = WinRTCrypto.CryptographicEngine.Encrypt(key1, data, iv);
-
-                    var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(key2, iv);
-                    var actualStream = new MemoryStream();
-                    using (var cryptoStream = CryptoStream.WriteTo(actualStream, encryptor))
-                    {
-                        cryptoStream.Write(data, 0, data.Length);
-                        cryptoStream.FlushFinalBlock();
-
-                        byte[] actual = actualStream.ToArray();
-                        Assert.Equal(
-                            Convert.ToBase64String(expected),
-                            Convert.ToBase64String(actual));
-                    }
+                    cryptoStream.Write(data, dataOffset, Math.Min(chunkSize, data.Length - dataOffset));
                 }
 
-                this.logger.WriteLine("Algorithm {0} passed.", symmetricAlgorithm);
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Algorithm {0} is not supported on this platform.", symmetricAlgorithm);
+                cryptoStream.FlushFinalBlock();
+
+                byte[] actual = actualStream.ToArray();
+                Assert.Equal(
+                    Convert.ToBase64String(expected),
+                    Convert.ToBase64String(actual));
             }
         }
     }
@@ -415,17 +428,17 @@ public class CryptographicEngineTests
         CollectionAssertEx.AreEqual(this.data, plaintext);
     }
 
-    [Fact]
-    public void EncryptDecryptStreamChain()
+    [Theory]
+    [InlineData(3)]
+    [InlineData(16)]
+    [InlineData(24)]
+    [InlineData(32)]
+    [InlineData(64)]
+    [InlineData(70)]
+    public void EncryptDecryptStreamChain(int dataLength)
     {
-        byte[] data = this.data;
+        byte[] data = Enumerable.Range(1, dataLength).Select(n => (byte)n).ToArray();
         this.EncryptDecryptStreamChain(data);
-    }
-
-    [Fact]
-    public void EncryptDecryptStreamChain_Multiblock()
-    {
-        this.EncryptDecryptStreamChain(this.bigData);
     }
 
     private static int GetKeyLength(SymmetricAlgorithmName symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
@@ -503,6 +516,8 @@ public class CryptographicEngineTests
             }
         }
 
-        CollectionAssertEx.AreEqual(data, decryptedStream.ToArray());
+        Assert.Equal(
+            Convert.ToBase64String(data),
+            Convert.ToBase64String(decryptedStream.ToArray()));
     }
 }

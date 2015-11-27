@@ -9,6 +9,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using Validation;
+    using Platform = System.Security.Cryptography;
 
     /// <summary>
     /// A .NET Framework implementation of the <see cref="ICryptographicKey"/> interface
@@ -80,6 +81,26 @@ namespace PCLCrypto
         /// </summary>
         public void Dispose()
         {
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] DeriveKeyMaterial(IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            // Right now we're assuming that KdfGenericBinary is directly usable as a salt
+            // in RFC2898. When our KeyDerivationParametersFactory class supports
+            // more parameter types than just BuildForPbkdf2, we might need to adjust this code
+            // to handle each type of parameter.
+            byte[] salt = parameters.KdfGenericBinary;
+            switch (this.Algorithm)
+            {
+                case KeyDerivationAlgorithm.Pbkdf2Sha1:
+                    var deriveBytes = new Platform.Rfc2898DeriveBytes(this.Key, salt, parameters.IterationCount);
+                    return deriveBytes.GetBytes(desiredKeySize);
+                default:
+                    // TODO: consider using Platform.PasswordDeriveBytes if it can
+                    // support some more of these algorithms.
+                    throw new NotSupportedException("Only KeyDerivationAlgorithm.Pbkdf2Sha1 is supported for this platform.");
+            }
         }
     }
 }

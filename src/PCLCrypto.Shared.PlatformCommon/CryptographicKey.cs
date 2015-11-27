@@ -12,7 +12,7 @@ namespace PCLCrypto
     /// <summary>
     /// Base class for implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal class CryptographicKey
+    internal abstract class CryptographicKey
     {
         /// <summary>
         /// Signs data with this key.
@@ -100,6 +100,20 @@ namespace PCLCrypto
         protected internal virtual ICryptoTransform CreateDecryptor(byte[] iv)
         {
             throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Derives a key from another key by using a key derivation function.
+        /// </summary>
+        /// <param name="parameters">Derivation parameters. The parameters vary depending on the type of KDF algorithm
+        /// used.</param>
+        /// <param name="desiredKeySize">Requested size, in bits, of the derived key.</param>
+        /// <returns>
+        /// Buffer that contains the derived key.
+        /// </returns>
+        protected internal virtual byte[] DeriveKeyMaterial(IKeyDerivationParameters parameters, int desiredKeySize)
+        {
+            throw new NotImplementedException();
         }
     }
 }

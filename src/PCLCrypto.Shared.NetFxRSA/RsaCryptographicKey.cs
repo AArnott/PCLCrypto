@@ -93,7 +93,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            using (var hash = this.GetHashAlgorithm())
             {
                 AsymmetricSignatureFormatter formatter = this.GetSignatureFormatter();
                 formatter.SetHashAlgorithm(hash.ToString());
@@ -104,7 +104,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            using (var hash = this.GetHashAlgorithm())
             {
                 var deformatter = this.GetSignatureDeformatter();
                 deformatter.SetHashAlgorithm(hash.ToString());
@@ -115,7 +115,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] SignHash(byte[] data)
         {
-            using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+            using (var hash = this.GetHashAlgorithm())
             {
                 var formatter = this.GetSignatureFormatter();
                 formatter.SetHashAlgorithm(hash.ToString());
@@ -128,7 +128,7 @@ namespace PCLCrypto
         {
             try
             {
-                using (var hash = CryptographicEngine.GetHashAlgorithm(this.Algorithm))
+                using (var hash = this.GetHashAlgorithm())
                 {
                     var deformatter = this.GetSignatureDeformatter();
                     deformatter.SetHashAlgorithm(hash.ToString());
@@ -183,6 +183,16 @@ namespace PCLCrypto
             }
 
             return keyExchange.DecryptKeyExchange(data);
+        }
+
+        /// <summary>
+        /// Creates a hash algorithm instance that is appropriate for the given algorithm.T
+        /// </summary>
+        /// <returns>The hash algorithm.</returns>
+        private System.Security.Cryptography.HashAlgorithm GetHashAlgorithm()
+        {
+            var hashAlgorithm = AsymmetricKeyAlgorithmProviderFactory.GetHashAlgorithmEnum(this.Algorithm);
+            return HashAlgorithmProvider.CreateHashAlgorithm(hashAlgorithm);
         }
 
         /// <summary>
