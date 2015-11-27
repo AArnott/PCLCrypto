@@ -37,14 +37,27 @@ namespace PCLCrypto
         /// The IV returned from the last cryptographic operation, which may serve
         /// as input into the next if the caller omits the IV.
         /// </summary>
-        /// <seealso cref="platformKey"/>
-        private byte[] iv;
+        /// <seealso cref="encryptorKey"/>
+        private byte[] encryptorIv;
 
         /// <summary>
-        /// The key that may carry state from a prior crypto operation.
+        /// The IV returned from the last cryptographic operation, which may serve
+        /// as input into the next if the caller omits the IV.
         /// </summary>
-        /// <seealso cref="iv"/>
-        private SafeKeyHandle platformKey;
+        /// <seealso cref="decryptorKey"/>
+        private byte[] decryptorIv;
+
+        /// <summary>
+        /// The encryption key that may carry state from a prior crypto operation.
+        /// </summary>
+        /// <seealso cref="encryptorIv"/>
+        private SafeKeyHandle encryptorKey;
+
+        /// <summary>
+        /// The decryption key that may carry state from a prior crypto operation.
+        /// </summary>
+        /// <seealso cref="decryptorIv"/>
+        private SafeKeyHandle decryptorKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricCryptographicKey" /> class.
@@ -102,7 +115,8 @@ namespace PCLCrypto
         /// </summary>
         public void Dispose()
         {
-            this.platformKey?.Dispose();
+            this.encryptorKey?.Dispose();
+            this.decryptorKey?.Dispose();
         }
 
         /// <inheritdoc />
@@ -110,7 +124,7 @@ namespace PCLCrypto
         {
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
-            var key = this.GetInitializedKey(iv);
+            var key = this.GetInitializedKey(ref this.encryptorKey, iv);
             switch (this.Padding)
             {
                 case SymmetricAlgorithmPadding.None:
@@ -136,13 +150,13 @@ namespace PCLCrypto
             // did not specify an IV.
             // Copy the IV because the native code changes it, and
             // our contract with the caller is that we don't.
-            this.iv = CopyBufferOrNull(iv) ?? this.iv;
+            this.encryptorIv = CopyBufferOrNull(iv) ?? this.encryptorIv;
 
             byte[] cipherText = BCryptEncrypt(
                 key,
                 plaintext,
                 IntPtr.Zero,
-                this.iv,
+                this.encryptorIv,
                 this.flags).ToArray();
             return cipherText;
         }
@@ -154,7 +168,7 @@ namespace PCLCrypto
             Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length does not a multiple of block size and no padding is selected.");
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
-            var key = this.GetInitializedKey(iv);
+            var key = this.GetInitializedKey(ref this.decryptorKey, iv);
             switch (this.Padding)
             {
                 case SymmetricAlgorithmPadding.PKCS7:
@@ -176,13 +190,13 @@ namespace PCLCrypto
             // did not specify an IV.
             // Copy the IV because the native code changes it, and
             // our contract with the caller is that we don't.
-            this.iv = CopyBufferOrNull(iv) ?? this.iv;
+            this.decryptorIv = CopyBufferOrNull(iv) ?? this.decryptorIv;
 
             byte[] plainText = BCryptDecrypt(
                 key,
                 ciphertext,
                 IntPtr.Zero,
-                this.iv,
+                this.decryptorIv,
                 this.flags).ToArray();
             return plainText;
         }
@@ -196,7 +210,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
-            return new BufferingCryptoTransform(input => this.Decrypt(input, iv));
+            return new BCryptDecryptTransform(this, iv);
         }
 
         /// <summary>
@@ -257,14 +271,14 @@ namespace PCLCrypto
             }
         }
 
-        private SafeKeyHandle GetInitializedKey(byte[] iv)
+        private SafeKeyHandle GetInitializedKey(ref SafeKeyHandle key, byte[] iv)
         {
-            if (this.platformKey == null || !this.CanStreamAcrossTopLevelCipherOperations || iv != null)
+            if (key == null || key.IsClosed || !this.CanStreamAcrossTopLevelCipherOperations || iv != null)
             {
-                this.platformKey?.Dispose();
+                key?.Dispose();
                 try
                 {
-                    this.platformKey = BCryptGenerateSymmetricKey(this.symmetricAlgorithmProvider.Algorithm, this.keyMaterial);
+                    key = BCryptGenerateSymmetricKey(this.symmetricAlgorithmProvider.Algorithm, this.keyMaterial);
                 }
                 catch (Win32Exception ex)
                 {
@@ -272,7 +286,7 @@ namespace PCLCrypto
                 }
             }
 
-            return this.platformKey;
+            return key;
         }
 
         /// <summary>
@@ -322,14 +336,16 @@ namespace PCLCrypto
             /// Initializes a new instance of the <see cref="BCryptCipherTransform"/> class.
             /// </summary>
             /// <param name="baseKey">The key that may carry state from a prior crypto operation.</param>
+            /// <param name="platformKey">The stateful platform key.</param>
             /// <param name="iv">The IV to use for the next transform operation.</param>
-            internal BCryptCipherTransform(SymmetricCryptographicKey baseKey, byte[] iv)
+            internal BCryptCipherTransform(SymmetricCryptographicKey baseKey, SafeKeyHandle platformKey, byte[] iv)
             {
                 Requires.NotNull(baseKey, nameof(baseKey));
+                Requires.NotNull(platformKey, nameof(platformKey));
 
                 this.baseKey = baseKey;
                 this.iv = baseKey.CopyOrZeroIV(iv);
-                this.platformKey = baseKey.GetInitializedKey(iv);
+                this.platformKey = platformKey;
             }
 
             /// <inheritdoc />
@@ -365,7 +381,7 @@ namespace PCLCrypto
             /// <param name="baseKey">The key that may carry state from a prior crypto operation.</param>
             /// <param name="iv">The IV to use for the next transform operation.</param>
             internal BCryptEncryptTransform(SymmetricCryptographicKey baseKey, byte[] iv)
-                : base(baseKey, iv)
+                : base(baseKey, baseKey.GetInitializedKey(ref baseKey.encryptorKey, iv), iv)
             {
             }
 
@@ -445,25 +461,122 @@ namespace PCLCrypto
         private class BCryptDecryptTransform : BCryptCipherTransform
         {
             /// <summary>
+            /// The buffer with the last block's worth of ciphertext, which may
+            /// be needed when depadding.
+            /// </summary>
+            private byte[] depadBuffer;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="BCryptDecryptTransform"/> class.
             /// </summary>
             /// <param name="baseKey">The key that may carry state from a prior crypto operation.</param>
             /// <param name="iv">The IV to use for the next transform operation.</param>
             internal BCryptDecryptTransform(SymmetricCryptographicKey baseKey, byte[] iv)
-                : base(baseKey, iv)
+                : base(baseKey, baseKey.GetInitializedKey(ref baseKey.decryptorKey, iv), iv)
             {
             }
 
             /// <inheritdoc />
-            public override int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+            public override unsafe int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
             {
-                throw new NotImplementedException();
+                Requires.NotNull(inputBuffer, nameof(inputBuffer));
+                Requires.Range(inputCount > 0 && (inputCount % this.InputBlockSize) == 0, nameof(inputCount), "Positive integer multiple of input block size required.");
+
+                int cbResult, bytesWritten = 0;
+                if (this.baseKey.Padding != SymmetricAlgorithmPadding.None && this.baseKey.Padding != SymmetricAlgorithmPadding.Zeros)
+                {
+                    if (this.depadBuffer == null)
+                    {
+                        this.depadBuffer = new byte[this.InputBlockSize];
+                    }
+                    else
+                    {
+                        BCryptDecrypt(
+                            this.platformKey,
+                            new ArraySegment<byte>(this.depadBuffer, 0, this.depadBuffer.Length),
+                            null,
+                            this.iv.AsArraySegment(),
+                            new ArraySegment<byte>(outputBuffer, outputOffset, outputBuffer.Length - outputOffset),
+                            out cbResult,
+                            BCryptEncryptFlags.None).ThrowOnError();
+                        outputOffset += cbResult;
+                        bytesWritten += cbResult;
+                    }
+
+                    // We need to capture the last block's worth of data from this input in case
+                    // it turns out to be the very last block (which will need to be depadded).
+                    Array.Copy(inputBuffer, inputOffset + inputCount - this.InputBlockSize, this.depadBuffer, 0, this.InputBlockSize);
+                    inputCount -= this.InputBlockSize;
+                }
+
+                if (inputCount > 0)
+                {
+                    BCryptDecrypt(
+                        this.platformKey,
+                        new ArraySegment<byte>(inputBuffer, inputOffset, inputCount),
+                        null,
+                        this.iv.AsArraySegment(),
+                        new ArraySegment<byte>(outputBuffer, outputOffset, outputBuffer.Length - outputOffset),
+                        out cbResult,
+                        BCryptEncryptFlags.None).ThrowOnError();
+                    bytesWritten += cbResult;
+                }
+
+                return bytesWritten;
             }
 
             /// <inheritdoc />
-            public override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+            public override unsafe byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
             {
-                throw new NotImplementedException();
+                int cbResult;
+                byte[] output;
+                int depadBufferPlaintextLength = 0;
+
+                if (this.depadBuffer != null)
+                {
+                    // Decrypt the depad buffer in-place.
+                    // If we have any input in this call at all, then *that* is what gets depadded.
+                    var flags = inputCount > 0 ? BCryptEncryptFlags.None : this.baseKey.flags;
+                    BCryptDecrypt(
+                        this.platformKey,
+                        new ArraySegment<byte>(this.depadBuffer),
+                        null,
+                        this.iv.AsArraySegment(),
+                        new ArraySegment<byte>(this.depadBuffer),
+                        out depadBufferPlaintextLength,
+                        flags).ThrowOnError();
+                }
+
+                BCryptDecrypt(
+                    this.platformKey,
+                    new ArraySegment<byte>(inputBuffer, inputOffset, inputCount),
+                    null,
+                    this.iv.AsArraySegment(),
+                    default(ArraySegment<byte>),
+                    out cbResult,
+                    this.baseKey.flags).ThrowOnError();
+
+                output = new byte[depadBufferPlaintextLength + cbResult];
+                if (this.depadBuffer != null)
+                {
+                    Array.Copy(this.depadBuffer, 0, output, 0, depadBufferPlaintextLength);
+                    this.depadBuffer = null;
+                }
+
+                if (inputCount > 0)
+                {
+                    BCryptDecrypt(
+                        this.platformKey,
+                        new ArraySegment<byte>(inputBuffer, inputOffset, inputCount),
+                        null,
+                        this.iv.AsArraySegment(),
+                        new ArraySegment<byte>(output, depadBufferPlaintextLength, output.Length - depadBufferPlaintextLength),
+                        out cbResult,
+                        this.baseKey.flags).ThrowOnError();
+                }
+
+                Array.Resize(ref output, depadBufferPlaintextLength + cbResult);
+                return output;
             }
         }
     }
