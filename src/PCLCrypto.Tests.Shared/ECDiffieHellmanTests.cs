@@ -180,7 +180,9 @@ public class ECDiffieHellmanTests
                 byte[] plaintext = await ReadAsync(aes, cancellationToken);
 
                 // Assert that the plaintext is as it was expected to be.
-                CollectionAssertEx.AreEqual(SecretMessage, plaintext);
+                Assert.Equal(
+                    Convert.ToBase64String(SecretMessage),
+                    Convert.ToBase64String(plaintext));
             }
 
             channel.Dispose();

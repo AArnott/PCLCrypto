@@ -516,6 +516,8 @@ public class CryptographicEngineTests
             }
         }
 
-        CollectionAssertEx.AreEqual(data, decryptedStream.ToArray());
+        Assert.Equal(
+            Convert.ToBase64String(data),
+            Convert.ToBase64String(decryptedStream.ToArray()));
     }
 }
