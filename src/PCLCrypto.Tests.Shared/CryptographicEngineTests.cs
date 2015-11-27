@@ -428,17 +428,17 @@ public class CryptographicEngineTests
         CollectionAssertEx.AreEqual(this.data, plaintext);
     }
 
-    [Fact]
-    public void EncryptDecryptStreamChain()
+    [Theory]
+    [InlineData(3)]
+    [InlineData(16)]
+    [InlineData(24)]
+    [InlineData(32)]
+    [InlineData(64)]
+    [InlineData(70)]
+    public void EncryptDecryptStreamChain(int dataLength)
     {
-        byte[] data = this.data;
+        byte[] data = Enumerable.Range(1, dataLength).Select(n => (byte)n).ToArray();
         this.EncryptDecryptStreamChain(data);
-    }
-
-    [Fact]
-    public void EncryptDecryptStreamChain_Multiblock()
-    {
-        this.EncryptDecryptStreamChain(this.bigData);
     }
 
     private static int GetKeyLength(SymmetricAlgorithmName symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
