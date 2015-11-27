@@ -61,7 +61,6 @@
     <Compile Include="MacAlgorithmProviderFactory.cs" />
     <Compile Include="SymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="AsymmetricKeyAlgorithmProviderFactory.cs" />
-    <Compile Include="CryptographicEngine.cs" />
     <Compile Include="SymmetricCryptographicKey.cs" />
     <Compile Include="DeriveBytes.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
