@@ -82,7 +82,7 @@ namespace PCLCrypto
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
             bool paddingInUse = this.Padding != SymmetricAlgorithmPadding.None;
-            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), "data", "Length is not a multiple of block size and no padding is selected.");
             Requires.Argument(iv == null || this.Mode.UsesIV(), "iv", "IV supplied but does not apply to this cipher.");
 
             return this.CipherOperation(
@@ -95,7 +95,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
-            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(this.IsValidInputSize(data.Length), "data", "Length is not a multiple of block size and no padding is selected.");
 
 #if __IOS__ || SILVERLIGHT
             // iOS and WP8 crypto implementation doesn't handle empty ciphertext for PKCS7

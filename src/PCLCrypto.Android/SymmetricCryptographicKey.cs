@@ -96,7 +96,7 @@ namespace PCLCrypto
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             this.InitializeCipher(CipherMode.EncryptMode, iv, ref this.encryptingCipher);
-            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), nameof(data), "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(paddingInUse || this.IsValidInputSize(data.Length), nameof(data), "Length is not a multiple of block size and no padding is selected.");
 
             if (this.Padding == SymmetricAlgorithmPadding.Zeros)
             {

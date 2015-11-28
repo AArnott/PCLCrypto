@@ -165,7 +165,7 @@ namespace PCLCrypto
         protected internal override byte[] Decrypt(byte[] ciphertext, byte[] iv)
         {
             Requires.NotNull(ciphertext, nameof(ciphertext));
-            Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length does not a multiple of block size and no padding is selected.");
+            Requires.Argument(this.IsValidInputSize(ciphertext.Length), nameof(ciphertext), "Length is not a multiple of block size and no padding is selected.");
             Verify.Operation(!this.Mode.IsAuthenticated(), "Cannot encrypt using this function when using an authenticated block chaining mode.");
 
             var key = this.GetInitializedKey(ref this.decryptorKey, iv);
