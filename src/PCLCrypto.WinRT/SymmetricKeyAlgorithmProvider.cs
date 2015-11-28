@@ -5,6 +5,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -17,6 +18,11 @@ namespace PCLCrypto
     /// </summary>
     internal partial class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
     {
+        /// <summary>
+        /// A lazy-initialized cache for the <see cref="LegalKeySizes"/> property.
+        /// </summary>
+        private IReadOnlyList<KeySizes> legalKeySizes;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
@@ -37,6 +43,25 @@ namespace PCLCrypto
         public int BlockLength
         {
             get { return BCryptGetProperty<int>(this.Algorithm, PropertyNames.BCRYPT_BLOCK_LENGTH); }
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<KeySizes> LegalKeySizes
+        {
+            get
+            {
+                if (this.legalKeySizes == null)
+                {
+                    var keyLengths = BCryptGetProperty<BCRYPT_KEY_LENGTHS_STRUCT>(this.Algorithm, PropertyNames.BCRYPT_KEY_LENGTHS);
+                    this.legalKeySizes = new ReadOnlyCollection<KeySizes>(
+                        new[]
+                        {
+                            new KeySizes(keyLengths.MinLength, keyLengths.MaxLength, keyLengths.Increment),
+                        });
+                }
+
+                return this.legalKeySizes;
+            }
         }
 
         /// <summary>

@@ -18,6 +18,11 @@ namespace PCLCrypto
     internal partial class SymmetricKeyAlgorithmProvider : ISymmetricKeyAlgorithmProvider
     {
         /// <summary>
+        /// A lazy-initialized cache for the <see cref="LegalKeySizes"/> property.
+        /// </summary>
+        private IReadOnlyList<KeySizes> legalKeySizes;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
         /// <param name="name">The name of the base algorithm to use.</param>
@@ -46,6 +51,30 @@ namespace PCLCrypto
                 {
                     throw new NotSupportedException("Algorithm not supported.", ex);
                 }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<KeySizes> LegalKeySizes
+        {
+            get
+            {
+                if (this.legalKeySizes == null)
+                {
+                    try
+                    {
+                        using (var platform = Cipher.GetInstance(this.Name.GetString()))
+                        {
+                            throw new NotImplementedException();
+                        }
+                    }
+                    catch (NoSuchAlgorithmException ex)
+                    {
+                        throw new NotSupportedException("Algorithm not supported.", ex);
+                    }
+                }
+
+                return this.legalKeySizes;
             }
         }
 

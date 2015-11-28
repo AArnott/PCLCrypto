@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ISymmetricKeyAlgorithmProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISymmetricKeyAlgorithmProviderFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithm.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KeySizes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacAlgorithm.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetFxCrypto.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RSAParameters.cs" />

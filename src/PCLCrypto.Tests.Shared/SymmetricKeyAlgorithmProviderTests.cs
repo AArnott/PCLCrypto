@@ -21,6 +21,15 @@ public class SymmetricKeyAlgorithmProviderTests
     }
 
     [Fact]
+    public void AllowedKeySizes()
+    {
+        ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
+        var result = provider.LegalKeySizes;
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+    }
+
+    [Fact]
     public void CreateSymmetricKey_InvalidInputs()
     {
         var provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
