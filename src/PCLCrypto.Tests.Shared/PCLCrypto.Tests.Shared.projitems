@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MacAlgorithmProviderTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PclCryptoStreamTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PclTestUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformSupport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RandomNumberGeneratorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SymmetricKeyAlgorithmProviderTests.cs" />
   </ItemGroup>
