@@ -7,10 +7,18 @@ using System.Linq;
 using System.Text;
 using PCLCrypto;
 using Xunit;
+using Xunit.Abstractions;
 
 public class SymmetricKeyAlgorithmProviderTests
 {
     private readonly byte[] keyMaterial = new byte[16] { 0x2, 0x5, 0x11, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, };
+
+    private readonly ITestOutputHelper logger;
+
+    public SymmetricKeyAlgorithmProviderTests(ITestOutputHelper logger)
+    {
+        this.logger = logger;
+    }
 
     [Fact]
     public void BlockLength()
@@ -20,13 +28,35 @@ public class SymmetricKeyAlgorithmProviderTests
         Assert.Equal(16, provider.BlockLength);
     }
 
-    [Fact]
-    public void AllowedKeySizes()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [InlineData(SymmetricAlgorithmName.Aes, 128, 256, 64)]
+    [InlineData(SymmetricAlgorithmName.Des, 64, 64, 0)]
+    [InlineData(SymmetricAlgorithmName.Rc4, 8, 512, 8)]
+#if DESKTOP
+    [InlineData(SymmetricAlgorithmName.Rc2, 40, 128, 8)]
+    [InlineData(SymmetricAlgorithmName.TripleDes, 128, 192, 64)]
+#else
+    [InlineData(SymmetricAlgorithmName.Rc2, 16, 128, 8)]
+    [InlineData(SymmetricAlgorithmName.TripleDes, 192, 192, 0)]
+#endif
+    public void LegalKeySizes(SymmetricAlgorithmName name, int minSize, int maxSize, int stepSize)
     {
-        ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
-        var result = provider.LegalKeySizes;
-        Assert.NotNull(result);
-        Assert.NotEmpty(result);
+        var blockMode = name.IsBlockCipher() ? SymmetricAlgorithmMode.Cbc : SymmetricAlgorithmMode.Streaming;
+        using (ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, SymmetricAlgorithmPadding.None))
+        {
+            var result = provider.LegalKeySizes;
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+            foreach (var item in result)
+            {
+                this.logger.WriteLine($"{item.MinSize}-{item.MaxSize} ({item.StepSize})");
+            }
+
+            var range = result.Single();
+            Assert.Equal(minSize, range.MinSize);
+            Assert.Equal(maxSize, range.MaxSize);
+            Assert.Equal(stepSize, range.StepSize);
+        }
     }
 
     [Fact]
