@@ -23,6 +23,7 @@ namespace PCLCrypto
         internal static void ApplyZeroPadding(ref byte[] buffer, int blockLength)
         {
             Requires.NotNull(buffer, nameof(buffer));
+            Requires.Range(blockLength > 0, nameof(blockLength));
 
             int bytesBeyondLastBlockLength = buffer.Length % blockLength;
             if (bytesBeyondLastBlockLength > 0)
