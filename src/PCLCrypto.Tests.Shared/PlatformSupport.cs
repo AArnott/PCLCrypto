@@ -3,10 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using PCLCrypto;
 using Xunit;
 
+/// <summary>
+/// A collection of tests used to audit support for specific features on various platforms.
+/// </summary>
 public class PlatformSupport
 {
     [SkippableTheory(typeof(NotSupportedException))]
@@ -15,12 +19,12 @@ public class PlatformSupport
     {
         using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, mode, padding))
         {
-            int keyLength = algorithm.BlockLength;
-            var keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength);
+            int keyLength = algorithm.LegalKeySizes.First().MinSize;
+            var keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength / 8);
             using (var key = algorithm.CreateSymmetricKey(keyMaterial))
             {
                 var ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, new byte[algorithm.BlockLength], null);
-                Assert.Equal(algorithm.BlockLength, ciphertext.Length);
+                Assert.NotEqual(0, ciphertext.Length);
             }
         }
     }
