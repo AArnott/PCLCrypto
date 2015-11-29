@@ -22,6 +22,27 @@ namespace PCLCrypto
         }
 
         /// <summary>
+        /// Gets a value indicating whether the specified algorithm is implemented by a block cipher.
+        /// </summary>
+        /// <param name="algorithm">The algorithm to check.</param>
+        /// <returns><c>true</c> if the cipher is a block cipher; <c>false</c> otherwise.</returns>
+        public static bool IsBlockCipher(this SymmetricAlgorithmName algorithm)
+        {
+            switch (algorithm)
+            {
+                case SymmetricAlgorithmName.Aes:
+                case SymmetricAlgorithmName.Des:
+                case SymmetricAlgorithmName.TripleDes:
+                case SymmetricAlgorithmName.Rc2:
+                    return true;
+                case SymmetricAlgorithmName.Rc4:
+                    return false;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the specified mode is implemented by a block cipher.
         /// </summary>
         /// <param name="mode">The mode to check.</param>
