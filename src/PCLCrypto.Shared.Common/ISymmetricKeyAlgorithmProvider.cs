@@ -20,6 +20,11 @@ namespace PCLCrypto
         int BlockLength { get; }
 
         /// <summary>
+        /// Gets the allowed key sizes.
+        /// </summary>
+        IReadOnlyList<KeySizes> LegalKeySizes { get; }
+
+        /// <summary>
         /// Gets the algorithm used in this algorithm.
         /// </summary>
         SymmetricAlgorithmName Name { get; }
