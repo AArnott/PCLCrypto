@@ -32,17 +32,17 @@ public class SymmetricKeyAlgorithmProviderTests
     [InlineData(SymmetricAlgorithmName.Aes, 128, 256, 64)]
     [InlineData(SymmetricAlgorithmName.Des, 64, 64, 0)]
     [InlineData(SymmetricAlgorithmName.Rc4, 8, 512, 8)]
-#if DESKTOP
-    [InlineData(SymmetricAlgorithmName.Rc2, 40, 128, 8)]
-    [InlineData(SymmetricAlgorithmName.TripleDes, 128, 192, 64)]
-#else
+#if WinRT
     [InlineData(SymmetricAlgorithmName.Rc2, 16, 128, 8)]
     [InlineData(SymmetricAlgorithmName.TripleDes, 192, 192, 0)]
+#else
+    [InlineData(SymmetricAlgorithmName.Rc2, 40, 128, 8)]
+    [InlineData(SymmetricAlgorithmName.TripleDes, 128, 192, 64)]
 #endif
     public void LegalKeySizes(SymmetricAlgorithmName name, int minSize, int maxSize, int stepSize)
     {
         var blockMode = name.IsBlockCipher() ? SymmetricAlgorithmMode.Cbc : SymmetricAlgorithmMode.Streaming;
-        using (ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, SymmetricAlgorithmPadding.None))
+        using (ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, SymmetricAlgorithmPadding.PKCS7))
         {
             var result = provider.LegalKeySizes;
             Assert.NotNull(result);
