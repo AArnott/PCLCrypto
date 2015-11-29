@@ -363,9 +363,23 @@ namespace PCLCrypto
             /// <inheritdoc />
             public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
             {
-                return this.mode.IsBlockCipher()
-                    ? this.transform.DoFinal(inputBuffer, inputOffset, inputCount)
-                    : this.transform.Update(inputBuffer, inputOffset, inputCount);
+                if (this.mode.IsBlockCipher())
+                {
+                    if (this.padding == SymmetricAlgorithmPadding.Zeros)
+                    {
+                        // We apply Zeros padding ourselves because BouncyCastle for some reason
+                        // does it wrong. For example, if the input buffer is a block length already,
+                        // it will return an extra block of ciphertext (as if it added a block of
+                        // zeros, perhaps.)
+                        CryptoUtilities.ApplyZeroPadding(ref inputBuffer, this.transform.BlockSize, ref inputOffset, ref inputCount);
+                    }
+
+                    return this.transform.DoFinal(inputBuffer, inputOffset, inputCount);
+                }
+                else
+                {
+                    return this.transform.Update(inputBuffer, inputOffset, inputCount);
+                }
             }
 
             /// <inheritdoc />
