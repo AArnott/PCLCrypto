@@ -5,6 +5,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -63,10 +64,32 @@ namespace PCLCrypto
                 {
                     try
                     {
-                        using (var platform = Cipher.GetInstance(this.Name.GetString()))
+                        // BouncyCastle doesn't offer an API for querying allowed key sizes.
+                        // http://stackoverflow.com/q/33974519/46926
+                        // So we hard-code them instead.
+                        KeySizes result;
+                        switch (this.Name)
                         {
-                            throw new NotImplementedException();
+                            case SymmetricAlgorithmName.Aes:
+                                result = new KeySizes(128, 256, 64);
+                                break;
+                            case SymmetricAlgorithmName.Des:
+                                result = new KeySizes(64, 64, 0);
+                                break;
+                            case SymmetricAlgorithmName.TripleDes:
+                                result = new KeySizes(128, 192, 64);
+                                break;
+                            case SymmetricAlgorithmName.Rc2:
+                                result = new KeySizes(40, 128, 8);
+                                break;
+                            case SymmetricAlgorithmName.Rc4:
+                                result = new KeySizes(8, 512, 8);
+                                break;
+                            default:
+                                throw new NotSupportedException();
                         }
+
+                        this.legalKeySizes = new ReadOnlyCollection<KeySizes>(new[] { result });
                     }
                     catch (NoSuchAlgorithmException ex)
                     {
