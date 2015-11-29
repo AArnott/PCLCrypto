@@ -8,7 +8,7 @@ namespace PCLCrypto
     /// <summary>
     /// Describes a range of valid key sizes.
     /// </summary>
-    public struct KeySizes
+    public struct KeySizes : IEnumerable<int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySizes"/> struct.
@@ -38,5 +38,26 @@ namespace PCLCrypto
         /// <see cref="MinSize"/> to <see cref="MaxSize"/>.
         /// </summary>
         public int StepSize { get; }
+
+        /// <inheritdoc />
+        public IEnumerator<int> GetEnumerator()
+        {
+            if (this.StepSize == 0)
+            {
+                // This "range" is exactly one element big,
+                // and the for loop below would run forever.
+                yield return this.MinSize;
+            }
+            else
+            {
+                for (int size = this.MinSize; size <= this.MaxSize; size += this.StepSize)
+                {
+                    yield return size;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => this.GetEnumerator();
     }
 }

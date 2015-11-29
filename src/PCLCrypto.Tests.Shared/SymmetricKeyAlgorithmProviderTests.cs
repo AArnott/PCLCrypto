@@ -47,9 +47,40 @@ public class SymmetricKeyAlgorithmProviderTests
             var result = provider.LegalKeySizes;
             Assert.NotNull(result);
             Assert.NotEmpty(result);
+
+            var random = new Random();
+            Action<int> attemptKeySize = size =>
+            {
+                var keyMaterial = new byte[size / 8];
+                random.NextBytes(keyMaterial); // some algorithms check against weak keys (e.g. all zeros)
+                provider.CreateSymmetricKey(keyMaterial).Dispose();
+            };
+
+            // Verify that each allegedly legal key size actually works.
             foreach (var item in result)
             {
                 this.logger.WriteLine($"{item.MinSize}-{item.MaxSize} ({item.StepSize})");
+                foreach (var keySize in item)
+                {
+                    attemptKeySize(keySize);
+                }
+
+                // Also check the cases just off the edges of the range to see that they actually fail.
+                // This ensures the returned values aren't too conservative.
+#if false // WinRT actually doesn't throw when given keys of inappropriate size. Go figure.
+                if (item.StepSize > 0)
+                {
+                    if (item.MinSize - item.StepSize > 0)
+                    {
+                        Assert.Throws<ArgumentException>(() => attemptKeySize(item.MinSize - item.StepSize));
+                    }
+
+                    if (item.MaxSize + item.StepSize > 0)
+                    {
+                        Assert.Throws<ArgumentException>(() => attemptKeySize(item.MaxSize + item.StepSize));
+                    }
+                }
+#endif
             }
 
             var range = result.Single();
