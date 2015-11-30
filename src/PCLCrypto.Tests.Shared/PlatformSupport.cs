@@ -28,4 +28,23 @@ public class PlatformSupport
             }
         }
     }
+
+    [SkippableTheory(typeof(NotSupportedException))]
+    [CombinatorialData]
+    public void AsymmetricEncryption(AsymmetricAlgorithm algorithmName)
+    {
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        using (var key = algorithm.CreateKeyPair(512))
+        {
+        }
+    }
+
+    [SkippableTheory(typeof(NotSupportedException))]
+    [CombinatorialData]
+    public void Hash(HashAlgorithm hashAlgorithm)
+    {
+        var result = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm).HashData(new byte[5]);
+        Assert.NotNull(result);
+        Assert.NotEqual(0, result.Length);
+    }
 }
