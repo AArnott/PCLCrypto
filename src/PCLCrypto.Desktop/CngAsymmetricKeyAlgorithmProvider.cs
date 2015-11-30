@@ -42,7 +42,27 @@ namespace PCLCrypto
             get
             {
                 // Not exposed by CNG. We probably need to switch this to BCrypt.
-                throw new NotImplementedException();
+                KeySizes range;
+                switch (this.Algorithm)
+                {
+                    case AsymmetricAlgorithm.DsaSha1:
+                    case AsymmetricAlgorithm.DsaSha256:
+                        range = new KeySizes(512, 1024, 64);
+                        break;
+                    case AsymmetricAlgorithm.EcdsaP256Sha256:
+                        range = new KeySizes(256, 256, 0);
+                        break;
+                    case AsymmetricAlgorithm.EcdsaP384Sha384:
+                        range = new KeySizes(384, 384, 0);
+                        break;
+                    case AsymmetricAlgorithm.EcdsaP521Sha512:
+                        range = new KeySizes(521, 521, 0);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                return new[] { range };
             }
         }
 

@@ -48,6 +48,43 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.Equal(AsymmetricAlgorithm.RsaOaepSha1, rsa.Algorithm);
     }
 
+    [SkippableTheory(typeof(NotSupportedException))]
+    [InlineData(AsymmetricAlgorithm.DsaSha1, 512, 1024, 64)]
+    [InlineData(AsymmetricAlgorithm.DsaSha256, 512, 1024, 64)]
+    [InlineData(AsymmetricAlgorithm.EcdsaP256Sha256, 256, 256, 0)]
+    [InlineData(AsymmetricAlgorithm.EcdsaP384Sha384, 384, 384, 0)]
+    [InlineData(AsymmetricAlgorithm.EcdsaP521Sha512, 521, 521, 0)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha1, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha256, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha384, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha512, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaPkcs1, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha1, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha256, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha384, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha512, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha1, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha256, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha384, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha512, 384, 16384, 8)]
+    public void LegalKeySizes(AsymmetricAlgorithm name, int minSize, int maxSize, int stepSize)
+    {
+        IAsymmetricKeyAlgorithmProvider provider = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(name);
+        var result = provider.LegalKeySizes;
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+
+        Action<int> attemptKeySize = size =>
+        {
+            provider.CreateKeyPair(size).Dispose();
+        };
+
+        var range = result.Single();
+        Assert.Equal(minSize, range.MinSize);
+        Assert.Equal(maxSize, range.MaxSize);
+        Assert.Equal(stepSize, range.StepSize);
+    }
+
     [Fact]
     public void CreateKeyPair_InvalidInputs()
     {
