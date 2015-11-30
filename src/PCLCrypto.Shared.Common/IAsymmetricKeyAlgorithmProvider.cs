@@ -19,6 +19,11 @@ namespace PCLCrypto
         AsymmetricAlgorithm Algorithm { get; }
 
         /// <summary>
+        /// Gets the allowed key sizes.
+        /// </summary>
+        IReadOnlyList<KeySizes> LegalKeySizes { get; }
+
+        /// <summary>
         /// Creates a new cryptographic key.
         /// </summary>
         /// <param name="keySize">The size of the key (in bits).</param>

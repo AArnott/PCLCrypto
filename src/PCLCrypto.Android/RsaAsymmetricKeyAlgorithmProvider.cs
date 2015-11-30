@@ -45,6 +45,15 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<KeySizes> LegalKeySizes
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
             Requires.Range(keySize > 0, "keySize");

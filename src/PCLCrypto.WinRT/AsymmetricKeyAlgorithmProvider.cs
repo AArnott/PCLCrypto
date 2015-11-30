@@ -43,6 +43,16 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<KeySizes> LegalKeySizes
+        {
+            get
+            {
+                // Not exposed by WinRT.
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
             Requires.Range(keySize > 0, "keySize");
