@@ -52,13 +52,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<KeySizes> LegalKeySizes
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public IReadOnlyList<KeySizes> LegalKeySizes => this.Algorithm.GetTypicalLegalAsymmetricKeySizes();
 
         /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)

@@ -48,42 +48,7 @@ namespace PCLCrypto
             get
             {
                 // Not exposed by WinRT. We probably need to switch this to BCrypt.
-                KeySizes range;
-                switch (this.Algorithm)
-                {
-                    case AsymmetricAlgorithm.DsaSha1:
-                    case AsymmetricAlgorithm.DsaSha256:
-                        range = new KeySizes(512, 1024, 64);
-                        break;
-                    case AsymmetricAlgorithm.EcdsaP256Sha256:
-                        range = new KeySizes(256, 256, 0);
-                        break;
-                    case AsymmetricAlgorithm.EcdsaP384Sha384:
-                        range = new KeySizes(384, 384, 0);
-                        break;
-                    case AsymmetricAlgorithm.EcdsaP521Sha512:
-                        range = new KeySizes(521, 521, 0);
-                        break;
-                    case AsymmetricAlgorithm.RsaOaepSha1:
-                    case AsymmetricAlgorithm.RsaOaepSha256:
-                    case AsymmetricAlgorithm.RsaOaepSha384:
-                    case AsymmetricAlgorithm.RsaOaepSha512:
-                    case AsymmetricAlgorithm.RsaPkcs1:
-                    case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
-                    case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
-                    case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
-                    case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
-                    case AsymmetricAlgorithm.RsaSignPssSha1:
-                    case AsymmetricAlgorithm.RsaSignPssSha256:
-                    case AsymmetricAlgorithm.RsaSignPssSha384:
-                    case AsymmetricAlgorithm.RsaSignPssSha512:
-                        range = new KeySizes(384, 16384, 8);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                return new[] { range };
+                return this.algorithm.GetTypicalLegalAsymmetricKeySizes();
             }
         }
 
