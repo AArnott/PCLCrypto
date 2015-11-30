@@ -370,6 +370,8 @@ public class CryptographicEngineTests
     [MemberData(nameof(BlockModesAndPadding))]
     public void CreateEncryptor_SymmetricEncryptionEquivalence(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
     {
+        Skip.If(!name.IsBlockCipher() && padding != SymmetricAlgorithmPadding.None, "By design - streaming ciphers need no padding.");
+
         var algorithmProvider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, mode, padding);
         int keyLength = GetKeyLength(name, algorithmProvider);
 

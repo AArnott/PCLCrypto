@@ -23,6 +23,7 @@ namespace PCLCrypto
         internal static void ApplyZeroPadding(ref byte[] buffer, int blockLength)
         {
             Requires.NotNull(buffer, nameof(buffer));
+            Requires.Range(blockLength > 0, nameof(blockLength));
 
             int bytesBeyondLastBlockLength = buffer.Length % blockLength;
             if (bytesBeyondLastBlockLength > 0)
@@ -121,6 +122,51 @@ namespace PCLCrypto
             {
                 value.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Gets legal crypto key sizes for asymmetric algorithms (for platforms that do not expose the actual values).
+        /// </summary>
+        /// <param name="algorithm">The asymmetric algorithm whose keys are of interest to the caller.</param>
+        /// <returns>A list of legal key size ranges.</returns>
+        internal static IReadOnlyList<KeySizes> GetTypicalLegalAsymmetricKeySizes(this AsymmetricAlgorithm algorithm)
+        {
+            KeySizes range;
+            switch (algorithm)
+            {
+                case AsymmetricAlgorithm.DsaSha1:
+                case AsymmetricAlgorithm.DsaSha256:
+                    range = new KeySizes(512, 1024, 64);
+                    break;
+                case AsymmetricAlgorithm.EcdsaP256Sha256:
+                    range = new KeySizes(256, 256, 0);
+                    break;
+                case AsymmetricAlgorithm.EcdsaP384Sha384:
+                    range = new KeySizes(384, 384, 0);
+                    break;
+                case AsymmetricAlgorithm.EcdsaP521Sha512:
+                    range = new KeySizes(521, 521, 0);
+                    break;
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                case AsymmetricAlgorithm.RsaPkcs1:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
+                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
+                case AsymmetricAlgorithm.RsaSignPssSha1:
+                case AsymmetricAlgorithm.RsaSignPssSha256:
+                case AsymmetricAlgorithm.RsaSignPssSha384:
+                case AsymmetricAlgorithm.RsaSignPssSha512:
+                    range = new KeySizes(384, 16384, 8);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return new[] { range };
         }
     }
 }

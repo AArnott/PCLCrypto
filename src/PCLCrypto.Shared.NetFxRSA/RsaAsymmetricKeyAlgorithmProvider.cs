@@ -41,6 +41,19 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<KeySizes> LegalKeySizes
+        {
+            get
+            {
+                using (var rsa = Platform.RSA.Create())
+                {
+                    return (from keySizes in rsa.LegalKeySizes
+                            select new KeySizes(keySizes.MinSize, keySizes.MaxSize, keySizes.SkipSize)).ToList();
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
             Requires.Range(keySize > 0, "keySize");
