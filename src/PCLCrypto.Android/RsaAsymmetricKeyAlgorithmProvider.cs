@@ -45,6 +45,9 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc/>
+        public IReadOnlyList<KeySizes> LegalKeySizes => this.Algorithm.GetTypicalLegalAsymmetricKeySizes();
+
+        /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
             Requires.Range(keySize > 0, "keySize");
