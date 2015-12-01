@@ -82,8 +82,14 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 #else
-            string alorithmName = MacAlgorithmProviderFactory.GetAlgorithmName(algorithm);
-            return Platform.KeyedHashAlgorithm.Create(alorithmName);
+            string algorithmName = MacAlgorithmProviderFactory.GetAlgorithmName(algorithm);
+            var result = Platform.KeyedHashAlgorithm.Create(algorithmName);
+            if (result == null)
+            {
+                throw new NotSupportedException();
+            }
+
+            return result;
 #endif
         }
     }
