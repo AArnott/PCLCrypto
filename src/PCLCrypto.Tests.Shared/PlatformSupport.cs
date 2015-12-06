@@ -22,10 +22,22 @@ public class PlatformSupport
     }
 
     [SkippableTheory(typeof(NotSupportedException))]
-    [CombinatorialData]
+    [PairwiseData]
     public void SymmetricEncryption(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
     {
-        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, mode, padding))
+        Skip.If(mode.IsAuthenticated(), "This test is only for non-authenticated block modes.");
+        bool badCombination = false;
+        badCombination |= !mode.IsBlockCipher() && padding != SymmetricAlgorithmPadding.None; // Padding does not apply to streaming ciphers.
+        badCombination |= name.IsBlockCipher() != mode.IsBlockCipher(); // Incompatible cipher and block mode.
+
+        Func<ISymmetricKeyAlgorithmProvider> creator = () => WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, mode, padding);
+        if (badCombination)
+        {
+            Assert.Throws<ArgumentException>(creator);
+            return;
+        }
+
+        using (var algorithm = creator())
         {
             int keyLength = algorithm.LegalKeySizes.First().MinSize;
             var keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength / 8);
@@ -42,7 +54,7 @@ public class PlatformSupport
     public void AsymmetricEncryption(AsymmetricAlgorithm algorithmName)
     {
         var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
-        using (var key = algorithm.CreateKeyPair(512))
+        using (var key = algorithm.CreateKeyPair(algorithm.LegalKeySizes.First().First()))
         {
         }
     }
@@ -87,9 +99,9 @@ public class PlatformSupport
         const int iterationCount = 2;
         var parameters = WinRTCrypto.KeyDerivationParameters.BuildForPbkdf2(salt, iterationCount);
 
-        const int desiredKeySize = 64;
+        const int desiredKeySize = 8;
         byte[] derivedKey = WinRTCrypto.CryptographicEngine.DeriveKeyMaterial(originalKey, parameters, desiredKeySize);
-        Assert.Equal(desiredKeySize, derivedKey.Length * 8);
+        Assert.Equal(desiredKeySize, derivedKey.Length);
 
         this.logger.WriteLine("Derived key: {0}", Convert.ToBase64String(derivedKey));
     }
@@ -103,10 +115,10 @@ public class PlatformSupport
         byte[] context = { 1, 1, 0, 0, 0, 0, 0, 0 }; // a nonce
         var parameters = WinRTCrypto.KeyDerivationParameters.BuildForSP800108(label, context);
 
-        const int desiredKeySize = 64;
+        const int desiredKeySize = 8;
         var originalKey = provider.CreateKey(Encoding.UTF8.GetBytes("my secret"));
         byte[] derivedKey = WinRTCrypto.CryptographicEngine.DeriveKeyMaterial(originalKey, parameters, desiredKeySize);
-        Assert.Equal(desiredKeySize, derivedKey.Length * 8);
+        Assert.Equal(desiredKeySize, derivedKey.Length);
 
         this.logger.WriteLine("Derived key: {0}", Convert.ToBase64String(derivedKey));
     }
@@ -128,10 +140,10 @@ public class PlatformSupport
             suppPubInfo,
             suppPrivInfo);
 
-        const int desiredKeySize = 64;
+        const int desiredKeySize = 8;
         var originalKey = provider.CreateKey(Encoding.UTF8.GetBytes("my secret"));
         byte[] derivedKey = WinRTCrypto.CryptographicEngine.DeriveKeyMaterial(originalKey, parameters, desiredKeySize);
-        Assert.Equal(desiredKeySize, derivedKey.Length * 8);
+        Assert.Equal(desiredKeySize, derivedKey.Length);
 
         this.logger.WriteLine("Derived key: {0}", Convert.ToBase64String(derivedKey));
     }

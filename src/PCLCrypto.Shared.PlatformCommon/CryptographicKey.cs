@@ -107,7 +107,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="parameters">Derivation parameters. The parameters vary depending on the type of KDF algorithm
         /// used.</param>
-        /// <param name="desiredKeySize">Requested size, in bits, of the derived key.</param>
+        /// <param name="desiredKeySize">Requested size, in bytes, of the derived key.</param>
         /// <returns>
         /// Buffer that contains the derived key.
         /// </returns>

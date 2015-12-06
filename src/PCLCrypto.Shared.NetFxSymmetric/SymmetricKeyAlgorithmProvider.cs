@@ -30,6 +30,9 @@ namespace PCLCrypto
         /// <param name="padding">The padding to use.</param>
         public SymmetricKeyAlgorithmProvider(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
         {
+            Requires.Argument(mode.IsBlockCipher() == name.IsBlockCipher(), nameof(mode), "Block chaining mode incompatible with cipher. Don't mix streaming and non-streaming ciphers and modes.");
+            Requires.Argument(padding == SymmetricAlgorithmPadding.None || mode.IsBlockCipher(), nameof(padding), "Padding does not apply to streaming ciphers.");
+
             this.Name = name;
             this.Mode = mode;
             this.Padding = padding;
