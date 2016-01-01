@@ -4,7 +4,7 @@
     "xunit": "2.1.0",
     "xunit.runner.devices": "1.2.2",
     "Xunit.Combinatorial": "1.1.12",
-    "Xunit.SkippableFact": "1.2.6"
+    "Xunit.SkippableFact": "1.2.14"
   },
   "frameworks": {
     "MonoAndroid,Version=v6.0": { }
