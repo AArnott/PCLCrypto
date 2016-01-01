@@ -3,7 +3,7 @@
     "Nerdbank.FullDuplexStream": "1.0.1",
     "xunit": "2.1.0",
     "xunit.runner.devices": "1.2.2",
-    "Xunit.SkippableFact": "1.1.4"
+    "Xunit.SkippableFact": "1.2.14"
   },
   "frameworks": {
     "MonoTouch,Version=v1.0": { }
