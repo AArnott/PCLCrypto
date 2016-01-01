@@ -34,7 +34,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] ToByteArray()
         {
-            return BCryptExportKey(this.keyHandle, null, AsymmetricKeyBlobTypes.EccPublic).ToArray();
+            return BCryptExportKey(this.keyHandle, null, AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB).ToArray();
         }
     }
 }
