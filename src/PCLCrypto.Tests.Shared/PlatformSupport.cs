@@ -54,8 +54,25 @@ public class PlatformSupport
     public void AsymmetricEncryption(AsymmetricAlgorithm algorithmName)
     {
         var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
-        using (var key = algorithm.CreateKeyPair(algorithm.LegalKeySizes.First().First()))
+
+        foreach (var keySize in algorithm.LegalKeySizes.SelectMany(k => k))
         {
+            try
+            {
+                this.logger.WriteLine($"Testing {algorithmName} with {keySize} bit key.");
+                using (var key = algorithm.CreateKeyPair(keySize))
+                {
+                }
+
+                break;
+            }
+            catch (ArgumentException)
+            {
+                // WinRT does not provide legal key sizes, and doesn't allow small RSA keys.
+                // It throws ArgumentException in this case. We can remove the skip on ArgumentException
+                // after we switch WinRT over to using BCrypt directly.
+                this.logger.WriteLine("Key size rejected. Please fix LegalKeySizes to report key sizes that actually work.");
+            }
         }
     }
 
