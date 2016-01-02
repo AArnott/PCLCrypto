@@ -36,7 +36,14 @@ namespace PCLCrypto
             this.Padding = padding;
 
             this.Algorithm = BCryptOpenAlgorithmProvider(GetAlgorithmName(name));
-            BCryptSetProperty(this.Algorithm, PropertyNames.BCRYPT_CHAINING_MODE, GetChainingMode(mode));
+            try
+            {
+                BCryptSetProperty(this.Algorithm, PropertyNames.BCRYPT_CHAINING_MODE, GetChainingMode(mode));
+            }
+            catch (PInvoke.Win32Exception ex)
+            {
+                throw new ArgumentException(ex.Message, ex);
+            }
         }
 
         /// <inheritdoc/>

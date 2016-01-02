@@ -7,9 +7,9 @@
       "suppressParent": "none"
     },
     "Validation": "2.2.8",
-    "Xamarin.Forms": "1.5.0.6447",
     "xunit": "2.1.0",
     "xunit.runner.visualstudio": "2.1.0",
+    "Xunit.Combinatorial": "1.1.12",
     "Xunit.SkippableFact": "1.2.14"
   },
   "frameworks": {

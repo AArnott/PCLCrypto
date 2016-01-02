@@ -42,7 +42,8 @@ public class SymmetricKeyAlgorithmProviderTests
     public void LegalKeySizes(SymmetricAlgorithmName name, int minSize, int maxSize, int stepSize)
     {
         var blockMode = name.IsBlockCipher() ? SymmetricAlgorithmMode.Cbc : SymmetricAlgorithmMode.Streaming;
-        using (ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, SymmetricAlgorithmPadding.PKCS7))
+        var padding = name.IsBlockCipher() ? SymmetricAlgorithmPadding.PKCS7 : SymmetricAlgorithmPadding.None;
+        using (ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, padding))
         {
             var result = provider.LegalKeySizes;
             Assert.NotNull(result);
