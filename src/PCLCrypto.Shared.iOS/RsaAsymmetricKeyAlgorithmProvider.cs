@@ -84,8 +84,15 @@ namespace PCLCrypto
 
             // Generate the RSA key.
             SecKey publicKey, privateKey;
-            SecStatusCode code = SecKey.GenerateKeyPair(keyPairAttr, out publicKey, out privateKey);
-            Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+            try
+            {
+                SecStatusCode code = SecKey.GenerateKeyPair(keyPairAttr, out publicKey, out privateKey);
+                Verify.Operation(code == SecStatusCode.Success, "status was " + code);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ArgumentException(ex.Message, ex);
+            }
 
             return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, this.algorithm);
         }
