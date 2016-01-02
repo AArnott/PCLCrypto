@@ -34,6 +34,7 @@ public class PlatformSupport
         if (badCombination)
         {
             Assert.Throws<ArgumentException>(creator);
+            this.logger.WriteLine("Expected exception thrown for invalid combination.");
             return;
         }
 
