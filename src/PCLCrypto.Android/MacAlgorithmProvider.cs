@@ -74,7 +74,14 @@ namespace PCLCrypto
         internal static Mac GetAlgorithm(MacAlgorithm algorithm)
         {
             string algorithmName = MacAlgorithmProviderFactory.GetAlgorithmName(algorithm);
-            return Mac.GetInstance(algorithmName);
+            try
+            {
+                return Mac.GetInstance(algorithmName);
+            }
+            catch (Java.Security.NoSuchAlgorithmException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
         }
 
         /// <summary>
