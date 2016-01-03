@@ -40,7 +40,7 @@ namespace PCLCrypto
             SafeKeyHandle keyHandle;
             keyHandle = BCryptImportKeyPair(
                 algorithm,
-                AsymmetricKeyBlobTypes.EccPublic,
+                AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB,
                 publicKey,
                 BCryptImportKeyPairFlags.None);
             algorithm.Dispose();

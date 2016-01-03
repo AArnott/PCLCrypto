@@ -1,7 +1,10 @@
 ﻿{
   "dependencies": {
-    "Nerdbank.GitVersioning": "1.1.47-rc-g58708fcf8c",
-    "PInvoke.BCrypt": "0.1.262-beta-g65ee26f9c0",
+    "Nerdbank.GitVersioning": {
+      "version": "1.1.61-rc",
+      "suppressParent": "none"
+    },
+    "PInvoke.BCrypt": "0.1.312-beta",
     "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },

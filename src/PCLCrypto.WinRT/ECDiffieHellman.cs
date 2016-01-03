@@ -119,7 +119,7 @@ namespace PCLCrypto
                     {
                         // Do this in a finally so that ThreadAbortException doesn't interrupt the
                         // assignment of a successfully allocated pointer.
-                        hashAlgorithmPtr = Marshal.StringToCoTaskMemUni(hashAlgorithmString);
+                        hashAlgorithmPtr = Marshal.StringToHGlobalUni(hashAlgorithmString);
                     }
 
                     var parameters = new List<BCryptBuffer>();
@@ -127,7 +127,7 @@ namespace PCLCrypto
                     {
                         cbBuffer = (hashAlgorithmString.Length + 1) * sizeof(char),
                         BufferType = BufferType.KDF_HASH_ALGORITHM,
-                        pvBuffer = hashAlgorithmPtr,
+                        pvBuffer_IntPtr = hashAlgorithmPtr,
                     });
 
                     const string kdf = KeyDerivationFunctions.HASH;
@@ -139,7 +139,7 @@ namespace PCLCrypto
                             {
                                 ulVersion = 0,
                                 cBuffers = parameters.Count,
-                                pBuffers = new IntPtr(pParameters),
+                                pBuffers = pParameters,
                             };
 
                             int secretLength;
@@ -170,7 +170,7 @@ namespace PCLCrypto
                 {
                     if (hashAlgorithmPtr != IntPtr.Zero)
                     {
-                        Marshal.FreeCoTaskMem(hashAlgorithmPtr);
+                        Marshal.FreeHGlobal(hashAlgorithmPtr);
                     }
                 }
             }
