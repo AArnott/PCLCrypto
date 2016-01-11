@@ -13,9 +13,9 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySizes"/> struct.
         /// </summary>
-        /// <param name="minSize">The minimum key size.</param>
-        /// <param name="maxSize">The maximum key size.</param>
-        /// <param name="stepSize">The increment between valid key sizes between <paramref name="minSize"/> and <paramref name="maxSize"/>.</param>
+        /// <param name="minSize">The minimum key size (in bits).</param>
+        /// <param name="maxSize">The maximum key size (in bits).</param>
+        /// <param name="stepSize">The increment (in bits) between valid key sizes between <paramref name="minSize"/> and <paramref name="maxSize"/>.</param>
         public KeySizes(int minSize, int maxSize, int stepSize)
         {
             this.MaxSize = maxSize;

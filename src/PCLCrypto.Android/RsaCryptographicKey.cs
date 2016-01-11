@@ -102,27 +102,6 @@ namespace PCLCrypto
             return KeyFormatter.GetFormatter(blobType).Write(this.parameters, includePrivateKey: false);
         }
 
-        /// <summary>
-        /// Disposes of managed resources associated with this object.
-        /// </summary>
-        public void Dispose()
-        {
-            this.publicKey.Dispose();
-            this.privateKey.Dispose();
-        }
-
-        /// <inheritdoc />
-        protected internal override byte[] Sign(byte[] data)
-        {
-            using (Signature instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
-            {
-                instance.InitSign(this.privateKey);
-                instance.Update(data);
-                byte[] signature = instance.Sign();
-                return signature;
-            }
-        }
-
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
@@ -184,6 +163,30 @@ namespace PCLCrypto
                 byte[] plainText = cipher.DoFinal(data);
                 return plainText;
             }
+        }
+
+        /// <inheritdoc />
+        protected internal override byte[] Sign(byte[] data)
+        {
+            using (Signature instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
+            {
+                instance.InitSign(this.privateKey);
+                instance.Update(data);
+                byte[] signature = instance.Sign();
+                return signature;
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.publicKey.Dispose();
+                this.privateKey.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

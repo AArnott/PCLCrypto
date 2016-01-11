@@ -16,7 +16,7 @@ namespace PCLCrypto
     /// <summary>
     /// The WinRT implementation of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal partial class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey
+    internal partial class SymmetricCryptographicKey : BCryptCryptographicKeyBase, ICryptographicKey
     {
         /// <summary>
         /// The symmetric key material.
@@ -85,38 +85,24 @@ namespace PCLCrypto
             }
         }
 
-        /// <inheritdoc />
-        public int KeySize => this.keyMaterial.Length * 8;
-
         /// <summary>
         /// Gets the symmetric algorithm provider that created this key, if applicable.
         /// </summary>
         internal SymmetricKeyAlgorithmProvider SymmetricAlgorithmProvider => this.symmetricAlgorithmProvider;
 
-        /// <summary>
-        /// Gets the key material buffer.
-        /// </summary>
-        internal byte[] KeyMaterial => this.keyMaterial;
+        /// <inheritdoc />
+        protected override SafeKeyHandle Key => this.GetInitializedKey(ref this.encryptorKey, null);
 
         /// <inheritdoc />
-        public byte[] Export(CryptographicPrivateKeyBlobType blobType)
+        protected override void Dispose(bool disposing)
         {
-            throw new NotSupportedException();
-        }
+            if (disposing)
+            {
+                this.encryptorKey?.Dispose();
+                this.decryptorKey?.Dispose();
+            }
 
-        /// <inheritdoc />
-        public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Disposes of managed resources associated with this object.
-        /// </summary>
-        public void Dispose()
-        {
-            this.encryptorKey?.Dispose();
-            this.decryptorKey?.Dispose();
+            base.Dispose(disposing);
         }
 
         /// <inheritdoc />
@@ -211,6 +197,16 @@ namespace PCLCrypto
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
             return new BCryptDecryptTransform(this, iv);
+        }
+
+        protected override string GetBCryptBlobType(CryptographicPrivateKeyBlobType blobType)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override string GetBCryptBlobType(CryptographicPublicKeyBlobType blobType)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

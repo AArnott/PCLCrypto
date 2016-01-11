@@ -8,6 +8,7 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using PInvoke;
     using Validation;
     using static PInvoke.BCrypt;
     using Platform = Windows.Security.Cryptography.Core;
@@ -24,7 +25,6 @@ namespace PCLCrypto
         public AsymmetricKeyAlgorithmProvider(AsymmetricAlgorithm algorithm)
         {
             this.Algorithm = algorithm;
-            this.AlgorithmHandle = BCryptOpenAlgorithmProvider(GetAlgorithmName(algorithm));
         }
 
         /// <summary>
@@ -37,23 +37,28 @@ namespace PCLCrypto
         {
             get
             {
-                // Not exposed by WinRT. We probably need to switch this to BCrypt.
-                return this.algorithm.GetTypicalLegalAsymmetricKeySizes();
+                using (var algorithm = this.OpenAlgorithm())
+                {
+                    var keySizes = BCryptGetProperty<BCRYPT_KEY_LENGTHS_STRUCT>(algorithm, PropertyNames.BCRYPT_KEY_LENGTHS);
+                    return new KeySizes[]
+                    {
+                        new KeySizes(keySizes.MinLength, keySizes.MaxLength, keySizes.Increment),
+                    };
+                }
             }
         }
-
-        /// <summary>
-        /// Gets the BCrypt algorithm.
-        /// </summary>
-        internal SafeAlgorithmHandle AlgorithmHandle { get; }
 
         /// <inheritdoc/>
         public ICryptographicKey CreateKeyPair(int keySize)
         {
             Requires.Range(keySize > 0, "keySize");
 
-            var key = this.platform.CreateKeyPair((uint)keySize);
-            return new WinRTCryptographicKey(key, canExportPrivateKey: true);
+            using (var algorithm = this.OpenAlgorithm())
+            {
+                var key = BCryptGenerateKeyPair(algorithm, keySize);
+                BCryptFinalizeKeyPair(key).ThrowOnError();
+                return new AsymmetricCryptographicKey(key, this.Algorithm);
+            }
         }
 
         /// <inheritdoc/>
@@ -61,8 +66,11 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var key = BCryptImportKeyPair(this.AlgorithmHandle, AsymmetricKeyBlobTypes.EccPrivate, keyBlob, BCryptImportKeyPairFlags.None);
-            return new WinRTCryptographicKey(key, canExportPrivateKey: true);
+            using (var algorithm = this.OpenAlgorithm())
+            {
+                var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType), keyBlob, BCryptImportKeyPairFlags.None);
+                return new AsymmetricCryptographicKey(key, this.Algorithm);
+            }
         }
 
         /// <inheritdoc/>
@@ -70,26 +78,10 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var key = BCryptImportKeyPair(this.AlgorithmHandle, GetPlatformKeyBlobType(blobType), keyBlob);
-            return new WinRTCryptographicKey(key, canExportPrivateKey: false);
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes of mangaed and unmanaged resources held by this instance.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> if actively being disposed of.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
+            using (var algorithm = this.OpenAlgorithm())
             {
-                this.AlgorithmHandle?.Dispose();
+                var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType, this.Algorithm.GetName()), keyBlob);
+                return new AsymmetricCryptographicKey(key, this.Algorithm);
             }
         }
 
@@ -98,18 +90,27 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="blobType">The platform independent enum value for the blob type.</param>
         /// <returns>The platform-specific enum value for the equivalent blob type.</returns>
-        internal static string GetPlatformKeyBlobType(CryptographicPublicKeyBlobType blobType)
+        internal static string GetPlatformKeyBlobType(CryptographicPublicKeyBlobType blobType, AsymmetricAlgorithmName algorithmName)
         {
-            switch (blobType)
+            switch (algorithmName)
             {
-                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                    return Platform.CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo;
-                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    return Platform.CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey;
-                case CryptographicPublicKeyBlobType.BCryptPublicKey:
-                    return Platform.CryptographicPublicKeyBlobType.BCryptPublicKey;
-                case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                    return Platform.CryptographicPublicKeyBlobType.Capi1PublicKey;
+                case AsymmetricAlgorithmName.Rsa:
+                case AsymmetricAlgorithmName.RsaSign:
+                    switch (blobType)
+                    {
+                        // TODO: fix these
+                        case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
+                        case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
+                        case CryptographicPublicKeyBlobType.BCryptPublicKey:
+                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
+                        case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
+                        default:
+                            throw new NotSupportedException();
+                    }
+
                 default:
                     throw new NotSupportedException();
             }
@@ -120,18 +121,19 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="blobType">The platform independent enum value for the blob type.</param>
         /// <returns>The platform-specific enum value for the equivalent blob type.</returns>
-        internal static Platform.CryptographicPrivateKeyBlobType GetPlatformKeyBlobType(CryptographicPrivateKeyBlobType blobType)
+        internal static string GetPlatformKeyBlobType(CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)
             {
+                // TODO: fix these
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    return Platform.CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo;
+                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    return Platform.CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey;
+                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
                 case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
-                    return Platform.CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    return Platform.CryptographicPrivateKeyBlobType.Capi1PrivateKey;
+                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
                 default:
                     throw new NotSupportedException();
             }
@@ -172,6 +174,11 @@ namespace PCLCrypto
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        private SafeAlgorithmHandle OpenAlgorithm()
+        {
+            return BCryptOpenAlgorithmProvider(GetAlgorithmName(this.Algorithm));
         }
     }
 }

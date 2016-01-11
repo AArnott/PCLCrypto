@@ -168,5 +168,19 @@ namespace PCLCrypto
 
             return new[] { range };
         }
+
+        /// <summary>
+        /// Allocates an array of characters to represent the specified string, with a null terminating character as the last array element.
+        /// </summary>
+        /// <param name="value">The string to represent as a character array.</param>
+        /// <returns>The character array with null terminator.</returns>
+        internal static char[] ToCharArrayWithNullTerminator(this string value)
+        {
+            Requires.NotNull(value, nameof(value));
+
+            char[] buffer = new char[value.Length + 1];
+            value.CopyTo(0, buffer, 0, value.Length);
+            return buffer;
+        }
     }
 }

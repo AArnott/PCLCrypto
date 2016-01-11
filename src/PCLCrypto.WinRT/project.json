@@ -4,7 +4,7 @@
       "version": "1.1.61-rc",
       "suppressParent": "none"
     },
-    "PInvoke.BCrypt": "0.1.312-beta",
+    "PInvoke.BCrypt": "0.1.327-beta-gff3f14cc23",
     "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },

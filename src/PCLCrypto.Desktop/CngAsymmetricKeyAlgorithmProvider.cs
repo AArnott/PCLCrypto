@@ -79,24 +79,6 @@ namespace PCLCrypto
             return new CngCryptographicKey(key, null);
         }
 
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes of mangaed and unmanaged resources held by this instance.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> if actively being disposed of.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
-        }
-
         /// <summary>
         /// Gets the platform-specific enum value for the given PCL enum value.
         /// </summary>

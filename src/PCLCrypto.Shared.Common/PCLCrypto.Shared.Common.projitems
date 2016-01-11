@@ -11,6 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AsymmetricAlgorithm.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsymmetricAlgorithmExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsymmetricAlgorithmName.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsymmetricEncryptionPadding.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsymmetricSignaturePadding.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicHash.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicPrivateKeyBlobType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CryptographicPublicKeyBlobType.cs" />

@@ -44,12 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
-    <Compile Include="BufferingCryptoTransform.cs" />
+    <Compile Include="AsymmetricCryptographicKey.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="ECDiffieHellman.cs" />
     <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="ECDiffieHellmanPublicKey.cs" />
+    <Compile Include="BCryptCryptographicKeyBase.cs" />
     <Compile Include="WinRTCryptographicKey.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />

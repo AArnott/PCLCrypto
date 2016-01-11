@@ -93,7 +93,7 @@ namespace PCLCrypto
                     this.platformKey = BCryptGenerateKeyPair(
                         this.PlatformAlgorithm,
                         this.KeySize);
-                    BCryptFinalizeKeyPair(this.platformKey);
+                    BCryptFinalizeKeyPair(this.platformKey).ThrowOnError();
                 }
 
                 return this.platformKey;

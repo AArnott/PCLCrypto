@@ -28,7 +28,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="buffer">The WinRT buffer.</param>
         /// <returns>The .NET buffer. Null if <paramref name="buffer"/> was null.</returns>
-        public static byte[] ToArray(this IBuffer buffer)
+        internal static byte[] ToArray(this IBuffer buffer)
         {
             if (buffer == null)
             {
@@ -50,7 +50,7 @@ namespace PCLCrypto
         /// </summary>
         /// <param name="array">The .NET buffer.</param>
         /// <returns>The WinRT buffer. Null if <paramref name="array"/> was null.</returns>
-        public static IBuffer ToBuffer(this byte[] array)
+        internal static IBuffer ToBuffer(this byte[] array)
         {
             if (array == null)
             {
@@ -63,6 +63,40 @@ namespace PCLCrypto
             }
 
             return Platform.CryptographicBuffer.CreateFromByteArray(array);
+        }
+
+        internal static Platform.Core.CryptographicPublicKeyBlobType ToPlatformKeyBlobType(this CryptographicPublicKeyBlobType blobType)
+        {
+            switch (blobType)
+            {
+                case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
+                    return Platform.Core.CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo;
+                case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
+                    return Platform.Core.CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey;
+                case CryptographicPublicKeyBlobType.BCryptPublicKey:
+                    return Platform.Core.CryptographicPublicKeyBlobType.BCryptPublicKey;
+                case CryptographicPublicKeyBlobType.Capi1PublicKey:
+                    return Platform.Core.CryptographicPublicKeyBlobType.Capi1PublicKey;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        internal static Platform.Core.CryptographicPrivateKeyBlobType ToPlatformKeyBlobType(this CryptographicPrivateKeyBlobType blobType)
+        {
+            switch (blobType)
+            {
+                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
+                    return Platform.Core.CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo;
+                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
+                    return Platform.Core.CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey;
+                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
+                    return Platform.Core.CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
+                    return Platform.Core.CryptographicPrivateKeyBlobType.Capi1PrivateKey;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

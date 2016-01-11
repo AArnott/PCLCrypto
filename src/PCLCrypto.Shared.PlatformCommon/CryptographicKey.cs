@@ -8,12 +8,43 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Validation;
 
     /// <summary>
     /// Base class for implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class CryptographicKey
+    internal abstract class CryptographicKey : IDisposable
     {
+        /// <summary>
+        /// Gets the hash algorithm to use for signatures. May be null.
+        /// </summary>
+        protected virtual IHashAlgorithmProvider SignatureHashAlgorithm
+        {
+            get { throw new NotSupportedException(); }
+        }
+
+        /// <summary>
+        /// Gets the hash algorithm to use for signatures, or throws an exception if null.
+        /// </summary>
+        protected IHashAlgorithmProvider SignatureHashAlgorithmOrThrow
+        {
+            get
+            {
+                var hashAlgorithm = this.SignatureHashAlgorithm;
+                Verify.Operation(hashAlgorithm != null, "No hash function has been defined for this key.");
+                return hashAlgorithm;
+            }
+        }
+
+        /// <summary>
+        /// Disposes managed and native resources associated with this instance.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// Signs data with this key.
         /// </summary>
@@ -21,7 +52,7 @@ namespace PCLCrypto
         /// <returns>The signature.</returns>
         protected internal virtual byte[] Sign(byte[] data)
         {
-            throw new NotSupportedException();
+            return this.SignHash(this.SignatureHashAlgorithmOrThrow.HashData(data));
         }
 
         /// <summary>
@@ -34,7 +65,7 @@ namespace PCLCrypto
         /// </returns>
         protected internal virtual bool VerifySignature(byte[] data, byte[] signature)
         {
-            throw new NotSupportedException();
+            return this.VerifyHash(this.SignatureHashAlgorithmOrThrow.HashData(data), signature);
         }
 
         /// <summary>
@@ -114,6 +145,14 @@ namespace PCLCrypto
         protected internal virtual byte[] DeriveKeyMaterial(IKeyDerivationParameters parameters, int desiredKeySize)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Disposes managed and native resources associated with this instance.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> if this object is being disposed; <c>false</c> if it is being finalized.</param>
+        protected virtual void Dispose(bool disposing)
+        {
         }
     }
 }

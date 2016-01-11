@@ -11,7 +11,7 @@ namespace PCLCrypto
     /// <summary>
     /// Provides access to asymmetric cryptographic algorithms of the platform.
     /// </summary>
-    public interface IAsymmetricKeyAlgorithmProvider : IDisposable
+    public interface IAsymmetricKeyAlgorithmProvider
     {
         /// <summary>
         /// Gets the asymmetric algorithm this provider manages keys for.

@@ -103,23 +103,5 @@ namespace PCLCrypto
             IPublicKey publicKey = factory.GeneratePublic(spec);
             return new RsaCryptographicKey(publicKey, parameters, this.algorithm);
         }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes of mangaed and unmanaged resources held by this instance.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> if actively being disposed of.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
-        }
     }
 }

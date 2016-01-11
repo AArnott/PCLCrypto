@@ -66,19 +66,6 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        public void Dispose()
-        {
-            this.encryptor?.Dispose();
-            this.decryptor?.Dispose();
-
-            var disposable = this.algorithm as IDisposable;
-            if (disposable != null)
-            {
-                disposable.Dispose();
-            }
-        }
-
-        /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
             bool paddingInUse = this.Padding != SymmetricAlgorithmPadding.None;
@@ -125,6 +112,24 @@ namespace PCLCrypto
         {
             return new CryptoTransformAdaptor(
                 this.algorithm.CreateDecryptor(this.algorithm.Key, this.ThisOrDefaultIV(iv)));
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.encryptor?.Dispose();
+                this.decryptor?.Dispose();
+
+                var disposable = this.algorithm as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>
