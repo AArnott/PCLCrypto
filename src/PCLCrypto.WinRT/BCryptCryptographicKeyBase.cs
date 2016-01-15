@@ -62,7 +62,7 @@ namespace PCLCrypto
             }
             catch (NTStatusException ex)
             {
-                if (ex.StatusCode.Value == NTStatus.Code.STATUS_NOT_SUPPORTED)
+                if (ex.NativeErrorCode.Value == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
                 {
                     throw new NotSupportedException(ex.Message, ex);
                 }
