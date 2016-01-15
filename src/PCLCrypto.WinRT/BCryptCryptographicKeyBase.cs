@@ -60,9 +60,9 @@ namespace PCLCrypto
             {
                 return BCryptExportKey(this.Key, SafeKeyHandle.Null, this.GetBCryptBlobType(blobType)).ToArray();
             }
-            catch (Win32Exception ex)
+            catch (NTStatusException ex)
             {
-                if ((Win32ErrorCode)ex.NativeErrorCode == Win32ErrorCode.ERROR_NOT_SUPPORTED)
+                if (ex.StatusCode.Value == NTStatus.Code.STATUS_NOT_SUPPORTED)
                 {
                     throw new NotSupportedException(ex.Message, ex);
                 }

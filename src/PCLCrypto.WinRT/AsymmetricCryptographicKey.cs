@@ -69,10 +69,10 @@ namespace PCLCrypto
                 (paddingInfo, flags) =>
                 {
                     NTStatus status = BCryptVerifySignature(this.Key, paddingInfo, data, data.Length, signature, signature.Length, flags);
-                    verified = status == NTStatus.STATUS_SUCCESS;
+                    verified = status == NTStatus.Code.STATUS_SUCCESS;
 
                     // Throw on errors except the invalid signature status, since we return false in that case.
-                    if (status != NTStatus.STATUS_INVALID_SIGNATURE)
+                    if (status != NTStatus.Code.STATUS_INVALID_SIGNATURE)
                     {
                         status.ThrowOnError();
                     }
