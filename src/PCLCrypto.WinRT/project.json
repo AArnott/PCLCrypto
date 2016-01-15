@@ -5,6 +5,7 @@
       "suppressParent": "none"
     },
     "PInvoke.BCrypt": "0.1.382-beta",
+    "PInvoke.NCrypt": "0.1.382-beta",
     "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },
