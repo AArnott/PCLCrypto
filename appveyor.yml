@@ -27,7 +27,7 @@ artifacts:
 - path: bin\**\*.nupkg
   name: NuGet Package
 test:
-  assemblies: '**\PCLCrypto.Tests.Desktop.dll'
+  assemblies: 'bin\**\PCLCrypto.Tests.Desktop.dll'
 on_success:
 - ps: >-
     if ($env:NuGetApiKey -and $env:APPVEYOR_REPO_TAG_NAME -match "^v\d\.\d") {
