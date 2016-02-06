@@ -130,7 +130,7 @@ namespace PCLCrypto
                         pvBuffer_IntPtr = hashAlgorithmPtr,
                     });
 
-                    const string kdf = KeyDerivationFunctions.HASH;
+                    const string kdf = KeyDerivationFunctions.BCRYPT_KDF_HASH;
                     unsafe
                     {
                         fixed (BCryptBuffer* pParameters = parameters.ToArray())
