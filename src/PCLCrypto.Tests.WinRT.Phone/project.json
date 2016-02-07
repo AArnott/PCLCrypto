@@ -10,9 +10,7 @@
     "WindowsPhoneApp,Version=v8.1": { }
   },
   "runtimes": {
-    "win": { },
-    "win-x86": { },
-    "win-arm": { }
+    "win": { }
   },
   "supports": { }
 }
