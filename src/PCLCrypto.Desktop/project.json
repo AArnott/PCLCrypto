@@ -12,7 +12,6 @@
     ".NETFramework,Version=v4.5": { }
   },
   "runtimes": {
-    "win-anycpu": { },
     "win":  { }
   },
   "supports": { }
