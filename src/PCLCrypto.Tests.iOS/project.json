@@ -10,8 +10,7 @@
     "MonoTouch,Version=v1.0": { }
   },
   "runtimes": {
-    "win": { },
-    "win-": { } // required on Dev14 RTM (no Update 1) machines
+    "win": { }
   },
   "supports": { }
 }

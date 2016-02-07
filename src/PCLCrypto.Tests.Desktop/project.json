@@ -10,9 +10,7 @@
     ".NETFramework,Version=v4.5": { }
   },
   "runtimes": {
-    "win-anycpu": { },
-    "win": { },
-    "win-": { } // required on Dev14 RTM (no Update 1) machines
+    "win": { }
   },
   "supports": { }
 }
