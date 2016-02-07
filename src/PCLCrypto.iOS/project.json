@@ -7,7 +7,6 @@
     "PInvoke.BCrypt": "0.1.401-beta",
     "PInvoke.NCrypt": "0.1.401-beta",
     "StyleCop.Analyzers": "1.0.0-beta015",
-    "System.Runtime.Numerics": "4.0.0",
     "Validation": "2.2.8"
   },
   "frameworks": {
