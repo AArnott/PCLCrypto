@@ -16,13 +16,13 @@ namespace PCLCrypto
     /// <summary>
     /// WinRT implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class AsymmetricKeyAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
+    internal class AsymmetricKeyECDsaAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AsymmetricKeyAlgorithmProvider"/> class.
+        /// Initializes a new instance of the <see cref="AsymmetricKeyECDsaAlgorithmProvider"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
-        public AsymmetricKeyAlgorithmProvider(AsymmetricAlgorithm algorithm)
+        public AsymmetricKeyECDsaAlgorithmProvider(AsymmetricAlgorithm algorithm)
         {
             this.Algorithm = algorithm;
         }
@@ -57,7 +57,8 @@ namespace PCLCrypto
             {
                 var key = BCryptGenerateKeyPair(algorithm, keySize);
                 BCryptFinalizeKeyPair(key).ThrowOnError();
-                return new AsymmetricCryptographicKey(key, this.Algorithm);
+                throw new NotImplementedException();
+                //return new AsymmetricCryptographicKey(key, this.Algorithm);
             }
         }
 
@@ -69,7 +70,8 @@ namespace PCLCrypto
             using (var algorithm = this.OpenAlgorithm())
             {
                 var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType), keyBlob, BCryptImportKeyPairFlags.None);
-                return new AsymmetricCryptographicKey(key, this.Algorithm);
+                throw new NotImplementedException();
+                //return new AsymmetricCryptographicKey(key, this.Algorithm);
             }
         }
 
@@ -81,7 +83,8 @@ namespace PCLCrypto
             using (var algorithm = this.OpenAlgorithm())
             {
                 var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType, this.Algorithm.GetName()), keyBlob);
-                return new AsymmetricCryptographicKey(key, this.Algorithm);
+                throw new NotImplementedException();
+                //return new AsymmetricCryptographicKey(key, this.Algorithm);
             }
         }
 

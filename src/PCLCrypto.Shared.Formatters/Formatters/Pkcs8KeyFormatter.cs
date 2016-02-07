@@ -70,7 +70,7 @@ namespace PCLCrypto.Formatters
                     Asn.BerClass.Universal,
                     Asn.BerPC.Primitive,
                     Asn.BerTag.OctetString,
-                    KeyFormatter.Pkcs1PrependZeros.Write(parameters, HasPrivateKey(parameters))),
+                    KeyFormatter.Pkcs1.Write(parameters, HasPrivateKey(parameters))),
                 new Asn.DataElement(
                     Asn.BerClass.ContextSpecific,
                     Asn.BerPC.Constructed,

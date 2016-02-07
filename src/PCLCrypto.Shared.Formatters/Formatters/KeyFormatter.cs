@@ -40,6 +40,13 @@ namespace PCLCrypto.Formatters
         /// </summary>
         internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
 
+#if !SILVERLIGHT
+        /// <summary>
+        /// The BCrypt RSA key formatter.
+        /// </summary>
+        internal static readonly KeyFormatter BCryptRsa = new BCryptRsaKeyFormatter();
+#endif
+
         /// <summary>
         /// The PKCS1 object identifier
         /// </summary>
@@ -62,9 +69,13 @@ namespace PCLCrypto.Formatters
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return Pkcs8;
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    return Pkcs1PrependZeros;
+                    return Pkcs1;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return Capi;
+#if !SILVERLIGHT
+                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
+                    return BCryptRsa;
+#endif
                 default:
                     throw new NotSupportedException();
             }
@@ -82,9 +93,13 @@ namespace PCLCrypto.Formatters
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
                     return X509SubjectPublicKeyInfo;
                 case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    return Pkcs1PrependZeros;
+                    return Pkcs1;
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     return Capi;
+#if !SILVERLIGHT
+                case CryptographicPublicKeyBlobType.BCryptPublicKey:
+                    return BCryptRsa;
+#endif
                 default:
                     throw new NotSupportedException();
             }
@@ -217,7 +232,7 @@ namespace PCLCrypto.Formatters
 
                 parameters.Modulus = TrimLeadingZero(parameters.Modulus);
                 parameters.D = TrimLeadingZero(parameters.D);
-                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D.Length);
+                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
                 parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
                 parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
 
@@ -328,7 +343,10 @@ namespace PCLCrypto.Formatters
         /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
         protected static byte[] TrimLeadingZero(byte[] buffer)
         {
-            Requires.NotNull(buffer, "buffer");
+            if (buffer == null)
+            {
+                return null;
+            }
 
             if (buffer.Length > 0 && buffer[0] == 0)
             {
@@ -351,21 +369,25 @@ namespace PCLCrypto.Formatters
         /// </returns>
         protected static byte[] TrimOrPadZeroToLength(byte[] buffer, int desiredLength)
         {
-            Requires.NotNull(buffer, "buffer");
             Requires.Range(desiredLength > 0, "desiredLength");
 
+            if (buffer == null)
+            {
+                return null;
+            }
+
+            byte[] result = buffer;
             if (buffer.Length > desiredLength)
             {
-                return TrimLeadingZero(buffer);
+                result = TrimLeadingZero(buffer);
             }
             else if (buffer.Length < desiredLength)
             {
-                return PrependLeadingZero(buffer);
+                result = PrependLeadingZero(buffer);
             }
-            else
-            {
-                return buffer;
-            }
+
+            VerifyFormat(result.Length == desiredLength);
+            return result;
         }
 
         /// <summary>
@@ -411,6 +433,19 @@ namespace PCLCrypto.Formatters
         protected static Exception FailFormat(string message = null)
         {
             throw new FormatException(message ?? "Unexpected format or unsupported key.");
+        }
+
+        /// <summary>
+        /// Returns a copy of the specified buffer where the copy has its byte order reversed.
+        /// </summary>
+        /// <param name="data">The buffer to copy and reverse.</param>
+        /// <returns>The new buffer with the contents of the original buffer reversed.</returns>
+        protected static byte[] CopyAndReverse(byte[] data)
+        {
+            byte[] reversed = new byte[data.Length];
+            Array.Copy(data, 0, reversed, 0, data.Length);
+            Array.Reverse(reversed);
+            return reversed;
         }
 
         /// <summary>

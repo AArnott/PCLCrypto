@@ -94,7 +94,7 @@ namespace PCLCrypto.Formatters
                         Asn.BerClass.Universal,
                         Asn.BerPC.Primitive,
                         Asn.BerTag.BitString,
-                        PrependLeadingZero(KeyFormatter.Pkcs1PrependZeros.Write(parameters, includePrivateKey: false), alwaysPrependZero: true)));
+                        PrependLeadingZero(KeyFormatter.Pkcs1.Write(parameters, includePrivateKey: false), alwaysPrependZero: true)));
             stream.WriteAsn1Element(rootElement);
         }
     }

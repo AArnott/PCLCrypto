@@ -18,7 +18,7 @@ namespace PCLCrypto
     /// <summary>
     /// The base class for NCrypt implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class NCryptCryptographicKeyBase : CryptographicKey, ICryptographicKey
+    internal abstract class NCryptCryptographicKeyBase : CryptographicKey
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NCryptCryptographicKeyBase" /> class.
@@ -35,42 +35,6 @@ namespace PCLCrypto
         /// </summary>
         protected abstract SafeKeyHandle Key { get; }
 
-        /// <inheritdoc />
-        public byte[] Export(CryptographicPrivateKeyBlobType blobType)
-        {
-            try
-            {
-                return NCryptExportKey(this.Key, SafeKeyHandle.Null, this.GetNCryptBlobType(blobType), IntPtr.Zero).ToArray();
-            }
-            catch (Win32Exception ex)
-            {
-                if ((Win32ErrorCode)ex.NativeErrorCode == Win32ErrorCode.ERROR_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
-
-        /// <inheritdoc />
-        public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
-        {
-            try
-            {
-                return NCryptExportKey(this.Key, SafeKeyHandle.Null, this.GetNCryptBlobType(blobType), IntPtr.Zero).ToArray();
-            }
-            catch (NTStatusException ex)
-            {
-                if (ex.NativeErrorCode.Value == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
-
         /// <summary>
         /// Disposes of managed and native resources of this object.
         /// </summary>
@@ -84,9 +48,5 @@ namespace PCLCrypto
 
             base.Dispose(disposing);
         }
-
-        protected abstract string GetNCryptBlobType(CryptographicPrivateKeyBlobType blobType);
-
-        protected abstract string GetNCryptBlobType(CryptographicPublicKeyBlobType blobType);
     }
 }

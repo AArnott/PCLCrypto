@@ -16,6 +16,32 @@ namespace PCLCrypto
     internal static class CryptoUtilities
     {
         /// <summary>
+        /// Extracts the array out of an <see cref="ArraySegment{T}"/>,
+        /// allocating a new array if necessary to remove any slack space.
+        /// </summary>
+        /// <typeparam name="T">The type of element in the array.</typeparam>
+        /// <param name="array">The array segment.</param>
+        /// <returns>An instance of an array with no slack space; or <c>null</c> if <see cref="ArraySegment{T}.Array"/> is null in <paramref name="array"/>.</returns>
+        internal static T[] AsTrimmedArray<T>(this ArraySegment<T> array)
+        {
+            if (array.Array == null)
+            {
+                return null;
+            }
+
+            if (array.Offset == 0 && array.Count == array.Array.Length)
+            {
+                return array.Array;
+            }
+            else
+            {
+                var result = new T[array.Count];
+                Array.Copy(array.Array, array.Offset, result, 0, array.Count);
+                return result;
+            }
+        }
+
+        /// <summary>
         /// Grows a buffer as necessary to align with a block size.
         /// </summary>
         /// <param name="buffer">The buffer to grow.</param>

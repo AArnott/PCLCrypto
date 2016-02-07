@@ -27,7 +27,7 @@ public class CryptographicEngineAsymmetricTests
         .OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1)
         .CreateKeyPair(512);
 
-    private static readonly ICryptographicKey EcdsaSigningKey;
+    private static readonly Lazy<ICryptographicKey> EcdsaSigningKey;
 
     /// <summary>
     /// Data the fits within a single cryptographic block.
@@ -40,9 +40,9 @@ public class CryptographicEngineAsymmetricTests
     {
         try
         {
-            EcdsaSigningKey = WinRTCrypto.AsymmetricKeyAlgorithmProvider
+            EcdsaSigningKey = new Lazy<ICryptographicKey>(() => WinRTCrypto.AsymmetricKeyAlgorithmProvider
                 .OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256)
-                .CreateKeyPair(256);
+                .CreateKeyPair(256));
         }
         catch (NotSupportedException)
         {
@@ -78,7 +78,7 @@ public class CryptographicEngineAsymmetricTests
             // Our static constructor has already determined whether this is supported.
             // So avoid first chance exceptions being repeated for easier debugging of
             // Xamarin platforms where exceptions really slow things down.
-            if (EcdsaSigningKey != null)
+            if (EcdsaSigningKey.Value != null)
             {
                 result.Add(new object[] { WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.EcdsaP256Sha256).CreateKeyPair(256), HashAlgorithm.Sha256 });
             }

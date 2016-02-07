@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Formatters\Asn.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Formatters\BCryptRsaKeyFormatter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Formatters\CapiKeyFormatter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Formatters\KeyFormatter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Formatters\Pkcs1KeyFormatter.cs" />

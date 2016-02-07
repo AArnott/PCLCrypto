@@ -43,6 +43,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Net" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -73,6 +74,7 @@
     <Compile Include="DesktopCryptoStreamTests.cs" />
     <Compile Include="Pkcs1KeyFormatterTests.cs" />
     <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
+    <Compile Include="RSAPrivateKeyCompletionTests.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -8,21 +8,22 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Formatters;
     using PInvoke;
     using Validation;
-    using static PInvoke.BCrypt;
+    using static PInvoke.NCrypt;
 
     /// <summary>
-    /// An asymmetric cryptographic key backed by the Win32 BCrypt library.
+    /// An RSA asymmetric cryptographic key backed by the Win32 crypto library.
     /// </summary>
-    internal class AsymmetricCryptographicKey : BCryptCryptographicKeyBase
+    internal class AsymmetricRsaCryptographicKey : NCryptCryptographicKeyBase, ICryptographicKey
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricCryptographicKey"/> class.
         /// </summary>
         /// <param name="key">The BCrypt cryptographic key handle.</param>
         /// <param name="algorithm">The asymmetric algorithm used by this instance.</param>
-        internal AsymmetricCryptographicKey(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
+        internal AsymmetricRsaCryptographicKey(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(key, nameof(key));
 
@@ -31,9 +32,9 @@ namespace PCLCrypto
             this.SignatureHashAlgorithm = this.SignatureHash.HasValue ? WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(this.SignatureHash.Value) : null;
         }
 
-        protected unsafe delegate void SignOrVerifyAction(void* paddingInfo, BCryptSignHashFlags flags);
+        protected unsafe delegate void SignOrVerifyAction(void* paddingInfo, NCryptSignHashFlags flags);
 
-        protected unsafe delegate byte[] EncryptOrDecryptFunction(void* paddingInfo, BCryptEncryptFlags flags);
+        protected unsafe delegate byte[] EncryptOrDecryptFunction(void* paddingInfo, NCryptEncryptFlags flags);
 
         /// <inheritdoc />
         protected override SafeKeyHandle Key { get; }
@@ -50,14 +51,57 @@ namespace PCLCrypto
         protected HashAlgorithm? SignatureHash => this.Algorithm.GetHashAlgorithm();
 
         /// <inheritdoc />
+        public byte[] Export(CryptographicPrivateKeyBlobType blobType)
+        {
+            try
+            {
+                byte[] nativeBlob = NCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormatString, IntPtr.Zero).ToArray();
+
+                byte[] formattedBlob = blobType == AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormatEnum
+                    ? nativeBlob
+                    : KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.GetFormatter(AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormatEnum).Read(nativeBlob));
+                return formattedBlob;
+            }
+            catch (SecurityStatusException ex)
+            {
+                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
+        {
+            try
+            {
+                byte[] nativeBlob = NCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyRsaAlgorithmProvider.NativePublicKeyFormatString, IntPtr.Zero).ToArray();
+                byte[] formattedBlob = blobType == AsymmetricKeyRsaAlgorithmProvider.NativePublicKeyFormatEnum
+                    ? nativeBlob
+                    : KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.GetFormatter(AsymmetricKeyRsaAlgorithmProvider.NativePublicKeyFormatEnum).Read(nativeBlob));
+                return formattedBlob;
+            }
+            catch (SecurityStatusException ex)
+            {
+                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         protected internal override unsafe byte[] SignHash(byte[] data)
         {
             byte[] signature = null;
             this.SignOrVerify(
                 (paddingInfo, flags) =>
-                {
-                    signature = BCryptSignHash(this.Key, data, paddingInfo, flags).ToArray();
-                });
+                    signature = NCryptSignHash(this.Key, paddingInfo, data, flags).ToArray());
             return signature;
         }
 
@@ -67,31 +111,26 @@ namespace PCLCrypto
             bool verified = false;
             this.SignOrVerify(
                 (paddingInfo, flags) =>
-                {
-                    NTSTATUS status = BCryptVerifySignature(this.Key, paddingInfo, data, data.Length, signature, signature.Length, flags);
-                    verified = status == NTSTATUS.Code.STATUS_SUCCESS;
-
-                    // Throw on errors except the invalid signature status, since we return false in that case.
-                    if (status != NTSTATUS.Code.STATUS_INVALID_SIGNATURE)
-                    {
-                        status.ThrowOnError();
-                    }
-                });
+                    verified = NCryptVerifySignature(this.Key, paddingInfo, data, signature, flags));
             return verified;
         }
 
         /// <inheritdoc />
         protected internal override unsafe byte[] Encrypt(byte[] data, byte[] iv)
         {
+            Verify.Operation(iv == null, "IV not applicable for this key.");
+
             return this.EncryptOrDecrypt(
-                (padding, flags) => BCryptEncrypt(this.Key, data, padding, iv, flags).ToArray());
+                (padding, flags) => NCryptEncrypt(this.Key, data, padding, flags).ToArray());
         }
 
         /// <inheritdoc />
         protected internal override unsafe byte[] Decrypt(byte[] data, byte[] iv)
         {
+            Verify.Operation(iv == null, "IV not applicable for this key.");
+
             return this.EncryptOrDecrypt(
-                (padding, flags) => BCryptDecrypt(this.Key, data, padding, iv, flags).ToArray());
+                (padding, flags) => NCryptDecrypt(this.Key, data, padding, flags).ToArray());
         }
 
         protected unsafe void SignOrVerify(SignOrVerifyAction action)
@@ -100,7 +139,7 @@ namespace PCLCrypto
 
             if (this.SignaturePadding.Value == AsymmetricSignaturePadding.None)
             {
-                action(null, BCryptSignHashFlags.None);
+                action(null, NCryptSignHashFlags.None);
             }
             else
             {
@@ -110,19 +149,19 @@ namespace PCLCrypto
                     switch (this.SignaturePadding.Value)
                     {
                         case AsymmetricSignaturePadding.Pkcs1:
-                            var pkcs1PaddingInfo = new BCRYPT_PKCS1_PADDING_INFO
+                            var pkcs1PaddingInfo = new BCrypt.BCRYPT_PKCS1_PADDING_INFO
                             {
                                 pszAlgId = hashAlgorithmNamePointer,
                             };
-                            action(&pkcs1PaddingInfo, BCryptSignHashFlags.BCRYPT_PAD_PKCS1);
+                            action(&pkcs1PaddingInfo, NCryptSignHashFlags.BCRYPT_PAD_PKCS1);
                             break;
                         case AsymmetricSignaturePadding.Pss:
-                            var pssPaddingInfo = new BCRYPT_PSS_PADDING_INFO
+                            var pssPaddingInfo = new BCrypt.BCRYPT_PSS_PADDING_INFO
                             {
                                 pszAlgId = hashAlgorithmNamePointer,
                                 cbSalt = hashAlgorithmName.Length,
                             };
-                            action(&pssPaddingInfo, BCryptSignHashFlags.BCRYPT_PAD_PSS);
+                            action(&pssPaddingInfo, NCryptSignHashFlags.BCRYPT_PAD_PSS);
                             break;
                         default:
                             throw new NotImplementedException();
@@ -137,38 +176,28 @@ namespace PCLCrypto
 
             if (this.EncryptionPadding.Value == AsymmetricEncryptionPadding.None)
             {
-                return cipherFunction(null, BCryptEncryptFlags.BCRYPT_PAD_NONE);
+                return cipherFunction(null, NCryptEncryptFlags.NCRYPT_NO_PADDING_FLAG);
             }
 
             switch (this.EncryptionPadding.Value)
             {
                 case AsymmetricEncryptionPadding.Pkcs1:
-                    return cipherFunction(null, BCryptEncryptFlags.BCRYPT_PAD_PKCS1);
+                    return cipherFunction(null, NCryptEncryptFlags.NCRYPT_PAD_PKCS1_FLAG);
                 case AsymmetricEncryptionPadding.Oaep:
                     fixed (char* hashAlgorithmNamePointer = &HashAlgorithmProviderFactory.GetHashAlgorithmName(this.SignatureHash.Value).ToCharArrayWithNullTerminator()[0])
                     {
-                        var paddingInfo = new BCRYPT_OAEP_PADDING_INFO
+                        var paddingInfo = new BCrypt.BCRYPT_OAEP_PADDING_INFO
                         {
                             pszAlgId = hashAlgorithmNamePointer,
                             pbLabel = null,
                             cbLabel = 0,
                         };
-                        return cipherFunction(&paddingInfo, BCryptEncryptFlags.BCRYPT_PAD_OAEP);
+                        return cipherFunction(&paddingInfo, NCryptEncryptFlags.NCRYPT_PAD_OAEP_FLAG);
                     }
 
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        protected override string GetBCryptBlobType(CryptographicPrivateKeyBlobType blobType)
-        {
-            return AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType);
-        }
-
-        protected override string GetBCryptBlobType(CryptographicPublicKeyBlobType blobType)
-        {
-            return AsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType, this.Algorithm.GetName());
         }
     }
 }
