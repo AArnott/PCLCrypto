@@ -74,7 +74,6 @@
     <Compile Include="DesktopCryptoStreamTests.cs" />
     <Compile Include="Pkcs1KeyFormatterTests.cs" />
     <Compile Include="RandomNumberGeneratorDesktopTests.cs" />
-    <Compile Include="RSAPrivateKeyCompletionTests.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
