@@ -59,7 +59,7 @@ namespace PCLCrypto
             Requires.Range(keySize > 0, "keySize");
 
             var rsa = new Platform.RSACryptoServiceProvider(keySize);
-            return new RsaCryptographicKey(rsa, this.algorithm, exportFullPrivateKeyData: true);
+            return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -67,12 +67,9 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
-
-            // Record whether there was full private key data initially, but then go ahead
-            // and ensure we fill in any gaps.
-            bool fullPrivateKeyDataPresent = parameters.HasFullPrivateKeyData();
-            parameters = parameters.ComputeFullPrivateKeyData();
+            var parameters = KeyFormatter.GetFormatter(blobType)
+                .Read(keyBlob)
+                .ComputeFullPrivateKeyData();
 
             if (!CapiKeyFormatter.IsCapiCompatible(parameters))
             {
@@ -105,7 +102,7 @@ namespace PCLCrypto
             }
 
             rsa.ImportParameters(KeyFormatter.ToPlatformParameters(parameters));
-            return new RsaCryptographicKey(rsa, this.algorithm, fullPrivateKeyDataPresent);
+            return new RsaCryptographicKey(rsa, this.algorithm);
         }
 
         /// <inheritdoc/>
@@ -115,7 +112,7 @@ namespace PCLCrypto
 
             var rsa = new Platform.RSACryptoServiceProvider();
             rsa.ImportParameters(KeyFormatter.ToPlatformParameters(KeyFormatter.GetFormatter(blobType).Read(keyBlob)));
-            return new RsaCryptographicKey(rsa, this.algorithm, exportFullPrivateKeyData: false);
+            return new RsaCryptographicKey(rsa, this.algorithm);
         }
     }
 }

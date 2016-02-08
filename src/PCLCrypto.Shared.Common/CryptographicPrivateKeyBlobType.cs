@@ -29,6 +29,11 @@ namespace PCLCrypto
         BCryptPrivateKey,
 
         /// <summary>
+        /// Microsoft full private key format defined by Cryptography API: Next Generation (CNG).
+        /// </summary>
+        BCryptFullPrivateKey,
+
+        /// <summary>
         /// Microsoft private key format defined by the legacy Cryptography API (CAPI). For more information, see Base Provider Key BLOBs.
         /// </summary>
         Capi1PrivateKey,

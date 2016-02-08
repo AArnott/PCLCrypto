@@ -23,8 +23,9 @@ namespace PCLCrypto
                 var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
                 using (var key = algorithm.CreateKeyPair(512))
                 {
-                    byte[] bcryptNative = key.Export(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
-                    var rsaParameters = KeyFormatter.BCryptRsa.Read(bcryptNative);
+                    const CryptographicPrivateKeyBlobType keyBlobFormat = CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+                    byte[] bcryptNative = key.Export(keyBlobFormat);
+                    var rsaParameters = KeyFormatter.GetFormatter(keyBlobFormat).Read(bcryptNative);
                     return rsaParameters;
                 }
             });

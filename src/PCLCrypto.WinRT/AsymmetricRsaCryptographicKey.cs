@@ -19,7 +19,7 @@ namespace PCLCrypto
     internal class AsymmetricRsaCryptographicKey : NCryptCryptographicKeyBase, ICryptographicKey
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AsymmetricCryptographicKey"/> class.
+        /// Initializes a new instance of the <see cref="AsymmetricRsaCryptographicKey"/> class.
         /// </summary>
         /// <param name="key">The BCrypt cryptographic key handle.</param>
         /// <param name="algorithm">The asymmetric algorithm used by this instance.</param>
@@ -55,11 +55,32 @@ namespace PCLCrypto
         {
             try
             {
-                byte[] nativeBlob = NCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormatString, IntPtr.Zero).ToArray();
+                byte[] nativeBlob;
+                string nativeFormatString;
+                CryptographicPrivateKeyBlobType nativeBlobType;
+                if (AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormats.TryGetValue(blobType, out nativeFormatString))
+                {
+                    nativeBlobType = blobType;
+                }
+                else
+                {
+                    nativeBlobType = AsymmetricKeyRsaAlgorithmProvider.PreferredNativePrivateKeyFormat;
+                    nativeFormatString = AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormats[nativeBlobType];
+                }
 
-                byte[] formattedBlob = blobType == AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormatEnum
-                    ? nativeBlob
-                    : KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.GetFormatter(AsymmetricKeyRsaAlgorithmProvider.NativePrivateKeyFormatEnum).Read(nativeBlob));
+                nativeBlob = NCryptExportKey(this.Key, SafeKeyHandle.Null, nativeFormatString, IntPtr.Zero).ToArray();
+
+                byte[] formattedBlob;
+                if (nativeBlobType != blobType)
+                {
+                    var parameters = KeyFormatter.GetFormatter(nativeBlobType).Read(nativeBlob);
+                    formattedBlob = KeyFormatter.GetFormatter(blobType).Write(parameters);
+                }
+                else
+                {
+                    formattedBlob = nativeBlob;
+                }
+
                 return formattedBlob;
             }
             catch (SecurityStatusException ex)

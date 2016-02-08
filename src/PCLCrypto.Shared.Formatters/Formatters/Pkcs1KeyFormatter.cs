@@ -20,17 +20,10 @@ namespace PCLCrypto.Formatters
     internal class Pkcs1KeyFormatter : KeyFormatter
     {
         /// <summary>
-        /// If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.
-        /// </summary>
-        private readonly bool prependLeadingZeroOnCertainElements;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Pkcs1KeyFormatter"/> class.
         /// </summary>
-        /// <param name="prependLeadingZeroOnCertainElements">If set to <c>true</c> certain parameters will have a 0x00 prepended to their binary representations: Modulus, P, Q, DP, InverseQ.</param>
-        internal Pkcs1KeyFormatter(bool prependLeadingZeroOnCertainElements = false)
+        internal Pkcs1KeyFormatter()
         {
-            this.prependLeadingZeroOnCertainElements = prependLeadingZeroOnCertainElements;
         }
 
         /// <summary>
@@ -94,16 +87,19 @@ namespace PCLCrypto.Formatters
                 sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, new byte[1]));
             }
 
-            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Modulus) : value.Modulus));
-            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.Exponent));
+            // Take care to always prepend a zero when an integer starts with a leading bit of 1,
+            // since the ASN.1 spec is that integers are encoded as two's complement, and these integers
+            // are always intended to be interpreted as positive.
+            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.Modulus)));
+            sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.Exponent)));
             if (KeyFormatter.HasPrivateKey(value))
             {
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.D));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.P) : value.P));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.Q) : value.Q));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.DP) : value.DP));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, value.DQ));
-                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, this.prependLeadingZeroOnCertainElements ? PrependLeadingZero(value.InverseQ) : value.InverseQ));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.D)));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.P)));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.Q)));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.DP)));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.DQ)));
+                sequence.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, PrependLeadingZero(value.InverseQ)));
             }
 
             stream.WriteAsn1Element(new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Constructed, Asn.BerTag.Sequence, sequence.ToArray()));

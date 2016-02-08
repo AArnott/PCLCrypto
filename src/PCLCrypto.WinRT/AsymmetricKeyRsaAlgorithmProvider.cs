@@ -21,8 +21,12 @@ namespace PCLCrypto
     {
         internal const CryptographicPublicKeyBlobType NativePublicKeyFormatEnum = CryptographicPublicKeyBlobType.BCryptPublicKey;
         internal const string NativePublicKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
-        internal const CryptographicPrivateKeyBlobType NativePrivateKeyFormatEnum = CryptographicPrivateKeyBlobType.BCryptPrivateKey;
-        internal const string NativePrivateKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_RSAPRIVATE_BLOB;
+        internal static readonly IReadOnlyDictionary<CryptographicPrivateKeyBlobType, string> NativePrivateKeyFormats = new Dictionary<CryptographicPrivateKeyBlobType, string>
+        {
+            { CryptographicPrivateKeyBlobType.BCryptPrivateKey, AsymmetricKeyBlobTypes.BCRYPT_RSAPRIVATE_BLOB },
+            { CryptographicPrivateKeyBlobType.BCryptFullPrivateKey, AsymmetricKeyBlobTypes.BCRYPT_RSAFULLPRIVATE_BLOB },
+        };
+        internal const CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat = CryptographicPrivateKeyBlobType.BCryptFullPrivateKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricKeyRsaAlgorithmProvider"/> class.
@@ -82,10 +86,20 @@ namespace PCLCrypto
 
             using (var provider = this.OpenProvider())
             {
-                byte[] bcryptPrivateBlob = blobType == NativePrivateKeyFormatEnum
-                    ? keyBlob
-                    : KeyFormatter.GetFormatter(NativePrivateKeyFormatEnum).Write(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
-                var key = NCryptImportKey(provider, null, NativePrivateKeyFormatString, IntPtr.Zero, bcryptPrivateBlob);
+                byte[] bcryptPrivateBlob;
+                string nativeFormatString;
+                if (NativePrivateKeyFormats.TryGetValue(blobType, out nativeFormatString))
+                {
+                    bcryptPrivateBlob = keyBlob;
+                }
+                else
+                {
+                    var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+                    bcryptPrivateBlob = KeyFormatter.GetFormatter(PreferredNativePrivateKeyFormat).Write(parameters);
+                    nativeFormatString = NativePrivateKeyFormats[PreferredNativePrivateKeyFormat];
+                }
+
+                var key = NCryptImportKey(provider, null, nativeFormatString, IntPtr.Zero, bcryptPrivateBlob);
                 NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_EXPORT_POLICY_PROPERTY, 3);
                 return new AsymmetricRsaCryptographicKey(key, this.Algorithm);
             }

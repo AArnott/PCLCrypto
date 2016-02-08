@@ -21,11 +21,6 @@ namespace PCLCrypto.Formatters
         internal static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
 
         /// <summary>
-        /// The PKCS1 key formatter that prepends zeros to certain RSA parameters.
-        /// </summary>
-        internal static readonly KeyFormatter Pkcs1PrependZeros = new Pkcs1KeyFormatter(prependLeadingZeroOnCertainElements: true);
-
-        /// <summary>
         /// The PKCS8 key formatter.
         /// </summary>
         internal static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
@@ -42,9 +37,19 @@ namespace PCLCrypto.Formatters
 
 #if !SILVERLIGHT
         /// <summary>
-        /// The BCrypt RSA key formatter.
+        /// The key formatter for BCrypt RSA private keys.
         /// </summary>
-        internal static readonly KeyFormatter BCryptRsa = new BCryptRsaKeyFormatter();
+        internal static readonly KeyFormatter BCryptRsaPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
+
+        /// <summary>
+        /// The key formatter for BCrypt RSA full private keys.
+        /// </summary>
+        internal static readonly KeyFormatter BCryptRsaFullPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptFullPrivateKey);
+
+        /// <summary>
+        /// The key formatter for BCrypt RSA public keys.
+        /// </summary>
+        internal static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
 #endif
 
         /// <summary>
@@ -74,7 +79,9 @@ namespace PCLCrypto.Formatters
                     return Capi;
 #if !SILVERLIGHT
                 case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
-                    return BCryptRsa;
+                    return BCryptRsaPrivateKey;
+                case CryptographicPrivateKeyBlobType.BCryptFullPrivateKey:
+                    return BCryptRsaFullPrivateKey;
 #endif
                 default:
                     throw new NotSupportedException();
@@ -98,7 +105,7 @@ namespace PCLCrypto.Formatters
                     return Capi;
 #if !SILVERLIGHT
                 case CryptographicPublicKeyBlobType.BCryptPublicKey:
-                    return BCryptRsa;
+                    return BCryptRsaPublicKey;
 #endif
                 default:
                     throw new NotSupportedException();
@@ -383,7 +390,7 @@ namespace PCLCrypto.Formatters
             }
             else if (buffer.Length < desiredLength)
             {
-                result = PrependLeadingZero(buffer);
+                result = PrependLeadingZero(buffer, alwaysPrependZero: true);
             }
 
             VerifyFormat(result.Length == desiredLength);
@@ -402,7 +409,7 @@ namespace PCLCrypto.Formatters
         {
             Requires.NotNull(buffer, "buffer");
 
-            if (buffer[0] != 0 || alwaysPrependZero)
+            if ((buffer[0] & 0x80) == 0x80 || alwaysPrependZero)
             {
                 byte[] modifiedBuffer = new byte[buffer.Length + 1];
                 Buffer.BlockCopy(buffer, 0, modifiedBuffer, 1, buffer.Length);

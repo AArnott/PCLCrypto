@@ -16,6 +16,7 @@ namespace PCLCrypto
     using System.Threading.Tasks;
     using PCLCrypto.Formatters;
     using PInvoke;
+    using Validation;
     using static PInvoke.BCrypt;
 
     /// <summary>
@@ -27,6 +28,26 @@ namespace PCLCrypto
     /// </remarks>
     internal class BCryptRsaKeyFormatter : KeyFormatter
     {
+        private readonly BCRYPT_RSAKEY_BLOB.MagicNumber keyType;
+
+        public BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType privateKeyType)
+        {
+            Requires.Argument(privateKeyType == CryptographicPrivateKeyBlobType.BCryptFullPrivateKey || privateKeyType == CryptographicPrivateKeyBlobType.BCryptPrivateKey, nameof(privateKeyType), "Not a BCrypt key blob format.");
+            this.keyType = privateKeyType == CryptographicPrivateKeyBlobType.BCryptFullPrivateKey
+                ? BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAFULLPRIVATE_MAGIC
+                : BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPRIVATE_MAGIC;
+        }
+
+        public BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType publicKeyType)
+        {
+            Requires.Argument(publicKeyType == CryptographicPublicKeyBlobType.BCryptPublicKey, nameof(publicKeyType), "Not a BCrypt key blob format.");
+            this.keyType = BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPUBLIC_MAGIC;
+        }
+
+        protected bool IncludePrivateKey => this.keyType != BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPUBLIC_MAGIC;
+
+        protected bool IncludeFullPrivateKey => this.keyType == BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAFULLPRIVATE_MAGIC;
+
         /// <inheritdoc />
         protected override unsafe RSAParameters ReadCore(Stream stream)
         {
@@ -49,6 +70,7 @@ namespace PCLCrypto
 #endif
             }
 
+            VerifyFormat(this.keyType == header.Magic, "Unexpected key blob type.");
             parameters.Exponent = reader.ReadBytes(header.cbPublicExp);
             parameters.Modulus = reader.ReadBytes(header.cbModulus);
 
@@ -76,10 +98,10 @@ namespace PCLCrypto
             var writer = new BinaryWriter(stream);
             var header = default(BCRYPT_RSAKEY_BLOB);
 
-            header.Magic =
-                parameters.D != null ? BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAFULLPRIVATE_MAGIC
-                : parameters.P != null ? BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPRIVATE_MAGIC
-                : BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPUBLIC_MAGIC;
+            header.Magic = this.keyType;
+
+            Verify.Operation(parameters.D != null || !this.IncludeFullPrivateKey, "Cannot serialize missing full private key data.");
+            Verify.Operation(parameters.P != null || !this.IncludePrivateKey, "Cannot serialize missing private key.");
 
             var modulus = TrimLeadingZero(parameters.Modulus);
 
@@ -108,12 +130,12 @@ namespace PCLCrypto
             writer.Write(parameters.Exponent);
             writer.Write(modulus);
 
-            if (parameters.P != null)
+            if (this.IncludePrivateKey)
             {
                 writer.Write(parameters.P);
                 writer.Write(parameters.Q);
 
-                if (parameters.D != null)
+                if (this.IncludeFullPrivateKey)
                 {
                     writer.Write(TrimOrPadZeroToLength(parameters.DP, header.cbPrime1));
                     writer.Write(TrimOrPadZeroToLength(parameters.DQ, header.cbPrime2));

@@ -29,27 +29,16 @@ namespace PCLCrypto
         private readonly AsymmetricAlgorithm algorithm;
 
         /// <summary>
-        /// A value indicating whether exported private key data should include
-        /// the full private key (as oppposed to just the minimal P, Q data).
-        /// </summary>
-        private readonly bool exportFullPrivateKeyData;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RsaCryptographicKey" /> class.
         /// </summary>
         /// <param name="key">The RSA crypto service provider.</param>
         /// <param name="algorithm">The algorithm.</param>
-        /// <param name="exportFullPrivateKeyData">
-        /// A value indicating whether exported private key data should include
-        /// the full private key (as oppposed to just the minimal P, Q data).
-        /// </param>
-        internal RsaCryptographicKey(RSA key, AsymmetricAlgorithm algorithm, bool exportFullPrivateKeyData)
+        internal RsaCryptographicKey(RSA key, AsymmetricAlgorithm algorithm)
         {
             Requires.NotNull(key, "key");
 
             this.key = key;
             this.algorithm = algorithm;
-            this.exportFullPrivateKeyData = exportFullPrivateKeyData;
         }
 
         /// <inheritdoc />
@@ -80,11 +69,6 @@ namespace PCLCrypto
             try
             {
                 var parameters = KeyFormatter.ToPCLParameters(this.key.ExportParameters(true));
-                if (!this.exportFullPrivateKeyData)
-                {
-                    parameters = parameters.StripOptionalPrivateKeyData();
-                }
-
                 return KeyFormatter.GetFormatter(blobType).Write(parameters);
             }
             catch (CryptographicException ex)
