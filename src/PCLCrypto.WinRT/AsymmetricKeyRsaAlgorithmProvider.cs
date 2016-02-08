@@ -22,7 +22,7 @@ namespace PCLCrypto
         internal const CryptographicPublicKeyBlobType NativePublicKeyFormatEnum = CryptographicPublicKeyBlobType.BCryptPublicKey;
         internal const string NativePublicKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
         internal const CryptographicPrivateKeyBlobType NativePrivateKeyFormatEnum = CryptographicPrivateKeyBlobType.BCryptPrivateKey;
-        internal const string NativePrivateKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_RSAFULLPRIVATE_BLOB;
+        internal const string NativePrivateKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_RSAPRIVATE_BLOB;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricKeyRsaAlgorithmProvider"/> class.
