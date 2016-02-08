@@ -208,5 +208,18 @@ namespace PCLCrypto
             value.CopyTo(0, buffer, 0, value.Length);
             return buffer;
         }
+
+        /// <summary>
+        /// Returns a copy of the specified buffer where the copy has its byte order reversed.
+        /// </summary>
+        /// <param name="data">The buffer to copy and reverse.</param>
+        /// <returns>The new buffer with the contents of the original buffer reversed.</returns>
+        internal static byte[] CopyAndReverse(byte[] data)
+        {
+            byte[] reversed = new byte[data.Length];
+            Array.Copy(data, 0, reversed, 0, data.Length);
+            Array.Reverse(reversed);
+            return reversed;
+        }
     }
 }

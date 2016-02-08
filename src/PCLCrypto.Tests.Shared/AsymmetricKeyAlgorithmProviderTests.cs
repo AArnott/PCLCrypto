@@ -304,41 +304,29 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.True(supportedAlgorithms > 0, "No supported algorithms.");
     }
 
-    [Fact]
-    public void KeyPairInterop()
+    public static object[][] PrivateKeyFormatsAndBlobsData =>
+        Helper.PrivateKeyFormatsAndBlobs.Select(kv => new object[] { kv.Key.Item2, kv.Key.Item1, kv.Value }).ToArray();
+
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PrivateKeyFormatsAndBlobsData))]
+    public void KeyPairInterop(CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithmName, string base64Key)
     {
-        int supportedFormats = 0;
-        foreach (var formatAndBlob in Helper.PrivateKeyFormatsAndBlobs)
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        var key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Key), blobType);
+        string exported = Convert.ToBase64String(key.Export(blobType));
+        if (blobType == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == base64Key.Length - 20)
         {
-            try
-            {
-                var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
-                var key = algorithm.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
-                string exported = Convert.ToBase64String(key.Export(formatAndBlob.Key.Item2));
-                if (formatAndBlob.Key.Item2 == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == formatAndBlob.Value.Length - 20)
-                {
-                    // I'm not sure what the last 20 bytes are (perhaps the optional attributes)
-                    // But Windows platforms produces them and Android doesn't seem to.
-                    // Since the private key material seems to be elsewhere, we'll exclude
-                    // the suffix from the comparison.
-                    // The prefix is also mismatched, but that seems to also be ignorable.
-                    Assert.Equal(formatAndBlob.Value.Substring(6, exported.Length - 6), exported.Substring(6));
-                }
-                else
-                {
-                    Assert.Equal(formatAndBlob.Value, exported);
-                }
-
-                supportedFormats++;
-                this.logger.WriteLine("Key format {0} supported.", formatAndBlob.Key);
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
-            }
+            // I'm not sure what the last 20 bytes are (perhaps the optional attributes)
+            // But Windows platforms produces them and Android doesn't seem to.
+            // Since the private key material seems to be elsewhere, we'll exclude
+            // the suffix from the comparison.
+            // The prefix is also mismatched, but that seems to also be ignorable.
+            Assert.Equal(base64Key.Substring(6, exported.Length - 6), exported.Substring(6));
         }
-
-        Assert.True(supportedFormats > 0, "No supported formats.");
+        else
+        {
+            Assert.Equal(base64Key, exported);
+        }
     }
 
     [Fact]
