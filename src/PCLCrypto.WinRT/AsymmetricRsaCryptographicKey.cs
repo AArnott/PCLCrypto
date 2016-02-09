@@ -136,7 +136,20 @@ namespace PCLCrypto
             bool verified = false;
             this.SignOrVerify(
                 (paddingInfo, flags) =>
-                    verified = NCryptVerifySignature(this.Key, paddingInfo, data, signature, flags));
+                {
+                    try
+                    {
+                        verified = NCryptVerifySignature(this.Key, paddingInfo, data, signature, flags);
+                    }
+                    catch (SecurityStatusException ex)
+                    {
+                        // Signatures with an unexpected size throw. But we should just return false.
+                        if (ex.NativeErrorCode != SECURITY_STATUS.NTE_INVALID_PARAMETER)
+                        {
+                            throw;
+                        }
+                    }
+                });
             return verified;
         }
 
