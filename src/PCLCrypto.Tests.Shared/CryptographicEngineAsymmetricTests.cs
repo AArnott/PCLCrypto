@@ -193,77 +193,48 @@ public class CryptographicEngineAsymmetricTests
             () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, this.data, null));
     }
 
-    [Theory, MemberData(nameof(SigningAndHashParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningAndHashParameters))]
     public void SignHashedData_VerifySignatureWithHashInput(ICryptographicKey key, HashAlgorithm hashAlgorithm)
     {
-        try
-        {
-            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm)
-                .HashData(this.data);
-            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(key, hash);
-            Assert.True(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, signature));
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, PclTestUtilities.Tamper(signature)));
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, PclTestUtilities.Tamper(this.data), signature));
-        }
-        catch (NotSupportedException)
-        {
-            // Not all platforms support this.
-            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
-        }
+        byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm)
+            .HashData(this.data);
+        byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(key, hash);
+        Assert.True(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, signature));
+        Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, PclTestUtilities.Tamper(signature)));
+        Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, PclTestUtilities.Tamper(this.data), signature));
     }
 
-    [Theory, MemberData(nameof(SigningAndHashParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningAndHashParameters))]
     public void SignHashedData_VerifySignature(ICryptographicKey key, HashAlgorithm hashAlgorithm)
     {
-        try
-        {
-            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm)
-                .HashData(this.data);
-            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(key, hash);
+        byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm)
+            .HashData(this.data);
+        byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(key, hash);
 
-            Assert.True(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, signature));
-        }
-        catch (NotSupportedException)
-        {
-            // Not all platforms support this.
-            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
-        }
+        Assert.True(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, signature));
     }
 
-    [Theory, MemberData(nameof(SigningAndHashParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningAndHashParameters))]
     public void Sign_VerifySignatureWithHashInput(ICryptographicKey key, HashAlgorithm hashAlgorithm)
     {
-        try
-        {
-            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm)
-                .HashData(this.data);
-            byte[] signature = WinRTCrypto.CryptographicEngine.Sign(key, this.data);
+        byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm)
+            .HashData(this.data);
+        byte[] signature = WinRTCrypto.CryptographicEngine.Sign(key, this.data);
 
-            Assert.True(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, signature));
-        }
-        catch (NotSupportedException)
-        {
-            // Not all platforms support this.
-            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
-        }
+        Assert.True(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, signature));
     }
 
-    [Fact]
+    [SkippableFact(typeof(NotSupportedException))]
     public void SignHashedData_VerifySignatureWithHashInput_WrongHashAlgorithm()
     {
-        try
-        {
-            byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
+        byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)
             .HashData(this.data);
-            byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(RsaSha1SigningKey, hash);
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(RsaSha256SigningKey, this.data, signature));
-            Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(RsaSha256SigningKey, hash, signature));
-        }
-        catch (NotSupportedException)
-        {
-            // Not all platforms support this.
-            this.logger.WriteLine("Skipped test for unsupported functionality on this platform.");
-        }
+        byte[] signature = WinRTCrypto.CryptographicEngine.SignHashedData(RsaSha1SigningKey, hash);
+        Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(RsaSha256SigningKey, this.data, signature));
+        Assert.False(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(RsaSha256SigningKey, hash, signature));
     }
 
     [Fact]

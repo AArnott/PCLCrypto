@@ -75,7 +75,7 @@ namespace PCLCrypto
                 NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTH_PROPERTY, keySize);
                 NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_EXPORT_POLICY_PROPERTY, 3);
                 NCryptFinalizeKey(key).ThrowOnError();
-                return new AsymmetricRsaCryptographicKey(key, this.Algorithm);
+                return new AsymmetricRsaCryptographicKey(key, this.Algorithm, publicKeyOnly: false);
             }
         }
 
@@ -101,7 +101,7 @@ namespace PCLCrypto
 
                 var key = NCryptImportKey(provider, null, nativeFormatString, IntPtr.Zero, bcryptPrivateBlob);
                 NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_EXPORT_POLICY_PROPERTY, 3);
-                return new AsymmetricRsaCryptographicKey(key, this.Algorithm);
+                return new AsymmetricRsaCryptographicKey(key, this.Algorithm, publicKeyOnly: false);
             }
         }
 
@@ -116,7 +116,7 @@ namespace PCLCrypto
                     ? keyBlob
                     : KeyFormatter.GetFormatter(NativePublicKeyFormatEnum).Write(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
                 var key = NCryptImportKey(provider, null, NativePublicKeyFormatString, IntPtr.Zero, bcryptPublicBlob);
-                return new AsymmetricRsaCryptographicKey(key, this.Algorithm);
+                return new AsymmetricRsaCryptographicKey(key, this.Algorithm, publicKeyOnly: true);
             }
         }
 

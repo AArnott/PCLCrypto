@@ -40,7 +40,7 @@ namespace PCLCrypto
             {
                 BCryptSetProperty(this.Algorithm, PropertyNames.BCRYPT_CHAINING_MODE, GetChainingMode(mode));
             }
-            catch (PInvoke.Win32Exception ex)
+            catch (PInvoke.NTStatusException ex)
             {
                 throw new ArgumentException(ex.Message, ex);
             }

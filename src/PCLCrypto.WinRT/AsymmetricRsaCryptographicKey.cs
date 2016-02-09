@@ -18,18 +18,21 @@ namespace PCLCrypto
     /// </summary>
     internal class AsymmetricRsaCryptographicKey : NCryptCryptographicKeyBase, ICryptographicKey
     {
+        private readonly bool publicKeyOnly;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricRsaCryptographicKey"/> class.
         /// </summary>
         /// <param name="key">The BCrypt cryptographic key handle.</param>
         /// <param name="algorithm">The asymmetric algorithm used by this instance.</param>
-        internal AsymmetricRsaCryptographicKey(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
+        internal AsymmetricRsaCryptographicKey(SafeKeyHandle key, AsymmetricAlgorithm algorithm, bool publicKeyOnly)
         {
             Requires.NotNull(key, nameof(key));
 
             this.Key = key;
             this.Algorithm = algorithm;
             this.SignatureHashAlgorithm = this.SignatureHash.HasValue ? WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(this.SignatureHash.Value) : null;
+            this.publicKeyOnly = publicKeyOnly;
         }
 
         protected unsafe delegate void SignOrVerifyAction(void* paddingInfo, NCryptSignHashFlags flags);
@@ -53,6 +56,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
+            Verify.Operation(!this.publicKeyOnly, "Only public key is available.");
             try
             {
                 byte[] nativeBlob;

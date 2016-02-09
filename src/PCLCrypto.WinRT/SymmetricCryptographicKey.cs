@@ -278,7 +278,7 @@ namespace PCLCrypto
                 {
                     key = BCryptGenerateSymmetricKey(this.symmetricAlgorithmProvider.Algorithm, this.keyMaterial);
                 }
-                catch (Win32Exception ex)
+                catch (NTStatusException ex)
                 {
                     throw new ArgumentException(ex.Message, ex);
                 }
