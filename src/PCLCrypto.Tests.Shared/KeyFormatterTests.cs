@@ -23,7 +23,7 @@ namespace PCLCrypto
                 var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
                 using (var key = algorithm.CreateKeyPair(512))
                 {
-                    const CryptographicPrivateKeyBlobType keyBlobFormat = CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+                    const CryptographicPrivateKeyBlobType keyBlobFormat = CryptographicPrivateKeyBlobType.BCryptFullPrivateKey;
                     byte[] bcryptNative = key.Export(keyBlobFormat);
                     var rsaParameters = KeyFormatter.GetFormatter(keyBlobFormat).Read(bcryptNative);
                     return rsaParameters;
@@ -41,12 +41,24 @@ namespace PCLCrypto
             Assert.Equal<byte>(rsaParameters.Value.Exponent, rsaParametersRead.Exponent);
             Assert.Equal<byte>(rsaParameters.Value.Modulus, rsaParametersRead.Modulus);
 
-            Assert.Equal<byte>(rsaParameters.Value.D, rsaParametersRead.D);
             Assert.Equal<byte>(rsaParameters.Value.P, rsaParametersRead.P);
             Assert.Equal<byte>(rsaParameters.Value.Q, rsaParametersRead.Q);
-            Assert.Equal<byte>(rsaParameters.Value.DP, rsaParametersRead.DP);
-            Assert.Equal<byte>(rsaParameters.Value.DQ, rsaParametersRead.DQ);
-            Assert.Equal<byte>(rsaParameters.Value.InverseQ, rsaParametersRead.InverseQ);
+
+            if (format != CryptographicPrivateKeyBlobType.BCryptPrivateKey)
+            {
+                Assert.Equal<byte>(rsaParameters.Value.D, rsaParametersRead.D);
+                Assert.Equal<byte>(rsaParameters.Value.DP, rsaParametersRead.DP);
+                Assert.Equal<byte>(rsaParameters.Value.DQ, rsaParametersRead.DQ);
+                Assert.Equal<byte>(rsaParameters.Value.InverseQ, rsaParametersRead.InverseQ);
+            }
+            else
+            {
+                // BCryptPrivateKey is lossy, by design.
+                Assert.Null(rsaParametersRead.D);
+                Assert.Null(rsaParametersRead.DP);
+                Assert.Null(rsaParametersRead.DQ);
+                Assert.Null(rsaParametersRead.InverseQ);
+            }
         }
 
         [Theory, CombinatorialData]
