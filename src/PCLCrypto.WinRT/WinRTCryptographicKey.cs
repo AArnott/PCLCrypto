@@ -42,7 +42,14 @@ namespace PCLCrypto
         /// <inheritdoc />
         public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType = CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo)
         {
-            return this.platformKey.ExportPublicKey(blobType.ToPlatformKeyBlobType()).ToArray();
+            try
+            {
+                return this.platformKey.ExportPublicKey(blobType.ToPlatformKeyBlobType()).ToArray();
+            }
+            catch (NotImplementedException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
         }
 
         /// <inheritdoc />

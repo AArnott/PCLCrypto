@@ -199,14 +199,16 @@ namespace PCLCrypto
             return new BCryptDecryptTransform(this, iv);
         }
 
+        /// <inheritdoc />
         protected override string GetBCryptBlobType(CryptographicPrivateKeyBlobType blobType)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
+        /// <inheritdoc />
         protected override string GetBCryptBlobType(CryptographicPublicKeyBlobType blobType)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
