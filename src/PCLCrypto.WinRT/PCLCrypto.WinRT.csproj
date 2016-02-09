@@ -41,6 +41,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsymmetricEcDsaCryptographicKey.cs" />
     <Compile Include="AsymmetricKeyRsaAlgorithmProvider.cs" />
     <Compile Include="AsymmetricKeyECDsaAlgorithmProvider.cs" />
     <Compile Include="AsymmetricRsaCryptographicKey.cs" />

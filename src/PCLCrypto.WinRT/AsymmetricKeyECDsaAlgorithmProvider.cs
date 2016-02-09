@@ -18,6 +18,11 @@ namespace PCLCrypto
     /// </summary>
     internal class AsymmetricKeyECDsaAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
     {
+        internal const CryptographicPublicKeyBlobType NativePublicKeyFormatEnum = CryptographicPublicKeyBlobType.BCryptPublicKey;
+        internal const string NativePublicKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB;
+        internal const CryptographicPrivateKeyBlobType NativePrivateKeyFormatEnum = CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+        internal const string NativePrivateKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_ECCPRIVATE_BLOB;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricKeyECDsaAlgorithmProvider"/> class.
         /// </summary>
@@ -57,8 +62,7 @@ namespace PCLCrypto
             {
                 var key = BCryptGenerateKeyPair(algorithm, keySize);
                 BCryptFinalizeKeyPair(key).ThrowOnError();
-                throw new NotImplementedException();
-                //return new AsymmetricCryptographicKey(key, this.Algorithm);
+                return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
             }
         }
 
@@ -69,9 +73,9 @@ namespace PCLCrypto
 
             using (var algorithm = this.OpenAlgorithm())
             {
-                var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType), keyBlob, BCryptImportKeyPairFlags.None);
-                throw new NotImplementedException();
-                //return new AsymmetricCryptographicKey(key, this.Algorithm);
+                throw new NotSupportedException();
+                ////var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType), keyBlob, BCryptImportKeyPairFlags.None);
+                ////return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
             }
         }
 
@@ -82,106 +86,15 @@ namespace PCLCrypto
 
             using (var algorithm = this.OpenAlgorithm())
             {
-                var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType, this.Algorithm.GetName()), keyBlob);
-                throw new NotImplementedException();
-                //return new AsymmetricCryptographicKey(key, this.Algorithm);
-            }
-        }
-
-        /// <summary>
-        /// Gets the platform-specific enum value for the given PCL enum value.
-        /// </summary>
-        /// <param name="blobType">The platform independent enum value for the blob type.</param>
-        /// <returns>The platform-specific enum value for the equivalent blob type.</returns>
-        internal static string GetPlatformKeyBlobType(CryptographicPublicKeyBlobType blobType, AsymmetricAlgorithmName algorithmName)
-        {
-            switch (algorithmName)
-            {
-                case AsymmetricAlgorithmName.Rsa:
-                case AsymmetricAlgorithmName.RsaSign:
-                    switch (blobType)
-                    {
-                        // TODO: fix these
-                        case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
-                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
-                        case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
-                        case CryptographicPublicKeyBlobType.BCryptPublicKey:
-                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
-                        case CryptographicPublicKeyBlobType.Capi1PublicKey:
-                            return AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
-                        default:
-                            throw new NotSupportedException();
-                    }
-
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        /// <summary>
-        /// Gets the platform-specific enum value for the given PCL enum value.
-        /// </summary>
-        /// <param name="blobType">The platform independent enum value for the blob type.</param>
-        /// <returns>The platform-specific enum value for the equivalent blob type.</returns>
-        internal static string GetPlatformKeyBlobType(CryptographicPrivateKeyBlobType blobType)
-        {
-            switch (blobType)
-            {
-                // TODO: fix these
-                case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
-                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
-                case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
-                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
-                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
-                case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
-                    return AsymmetricKeyBlobTypes.BCRYPT_PRIVATE_KEY_BLOB;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        /// <summary>
-        /// Returns the string to pass to the platform APIs for a given algorithm.
-        /// </summary>
-        /// <param name="algorithm">The algorithm desired.</param>
-        /// <returns>The platform-specific string to pass to OpenAlgorithm.</returns>
-        private static string GetAlgorithmName(AsymmetricAlgorithm algorithm)
-        {
-            switch (algorithm)
-            {
-                case AsymmetricAlgorithm.DsaSha1:
-                case AsymmetricAlgorithm.DsaSha256:
-                    return AlgorithmIdentifiers.BCRYPT_DSA_ALGORITHM;
-                case AsymmetricAlgorithm.EcdsaP256Sha256:
-                    return AlgorithmIdentifiers.BCRYPT_ECDSA_P256_ALGORITHM;
-                case AsymmetricAlgorithm.EcdsaP384Sha384:
-                    return AlgorithmIdentifiers.BCRYPT_ECDSA_P384_ALGORITHM;
-                case AsymmetricAlgorithm.EcdsaP521Sha512:
-                    return AlgorithmIdentifiers.BCRYPT_ECDSA_P521_ALGORITHM;
-                case AsymmetricAlgorithm.RsaOaepSha1:
-                case AsymmetricAlgorithm.RsaOaepSha256:
-                case AsymmetricAlgorithm.RsaOaepSha384:
-                case AsymmetricAlgorithm.RsaOaepSha512:
-                case AsymmetricAlgorithm.RsaPkcs1:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha1:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha256:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha384:
-                case AsymmetricAlgorithm.RsaSignPkcs1Sha512:
-                case AsymmetricAlgorithm.RsaSignPssSha1:
-                case AsymmetricAlgorithm.RsaSignPssSha256:
-                case AsymmetricAlgorithm.RsaSignPssSha384:
-                case AsymmetricAlgorithm.RsaSignPssSha512:
-                    return AlgorithmIdentifiers.BCRYPT_RSA_ALGORITHM;
-                default:
-                    throw new NotSupportedException();
+                throw new NotSupportedException();
+                ////var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType, this.Algorithm.GetName()), keyBlob);
+                ////return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
             }
         }
 
         private SafeAlgorithmHandle OpenAlgorithm()
         {
-            return BCryptOpenAlgorithmProvider(GetAlgorithmName(this.Algorithm));
+            return BCryptOpenAlgorithmProvider(CngUtilities.GetAlgorithmId(this.Algorithm));
         }
     }
 }

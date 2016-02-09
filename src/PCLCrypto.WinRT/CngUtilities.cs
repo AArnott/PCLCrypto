@@ -12,14 +12,29 @@ namespace PCLCrypto
 
     internal static class CngUtilities
     {
-        internal static string GetAlgorithmId(AsymmetricAlgorithm algorithm, int keySize)
+        internal static int GetAlgorithmKeySize(AsymmetricAlgorithm algorithm)
+        {
+            switch (algorithm)
+            {
+                case AsymmetricAlgorithm.EcdsaP256Sha256:
+                    return 256;
+                case AsymmetricAlgorithm.EcdsaP384Sha384:
+                    return 384;
+                case AsymmetricAlgorithm.EcdsaP521Sha512:
+                    return 521;
+                default:
+                    throw new ArgumentException("algorithm does not specify a key size.");
+            }
+        }
+
+        internal static string GetAlgorithmId(AsymmetricAlgorithm algorithm)
         {
             switch (algorithm.GetName())
             {
                 case AsymmetricAlgorithmName.Dsa:
                     return BCrypt.AlgorithmIdentifiers.BCRYPT_DSA_ALGORITHM;
                 case AsymmetricAlgorithmName.Ecdsa:
-                    switch (keySize)
+                    switch (GetAlgorithmKeySize(algorithm))
                     {
                         case 256:
                             return BCrypt.AlgorithmIdentifiers.BCRYPT_ECDSA_P256_ALGORITHM;

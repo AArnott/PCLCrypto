@@ -52,7 +52,7 @@ namespace PCLCrypto
             {
                 using (var provider = this.OpenProvider())
                 {
-                    using (var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm, 0)))
+                    using (var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm)))
                     {
                         var keySizes = NCryptGetProperty<NCRYPT_SUPPORTED_LENGTHS>(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTHS_PROPERTY);
                         return new KeySizes[]
@@ -71,7 +71,7 @@ namespace PCLCrypto
 
             using (var provider = this.OpenProvider())
             {
-                var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm, keySize));
+                var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm));
                 NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTH_PROPERTY, keySize);
                 NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_EXPORT_POLICY_PROPERTY, 3);
                 NCryptFinalizeKey(key).ThrowOnError();
