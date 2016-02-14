@@ -7,6 +7,8 @@ PCLCrypto is an [open source library][7] that provides portable class library au
 [![NuGet package](https://img.shields.io/nuget/v/PCLCrypto.svg)](https://nuget.org/packages/PCLCrypto)
 [![Join the chat at https://gitter.im/AArnott/PCLCrypto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AArnott/PCLCrypto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+[![Issue Stats][pull-requests-img]][pull-requests-url] [![Issue Stats][issues-closed-img]][issues-closed-url]
+
 ### Features
 
  * Cryptographically strong random number generator 
@@ -99,3 +101,9 @@ class TwitterClient
  [7]: http://github.com/aarnott/pclcrypto
  [8]: https://www.coinbase.com/checkouts/b3affe1c4e7b7b60028c3efcce2b1931
  [9]: http://intellitect.com/static-using-statement-in-c-6-0/
+
+[pull-requests-img]: http://www.issuestats.com/github/aarnott/pclcrypto/badge/pr
+[pull-requests-url]: http://www.issuestats.com/github/aarnott/pclcrypto
+
+[issues-closed-img]: http://www.issuestats.com/github/aarnott/pclcrypto/badge/issue
+[issues-closed-url]: http://www.issuestats.com/github/aarnott/pclcrypto
