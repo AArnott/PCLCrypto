@@ -36,40 +36,10 @@ namespace PCLCrypto
         protected abstract SafeKeyHandle Key { get; }
 
         /// <inheritdoc />
-        public byte[] Export(CryptographicPrivateKeyBlobType blobType)
-        {
-            try
-            {
-                return BCryptExportKey(this.Key, SafeKeyHandle.Null, this.GetBCryptBlobType(blobType)).ToArray();
-            }
-            catch (Win32Exception ex)
-            {
-                if ((Win32ErrorCode)ex.NativeErrorCode == Win32ErrorCode.ERROR_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
+        public abstract byte[] Export(CryptographicPrivateKeyBlobType blobType);
 
         /// <inheritdoc />
-        public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
-        {
-            try
-            {
-                return BCryptExportKey(this.Key, SafeKeyHandle.Null, this.GetBCryptBlobType(blobType)).ToArray();
-            }
-            catch (NTStatusException ex)
-            {
-                if (ex.NativeErrorCode.Value == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
+        public abstract byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType);
 
         /// <summary>
         /// Disposes of managed and native resources of this object.
@@ -84,9 +54,5 @@ namespace PCLCrypto
 
             base.Dispose(disposing);
         }
-
-        protected abstract string GetBCryptBlobType(CryptographicPrivateKeyBlobType blobType);
-
-        protected abstract string GetBCryptBlobType(CryptographicPublicKeyBlobType blobType);
     }
 }

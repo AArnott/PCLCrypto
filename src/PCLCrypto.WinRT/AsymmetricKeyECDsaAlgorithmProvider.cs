@@ -70,12 +70,12 @@ namespace PCLCrypto
         public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
         {
             Requires.NotNull(keyBlob, "keyBlob");
+            Requires.Argument(blobType == NativePrivateKeyFormatEnum, nameof(blobType), "Unsupported key blob type.");
 
             using (var algorithm = this.OpenAlgorithm())
             {
-                throw new NotSupportedException();
-                ////var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType), keyBlob, BCryptImportKeyPairFlags.None);
-                ////return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
+                var key = BCryptImportKeyPair(algorithm, NativePrivateKeyFormatString, keyBlob);
+                return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
             }
         }
 
@@ -83,12 +83,12 @@ namespace PCLCrypto
         public ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType)
         {
             Requires.NotNull(keyBlob, "keyBlob");
+            Requires.Argument(blobType == NativePublicKeyFormatEnum, nameof(blobType), "Unsupported key blob type.");
 
             using (var algorithm = this.OpenAlgorithm())
             {
-                throw new NotSupportedException();
-                ////var key = BCryptImportKeyPair(algorithm, GetPlatformKeyBlobType(blobType, this.Algorithm.GetName()), keyBlob);
-                ////return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
+                var key = BCryptImportKey(algorithm, NativePublicKeyFormatString, keyBlob);
+                return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
             }
         }
 

@@ -9,6 +9,7 @@ namespace PCLCrypto
     using System.Text;
     using System.Threading.Tasks;
     using PInvoke;
+    using Validation;
     using static PInvoke.BCrypt;
 
     /// <summary>
@@ -21,27 +22,46 @@ namespace PCLCrypto
             this.Key = key;
         }
 
+        /// <inheritdoc />
         protected override BCrypt.SafeKeyHandle Key { get; }
 
-        protected override string GetBCryptBlobType(CryptographicPublicKeyBlobType blobType)
+        /// <inheritdoc />
+        public override byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
-            switch (blobType)
+            Requires.Argument(blobType == AsymmetricKeyECDsaAlgorithmProvider.NativePrivateKeyFormatEnum, nameof(blobType), "Not a supported blob type.");
+
+            try
             {
-                case CryptographicPublicKeyBlobType.BCryptPublicKey:
-                    return AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB;
-                default:
-                    throw new NotSupportedException();
+                return BCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyECDsaAlgorithmProvider.NativePrivateKeyFormatString).ToArray();
+            }
+            catch (NTStatusException ex)
+            {
+                if (ex.NativeErrorCode == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
             }
         }
 
-        protected override string GetBCryptBlobType(CryptographicPrivateKeyBlobType blobType)
+        /// <inheritdoc />
+        public override byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
-            switch (blobType)
+            Requires.Argument(blobType == AsymmetricKeyECDsaAlgorithmProvider.NativePublicKeyFormatEnum, nameof(blobType), "Not a supported blob type.");
+
+            try
             {
-                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
-                    return AsymmetricKeyBlobTypes.BCRYPT_ECCPRIVATE_BLOB;
-                default:
-                    throw new NotSupportedException();
+                return BCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyECDsaAlgorithmProvider.NativePublicKeyFormatString).ToArray();
+            }
+            catch (NTStatusException ex)
+            {
+                if (ex.NativeErrorCode.Value == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
             }
         }
     }
