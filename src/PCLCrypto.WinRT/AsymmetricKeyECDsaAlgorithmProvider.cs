@@ -72,10 +72,22 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
             Requires.Argument(blobType == NativePrivateKeyFormatEnum, nameof(blobType), "Unsupported key blob type.");
 
-            using (var algorithm = this.OpenAlgorithm())
+            try
             {
-                var key = BCryptImportKeyPair(algorithm, NativePrivateKeyFormatString, keyBlob);
-                return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
+                using (var algorithm = this.OpenAlgorithm())
+                {
+                    var key = BCryptImportKeyPair(algorithm, NativePrivateKeyFormatString, keyBlob);
+                    return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
+                }
+            }
+            catch (NTStatusException ex)
+            {
+                if (ex.NativeErrorCode == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
             }
         }
 
@@ -85,10 +97,22 @@ namespace PCLCrypto
             Requires.NotNull(keyBlob, "keyBlob");
             Requires.Argument(blobType == NativePublicKeyFormatEnum, nameof(blobType), "Unsupported key blob type.");
 
-            using (var algorithm = this.OpenAlgorithm())
+            try
             {
-                var key = BCryptImportKey(algorithm, NativePublicKeyFormatString, keyBlob);
-                return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
+                using (var algorithm = this.OpenAlgorithm())
+                {
+                    var key = BCryptImportKey(algorithm, NativePublicKeyFormatString, keyBlob);
+                    return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
+                }
+            }
+            catch (NTStatusException ex)
+            {
+                if (ex.NativeErrorCode == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
             }
         }
 

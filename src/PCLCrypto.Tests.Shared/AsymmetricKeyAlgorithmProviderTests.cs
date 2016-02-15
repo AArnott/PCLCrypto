@@ -71,6 +71,12 @@ public class AsymmetricKeyAlgorithmProviderTests
          from blobType in Enum.GetValues(typeof(CryptographicPublicKeyBlobType)).Cast<CryptographicPublicKeyBlobType>()
          select new object[] { AsymmetricAlgorithm.RsaOaepSha1, 512, blobType }).ToArray();
 
+    public static object[][] PublicKeyFormatsAndBlobsData =>
+        Helper.PublicKeyFormatsAndBlobs.Select(kv => new object[] { kv.Key.Item1, kv.Key.Item2, kv.Value }).ToArray();
+
+    public static object[][] PrivateKeyFormatsAndBlobsData =>
+        Helper.PrivateKeyFormatsAndBlobs.Select(kv => new object[] { kv.Key.Item2, kv.Key.Item1, kv.Value }).ToArray();
+
     [Fact]
     public void OpenAlgorithm_GetAlgorithmName()
     {
@@ -260,9 +266,6 @@ public class AsymmetricKeyAlgorithmProviderTests
         }
     }
 
-    public static object[][] PrivateKeyFormatsAndBlobsData =>
-        Helper.PrivateKeyFormatsAndBlobs.Select(kv => new object[] { kv.Key.Item2, kv.Key.Item1, kv.Value }).ToArray();
-
     [SkippableTheory(typeof(NotSupportedException))]
     [MemberData(nameof(PrivateKeyFormatsAndBlobsData))]
     public void KeyPairInterop(CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithmName, string base64Key)
@@ -285,40 +288,16 @@ public class AsymmetricKeyAlgorithmProviderTests
         }
     }
 
-    [Fact]
-    public void PublicKeyInterop()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PublicKeyFormatsAndBlobsData))]
+    public void PublicKeyInterop(AsymmetricAlgorithm asymmetricAlgorithm, CryptographicPublicKeyBlobType blobType, string publicKeyBase64)
     {
-        int supportedAlgorithms = 0;
-        int supportedFormats = 0;
-        foreach (var formatAndBlob in Helper.PublicKeyFormatsAndBlobs)
-        {
-            IAsymmetricKeyAlgorithmProvider algorithm;
-            try
-            {
-                algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
-                supportedAlgorithms++;
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Algorithm {0} not supported.", formatAndBlob.Key.Item1);
-                continue;
-            }
+        IAsymmetricKeyAlgorithmProvider algorithm;
+        algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(asymmetricAlgorithm);
 
-            try
-            {
-                var key = algorithm.ImportPublicKey(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
-                string exported = Convert.ToBase64String(key.ExportPublicKey(formatAndBlob.Key.Item2));
-                Assert.Equal(formatAndBlob.Value, exported);
-                supportedFormats++;
-                this.logger.WriteLine("Key format {0} supported.", formatAndBlob.Key);
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
-            }
-        }
-
-        Assert.True(supportedFormats > 0, "No supported formats.");
+        var key = algorithm.ImportPublicKey(Convert.FromBase64String(publicKeyBase64), blobType);
+        string exported = Convert.ToBase64String(key.ExportPublicKey(blobType));
+        Assert.Equal(publicKeyBase64, exported);
     }
 
     [Fact]
