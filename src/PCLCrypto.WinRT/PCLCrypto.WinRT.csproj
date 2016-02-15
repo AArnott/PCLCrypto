@@ -41,10 +41,10 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsymmetricEcDsaCryptographicKey.cs" />
-    <Compile Include="AsymmetricKeyRsaAlgorithmProvider.cs" />
-    <Compile Include="AsymmetricKeyECDsaAlgorithmProvider.cs" />
-    <Compile Include="AsymmetricRsaCryptographicKey.cs" />
+    <Compile Include="ECDsaKey.cs" />
+    <Compile Include="RsaKeyProvider.cs" />
+    <Compile Include="ECDsaKeyProvider.cs" />
+    <Compile Include="RsaKey.cs" />
     <Compile Include="CngUtilities.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="ECDiffieHellman.cs" />

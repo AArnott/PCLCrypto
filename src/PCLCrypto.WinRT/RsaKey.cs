@@ -16,14 +16,14 @@ namespace PCLCrypto
     /// <summary>
     /// An RSA asymmetric cryptographic key backed by the Win32 crypto library.
     /// </summary>
-    internal class AsymmetricRsaCryptographicKey : NCryptAsymmetricKeyBase, ICryptographicKey
+    internal class RsaKey : NCryptAsymmetricKeyBase, ICryptographicKey
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AsymmetricRsaCryptographicKey"/> class.
+        /// Initializes a new instance of the <see cref="RsaKey"/> class.
         /// </summary>
         /// <param name="key">The BCrypt cryptographic key handle.</param>
         /// <param name="algorithm">The asymmetric algorithm used by this instance.</param>
-        internal AsymmetricRsaCryptographicKey(AsymmetricKeyRsaAlgorithmProvider provider, SafeKeyHandle key, bool isPublicOnly)
+        internal RsaKey(RsaKeyProvider provider, SafeKeyHandle key, bool isPublicOnly)
             : base(provider, key, isPublicOnly)
         {
         }

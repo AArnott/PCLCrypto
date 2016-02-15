@@ -15,9 +15,9 @@ namespace PCLCrypto
     /// <summary>
     /// A cryptographic key for ECDSA operations.
     /// </summary>
-    internal class AsymmetricEcDsaCryptographicKey : NCryptAsymmetricKeyBase
+    internal class ECDsaKey : NCryptAsymmetricKeyBase
     {
-        internal AsymmetricEcDsaCryptographicKey(NCryptAsymmetricKeyProviderBase provider, SafeKeyHandle key, bool isPublicOnly)
+        internal ECDsaKey(NCryptAsymmetricKeyProviderBase provider, SafeKeyHandle key, bool isPublicOnly)
             : base(provider, key, isPublicOnly)
         {
         }

@@ -6,43 +6,50 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Formatters;
     using PInvoke;
     using Validation;
     using static PInvoke.NCrypt;
+    using Platform = Windows.Security.Cryptography.Core;
 
     /// <summary>
     /// WinRT implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class AsymmetricKeyECDsaAlgorithmProvider : NCryptAsymmetricKeyProviderBase
+    internal class RsaKeyProvider : NCryptAsymmetricKeyProviderBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AsymmetricKeyECDsaAlgorithmProvider"/> class.
+        /// Initializes a new instance of the <see cref="RsaKeyProvider"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
-        public AsymmetricKeyECDsaAlgorithmProvider(AsymmetricAlgorithm algorithm)
+        public RsaKeyProvider(AsymmetricAlgorithm algorithm)
             : base(algorithm)
         {
+            var algorithmName = algorithm.GetName();
+            Requires.Argument(algorithmName == AsymmetricAlgorithmName.Rsa || algorithmName == AsymmetricAlgorithmName.RsaSign, nameof(algorithm), "RSA algorithm expected.");
         }
 
         /// <inheritdoc />
         protected internal override CryptographicPublicKeyBlobType NativePublicKeyFormatEnum => CryptographicPublicKeyBlobType.BCryptPublicKey;
 
         /// <inheritdoc />
-        protected internal override string NativePublicKeyFormatString => AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB;
+        protected internal override string NativePublicKeyFormatString => AsymmetricKeyBlobTypes.BCRYPT_RSAPUBLIC_BLOB;
 
         /// <inheritdoc />
         protected internal override IReadOnlyDictionary<CryptographicPrivateKeyBlobType, string> NativePrivateKeyFormats => new Dictionary<CryptographicPrivateKeyBlobType, string>
         {
-            { CryptographicPrivateKeyBlobType.BCryptPrivateKey, AsymmetricKeyBlobTypes.BCRYPT_ECCPRIVATE_BLOB },
+            { CryptographicPrivateKeyBlobType.BCryptPrivateKey, AsymmetricKeyBlobTypes.BCRYPT_RSAPRIVATE_BLOB },
+            { CryptographicPrivateKeyBlobType.BCryptFullPrivateKey, AsymmetricKeyBlobTypes.BCRYPT_RSAFULLPRIVATE_BLOB },
         };
 
         /// <inheritdoc />
-        protected internal override CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat => CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+        protected internal override CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat => CryptographicPrivateKeyBlobType.BCryptFullPrivateKey;
 
         /// <inheritdoc />
         protected override ICryptographicKey CreateKey(SafeKeyHandle key, bool publicKeyOnly)
         {
-            return new AsymmetricEcDsaCryptographicKey(this, key, publicKeyOnly);
+            return new RsaKey(this, key, publicKeyOnly);
         }
     }
 }

@@ -28,10 +28,10 @@ namespace PCLCrypto
             switch (algorithm.GetName())
             {
                 case AsymmetricAlgorithmName.Ecdsa:
-                    return new AsymmetricKeyECDsaAlgorithmProvider(algorithm);
+                    return new ECDsaKeyProvider(algorithm);
                 case AsymmetricAlgorithmName.Rsa:
                 case AsymmetricAlgorithmName.RsaSign:
-                    return new AsymmetricKeyRsaAlgorithmProvider(algorithm);
+                    return new RsaKeyProvider(algorithm);
                 case AsymmetricAlgorithmName.Dsa:
                 default:
                     throw new NotSupportedException();
