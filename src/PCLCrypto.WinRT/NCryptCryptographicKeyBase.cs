@@ -18,13 +18,15 @@ namespace PCLCrypto
     /// <summary>
     /// The base class for NCrypt implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class NCryptCryptographicKeyBase : CryptographicKey
+    internal abstract class NCryptCryptographicKeyBase : CryptographicKey, ICryptographicKey
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NCryptCryptographicKeyBase" /> class.
         /// </summary>
-        internal NCryptCryptographicKeyBase()
+        internal NCryptCryptographicKeyBase(SafeKeyHandle key)
         {
+            Requires.NotNull(key, nameof(key));
+            this.Key = key;
         }
 
         /// <inheritdoc />
@@ -33,7 +35,13 @@ namespace PCLCrypto
         /// <summary>
         /// Gets the handle to the NCrypt cryptographic key for purposes of key export.
         /// </summary>
-        protected abstract SafeKeyHandle Key { get; }
+        protected SafeKeyHandle Key { get; }
+
+        /// <inheritdoc />
+        public abstract byte[] Export(CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo);
+
+        /// <inheritdoc />
+        public abstract byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType = CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo);
 
         /// <summary>
         /// Disposes of managed and native resources of this object.

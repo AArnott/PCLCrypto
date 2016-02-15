@@ -6,12 +6,9 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using PInvoke;
     using Validation;
-    using static PInvoke.BCrypt;
-    using Platform = Windows.Security.Cryptography.Core;
+    using static PInvoke.NCrypt;
 
     /// <summary>
     /// WinRT implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
@@ -42,13 +39,16 @@ namespace PCLCrypto
         {
             get
             {
-                using (var algorithm = this.OpenAlgorithm())
+                using (var provider = this.OpenProvider())
                 {
-                    var keySizes = BCryptGetProperty<BCRYPT_KEY_LENGTHS_STRUCT>(algorithm, PropertyNames.BCRYPT_KEY_LENGTHS);
-                    return new KeySizes[]
+                    using (var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm)))
                     {
-                        new KeySizes(keySizes.MinLength, keySizes.MaxLength, keySizes.Increment),
-                    };
+                        var keySizes = NCryptGetProperty<NCRYPT_SUPPORTED_LENGTHS>(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTHS_PROPERTY);
+                        return new KeySizes[]
+                        {
+                            new KeySizes(keySizes.dwMinLength, keySizes.dwMaxLength, keySizes.dwIncrement),
+                        };
+                    }
                 }
             }
         }
@@ -58,10 +58,12 @@ namespace PCLCrypto
         {
             Requires.Range(keySize > 0, "keySize");
 
-            using (var algorithm = this.OpenAlgorithm())
+            using (var provider = this.OpenProvider())
             {
-                var key = BCryptGenerateKeyPair(algorithm, keySize);
-                BCryptFinalizeKeyPair(key).ThrowOnError();
+                var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm));
+                NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTH_PROPERTY, keySize);
+                NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_EXPORT_POLICY_PROPERTY, 3);
+                NCryptFinalizeKey(key).ThrowOnError();
                 return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
             }
         }
@@ -74,15 +76,20 @@ namespace PCLCrypto
 
             try
             {
-                using (var algorithm = this.OpenAlgorithm())
+                using (var provider = this.OpenProvider())
                 {
-                    var key = BCryptImportKeyPair(algorithm, NativePrivateKeyFormatString, keyBlob);
+                    var key = NCryptImportKey(
+                        provider,
+                        SafeKeyHandle.Null,
+                        NativePrivateKeyFormatString,
+                        IntPtr.Zero,
+                        keyBlob);
                     return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
                 }
             }
-            catch (NTStatusException ex)
+            catch (SecurityStatusException ex)
             {
-                if (ex.NativeErrorCode == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
+                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
                 {
                     throw new NotSupportedException(ex.Message, ex);
                 }
@@ -99,15 +106,20 @@ namespace PCLCrypto
 
             try
             {
-                using (var algorithm = this.OpenAlgorithm())
+                using (var provider = this.OpenProvider())
                 {
-                    var key = BCryptImportKey(algorithm, NativePublicKeyFormatString, keyBlob);
+                    var key = NCryptImportKey(
+                        provider,
+                        SafeKeyHandle.Null,
+                        NativePublicKeyFormatString,
+                        IntPtr.Zero,
+                        keyBlob);
                     return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
                 }
             }
-            catch (NTStatusException ex)
+            catch (SecurityStatusException ex)
             {
-                if (ex.NativeErrorCode == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
+                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
                 {
                     throw new NotSupportedException(ex.Message, ex);
                 }
@@ -116,9 +128,9 @@ namespace PCLCrypto
             }
         }
 
-        private SafeAlgorithmHandle OpenAlgorithm()
+        private SafeProviderHandle OpenProvider()
         {
-            return BCryptOpenAlgorithmProvider(CngUtilities.GetAlgorithmId(this.Algorithm));
+            return NCryptOpenStorageProvider(KeyStorageProviders.MS_KEY_STORAGE_PROVIDER);
         }
     }
 }

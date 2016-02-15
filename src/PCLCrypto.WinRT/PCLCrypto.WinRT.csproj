@@ -52,6 +52,7 @@
     <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="ECDiffieHellmanPublicKey.cs" />
     <Compile Include="BCryptCryptographicKeyBase.cs" />
+    <Compile Include="NCryptCryptographicAsymmetricKeyBase.cs" />
     <Compile Include="NCryptCryptographicKeyBase.cs" />
     <Compile Include="WinRTCryptographicKey.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />

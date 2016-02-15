@@ -10,20 +10,17 @@ namespace PCLCrypto
     using System.Threading.Tasks;
     using PInvoke;
     using Validation;
-    using static PInvoke.BCrypt;
+    using static PInvoke.NCrypt;
 
     /// <summary>
     /// A cryptographic key for ECDSA operations.
     /// </summary>
-    internal class AsymmetricEcDsaCryptographicKey : BCryptCryptographicKeyBase
+    internal class AsymmetricEcDsaCryptographicKey : NCryptCryptographicAsymmetricKeyBase
     {
         internal AsymmetricEcDsaCryptographicKey(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
+            : base(key, algorithm)
         {
-            this.Key = key;
         }
-
-        /// <inheritdoc />
-        protected override BCrypt.SafeKeyHandle Key { get; }
 
         /// <inheritdoc />
         public override byte[] Export(CryptographicPrivateKeyBlobType blobType)
@@ -32,7 +29,11 @@ namespace PCLCrypto
 
             try
             {
-                return BCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyECDsaAlgorithmProvider.NativePrivateKeyFormatString).ToArray();
+                return NCryptExportKey(
+                    this.Key,
+                    SafeKeyHandle.Null,
+                    AsymmetricKeyECDsaAlgorithmProvider.NativePrivateKeyFormatString,
+                    IntPtr.Zero).ToArray();
             }
             catch (NTStatusException ex)
             {
@@ -52,7 +53,11 @@ namespace PCLCrypto
 
             try
             {
-                return BCryptExportKey(this.Key, SafeKeyHandle.Null, AsymmetricKeyECDsaAlgorithmProvider.NativePublicKeyFormatString).ToArray();
+                return NCryptExportKey(
+                    this.Key,
+                    SafeKeyHandle.Null,
+                    AsymmetricKeyECDsaAlgorithmProvider.NativePublicKeyFormatString,
+                    IntPtr.Zero).ToArray();
             }
             catch (NTStatusException ex)
             {
