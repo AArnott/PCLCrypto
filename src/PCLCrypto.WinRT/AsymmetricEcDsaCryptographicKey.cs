@@ -17,57 +17,9 @@ namespace PCLCrypto
     /// </summary>
     internal class AsymmetricEcDsaCryptographicKey : NCryptAsymmetricKeyBase
     {
-        internal AsymmetricEcDsaCryptographicKey(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
-            : base(key, algorithm)
+        internal AsymmetricEcDsaCryptographicKey(NCryptAsymmetricKeyProviderBase provider, SafeKeyHandle key, bool isPublicOnly)
+            : base(provider, key, isPublicOnly)
         {
-        }
-
-        /// <inheritdoc />
-        public override byte[] Export(CryptographicPrivateKeyBlobType blobType)
-        {
-            Requires.Argument(blobType == AsymmetricKeyECDsaAlgorithmProvider.NativePrivateKeyFormatEnum, nameof(blobType), "Not a supported blob type.");
-
-            try
-            {
-                return NCryptExportKey(
-                    this.Key,
-                    SafeKeyHandle.Null,
-                    AsymmetricKeyECDsaAlgorithmProvider.NativePrivateKeyFormatString,
-                    IntPtr.Zero).ToArray();
-            }
-            catch (NTStatusException ex)
-            {
-                if (ex.NativeErrorCode == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
-
-        /// <inheritdoc />
-        public override byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
-        {
-            Requires.Argument(blobType == AsymmetricKeyECDsaAlgorithmProvider.NativePublicKeyFormatEnum, nameof(blobType), "Not a supported blob type.");
-
-            try
-            {
-                return NCryptExportKey(
-                    this.Key,
-                    SafeKeyHandle.Null,
-                    AsymmetricKeyECDsaAlgorithmProvider.NativePublicKeyFormatString,
-                    IntPtr.Zero).ToArray();
-            }
-            catch (NTStatusException ex)
-            {
-                if (ex.NativeErrorCode.Value == NTSTATUS.Code.STATUS_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
         }
     }
 }

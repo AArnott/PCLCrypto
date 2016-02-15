@@ -5,33 +5,108 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Formatters;
     using PInvoke;
     using Validation;
     using static PInvoke.NCrypt;
 
     internal abstract class NCryptAsymmetricKeyBase : NCryptKeyBase
     {
-        protected NCryptAsymmetricKeyBase(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
+        protected NCryptAsymmetricKeyBase(NCryptAsymmetricKeyProviderBase provider, SafeKeyHandle key, bool isPublicOnly)
             : base(key)
         {
-            this.Algorithm = algorithm;
+            Requires.NotNull(provider, nameof(provider));
+
+            this.Provider = provider;
             this.SignatureHashAlgorithm = this.SignatureHash.HasValue ? WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(this.SignatureHash.Value) : null;
+            this.IsPublicOnly = isPublicOnly;
         }
 
         protected unsafe delegate void SignOrVerifyAction(void* paddingInfo, NCryptSignHashFlags flags);
 
         protected unsafe delegate byte[] EncryptOrDecryptFunction(void* paddingInfo, NCryptEncryptFlags flags);
 
+        protected NCryptAsymmetricKeyProviderBase Provider { get; }
+
         protected AsymmetricEncryptionPadding? EncryptionPadding => this.Algorithm.GetEncryptionPadding();
 
         protected AsymmetricSignaturePadding? SignaturePadding => this.Algorithm.GetSignaturePadding();
 
-        protected AsymmetricAlgorithm Algorithm { get; }
+        protected AsymmetricAlgorithm Algorithm => this.Provider.Algorithm;
 
         protected HashAlgorithm? SignatureHash => this.Algorithm.GetHashAlgorithm();
 
         /// <inheritdoc />
         protected override IHashAlgorithmProvider SignatureHashAlgorithm { get; }
+
+        protected bool IsPublicOnly { get; }
+
+        /// <inheritdoc />
+        public override byte[] Export(CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo)
+        {
+            Verify.Operation(!this.IsPublicOnly, "Only public key is available.");
+            try
+            {
+                byte[] nativeBlob;
+                string nativeFormatString;
+                CryptographicPrivateKeyBlobType nativeBlobType;
+                if (this.Provider.NativePrivateKeyFormats.TryGetValue(blobType, out nativeFormatString))
+                {
+                    nativeBlobType = blobType;
+                }
+                else
+                {
+                    nativeBlobType = this.Provider.PreferredNativePrivateKeyFormat;
+                    nativeFormatString = this.Provider.NativePrivateKeyFormats[nativeBlobType];
+                }
+
+                nativeBlob = NCryptExportKey(this.Key, SafeKeyHandle.Null, nativeFormatString, IntPtr.Zero).ToArray();
+
+                byte[] formattedBlob;
+                if (nativeBlobType != blobType)
+                {
+                    var parameters = KeyFormatter.GetFormatter(nativeBlobType).Read(nativeBlob);
+                    formattedBlob = KeyFormatter.GetFormatter(blobType).Write(parameters);
+                }
+                else
+                {
+                    formattedBlob = nativeBlob;
+                }
+
+                return formattedBlob;
+            }
+            catch (SecurityStatusException ex)
+            {
+                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public override byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
+        {
+            try
+            {
+                byte[] nativeBlob = NCryptExportKey(this.Key, SafeKeyHandle.Null, this.Provider.NativePublicKeyFormatString, IntPtr.Zero).ToArray();
+                byte[] formattedBlob = blobType == this.Provider.NativePublicKeyFormatEnum
+                    ? nativeBlob
+                    : KeyFormatter.GetFormatter(blobType).Write(KeyFormatter.GetFormatter(this.Provider.NativePublicKeyFormatEnum).Read(nativeBlob));
+                return formattedBlob;
+            }
+            catch (SecurityStatusException ex)
+            {
+                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
+                {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+
+                throw;
+            }
+        }
 
         /// <inheritdoc />
         protected internal override unsafe byte[] SignHash(byte[] data)

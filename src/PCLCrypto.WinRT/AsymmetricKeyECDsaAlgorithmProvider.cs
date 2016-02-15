@@ -13,124 +13,36 @@ namespace PCLCrypto
     /// <summary>
     /// WinRT implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class AsymmetricKeyECDsaAlgorithmProvider : IAsymmetricKeyAlgorithmProvider
+    internal class AsymmetricKeyECDsaAlgorithmProvider : NCryptAsymmetricKeyProviderBase
     {
-        internal const CryptographicPublicKeyBlobType NativePublicKeyFormatEnum = CryptographicPublicKeyBlobType.BCryptPublicKey;
-        internal const string NativePublicKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB;
-        internal const CryptographicPrivateKeyBlobType NativePrivateKeyFormatEnum = CryptographicPrivateKeyBlobType.BCryptPrivateKey;
-        internal const string NativePrivateKeyFormatString = AsymmetricKeyBlobTypes.BCRYPT_ECCPRIVATE_BLOB;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AsymmetricKeyECDsaAlgorithmProvider"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
         public AsymmetricKeyECDsaAlgorithmProvider(AsymmetricAlgorithm algorithm)
+            : base(algorithm)
         {
-            this.Algorithm = algorithm;
         }
 
-        /// <summary>
-        /// Gets the algorithm.
-        /// </summary>
-        public AsymmetricAlgorithm Algorithm { get; }
+        /// <inheritdoc />
+        protected internal override CryptographicPublicKeyBlobType NativePublicKeyFormatEnum => CryptographicPublicKeyBlobType.BCryptPublicKey;
 
-        /// <inheritdoc/>
-        public IReadOnlyList<KeySizes> LegalKeySizes
+        /// <inheritdoc />
+        protected internal override string NativePublicKeyFormatString => AsymmetricKeyBlobTypes.BCRYPT_ECCPUBLIC_BLOB;
+
+        /// <inheritdoc />
+        protected internal override IReadOnlyDictionary<CryptographicPrivateKeyBlobType, string> NativePrivateKeyFormats => new Dictionary<CryptographicPrivateKeyBlobType, string>
         {
-            get
-            {
-                using (var provider = this.OpenProvider())
-                {
-                    using (var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm)))
-                    {
-                        var keySizes = NCryptGetProperty<NCRYPT_SUPPORTED_LENGTHS>(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTHS_PROPERTY);
-                        return new KeySizes[]
-                        {
-                            new KeySizes(keySizes.dwMinLength, keySizes.dwMaxLength, keySizes.dwIncrement),
-                        };
-                    }
-                }
-            }
-        }
+            { CryptographicPrivateKeyBlobType.BCryptPrivateKey, AsymmetricKeyBlobTypes.BCRYPT_ECCPRIVATE_BLOB },
+        };
 
-        /// <inheritdoc/>
-        public ICryptographicKey CreateKeyPair(int keySize)
+        /// <inheritdoc />
+        protected internal override CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat => CryptographicPrivateKeyBlobType.BCryptPrivateKey;
+
+        /// <inheritdoc />
+        protected override ICryptographicKey CreateKey(SafeKeyHandle key, bool publicKeyOnly)
         {
-            Requires.Range(keySize > 0, "keySize");
-
-            using (var provider = this.OpenProvider())
-            {
-                var key = NCryptCreatePersistedKey(provider, CngUtilities.GetAlgorithmId(this.Algorithm));
-                NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTH_PROPERTY, keySize);
-                NCryptSetProperty(key, KeyStoragePropertyIdentifiers.NCRYPT_EXPORT_POLICY_PROPERTY, 3);
-                NCryptFinalizeKey(key).ThrowOnError();
-                return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
-            }
-        }
-
-        /// <inheritdoc/>
-        public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType)
-        {
-            Requires.NotNull(keyBlob, "keyBlob");
-            Requires.Argument(blobType == NativePrivateKeyFormatEnum, nameof(blobType), "Unsupported key blob type.");
-
-            try
-            {
-                using (var provider = this.OpenProvider())
-                {
-                    var key = NCryptImportKey(
-                        provider,
-                        SafeKeyHandle.Null,
-                        NativePrivateKeyFormatString,
-                        IntPtr.Zero,
-                        keyBlob);
-                    return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
-                }
-            }
-            catch (SecurityStatusException ex)
-            {
-                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
-
-        /// <inheritdoc/>
-        public ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType)
-        {
-            Requires.NotNull(keyBlob, "keyBlob");
-            Requires.Argument(blobType == NativePublicKeyFormatEnum, nameof(blobType), "Unsupported key blob type.");
-
-            try
-            {
-                using (var provider = this.OpenProvider())
-                {
-                    var key = NCryptImportKey(
-                        provider,
-                        SafeKeyHandle.Null,
-                        NativePublicKeyFormatString,
-                        IntPtr.Zero,
-                        keyBlob);
-                    return new AsymmetricEcDsaCryptographicKey(key, this.Algorithm);
-                }
-            }
-            catch (SecurityStatusException ex)
-            {
-                if (ex.NativeErrorCode == SECURITY_STATUS.NTE_NOT_SUPPORTED)
-                {
-                    throw new NotSupportedException(ex.Message, ex);
-                }
-
-                throw;
-            }
-        }
-
-        private SafeProviderHandle OpenProvider()
-        {
-            return NCryptOpenStorageProvider(KeyStorageProviders.MS_KEY_STORAGE_PROVIDER);
+            return new AsymmetricEcDsaCryptographicKey(this, key, publicKeyOnly);
         }
     }
 }
