@@ -18,12 +18,12 @@ namespace PCLCrypto
     /// <summary>
     /// The base class for NCrypt implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class NCryptCryptographicKeyBase : CryptographicKey, ICryptographicKey
+    internal abstract class NCryptKeyBase : CryptographicKey, ICryptographicKey
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NCryptCryptographicKeyBase" /> class.
+        /// Initializes a new instance of the <see cref="NCryptKeyBase" /> class.
         /// </summary>
-        internal NCryptCryptographicKeyBase(SafeKeyHandle key)
+        internal NCryptKeyBase(SafeKeyHandle key)
         {
             Requires.NotNull(key, nameof(key));
             this.Key = key;

@@ -9,9 +9,9 @@
     using Validation;
     using static PInvoke.NCrypt;
 
-    internal abstract class NCryptCryptographicAsymmetricKeyBase : NCryptCryptographicKeyBase
+    internal abstract class NCryptAsymmetricKeyBase : NCryptKeyBase
     {
-        protected NCryptCryptographicAsymmetricKeyBase(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
+        protected NCryptAsymmetricKeyBase(SafeKeyHandle key, AsymmetricAlgorithm algorithm)
             : base(key)
         {
             this.Algorithm = algorithm;

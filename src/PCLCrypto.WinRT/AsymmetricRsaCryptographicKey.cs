@@ -16,7 +16,7 @@ namespace PCLCrypto
     /// <summary>
     /// An RSA asymmetric cryptographic key backed by the Win32 crypto library.
     /// </summary>
-    internal class AsymmetricRsaCryptographicKey : NCryptCryptographicAsymmetricKeyBase, ICryptographicKey
+    internal class AsymmetricRsaCryptographicKey : NCryptAsymmetricKeyBase, ICryptographicKey
     {
         private readonly bool publicKeyOnly;
 
