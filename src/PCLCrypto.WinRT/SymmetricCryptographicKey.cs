@@ -16,7 +16,7 @@ namespace PCLCrypto
     /// <summary>
     /// The WinRT implementation of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal partial class SymmetricCryptographicKey : BCryptCryptographicKeyBase, ICryptographicKey
+    internal partial class SymmetricCryptographicKey : BCryptKeyBase, ICryptographicKey
     {
         /// <summary>
         /// The symmetric key material.

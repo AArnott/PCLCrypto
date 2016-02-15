@@ -45,11 +45,5 @@ namespace PCLCrypto
 
         /// <inheritdoc />
         protected internal override CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat => CryptographicPrivateKeyBlobType.BCryptFullPrivateKey;
-
-        /// <inheritdoc />
-        protected override ICryptographicKey CreateKey(SafeKeyHandle key, bool publicKeyOnly)
-        {
-            return new RsaKey(this, key, publicKeyOnly);
-        }
     }
 }

@@ -10,9 +10,9 @@
     using Validation;
     using static PInvoke.NCrypt;
 
-    internal abstract class NCryptAsymmetricKeyBase : NCryptKeyBase
+    internal class NCryptAsymmetricKey : NCryptKeyBase
     {
-        protected NCryptAsymmetricKeyBase(NCryptAsymmetricKeyProviderBase provider, SafeKeyHandle key, bool isPublicOnly)
+        internal NCryptAsymmetricKey(NCryptAsymmetricKeyProviderBase provider, SafeKeyHandle key, bool isPublicOnly)
             : base(key)
         {
             Requires.NotNull(provider, nameof(provider));

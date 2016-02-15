@@ -38,11 +38,5 @@ namespace PCLCrypto
 
         /// <inheritdoc />
         protected internal override CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat => CryptographicPrivateKeyBlobType.BCryptPrivateKey;
-
-        /// <inheritdoc />
-        protected override ICryptographicKey CreateKey(SafeKeyHandle key, bool publicKeyOnly)
-        {
-            return new ECDsaKey(this, key, publicKeyOnly);
-        }
     }
 }

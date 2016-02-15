@@ -41,18 +41,16 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ECDsaKey.cs" />
     <Compile Include="RsaKeyProvider.cs" />
     <Compile Include="ECDsaKeyProvider.cs" />
-    <Compile Include="RsaKey.cs" />
     <Compile Include="CngUtilities.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="ECDiffieHellman.cs" />
     <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="ECDiffieHellmanPublicKey.cs" />
-    <Compile Include="BCryptCryptographicKeyBase.cs" />
-    <Compile Include="NCryptAsymmetricKeyBase.cs" />
+    <Compile Include="BCryptKeyBase.cs" />
+    <Compile Include="NCryptAsymmetricKey.cs" />
     <Compile Include="NCryptAsymmetricKeyProviderBase.cs" />
     <Compile Include="NCryptKeyBase.cs" />
     <Compile Include="WinRTCryptographicKey.cs" />

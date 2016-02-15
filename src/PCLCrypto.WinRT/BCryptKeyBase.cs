@@ -18,12 +18,12 @@ namespace PCLCrypto
     /// <summary>
     /// The base class for BCrypt implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class BCryptCryptographicKeyBase : CryptographicKey, ICryptographicKey
+    internal abstract class BCryptKeyBase : CryptographicKey, ICryptographicKey
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BCryptCryptographicKeyBase" /> class.
+        /// Initializes a new instance of the <see cref="BCryptKeyBase" /> class.
         /// </summary>
-        internal BCryptCryptographicKeyBase()
+        internal BCryptKeyBase()
         {
         }
 
