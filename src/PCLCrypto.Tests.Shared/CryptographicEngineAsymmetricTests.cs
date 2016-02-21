@@ -98,7 +98,8 @@ public class CryptographicEngineAsymmetricTests
             () => WinRTCrypto.CryptographicEngine.Sign(null, this.data));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void Sign_NullData(ICryptographicKey key)
     {
         Assert.Throws<ArgumentNullException>(
@@ -112,21 +113,24 @@ public class CryptographicEngineAsymmetricTests
             () => WinRTCrypto.CryptographicEngine.VerifySignature(null, this.data, new byte[2]));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void VerifySignature_NullData(ICryptographicKey key)
     {
         Assert.Throws<ArgumentNullException>(
             () => WinRTCrypto.CryptographicEngine.VerifySignature(key, null, new byte[2]));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void VerifySignature_NullSignature(ICryptographicKey key)
     {
         Assert.Throws<ArgumentNullException>(
             () => WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, null));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void SignAndVerifySignature(ICryptographicKey key)
     {
         try
@@ -163,7 +167,8 @@ public class CryptographicEngineAsymmetricTests
             () => WinRTCrypto.CryptographicEngine.SignHashedData(null, this.data));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void SignHashedData_NullHash(ICryptographicKey key)
     {
         Assert.Throws<ArgumentNullException>(
@@ -178,7 +183,8 @@ public class CryptographicEngineAsymmetricTests
             () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(null, this.data, signature));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void VerifySignatureWithHashInput_NullData(ICryptographicKey key)
     {
         var signature = new byte[23];
@@ -186,7 +192,8 @@ public class CryptographicEngineAsymmetricTests
             () => WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, null, signature));
     }
 
-    [Theory, MemberData(nameof(SigningParameters))]
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(SigningParameters))]
     public void VerifySignatureWithHashInput_NullSignature(ICryptographicKey key)
     {
         Assert.Throws<ArgumentNullException>(

@@ -300,37 +300,25 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.Equal(publicKeyBase64, exported);
     }
 
-    [Fact]
-    public void EncryptionInterop()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PrivateKeyFormatsAndBlobsData))]
+    public void EncryptionInterop(CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithmName, string base64Key)
     {
         byte[] data = new byte[] { 1, 2, 3 };
         byte[] cipherText = Convert.FromBase64String("EvnsqTK9tDemRIceCap4Yc5znXeb+nyBPsFRf6oT+OPqQ958RH7NXE3xLKsVJhOLJ4iJ2NM+AlrKRltIK8cTmw==");
-        foreach (var formatAndBlob in Helper.PrivateKeyFormatsAndBlobs)
-        {
-            var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
-            ICryptographicKey key;
-            try
-            {
-                key = algorithm.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
-            }
-            catch (NotSupportedException)
-            {
-                continue;
-            }
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        ICryptographicKey key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Key), blobType);
 
-            // Verify that we can decrypt something encrypted previously (on WinRT)
-            byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
-            Assert.Equal(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
+        // Verify that we can decrypt something encrypted previously (on WinRT)
+        byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
+        Assert.Equal(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
 
-            // Now verify we can decrypt something we encrypted ourselves.
-            byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
-            byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
-            Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
+        // Now verify we can decrypt something we encrypted ourselves.
+        byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
+        byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
+        Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
 
-            return; // We only need one key format to work for the encryption test.
-        }
-
-        Assert.True(false, "No supported formats.");
+        return; // We only need one key format to work for the encryption test.
     }
 
     [Fact(Skip = SkipIfLimitedToCapi)]

@@ -102,7 +102,9 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType)
+                .Read(keyBlob)
+                .ComputeFullPrivateKeyData();
 
             string keyIdentifier = Guid.NewGuid().ToString();
             SecKey privateKey = ImportKey(parameters, RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier));

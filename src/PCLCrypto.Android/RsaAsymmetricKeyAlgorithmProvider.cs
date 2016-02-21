@@ -77,7 +77,10 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType)
+                .Read(keyBlob)
+                .ComputeFullPrivateKeyData();
+
             IPrivateKey privateKey;
             IPublicKey publicKey;
 
