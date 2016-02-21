@@ -276,7 +276,10 @@ namespace PCLCrypto
                 key?.Dispose();
                 try
                 {
-                    key = BCryptGenerateSymmetricKey(this.symmetricAlgorithmProvider.Algorithm, this.keyMaterial);
+                    using (var algorithm = this.symmetricAlgorithmProvider.OpenAlgorithm())
+                    {
+                        key = BCryptGenerateSymmetricKey(algorithm, this.keyMaterial);
+                    }
                 }
                 catch (NTStatusException ex)
                 {
@@ -301,10 +304,13 @@ namespace PCLCrypto
 
         private SafeKeyHandle CreateKey()
         {
-            return BCryptImportKey(
-                this.symmetricAlgorithmProvider.Algorithm,
-                SymmetricKeyBlobTypes.BCRYPT_KEY_DATA_BLOB,
-                this.keyMaterial);
+            using (var algorithm = this.symmetricAlgorithmProvider.OpenAlgorithm())
+            {
+                return BCryptImportKey(
+                    algorithm,
+                    SymmetricKeyBlobTypes.BCRYPT_KEY_DATA_BLOB,
+                    this.keyMaterial);
+            }
         }
 
         private abstract class BCryptCipherTransform : ICryptoTransform

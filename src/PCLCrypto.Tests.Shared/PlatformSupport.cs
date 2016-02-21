@@ -38,15 +38,13 @@ public class PlatformSupport
             return;
         }
 
-        using (var algorithm = creator())
+        var algorithm = creator();
+        int keyLength = algorithm.LegalKeySizes.First().MinSize;
+        var keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength / 8);
+        using (var key = algorithm.CreateSymmetricKey(keyMaterial))
         {
-            int keyLength = algorithm.LegalKeySizes.First().MinSize;
-            var keyMaterial = WinRTCrypto.CryptographicBuffer.GenerateRandom(keyLength / 8);
-            using (var key = algorithm.CreateSymmetricKey(keyMaterial))
-            {
-                var ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, new byte[algorithm.BlockLength], null);
-                Assert.NotEqual(0, ciphertext.Length);
-            }
+            var ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, new byte[algorithm.BlockLength], null);
+            Assert.NotEqual(0, ciphertext.Length);
         }
     }
 

@@ -110,13 +110,11 @@ public class CryptographicEngineTests
         // the EncryptAndAuthenticate method.
         try
         {
-            using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCcm))
+            var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCcm);
+            using (var aesCcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
             {
-                using (var aesCcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
-                {
-                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesCcmKey, new byte[16]));
-                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesCcmKey, new byte[16]));
-                }
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesCcmKey, new byte[16]));
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesCcmKey, new byte[16]));
             }
         }
         catch (NotSupportedException)
@@ -126,13 +124,11 @@ public class CryptographicEngineTests
 
         try
         {
-            using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesGcm))
+            var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesGcm);
+            using (var aesGcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
             {
-                using (var aesGcmKey = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
-                {
-                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesGcmKey, new byte[16]));
-                    Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesGcmKey, new byte[16]));
-                }
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Encrypt(aesGcmKey, new byte[16]));
+                Assert.Throws<InvalidOperationException>(() => WinRTCrypto.CryptographicEngine.Decrypt(aesGcmKey, new byte[16]));
             }
         }
         catch (NotSupportedException)
@@ -192,43 +188,41 @@ public class CryptographicEngineTests
         byte[] iv = IV;
         byte[] plaintext = new byte[inputLength];
         Array.Copy(this.bigData, plaintext, inputLength);
-        using (var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, padding))
+        var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, padding);
+        using (var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
         {
-            using (var key = algorithm.CreateSymmetricKey(Convert.FromBase64String(AesKeyMaterial)))
+            if (expectedCiphertext == null)
             {
-                if (expectedCiphertext == null)
-                {
-                    Assert.Throws<ArgumentException>(
-                        () => WinRTCrypto.CryptographicEngine.Encrypt(key, plaintext, iv));
-                }
-                else
-                {
-                    byte[] actualCipherText = WinRTCrypto.CryptographicEngine.Encrypt(key, plaintext, iv);
-                    Assert.Equal(
-                        expectedCiphertext,
-                        Convert.ToBase64String(actualCipherText));
+                Assert.Throws<ArgumentException>(
+                    () => WinRTCrypto.CryptographicEngine.Encrypt(key, plaintext, iv));
+            }
+            else
+            {
+                byte[] actualCipherText = WinRTCrypto.CryptographicEngine.Encrypt(key, plaintext, iv);
+                Assert.Equal(
+                    expectedCiphertext,
+                    Convert.ToBase64String(actualCipherText));
 
-                    byte[] expectedPlainText = plaintext;
-                    if (!PaddingPreservesPlaintextLength(padding))
+                byte[] expectedPlainText = plaintext;
+                if (!PaddingPreservesPlaintextLength(padding))
+                {
+                    // Therefore the expected decrypted value will have a length that is a multiple
+                    // of the block length.
+                    int blockLength = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, SymmetricAlgorithmPadding.Zeros)
+                        .BlockLength;
+                    int bytesBeyondLastBlockLength = expectedPlainText.Length % blockLength;
+                    if (bytesBeyondLastBlockLength > 0)
                     {
-                        // Therefore the expected decrypted value will have a length that is a multiple
-                        // of the block length.
-                        int blockLength = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmName.Aes, SymmetricAlgorithmMode.Cbc, SymmetricAlgorithmPadding.Zeros)
-                            .BlockLength;
-                        int bytesBeyondLastBlockLength = expectedPlainText.Length % blockLength;
-                        if (bytesBeyondLastBlockLength > 0)
-                        {
-                            int growBy = blockLength - bytesBeyondLastBlockLength;
-                            Array.Resize(ref expectedPlainText, expectedPlainText.Length + growBy);
-                        }
+                        int growBy = blockLength - bytesBeyondLastBlockLength;
+                        Array.Resize(ref expectedPlainText, expectedPlainText.Length + growBy);
                     }
-
-                    byte[] actualPlainText = WinRTCrypto.CryptographicEngine.Decrypt(key, actualCipherText, iv);
-
-                    Assert.Equal(
-                        Convert.ToBase64String(expectedPlainText),
-                        Convert.ToBase64String(actualPlainText));
                 }
+
+                byte[] actualPlainText = WinRTCrypto.CryptographicEngine.Decrypt(key, actualCipherText, iv);
+
+                Assert.Equal(
+                    Convert.ToBase64String(expectedPlainText),
+                    Convert.ToBase64String(actualPlainText));
             }
         }
     }

@@ -113,13 +113,6 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Disposes resources associated with this instance.
-        /// </summary>
-        public void Dispose()
-        {
-        }
-
-        /// <summary>
         /// Gets the block size (in bytes) for the specified algorithm.
         /// </summary>
         /// <param name="mode">The algorithm mode.</param>
