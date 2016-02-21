@@ -23,6 +23,7 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="NCryptKeyBase" /> class.
         /// </summary>
+        /// <param name="key">The native NCrypt key that this instance represents.</param>
         internal NCryptKeyBase(SafeKeyHandle key)
         {
             Requires.NotNull(key, nameof(key));

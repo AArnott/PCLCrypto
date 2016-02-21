@@ -13,15 +13,6 @@ using Xunit.Abstractions;
 #if !(SILVERLIGHT && !WINDOWS_PHONE) // Silverlight 5 doesn't include asymmetric crypto
 public class AsymmetricKeyAlgorithmProviderTests
 {
-    /// <summary>
-    /// A dictionary of key algorithms to test with key sizes (in bits).
-    /// </summary>
-    private static readonly IReadOnlyDictionary<AsymmetricAlgorithm, int> KeyAlgorithmsAndSizesToTest = new Dictionary<AsymmetricAlgorithm, int>
-        {
-            { AsymmetricAlgorithm.RsaOaepSha1, 512 },
-            { AsymmetricAlgorithm.EcdsaP256Sha256, 256 },
-        };
-
 #if DESKTOP || WinRT
     private const string SkipIfECDsaNotSupported = null;
 #else
@@ -47,6 +38,15 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const int MinDsaKeySize = 1024;
     private const int MaxDsaKeySize = 1024;
 #endif
+
+    /// <summary>
+    /// A dictionary of key algorithms to test with key sizes (in bits).
+    /// </summary>
+    private static readonly IReadOnlyDictionary<AsymmetricAlgorithm, int> KeyAlgorithmsAndSizesToTest = new Dictionary<AsymmetricAlgorithm, int>
+        {
+            { AsymmetricAlgorithm.RsaOaepSha1, 512 },
+            { AsymmetricAlgorithm.EcdsaP256Sha256, 256 },
+        };
 
     private readonly ITestOutputHelper logger;
 

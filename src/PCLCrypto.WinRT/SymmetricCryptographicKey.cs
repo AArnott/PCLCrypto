@@ -91,6 +91,9 @@ namespace PCLCrypto
         internal SymmetricKeyAlgorithmProvider SymmetricAlgorithmProvider => this.symmetricAlgorithmProvider;
 
         /// <inheritdoc />
+        protected override SafeKeyHandle Key => this.GetInitializedKey(ref this.encryptorKey, null);
+
+        /// <inheritdoc />
         public override byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
             throw new NotSupportedException();
@@ -100,21 +103,6 @@ namespace PCLCrypto
         public override byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
             throw new NotSupportedException();
-        }
-
-        /// <inheritdoc />
-        protected override SafeKeyHandle Key => this.GetInitializedKey(ref this.encryptorKey, null);
-
-        /// <inheritdoc />
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                this.encryptorKey?.Dispose();
-                this.decryptorKey?.Dispose();
-            }
-
-            base.Dispose(disposing);
         }
 
         /// <inheritdoc />
@@ -209,6 +197,18 @@ namespace PCLCrypto
         protected internal override ICryptoTransform CreateDecryptor(byte[] iv)
         {
             return new BCryptDecryptTransform(this, iv);
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.encryptorKey?.Dispose();
+                this.decryptorKey?.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

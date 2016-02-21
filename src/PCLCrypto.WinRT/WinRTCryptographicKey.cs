@@ -12,10 +12,17 @@ namespace PCLCrypto
     using Windows.Security.Cryptography.Core;
     using Platform = Windows.Security.Cryptography;
 
+    /// <summary>
+    /// Represents a WinRT crypto based key.
+    /// </summary>
     internal class WinRTCryptographicKey : CryptographicKey, ICryptographicKey
     {
         private readonly Platform.Core.CryptographicKey platformKey;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WinRTCryptographicKey"/> class.
+        /// </summary>
+        /// <param name="platformKey">The WinRT key that this instance wraps.</param>
         internal WinRTCryptographicKey(Platform.Core.CryptographicKey platformKey)
         {
             Requires.NotNull(platformKey, nameof(platformKey));

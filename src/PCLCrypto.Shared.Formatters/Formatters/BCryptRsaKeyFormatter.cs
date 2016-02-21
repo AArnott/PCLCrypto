@@ -28,8 +28,18 @@ namespace PCLCrypto
     /// </remarks>
     internal class BCryptRsaKeyFormatter : KeyFormatter
     {
+        /// <summary>
+        /// The magic number to use in the header, based on the desired private key type
+        /// selected in the constructor.
+        /// </summary>
         private readonly BCRYPT_RSAKEY_BLOB.MagicNumber keyType;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BCryptRsaKeyFormatter"/> class.
+        /// </summary>
+        /// <param name="privateKeyType">
+        /// Either <see cref="CryptographicPrivateKeyBlobType.BCryptFullPrivateKey"/> or <see cref="CryptographicPrivateKeyBlobType.BCryptPrivateKey"/>
+        /// </param>
         public BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType privateKeyType)
         {
             Requires.Argument(privateKeyType == CryptographicPrivateKeyBlobType.BCryptFullPrivateKey || privateKeyType == CryptographicPrivateKeyBlobType.BCryptPrivateKey, nameof(privateKeyType), "Not a BCrypt key blob format.");
@@ -38,14 +48,24 @@ namespace PCLCrypto
                 : BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPRIVATE_MAGIC;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BCryptRsaKeyFormatter"/> class.
+        /// </summary>
+        /// <param name="publicKeyType">Must always be <see cref="CryptographicPublicKeyBlobType.BCryptPublicKey"/></param>
         public BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType publicKeyType)
         {
             Requires.Argument(publicKeyType == CryptographicPublicKeyBlobType.BCryptPublicKey, nameof(publicKeyType), "Not a BCrypt key blob format.");
             this.keyType = BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPUBLIC_MAGIC;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether to include the private key when serializing.
+        /// </summary>
         protected bool IncludePrivateKey => this.keyType != BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPUBLIC_MAGIC;
 
+        /// <summary>
+        /// Gets a value indicating whether to include the optional parameters of the private key when serializing the private key.
+        /// </summary>
         protected bool IncludeFullPrivateKey => this.keyType == BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAFULLPRIVATE_MAGIC;
 
         /// <inheritdoc />

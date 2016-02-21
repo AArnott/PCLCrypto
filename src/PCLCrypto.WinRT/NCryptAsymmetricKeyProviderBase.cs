@@ -11,8 +11,15 @@ namespace PCLCrypto
     using Validation;
     using static PInvoke.NCrypt;
 
+    /// <summary>
+    /// A base class for NCrypt-based asymmetric keys.
+    /// </summary>
     internal abstract class NCryptAsymmetricKeyProviderBase : IAsymmetricKeyAlgorithmProvider
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NCryptAsymmetricKeyProviderBase"/> class.
+        /// </summary>
+        /// <param name="algorithm">The asymmetric algorithm.</param>
         protected NCryptAsymmetricKeyProviderBase(AsymmetricAlgorithm algorithm)
         {
             this.Algorithm = algorithm;
@@ -42,12 +49,25 @@ namespace PCLCrypto
             }
         }
 
+        /// <summary>
+        /// Gets the PCL blob type that identifies the preferred public key format for NCrypt.
+        /// This should be the PCL equivalent of <see cref="NativePublicKeyFormatString"/>.
+        /// </summary>
         protected internal abstract CryptographicPublicKeyBlobType NativePublicKeyFormatEnum { get; }
 
+        /// <summary>
+        /// Gets the NCrypt string that identifies the preferred format for serialized public keys.
+        /// </summary>
         protected internal abstract string NativePublicKeyFormatString { get; }
 
+        /// <summary>
+        /// Gets a map of private key blob types to their NCrypt key format names.
+        /// </summary>
         protected internal abstract IReadOnlyDictionary<CryptographicPrivateKeyBlobType, string> NativePrivateKeyFormats { get; }
 
+        /// <summary>
+        /// Gets the NCrypt string that identifies the preferred format for serialized private keys.
+        /// </summary>
         protected internal abstract CryptographicPrivateKeyBlobType PreferredNativePrivateKeyFormat { get; }
 
         /// <inheritdoc/>
@@ -74,15 +94,15 @@ namespace PCLCrypto
             {
                 byte[] bcryptPrivateBlob;
                 string nativeFormatString;
-                if (NativePrivateKeyFormats.TryGetValue(blobType, out nativeFormatString))
+                if (this.NativePrivateKeyFormats.TryGetValue(blobType, out nativeFormatString))
                 {
                     bcryptPrivateBlob = keyBlob;
                 }
                 else
                 {
                     var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
-                    bcryptPrivateBlob = KeyFormatter.GetFormatter(PreferredNativePrivateKeyFormat).Write(parameters);
-                    nativeFormatString = NativePrivateKeyFormats[PreferredNativePrivateKeyFormat];
+                    bcryptPrivateBlob = KeyFormatter.GetFormatter(this.PreferredNativePrivateKeyFormat).Write(parameters);
+                    nativeFormatString = this.NativePrivateKeyFormats[this.PreferredNativePrivateKeyFormat];
                 }
 
                 var key = NCryptImportKey(provider, null, nativeFormatString, IntPtr.Zero, bcryptPrivateBlob);
@@ -98,14 +118,21 @@ namespace PCLCrypto
 
             using (var provider = NCryptOpenStorageProvider(KeyStorageProviders.MS_KEY_STORAGE_PROVIDER))
             {
-                byte[] bcryptPublicBlob = blobType == NativePublicKeyFormatEnum
+                byte[] bcryptPublicBlob = blobType == this.NativePublicKeyFormatEnum
                     ? keyBlob
-                    : KeyFormatter.GetFormatter(NativePublicKeyFormatEnum).Write(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
-                var key = NCryptImportKey(provider, null, NativePublicKeyFormatString, IntPtr.Zero, bcryptPublicBlob);
+                    : KeyFormatter.GetFormatter(this.NativePublicKeyFormatEnum).Write(KeyFormatter.GetFormatter(blobType).Read(keyBlob));
+                var key = NCryptImportKey(provider, null, this.NativePublicKeyFormatString, IntPtr.Zero, bcryptPublicBlob);
                 return this.CreateKey(key, isPublicOnly: true);
             }
         }
 
+        /// <summary>
+        /// Instantiates an instance of <see cref="ICryptographicKey"/>
+        /// (usually a derivative of <see cref="NCryptAsymmetricKey"/>).
+        /// </summary>
+        /// <param name="key">The native key to wrap.</param>
+        /// <param name="isPublicOnly"><c>true</c> if the <paramref name="key"/> contains only the public key.</param>
+        /// <returns>The instantiated PCL wrapper.</returns>
         protected virtual ICryptographicKey CreateKey(SafeKeyHandle key, bool isPublicOnly)
         {
             return new NCryptAsymmetricKey(this, key, isPublicOnly);

@@ -65,6 +65,11 @@ namespace PCLCrypto
             return Platform.CryptographicBuffer.CreateFromByteArray(array);
         }
 
+        /// <summary>
+        /// Maps a PCL key blob type to its WinRT equivalent.
+        /// </summary>
+        /// <param name="blobType">The PCL key blob type.</param>
+        /// <returns>The equivalent WinRT key blob type.</returns>
         internal static Platform.Core.CryptographicPublicKeyBlobType ToPlatformKeyBlobType(this CryptographicPublicKeyBlobType blobType)
         {
             switch (blobType)
@@ -82,6 +87,11 @@ namespace PCLCrypto
             }
         }
 
+        /// <summary>
+        /// Maps a PCL key blob type to its WinRT equivalent.
+        /// </summary>
+        /// <param name="blobType">The PCL key blob type.</param>
+        /// <returns>The equivalent WinRT key blob type.</returns>
         internal static Platform.Core.CryptographicPrivateKeyBlobType ToPlatformKeyBlobType(this CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)
