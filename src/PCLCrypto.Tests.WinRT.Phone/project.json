@@ -1,0 +1,17 @@
+﻿{
+  "dependencies": {
+    "Nerdbank.FullDuplexStream": "1.0.1",
+    "xunit": "2.1.0",
+    "xunit.runner.devices": "1.2.2",
+    "Xunit.SkippableFact": "1.2.14"
+  },
+  "frameworks": {
+    "WindowsPhoneApp,Version=v8.1": { }
+  },
+  "runtimes": {
+    "win": { },
+    "win-x86": { },
+    "win-arm": { }
+  },
+  "supports": { }
+}

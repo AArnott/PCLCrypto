@@ -1,15 +1,18 @@
-﻿using System;
-using System.Diagnostics;
-using System.Resources;
-using System.Windows;
-using System.Windows.Markup;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using PCLCrypto.Tests.WindowsPhone.Resources;
+﻿// Copyright (c) Andrew Arnott. All rights reserved.
+// Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
 namespace PCLCrypto.Tests.WindowsPhone
 {
+    using System;
+    using System.Diagnostics;
+    using System.Resources;
+    using System.Windows;
+    using System.Windows.Markup;
+    using System.Windows.Navigation;
+    using Microsoft.Phone.Controls;
+    using Microsoft.Phone.Shell;
+    using PCLCrypto.Tests.WindowsPhone.Resources;
+
     public partial class App : Application
     {
         /// <summary>
@@ -19,21 +22,21 @@ namespace PCLCrypto.Tests.WindowsPhone
         public static PhoneApplicationFrame RootFrame { get; private set; }
 
         /// <summary>
-        /// Constructor for the Application object.
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
         public App()
         {
             // Global handler for uncaught exceptions.
-            UnhandledException += Application_UnhandledException;
+            this.UnhandledException += this.Application_UnhandledException;
 
             // Standard XAML initialization
-            InitializeComponent();
+            this.InitializeComponent();
 
             // Phone-specific initialization
-            InitializePhoneApplication();
+            this.InitializePhoneApplication();
 
             // Language display initialization
-            InitializeLanguage();
+            this.InitializeLanguage();
 
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
@@ -42,11 +45,11 @@ namespace PCLCrypto.Tests.WindowsPhone
                 Application.Current.Host.Settings.EnableFrameRateCounter = true;
 
                 // Show the areas of the app that are being redrawn in each frame.
-                //Application.Current.Host.Settings.EnableRedrawRegions = true;
+                ////Application.Current.Host.Settings.EnableRedrawRegions = true;
 
                 // Enable non-production analysis visualization mode,
                 // which shows areas of a page that are handed off to GPU with a colored overlay.
-                //Application.Current.Host.Settings.EnableCacheVisualization = true;
+                ////Application.Current.Host.Settings.EnableCacheVisualization = true;
 
                 // Prevent the screen from turning off while under the debugger by disabling
                 // the application's idle detection.
@@ -54,7 +57,6 @@ namespace PCLCrypto.Tests.WindowsPhone
                 // and consume battery power when the user is not using the phone.
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
-
         }
 
         // Code to execute when the application is launching (eg, from Start)
@@ -109,33 +111,37 @@ namespace PCLCrypto.Tests.WindowsPhone
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
         {
-            if (phoneApplicationInitialized)
+            if (this.phoneApplicationInitialized)
+            {
                 return;
+            }
 
             // Create the frame but don't set it as RootVisual yet; this allows the splash
             // screen to remain active until the application is ready to render.
             RootFrame = new PhoneApplicationFrame();
-            RootFrame.Navigated += CompleteInitializePhoneApplication;
+            RootFrame.Navigated += this.CompleteInitializePhoneApplication;
 
             // Handle navigation failures
-            RootFrame.NavigationFailed += RootFrame_NavigationFailed;
+            RootFrame.NavigationFailed += this.RootFrame_NavigationFailed;
 
             // Handle reset requests for clearing the backstack
-            RootFrame.Navigated += CheckForResetNavigation;
+            RootFrame.Navigated += this.CheckForResetNavigation;
 
             // Ensure we don't initialize again
-            phoneApplicationInitialized = true;
+            this.phoneApplicationInitialized = true;
         }
 
         // Do not add any additional code to this method
         private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
         {
             // Set the root visual to allow the application to render
-            if (RootVisual != RootFrame)
-                RootVisual = RootFrame;
+            if (this.RootVisual != RootFrame)
+            {
+                this.RootVisual = RootFrame;
+            }
 
             // Remove this handler since it is no longer needed
-            RootFrame.Navigated -= CompleteInitializePhoneApplication;
+            RootFrame.Navigated -= this.CompleteInitializePhoneApplication;
         }
 
         private void CheckForResetNavigation(object sender, NavigationEventArgs e)
@@ -143,22 +149,26 @@ namespace PCLCrypto.Tests.WindowsPhone
             // If the app has received a 'reset' navigation, then we need to check
             // on the next navigation to see if the page stack should be reset
             if (e.NavigationMode == NavigationMode.Reset)
-                RootFrame.Navigated += ClearBackStackAfterReset;
+            {
+                RootFrame.Navigated += this.ClearBackStackAfterReset;
+            }
         }
 
         private void ClearBackStackAfterReset(object sender, NavigationEventArgs e)
         {
             // Unregister the event so it doesn't get called again
-            RootFrame.Navigated -= ClearBackStackAfterReset;
+            RootFrame.Navigated -= this.ClearBackStackAfterReset;
 
             // Only clear the stack for 'new' (forward) and 'refresh' navigations
             if (e.NavigationMode != NavigationMode.New && e.NavigationMode != NavigationMode.Refresh)
+            {
                 return;
+            }
 
             // For UI consistency, clear the entire page stack
             while (RootFrame.RemoveBackEntry() != null)
             {
-                ; // do nothing
+                // do nothing
             }
         }
 
@@ -180,7 +190,6 @@ namespace PCLCrypto.Tests.WindowsPhone
         //     ResourceFlowDirection's value should be "RightToLeft"
         //
         // For more info on localizing Windows Phone apps see http://go.microsoft.com/fwlink/?LinkId=262072.
-        //
         private void InitializeLanguage()
         {
             try
@@ -210,7 +219,6 @@ namespace PCLCrypto.Tests.WindowsPhone
                 // ResourceLangauge not being correctly set to a supported language
                 // code or ResourceFlowDirection is set to a value other than LeftToRight
                 // or RightToLeft.
-
                 if (Debugger.IsAttached)
                 {
                     Debugger.Break();
