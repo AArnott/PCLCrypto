@@ -7,6 +7,7 @@ namespace PCLCrypto
     using System.Diagnostics;
 #if !SILVERLIGHT
     using System.Numerics;
+    using Validation;
 #endif
 
     /// <summary>
@@ -75,9 +76,10 @@ namespace PCLCrypto
         private static RSAParameters Create(byte[] p, byte[] q, byte[] exponent, byte[] modulus)
         {
             var addlParameters = GetFullPrivateParameters(
-                p: new BigInteger(CryptoUtilities.CopyAndReverse(p)),
-                q: new BigInteger(CryptoUtilities.CopyAndReverse(q)),
-                e: new BigInteger(CryptoUtilities.CopyAndReverse(exponent)));
+                p: CryptoUtilities.FromPositiveBigEndian(p),
+                q: CryptoUtilities.FromPositiveBigEndian(q),
+                e: CryptoUtilities.FromPositiveBigEndian(exponent),
+                n: CryptoUtilities.FromPositiveBigEndian(modulus));
 
             return new RSAParameters
             {
@@ -99,21 +101,24 @@ namespace PCLCrypto
         /// <param name="p">The P parameter.</param>
         /// <param name="q">The Q parameter.</param>
         /// <param name="e">The e parameter.</param>
+        /// <param name="n">The modulus (<paramref name="p"/> * <paramref name="q"/>)</param>
         /// <returns>An <see cref="RSAParameters"/> structure initialized with
         /// the values for D, DP, DQ, InverseQ.</returns>
-        private static RSAParameters GetFullPrivateParameters(BigInteger p, BigInteger q, BigInteger e)
+        private static RSAParameters GetFullPrivateParameters(BigInteger p, BigInteger q, BigInteger e, BigInteger n)
         {
-            var n = p * q;
+            Requires.Argument(p > 0, nameof(p), "Must be positive");
+            Requires.Argument(q > 0, nameof(q), "Must be positive");
+            Requires.Argument(e > 0, nameof(e), "Must be positive");
+            Requires.Argument(n > 0, nameof(n), "Must be positive");
+
             var phiOfN = n - p - q + 1; // OR: (p - 1) * (q - 1);
 
             var d = ModInverse(e, phiOfN);
-            Debug.Assert((d * e) % phiOfN == 1, "mod inverse didn't meet goal.");
 
             var dp = d % (p - 1);
             var dq = d % (q - 1);
 
             var qInv = ModInverse(q, p);
-            ////Debug.Assert(1 == (qInv * q) % p); // this tends to fail. :(
 
             return new RSAParameters
             {
@@ -174,6 +179,7 @@ namespace PCLCrypto
                 t += n;
             }
 
+            Debug.Assert((t * a) % n == 1, "ModInverse didn't meet goal.");
             return t;
         }
 #endif

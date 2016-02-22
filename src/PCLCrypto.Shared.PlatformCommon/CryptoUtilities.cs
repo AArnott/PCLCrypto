@@ -5,6 +5,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -221,5 +222,27 @@ namespace PCLCrypto
             Array.Reverse(reversed);
             return reversed;
         }
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Creates a <see cref="System.Numerics.BigInteger"/> initialized with a big endian
+        /// data buffer, ensuring that the integer is interpreted as positive.
+        /// </summary>
+        /// <param name="data">The big endian representation of a positive integer.</param>
+        /// <returns>The initialized <see cref="System.Numerics.BigInteger"/>.</returns>
+        internal static System.Numerics.BigInteger FromPositiveBigEndian(byte[] data)
+        {
+            Requires.NotNull(data, nameof(data));
+
+            bool needsExtraByte = (data[0] & 0x80) == 0x80; // most significant bit is set
+            int littleEndianLength = needsExtraByte ? data.Length + 1 : data.Length;
+            byte[] littleEndian = new byte[littleEndianLength];
+            Array.Copy(data, littleEndian, data.Length);
+            Array.Reverse(littleEndian, 0, data.Length); // leave the trailing 0 alone if there is one.
+            var result = new System.Numerics.BigInteger(littleEndian);
+            Debug.Assert(result >= 0, "positive integer expected");
+            return result;
+        }
+#endif
     }
 }
