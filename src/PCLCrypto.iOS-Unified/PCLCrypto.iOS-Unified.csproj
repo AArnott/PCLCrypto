@@ -28,7 +28,6 @@
     <DefineConstants>$(DefineConstants);__UNIFIED__;__MOBILE__;__IOS__;Xamarin</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Security" />
     <Reference Include="System" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
