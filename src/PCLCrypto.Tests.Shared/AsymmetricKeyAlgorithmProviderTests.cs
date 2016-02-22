@@ -355,7 +355,7 @@ public class AsymmetricKeyAlgorithmProviderTests
 
         Assert.Equal<byte>(pkcs1Parameters.P, bcryptParameters.P);
         Assert.Equal<byte>(pkcs1Parameters.Q, bcryptParameters.Q);
-        Assert.Equal<byte>(pkcs1Parameters.D, bcryptParameters.D);
+        ////Assert.Equal<byte>(pkcs1Parameters.D, bcryptParameters.D); // not equal when computed ourselves, but equivalent
         Assert.Equal<byte>(pkcs1Parameters.DP, bcryptParameters.DP);
         Assert.Equal<byte>(pkcs1Parameters.DQ, bcryptParameters.DQ);
         Assert.Equal<byte>(pkcs1Parameters.InverseQ, bcryptParameters.InverseQ);
