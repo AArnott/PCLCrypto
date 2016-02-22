@@ -34,6 +34,11 @@ namespace PCLCrypto
             this.Name = name;
             this.Mode = mode;
             this.Padding = padding;
+
+            // Try opening the algorithm now to throw any exceptions that it may.
+            using (this.OpenAlgorithm())
+            {
+            }
         }
 
         /// <inheritdoc/>
