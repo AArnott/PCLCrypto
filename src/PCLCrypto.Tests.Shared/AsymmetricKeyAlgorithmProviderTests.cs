@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using PCLCrypto;
+using PCLCrypto.Formatters;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -310,15 +311,54 @@ public class AsymmetricKeyAlgorithmProviderTests
         ICryptographicKey key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Key), blobType);
 
         // Verify that we can decrypt something encrypted previously (on WinRT)
+        this.logger.WriteLine("Verify decryption of ciphertext encrypted on WinRT.");
         byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
         Assert.Equal(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
 
         // Now verify we can decrypt something we encrypted ourselves.
+        this.logger.WriteLine("Verify decryption of ciphertext encrypted on this platform.");
         byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
         byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
         Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
+    }
 
-        return; // We only need one key format to work for the encryption test.
+    /// <summary>
+    /// Verifies that BCryptPrivateKey (which lacks many of the optional private parameters)
+    /// gets filled in with the optional parameters equivalent to what they were originally.
+    /// </summary>
+    [Fact]
+    public void PrivateKeyDataComputation()
+    {
+        var algorithmName = AsymmetricAlgorithm.RsaOaepSha1;
+        string base64BCrypt = Helper.PrivateKeyFormatsAndBlobs[Tuple.Create(algorithmName, CryptographicPrivateKeyBlobType.BCryptPrivateKey)];
+        string base64Pkcs1 = Helper.PrivateKeyFormatsAndBlobs[Tuple.Create(algorithmName, CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey)];
+
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        ICryptographicKey bcryptKey = algorithm.ImportKeyPair(Convert.FromBase64String(base64BCrypt), CryptographicPrivateKeyBlobType.BCryptPrivateKey);
+        ICryptographicKey pkcs1Key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Pkcs1), CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey);
+
+        var bcryptParameters = bcryptKey.ExportParameters(true);
+        var pkcs1Parameters = pkcs1Key.ExportParameters(true);
+
+        this.logger.WriteLine("PKCS1  P: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.P));
+        this.logger.WriteLine("BCrypt P: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.P));
+        this.logger.WriteLine("PKCS1  Q: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.Q));
+        this.logger.WriteLine("BCrypt Q: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.Q));
+        this.logger.WriteLine("PKCS1  D: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.D));
+        this.logger.WriteLine("BCrypt D: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.D));
+        this.logger.WriteLine("PKCS1  DP: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.DP));
+        this.logger.WriteLine("BCrypt DP: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.DP));
+        this.logger.WriteLine("PKCS1  DQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.DQ));
+        this.logger.WriteLine("BCrypt DQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.DQ));
+        this.logger.WriteLine("PKCS1  InverseQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.InverseQ));
+        this.logger.WriteLine("BCrypt InverseQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.InverseQ));
+
+        Assert.Equal<byte>(pkcs1Parameters.P, bcryptParameters.P);
+        Assert.Equal<byte>(pkcs1Parameters.Q, bcryptParameters.Q);
+        Assert.Equal<byte>(pkcs1Parameters.D, bcryptParameters.D);
+        Assert.Equal<byte>(pkcs1Parameters.DP, bcryptParameters.DP);
+        Assert.Equal<byte>(pkcs1Parameters.DQ, bcryptParameters.DQ);
+        Assert.Equal<byte>(pkcs1Parameters.InverseQ, bcryptParameters.InverseQ);
     }
 
     [Fact(Skip = SkipIfLimitedToCapi)]
