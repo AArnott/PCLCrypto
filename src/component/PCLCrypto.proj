@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))\EnlistmentInfo.props" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.props))' != '' " />
+  <PropertyGroup>
+    <NuGetPackageRoot>$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+  </PropertyGroup>
 
   <UsingTask AssemblyFile="$(ProjectRoot)tools\VersioningTasks.dll" TaskName="NuGetPack" />
 
@@ -110,5 +113,5 @@
   </Target>
 
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))\EnlistmentInfo.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))' != '' " />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.1.52-rc\build\portable-net+win+wpa+wp+sl+net-cf+netmf+MonoAndroid+MonoTouch+Xamarin.iOS\Nerdbank.GitVersioning.targets" />
+  <Import Project="$(NuGetPackageRoot)\Nerdbank.GitVersioning\1.1.47-rc-g58708fcf8c\build\dotnet\Nerdbank.GitVersioning.targets" />
 </Project>
