@@ -35,21 +35,22 @@ namespace PCLCrypto
             this.Mode = mode;
             this.Padding = padding;
 
-            this.Algorithm = BCryptOpenAlgorithmProvider(GetAlgorithmName(name));
-            try
+            // Try opening the algorithm now to throw any exceptions that it may.
+            using (this.OpenAlgorithm())
             {
-                BCryptSetProperty(this.Algorithm, PropertyNames.BCRYPT_CHAINING_MODE, GetChainingMode(mode));
-            }
-            catch (PInvoke.Win32Exception ex)
-            {
-                throw new ArgumentException(ex.Message, ex);
             }
         }
 
         /// <inheritdoc/>
         public int BlockLength
         {
-            get { return BCryptGetProperty<int>(this.Algorithm, PropertyNames.BCRYPT_BLOCK_LENGTH); }
+            get
+            {
+                using (var algorithm = this.OpenAlgorithm())
+                {
+                    return BCryptGetProperty<int>(algorithm, PropertyNames.BCRYPT_BLOCK_LENGTH);
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -59,22 +60,20 @@ namespace PCLCrypto
             {
                 if (this.legalKeySizes == null)
                 {
-                    var keyLengths = BCryptGetProperty<BCRYPT_KEY_LENGTHS_STRUCT>(this.Algorithm, PropertyNames.BCRYPT_KEY_LENGTHS);
-                    this.legalKeySizes = new ReadOnlyCollection<KeySizes>(
-                        new[]
-                        {
-                            new KeySizes(keyLengths.MinLength, keyLengths.MaxLength, keyLengths.Increment),
-                        });
+                    using (var algorithm = this.OpenAlgorithm())
+                    {
+                        var keyLengths = BCryptGetProperty<BCRYPT_KEY_LENGTHS_STRUCT>(algorithm, PropertyNames.BCRYPT_KEY_LENGTHS);
+                        this.legalKeySizes = new ReadOnlyCollection<KeySizes>(
+                            new[]
+                            {
+                                new KeySizes(keyLengths.MinLength, keyLengths.MaxLength, keyLengths.Increment),
+                            });
+                    }
                 }
 
                 return this.legalKeySizes;
             }
         }
-
-        /// <summary>
-        /// Gets the BCrypt algorithm.
-        /// </summary>
-        internal SafeAlgorithmHandle Algorithm { get; }
 
         /// <inheritdoc/>
         public ICryptographicKey CreateSymmetricKey(byte[] keyMaterial)
@@ -85,11 +84,23 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Disposes resources associated with this instance.
+        /// Initializes a new <see cref="SafeAlgorithmHandle"/> to represent
+        /// this algorithm.
         /// </summary>
-        public void Dispose()
+        /// <returns>The new <see cref="SafeAlgorithmHandle"/>.</returns>
+        protected internal SafeAlgorithmHandle OpenAlgorithm()
         {
-            this.Algorithm.Dispose();
+            var algorithm = BCryptOpenAlgorithmProvider(GetAlgorithmName(this.Name));
+            try
+            {
+                BCryptSetProperty(algorithm, PropertyNames.BCRYPT_CHAINING_MODE, GetChainingMode(this.Mode));
+                return algorithm;
+            }
+            catch (PInvoke.NTStatusException ex)
+            {
+                algorithm.Dispose();
+                throw new ArgumentException(ex.Message, ex);
+            }
         }
 
         /// <summary>

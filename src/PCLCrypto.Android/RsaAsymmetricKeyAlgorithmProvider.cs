@@ -69,6 +69,9 @@ namespace PCLCrypto
                 D = privateKeyParameters.PrivateExponent.ToByteArray(),
             };
 
+            // Normalize RSAParameters (remove leading zeros, etc.)
+            parameters = KeyFormatter.Pkcs1.Read(KeyFormatter.Pkcs1.Write(parameters));
+
             return new RsaCryptographicKey(key.Public, key.Private, parameters, this.algorithm);
         }
 
@@ -77,7 +80,10 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType)
+                .Read(keyBlob)
+                .ComputeFullPrivateKeyData();
+
             IPrivateKey privateKey;
             IPublicKey publicKey;
 

@@ -3,6 +3,8 @@
 
 namespace PCLCrypto
 {
+    using System;
+
     /// <content>
     /// The common property getters.
     /// </content>

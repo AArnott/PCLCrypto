@@ -16,7 +16,7 @@ namespace PCLCrypto
     /// <summary>
     /// The WinRT implementation of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal partial class SymmetricCryptographicKey : CryptographicKey, ICryptographicKey
+    internal partial class SymmetricCryptographicKey : BCryptKeyBase, ICryptographicKey
     {
         /// <summary>
         /// The symmetric key material.
@@ -85,38 +85,24 @@ namespace PCLCrypto
             }
         }
 
-        /// <inheritdoc />
-        public int KeySize => this.keyMaterial.Length * 8;
-
         /// <summary>
         /// Gets the symmetric algorithm provider that created this key, if applicable.
         /// </summary>
         internal SymmetricKeyAlgorithmProvider SymmetricAlgorithmProvider => this.symmetricAlgorithmProvider;
 
-        /// <summary>
-        /// Gets the key material buffer.
-        /// </summary>
-        internal byte[] KeyMaterial => this.keyMaterial;
+        /// <inheritdoc />
+        protected override SafeKeyHandle Key => this.GetInitializedKey(ref this.encryptorKey, null);
 
         /// <inheritdoc />
-        public byte[] Export(CryptographicPrivateKeyBlobType blobType)
+        public override byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
             throw new NotSupportedException();
         }
 
         /// <inheritdoc />
-        public byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
+        public override byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType)
         {
             throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Disposes of managed resources associated with this object.
-        /// </summary>
-        public void Dispose()
-        {
-            this.encryptorKey?.Dispose();
-            this.decryptorKey?.Dispose();
         }
 
         /// <inheritdoc />
@@ -213,6 +199,18 @@ namespace PCLCrypto
             return new BCryptDecryptTransform(this, iv);
         }
 
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.encryptorKey?.Dispose();
+                this.decryptorKey?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         /// Gets the BCrypt algorithm identifier to pass to <see cref="BCryptOpenAlgorithmProvider(string, string, BCryptOpenAlgorithmProviderFlags)"/>.
         /// </summary>
@@ -278,9 +276,12 @@ namespace PCLCrypto
                 key?.Dispose();
                 try
                 {
-                    key = BCryptGenerateSymmetricKey(this.symmetricAlgorithmProvider.Algorithm, this.keyMaterial);
+                    using (var algorithm = this.symmetricAlgorithmProvider.OpenAlgorithm())
+                    {
+                        key = BCryptGenerateSymmetricKey(algorithm, this.keyMaterial);
+                    }
                 }
-                catch (Win32Exception ex)
+                catch (NTStatusException ex)
                 {
                     throw new ArgumentException(ex.Message, ex);
                 }
@@ -303,10 +304,13 @@ namespace PCLCrypto
 
         private SafeKeyHandle CreateKey()
         {
-            return BCryptImportKey(
-                this.symmetricAlgorithmProvider.Algorithm,
-                SymmetricKeyBlobTypes.BCRYPT_KEY_DATA_BLOB,
-                this.keyMaterial);
+            using (var algorithm = this.symmetricAlgorithmProvider.OpenAlgorithm())
+            {
+                return BCryptImportKey(
+                    algorithm,
+                    SymmetricKeyBlobTypes.BCRYPT_KEY_DATA_BLOB,
+                    this.keyMaterial);
+            }
         }
 
         private abstract class BCryptCipherTransform : ICryptoTransform

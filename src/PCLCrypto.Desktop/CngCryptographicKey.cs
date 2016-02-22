@@ -79,18 +79,6 @@ namespace PCLCrypto
             return this.key.Export(CngAsymmetricKeyAlgorithmProvider.GetPlatformKeyBlobType(blobType));
         }
 
-        /// <summary>
-        /// Disposes of managed resources associated with this object.
-        /// </summary>
-        public void Dispose()
-        {
-            // Delete the key since we may have created it with a name,
-            // so that we can export it, but we do not wish for it to be
-            // permanently recorded in the device's key store.
-            this.key.Delete();
-            this.key.Dispose();
-        }
-
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
@@ -125,6 +113,21 @@ namespace PCLCrypto
             {
                 return cng.VerifyHash(data, signature);
             }
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Delete the key since we may have created it with a name,
+                // so that we can export it, but we do not wish for it to be
+                // permanently recorded in the device's key store.
+                this.key.Delete();
+                this.key.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -17,11 +17,6 @@ namespace PCLCrypto
     internal class KeyDerivationParameters : IKeyDerivationParameters
     {
         /// <summary>
-        /// The platform parameters.
-        /// </summary>
-        private readonly Platform.KeyDerivationParameters platform;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="KeyDerivationParameters"/> class.
         /// </summary>
         /// <param name="parameters">The platform parameters.</param>
@@ -29,20 +24,20 @@ namespace PCLCrypto
         {
             Requires.NotNull(parameters, "parameters");
 
-            this.platform = parameters;
+            this.Parameters = parameters;
         }
 
         /// <inheritdoc />
         public int IterationCount
         {
-            get { return (int)this.platform.IterationCount; }
+            get { return (int)this.Parameters.IterationCount; }
         }
 
         /// <inheritdoc />
         public byte[] KdfGenericBinary
         {
-            get { return this.platform.KdfGenericBinary.ToArray(); }
-            set { this.platform.KdfGenericBinary = value.ToBuffer(); }
+            get { return this.Parameters.KdfGenericBinary.ToArray(); }
+            set { this.Parameters.KdfGenericBinary = value.ToBuffer(); }
         }
 
         /// <summary>
@@ -51,9 +46,6 @@ namespace PCLCrypto
         /// <value>
         /// The parameters.
         /// </value>
-        internal Platform.KeyDerivationParameters Parameters
-        {
-            get { return this.platform; }
-        }
+        internal Platform.KeyDerivationParameters Parameters { get; }
    }
 }

@@ -1,6 +1,9 @@
 ﻿{
   "dependencies": {
     "Nerdbank.FullDuplexStream": "1.0.1",
+    "System.Runtime.Numerics": "4.0.0",
+    "PInvoke.BCrypt": "0.1.433-rc-gfce000155c",
+    "PInvoke.NCrypt": "0.1.433-rc-gfce000155c",
     "xunit": "2.1.0",
     "xunit.runner.visualstudio": "2.1.0",
     "Xunit.Combinatorial": "1.1.12",

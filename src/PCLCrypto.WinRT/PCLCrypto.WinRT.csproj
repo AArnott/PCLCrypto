@@ -28,7 +28,6 @@
     <DefineConstants>TRACE;DEBUG;WinRT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,20 +35,24 @@
     <DefineConstants>TRACE;WinRT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsymmetricKeyAlgorithmProvider.cs" />
-    <Compile Include="BufferingCryptoTransform.cs" />
+    <Compile Include="RsaKeyProvider.cs" />
+    <Compile Include="ECDsaKeyProvider.cs" />
+    <Compile Include="CngUtilities.cs" />
     <Compile Include="CryptographicBuffer.cs" />
     <Compile Include="ECDiffieHellman.cs" />
     <Compile Include="ECDiffieHellmanCngPublicKeyFactory.cs" />
     <Compile Include="ECDiffieHellmanFactory.cs" />
     <Compile Include="ECDiffieHellmanPublicKey.cs" />
+    <Compile Include="BCryptKeyBase.cs" />
+    <Compile Include="NCryptAsymmetricKey.cs" />
+    <Compile Include="NCryptAsymmetricKeyProviderBase.cs" />
+    <Compile Include="NCryptKeyBase.cs" />
     <Compile Include="WinRTCryptographicKey.cs" />
     <Compile Include="WinRTCryptographicHash.cs" />
     <Compile Include="HashAlgorithmProvider.cs" />

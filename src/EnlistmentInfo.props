@@ -5,7 +5,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<ProjectRoot>$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), '$(MSBuildThisFileDirectory)'))</ProjectRoot>
+		<ProjectRoot>$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), '$(MSBuildThisFileDirectory)..\'))</ProjectRoot>
 		<SolutionDir>$(ProjectRoot)src\</SolutionDir>
 		<RestorePackages>true</RestorePackages>
 
@@ -18,11 +18,12 @@
 
     <ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-		<SignAssembly>true</SignAssembly>
+    <SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>$(SolutionDir)opensource.snk</AssemblyOriginatorKeyFile>
 
-    <CodeAnalysisRuleSet Condition=" $(MSBuildProjectName.Contains('Tests')) ">$(MSBuildThisFileDirectory)src\PCLCrypto.Tests.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition=" $(MSBuildProjectName.Contains('Tests')) ">$(SolutionDir)PCLCrypto.Tests.ruleset</CodeAnalysisRuleSet>
 
   </PropertyGroup>
 

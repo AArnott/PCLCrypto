@@ -92,6 +92,10 @@ public class MacAlgorithmProviderTests
         byte[] mac = WinRTCrypto.CryptographicEngine.Sign(key, this.data);
         Assert.True(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, mac));
         Assert.Equal(this.macBase64, Convert.ToBase64String(mac));
+
+        // Tamper with the MAC and assert that the verification fails.
+        mac[0]++;
+        Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, mac));
     }
 
     [Fact]

@@ -29,11 +29,13 @@
       </group>
       <group targetFramework="win81">
         <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.122-beta" />
+        <dependency id="PInvoke.BCrypt" version="0.1.433-rc-gfce000155c" />
+        <dependency id="PInvoke.NCrypt" version="0.1.433-rc-gfce000155c" />
       </group>
       <group targetFramework="wpa81">
         <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.122-beta" />
+        <dependency id="PInvoke.BCrypt" version="0.1.433-rc-gfce000155c" />
+        <dependency id="PInvoke.NCrypt" version="0.1.433-rc-gfce000155c" />
       </group>
     </dependencies>
   </metadata>

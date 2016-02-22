@@ -67,7 +67,10 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            var parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            var parameters = KeyFormatter.GetFormatter(blobType)
+                .Read(keyBlob)
+                .ComputeFullPrivateKeyData();
+
             if (!CapiKeyFormatter.IsCapiCompatible(parameters))
             {
                 // Try to make it CAPI compatible since it's faster on desktop,

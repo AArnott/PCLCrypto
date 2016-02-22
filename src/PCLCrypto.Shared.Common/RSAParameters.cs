@@ -11,48 +11,51 @@ namespace PCLCrypto
     /// <summary>
     /// Represents the standard parameters for the RSA algorithm.
     /// </summary>
+    /// <remarks>
+    /// All integers are encoded in big endian.
+    /// </remarks>
     public struct RSAParameters
     {
         /// <summary>
-        /// Represents the D parameter for the System.Security.Cryptography.RSA algorithm.
+        /// Represents the private exponent parameter for the System.Security.Cryptography.RSA algorithm.
         /// </summary>
         public byte[] D;
 
         /// <summary>
-        /// Represents the DP parameter for the System.Security.Cryptography.RSA algorithm.
+        /// Represents the exponent1 parameter for the System.Security.Cryptography.RSA algorithm.
         /// </summary>
         public byte[] DP;
 
         /// <summary>
-        /// Represents the DQ parameter for the System.Security.Cryptography.RSA algorithm.
+        /// Represents the exponent2 parameter for the System.Security.Cryptography.RSA algorithm.
         /// </summary>
         public byte[] DQ;
 
         /// <summary>
-        /// Represents the Exponent parameter for the System.Security.Cryptography.RSA
+        /// Represents the publicExponent parameter for the System.Security.Cryptography.RSA
         /// algorithm.
         /// </summary>
         public byte[] Exponent;
 
         /// <summary>
-        /// Represents the InverseQ parameter for the System.Security.Cryptography.RSA
+        /// Represents the coefficient parameter for the System.Security.Cryptography.RSA
         /// algorithm.
         /// </summary>
         public byte[] InverseQ;
 
         /// <summary>
-        /// Represents the Modulus parameter for the System.Security.Cryptography.RSA
+        /// Represents the modulus parameter for the System.Security.Cryptography.RSA
         /// algorithm.
         /// </summary>
         public byte[] Modulus;
 
         /// <summary>
-        /// Represents the P parameter for the System.Security.Cryptography.RSA algorithm.
+        /// Represents the prime1 parameter for the System.Security.Cryptography.RSA algorithm.
         /// </summary>
         public byte[] P;
 
         /// <summary>
-        /// Represents the Q parameter for the System.Security.Cryptography.RSA algorithm.
+        /// Represents the prime2 parameter for the System.Security.Cryptography.RSA algorithm.
         /// </summary>
         public byte[] Q;
     }

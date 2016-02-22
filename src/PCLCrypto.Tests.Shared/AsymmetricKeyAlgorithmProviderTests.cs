@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using PCLCrypto;
+using PCLCrypto.Formatters;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -25,10 +26,24 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const string SkipIfLimitedToCapi = null;
 #endif
 
+#if WinRT
+    private const int MinRsaKeySize = 512;
+    private const int MinDsaKeySize = 512;
+    private const int MaxDsaKeySize = 3072;
+#elif DESKTOP
+    private const int MinRsaKeySize = 384;
+    private const int MinDsaKeySize = 512;
+    private const int MaxDsaKeySize = 1024;
+#else
+    private const int MinRsaKeySize = 384;
+    private const int MinDsaKeySize = 1024;
+    private const int MaxDsaKeySize = 1024;
+#endif
+
     /// <summary>
     /// A dictionary of key algorithms to test with key sizes (in bits).
     /// </summary>
-    private static readonly IReadOnlyDictionary<AsymmetricAlgorithm, int> KeyAlgorithmsToTest = new Dictionary<AsymmetricAlgorithm, int>
+    private static readonly IReadOnlyDictionary<AsymmetricAlgorithm, int> KeyAlgorithmsAndSizesToTest = new Dictionary<AsymmetricAlgorithm, int>
         {
             { AsymmetricAlgorithm.RsaOaepSha1, 512 },
             { AsymmetricAlgorithm.EcdsaP256Sha256, 256 },
@@ -41,6 +56,28 @@ public class AsymmetricKeyAlgorithmProviderTests
         this.logger = logger;
     }
 
+    /// <summary>
+    /// A dictionary of key algorithms to test with key sizes (in bits).
+    /// </summary>
+    public static object[][] PrivateKeyAlgorithmsAndBlobsToTest =>
+        (from algorithmAndSize in KeyAlgorithmsAndSizesToTest
+         from blobType in Enum.GetValues(typeof(CryptographicPrivateKeyBlobType)).Cast<CryptographicPrivateKeyBlobType>()
+         select new object[] { AsymmetricAlgorithm.RsaOaepSha1, 512, blobType }).ToArray();
+
+    /// <summary>
+    /// A dictionary of key algorithms to test with key sizes (in bits).
+    /// </summary>
+    public static object[][] PublicKeyAlgorithmsAndBlobsToTest =>
+        (from algorithmAndSize in KeyAlgorithmsAndSizesToTest
+         from blobType in Enum.GetValues(typeof(CryptographicPublicKeyBlobType)).Cast<CryptographicPublicKeyBlobType>()
+         select new object[] { AsymmetricAlgorithm.RsaOaepSha1, 512, blobType }).ToArray();
+
+    public static object[][] PublicKeyFormatsAndBlobsData =>
+        Helper.PublicKeyFormatsAndBlobs.Select(kv => new object[] { kv.Key.Item1, kv.Key.Item2, kv.Value }).ToArray();
+
+    public static object[][] PrivateKeyFormatsAndBlobsData =>
+        Helper.PrivateKeyFormatsAndBlobs.Select(kv => new object[] { kv.Key.Item2, kv.Key.Item1, kv.Value }).ToArray();
+
     [Fact]
     public void OpenAlgorithm_GetAlgorithmName()
     {
@@ -49,24 +86,24 @@ public class AsymmetricKeyAlgorithmProviderTests
     }
 
     [SkippableTheory(typeof(NotSupportedException))]
-    [InlineData(AsymmetricAlgorithm.DsaSha1, 512, 1024, 64)]
-    [InlineData(AsymmetricAlgorithm.DsaSha256, 512, 1024, 64)]
+    [InlineData(AsymmetricAlgorithm.DsaSha1, MinDsaKeySize, MaxDsaKeySize, 64)]
+    [InlineData(AsymmetricAlgorithm.DsaSha256, MinDsaKeySize, MaxDsaKeySize, 64)]
     [InlineData(AsymmetricAlgorithm.EcdsaP256Sha256, 256, 256, 0)]
     [InlineData(AsymmetricAlgorithm.EcdsaP384Sha384, 384, 384, 0)]
     [InlineData(AsymmetricAlgorithm.EcdsaP521Sha512, 521, 521, 0)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha1, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha256, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha384, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha512, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaPkcs1, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha1, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha256, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha384, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha512, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha1, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha256, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha384, 384, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha512, 384, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha1, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha256, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha384, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha512, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaPkcs1, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha1, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha256, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha384, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha512, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha1, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha256, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha384, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha512, MinRsaKeySize, 16384, 8)]
     public void LegalKeySizes(AsymmetricAlgorithm name, int minSize, int maxSize, int stepSize)
     {
         IAsymmetricKeyAlgorithmProvider provider = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(name);
@@ -180,221 +217,151 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.Throws<NotSupportedException>(() => key.ExportParameters(includePrivateParameters: false));
     }
 
-    [Fact]
-    public void KeyPairRoundTrip()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PrivateKeyAlgorithmsAndBlobsToTest))]
+    public void KeyPairRoundTrip(AsymmetricAlgorithm algorithm, int keySize, CryptographicPrivateKeyBlobType format)
     {
-        int supportedAlgorithms = 0;
-        foreach (var algorithm in KeyAlgorithmsToTest)
+        IAsymmetricKeyAlgorithmProvider keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm);
+
+        using (ICryptographicKey key = keyAlgorithm.CreateKeyPair(keySize))
         {
-            this.logger.WriteLine("** Algorithm: {0} **", algorithm.Key);
-            IAsymmetricKeyAlgorithmProvider keyAlgorithm;
-            try
+            byte[] keyBlob = key.Export(format);
+            using (var key2 = keyAlgorithm.ImportKeyPair(keyBlob, format))
             {
-                keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
-                supportedAlgorithms++;
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Algorithm {0} NOT supported.", algorithm.Key);
-                continue;
-            }
+                byte[] key2Blob = key2.Export(format);
 
-            using (ICryptographicKey key = keyAlgorithm.CreateKeyPair(algorithm.Value))
-            {
-                int supportedFormats = 0;
-                foreach (CryptographicPrivateKeyBlobType format in Enum.GetValues(typeof(CryptographicPrivateKeyBlobType)))
-                {
-                    try
-                    {
-                        byte[] keyBlob = key.Export(format);
-                        using (var key2 = keyAlgorithm.ImportKeyPair(keyBlob, format))
-                        {
-                            byte[] key2Blob = key2.Export(format);
-
-                            Assert.Equal(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
-                            this.logger.WriteLine("Format {0} supported.", format);
-                            this.logger.WriteLine(Convert.ToBase64String(keyBlob));
-                            supportedFormats++;
-                        }
-                    }
-                    catch (NotSupportedException)
-                    {
-                        this.logger.WriteLine("Format {0} NOT supported.", format);
-                    }
-                }
-
-                Assert.True(supportedFormats > 0, "No supported formats.");
+                Assert.Equal(Convert.ToBase64String(keyBlob), Convert.ToBase64String(key2Blob));
+                this.logger.WriteLine(Convert.ToBase64String(keyBlob));
             }
         }
-
-        Assert.True(supportedAlgorithms > 0, "No supported algorithms.");
     }
 
-    [Fact]
-    public void PublicKeyRoundTrip()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PublicKeyAlgorithmsAndBlobsToTest))]
+    public void PublicKeyRoundTrip(AsymmetricAlgorithm algorithm, int keySize, CryptographicPublicKeyBlobType format)
     {
-        int supportedAlgorithms = 0;
-        foreach (var algorithm in KeyAlgorithmsToTest)
+        var keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm);
+
+        using (var key = keyAlgorithm.CreateKeyPair(keySize))
         {
-            this.logger.WriteLine("** Algorithm: {0} **", algorithm.Key);
-            IAsymmetricKeyAlgorithmProvider keyAlgorithm;
-            try
+            byte[] keyBlob = key.ExportPublicKey(format);
+            using (var key2 = keyAlgorithm.ImportPublicKey(keyBlob, format))
             {
-                keyAlgorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithm.Key);
-                supportedAlgorithms++;
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Algorithm {0} not supported.", algorithm);
-                continue;
-            }
+                byte[] key2Blob = key2.ExportPublicKey(format);
+                CollectionAssertEx.AreEqual(keyBlob, key2Blob);
 
-            var key = keyAlgorithm.CreateKeyPair(algorithm.Value);
-
-            int supportedFormats = 0;
-            foreach (CryptographicPublicKeyBlobType format in Enum.GetValues(typeof(CryptographicPublicKeyBlobType)))
-            {
                 try
                 {
-                    byte[] keyBlob = key.ExportPublicKey(format);
-                    var key2 = keyAlgorithm.ImportPublicKey(keyBlob, format);
-                    byte[] key2Blob = key2.ExportPublicKey(format);
-
-                    CollectionAssertEx.AreEqual(keyBlob, key2Blob);
-
-                    try
-                    {
-                        // We use a non-empty buffer here because monotouch's
-                        // Security.SecKey.Encrypt method has a bug that throws
-                        // IndexOutOfRangeException when given empty buffers.
-                        WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[1]);
-                    }
-                    catch (NotSupportedException)
-                    {
-                        // Some algorithms, such as ECDSA, only support signing/verifying.
-                    }
-
-                    this.logger.WriteLine("Format {0} supported.", format);
-                    this.logger.WriteLine("    " + Convert.ToBase64String(keyBlob));
-                    supportedFormats++;
+                    // We use a non-empty buffer here because monotouch's
+                    // Security.SecKey.Encrypt method has a bug that throws
+                    // IndexOutOfRangeException when given empty buffers.
+                    WinRTCrypto.CryptographicEngine.Encrypt(key2, new byte[1]);
                 }
                 catch (NotSupportedException)
                 {
-                    this.logger.WriteLine("Format {0} NOT supported.", format);
+                    // Some algorithms, such as ECDSA, only support signing/verifying.
                 }
+
+                this.logger.WriteLine(Convert.ToBase64String(keyBlob));
             }
-
-            Assert.True(supportedFormats > 0, "No supported formats.");
         }
-
-        Assert.True(supportedAlgorithms > 0, "No supported algorithms.");
     }
 
-    [Fact]
-    public void KeyPairInterop()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PrivateKeyFormatsAndBlobsData))]
+    public void KeyPairInterop(CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithmName, string base64Key)
     {
-        int supportedFormats = 0;
-        foreach (var formatAndBlob in Helper.PrivateKeyFormatsAndBlobs)
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        var key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Key), blobType);
+        string exported = Convert.ToBase64String(key.Export(blobType));
+        if (blobType == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == base64Key.Length - 20)
         {
-            try
-            {
-                var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
-                var key = algorithm.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
-                string exported = Convert.ToBase64String(key.Export(formatAndBlob.Key.Item2));
-                if (formatAndBlob.Key.Item2 == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == formatAndBlob.Value.Length - 20)
-                {
-                    // I'm not sure what the last 20 bytes are (perhaps the optional attributes)
-                    // But Windows platforms produces them and Android doesn't seem to.
-                    // Since the private key material seems to be elsewhere, we'll exclude
-                    // the suffix from the comparison.
-                    // The prefix is also mismatched, but that seems to also be ignorable.
-                    Assert.Equal(formatAndBlob.Value.Substring(6, exported.Length - 6), exported.Substring(6));
-                }
-                else
-                {
-                    Assert.Equal(formatAndBlob.Value, exported);
-                }
-
-                supportedFormats++;
-                this.logger.WriteLine("Key format {0} supported.", formatAndBlob.Key);
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
-            }
+            // I'm not sure what the last 20 bytes are (perhaps the optional attributes)
+            // But Windows platforms produces them and Android doesn't seem to.
+            // Since the private key material seems to be elsewhere, we'll exclude
+            // the suffix from the comparison.
+            // The prefix is also mismatched, but that seems to also be ignorable.
+            Assert.Equal(base64Key.Substring(6, exported.Length - 6), exported.Substring(6));
         }
-
-        Assert.True(supportedFormats > 0, "No supported formats.");
+        else
+        {
+            Assert.Equal(base64Key, exported);
+        }
     }
 
-    [Fact]
-    public void PublicKeyInterop()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PublicKeyFormatsAndBlobsData))]
+    public void PublicKeyInterop(AsymmetricAlgorithm asymmetricAlgorithm, CryptographicPublicKeyBlobType blobType, string publicKeyBase64)
     {
-        int supportedAlgorithms = 0;
-        int supportedFormats = 0;
-        foreach (var formatAndBlob in Helper.PublicKeyFormatsAndBlobs)
-        {
-            IAsymmetricKeyAlgorithmProvider algorithm;
-            try
-            {
-                algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
-                supportedAlgorithms++;
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Algorithm {0} not supported.", formatAndBlob.Key.Item1);
-                continue;
-            }
+        IAsymmetricKeyAlgorithmProvider algorithm;
+        algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(asymmetricAlgorithm);
 
-            try
-            {
-                var key = algorithm.ImportPublicKey(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
-                string exported = Convert.ToBase64String(key.ExportPublicKey(formatAndBlob.Key.Item2));
-                Assert.Equal(formatAndBlob.Value, exported);
-                supportedFormats++;
-                this.logger.WriteLine("Key format {0} supported.", formatAndBlob.Key);
-            }
-            catch (NotSupportedException)
-            {
-                this.logger.WriteLine("Key format {0} NOT supported.", formatAndBlob.Key);
-            }
-        }
-
-        Assert.True(supportedFormats > 0, "No supported formats.");
+        var key = algorithm.ImportPublicKey(Convert.FromBase64String(publicKeyBase64), blobType);
+        string exported = Convert.ToBase64String(key.ExportPublicKey(blobType));
+        Assert.Equal(publicKeyBase64, exported);
     }
 
-    [Fact]
-    public void EncryptionInterop()
+    [SkippableTheory(typeof(NotSupportedException))]
+    [MemberData(nameof(PrivateKeyFormatsAndBlobsData))]
+    public void EncryptionInterop(CryptographicPrivateKeyBlobType blobType, AsymmetricAlgorithm algorithmName, string base64Key)
     {
         byte[] data = new byte[] { 1, 2, 3 };
         byte[] cipherText = Convert.FromBase64String("EvnsqTK9tDemRIceCap4Yc5znXeb+nyBPsFRf6oT+OPqQ958RH7NXE3xLKsVJhOLJ4iJ2NM+AlrKRltIK8cTmw==");
-        foreach (var formatAndBlob in Helper.PrivateKeyFormatsAndBlobs)
-        {
-            var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(formatAndBlob.Key.Item1);
-            ICryptographicKey key;
-            try
-            {
-                key = algorithm.ImportKeyPair(Convert.FromBase64String(formatAndBlob.Value), formatAndBlob.Key.Item2);
-            }
-            catch (NotSupportedException)
-            {
-                continue;
-            }
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        ICryptographicKey key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Key), blobType);
 
-            // Verify that we can decrypt something encrypted previously (on WinRT)
-            byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
-            Assert.Equal(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
+        // Verify that we can decrypt something encrypted previously (on WinRT)
+        this.logger.WriteLine("Verify decryption of ciphertext encrypted on WinRT.");
+        byte[] decryptedPlaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, cipherText);
+        Assert.Equal(Convert.ToBase64String(decryptedPlaintext), Convert.ToBase64String(data));
 
-            // Now verify we can decrypt something we encrypted ourselves.
-            byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
-            byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
-            Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
-
-            return; // We only need one key format to work for the encryption test.
-        }
-
-        Assert.True(false, "No supported formats.");
+        // Now verify we can decrypt something we encrypted ourselves.
+        this.logger.WriteLine("Verify decryption of ciphertext encrypted on this platform.");
+        byte[] myciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, data);
+        byte[] myplaintext = WinRTCrypto.CryptographicEngine.Decrypt(key, myciphertext);
+        Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
     }
+
+#if !SILVERLIGHT
+    /// <summary>
+    /// Verifies that BCryptPrivateKey (which lacks many of the optional private parameters)
+    /// gets filled in with the optional parameters equivalent to what they were originally.
+    /// </summary>
+    [Fact]
+    public void PrivateKeyDataComputation()
+    {
+        var algorithmName = AsymmetricAlgorithm.RsaOaepSha1;
+        string base64BCrypt = Helper.PrivateKeyFormatsAndBlobs[Tuple.Create(algorithmName, CryptographicPrivateKeyBlobType.BCryptPrivateKey)];
+        string base64Pkcs1 = Helper.PrivateKeyFormatsAndBlobs[Tuple.Create(algorithmName, CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey)];
+
+        var algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
+        ICryptographicKey bcryptKey = algorithm.ImportKeyPair(Convert.FromBase64String(base64BCrypt), CryptographicPrivateKeyBlobType.BCryptPrivateKey);
+        ICryptographicKey pkcs1Key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Pkcs1), CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey);
+
+        var bcryptParameters = bcryptKey.ExportParameters(true);
+        var pkcs1Parameters = pkcs1Key.ExportParameters(true);
+
+        this.logger.WriteLine("PKCS1  P: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.P));
+        this.logger.WriteLine("BCrypt P: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.P));
+        this.logger.WriteLine("PKCS1  Q: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.Q));
+        this.logger.WriteLine("BCrypt Q: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.Q));
+        this.logger.WriteLine("PKCS1  D: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.D));
+        this.logger.WriteLine("BCrypt D: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.D));
+        this.logger.WriteLine("PKCS1  DP: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.DP));
+        this.logger.WriteLine("BCrypt DP: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.DP));
+        this.logger.WriteLine("PKCS1  DQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.DQ));
+        this.logger.WriteLine("BCrypt DQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.DQ));
+        this.logger.WriteLine("PKCS1  InverseQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(pkcs1Parameters.InverseQ));
+        this.logger.WriteLine("BCrypt InverseQ: {0}", WinRTCrypto.CryptographicBuffer.EncodeToHexString(bcryptParameters.InverseQ));
+
+        Assert.Equal<byte>(pkcs1Parameters.P, bcryptParameters.P);
+        Assert.Equal<byte>(pkcs1Parameters.Q, bcryptParameters.Q);
+        ////Assert.Equal<byte>(pkcs1Parameters.D, bcryptParameters.D); // not equal when computed ourselves, but equivalent
+        Assert.Equal<byte>(pkcs1Parameters.DP, bcryptParameters.DP);
+        Assert.Equal<byte>(pkcs1Parameters.DQ, bcryptParameters.DQ);
+        Assert.Equal<byte>(pkcs1Parameters.InverseQ, bcryptParameters.InverseQ);
+    }
+#endif
 
     [Fact(Skip = SkipIfLimitedToCapi)]
     public void KeyPairInterop_iOSGenerated()

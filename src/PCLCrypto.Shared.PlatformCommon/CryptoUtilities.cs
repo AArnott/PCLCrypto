@@ -5,6 +5,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -15,6 +16,32 @@ namespace PCLCrypto
     /// </summary>
     internal static class CryptoUtilities
     {
+        /// <summary>
+        /// Extracts the array out of an <see cref="ArraySegment{T}"/>,
+        /// allocating a new array if necessary to remove any slack space.
+        /// </summary>
+        /// <typeparam name="T">The type of element in the array.</typeparam>
+        /// <param name="array">The array segment.</param>
+        /// <returns>An instance of an array with no slack space; or <c>null</c> if <see cref="ArraySegment{T}.Array"/> is null in <paramref name="array"/>.</returns>
+        internal static T[] AsTrimmedArray<T>(this ArraySegment<T> array)
+        {
+            if (array.Array == null)
+            {
+                return null;
+            }
+
+            if (array.Offset == 0 && array.Count == array.Array.Length)
+            {
+                return array.Array;
+            }
+            else
+            {
+                var result = new T[array.Count];
+                Array.Copy(array.Array, array.Offset, result, 0, array.Count);
+                return result;
+            }
+        }
+
         /// <summary>
         /// Grows a buffer as necessary to align with a block size.
         /// </summary>
@@ -168,5 +195,54 @@ namespace PCLCrypto
 
             return new[] { range };
         }
+
+        /// <summary>
+        /// Allocates an array of characters to represent the specified string, with a null terminating character as the last array element.
+        /// </summary>
+        /// <param name="value">The string to represent as a character array.</param>
+        /// <returns>The character array with null terminator.</returns>
+        internal static char[] ToCharArrayWithNullTerminator(this string value)
+        {
+            Requires.NotNull(value, nameof(value));
+
+            char[] buffer = new char[value.Length + 1];
+            value.CopyTo(0, buffer, 0, value.Length);
+            return buffer;
+        }
+
+        /// <summary>
+        /// Returns a copy of the specified buffer where the copy has its byte order reversed.
+        /// </summary>
+        /// <param name="data">The buffer to copy and reverse.</param>
+        /// <returns>The new buffer with the contents of the original buffer reversed.</returns>
+        internal static byte[] CopyAndReverse(byte[] data)
+        {
+            byte[] reversed = new byte[data.Length];
+            Array.Copy(data, 0, reversed, 0, data.Length);
+            Array.Reverse(reversed);
+            return reversed;
+        }
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Creates a <see cref="System.Numerics.BigInteger"/> initialized with a big endian
+        /// data buffer, ensuring that the integer is interpreted as positive.
+        /// </summary>
+        /// <param name="data">The big endian representation of a positive integer.</param>
+        /// <returns>The initialized <see cref="System.Numerics.BigInteger"/>.</returns>
+        internal static System.Numerics.BigInteger FromPositiveBigEndian(byte[] data)
+        {
+            Requires.NotNull(data, nameof(data));
+
+            bool needsExtraByte = (data[0] & 0x80) == 0x80; // most significant bit is set
+            int littleEndianLength = needsExtraByte ? data.Length + 1 : data.Length;
+            byte[] littleEndian = new byte[littleEndianLength];
+            Array.Copy(data, littleEndian, data.Length);
+            Array.Reverse(littleEndian, 0, data.Length); // leave the trailing 0 alone if there is one.
+            var result = new System.Numerics.BigInteger(littleEndian);
+            Debug.Assert(result >= 0, "positive integer expected");
+            return result;
+        }
+#endif
     }
 }

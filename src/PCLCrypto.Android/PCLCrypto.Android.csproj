@@ -28,10 +28,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
-    <Reference Include="Mono.Security" />
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Xml.Linq" />

@@ -25,7 +25,17 @@ namespace PCLCrypto
         /// <inheritdoc />
         public IAsymmetricKeyAlgorithmProvider OpenAlgorithm(AsymmetricAlgorithm algorithm)
         {
-            return new AsymmetricKeyAlgorithmProvider(algorithm);
+            switch (algorithm.GetName())
+            {
+                case AsymmetricAlgorithmName.Ecdsa:
+                    return new ECDsaKeyProvider(algorithm);
+                case AsymmetricAlgorithmName.Rsa:
+                case AsymmetricAlgorithmName.RsaSign:
+                    return new RsaKeyProvider(algorithm);
+                case AsymmetricAlgorithmName.Dsa:
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

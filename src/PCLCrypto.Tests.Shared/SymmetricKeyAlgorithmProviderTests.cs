@@ -43,52 +43,50 @@ public class SymmetricKeyAlgorithmProviderTests
     {
         var blockMode = name.IsBlockCipher() ? SymmetricAlgorithmMode.Cbc : SymmetricAlgorithmMode.Streaming;
         var padding = name.IsBlockCipher() ? SymmetricAlgorithmPadding.PKCS7 : SymmetricAlgorithmPadding.None;
-        using (ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, padding))
+        ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(name, blockMode, padding);
+        var result = provider.LegalKeySizes;
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+
+        var random = new Random();
+        Action<int> attemptKeySize = size =>
         {
-            var result = provider.LegalKeySizes;
-            Assert.NotNull(result);
-            Assert.NotEmpty(result);
-
-            var random = new Random();
-            Action<int> attemptKeySize = size =>
-            {
-                var keyMaterial = new byte[size / 8];
-                random.NextBytes(keyMaterial); // some algorithms check against weak keys (e.g. all zeros)
+            var keyMaterial = new byte[size / 8];
+            random.NextBytes(keyMaterial); // some algorithms check against weak keys (e.g. all zeros)
                 provider.CreateSymmetricKey(keyMaterial).Dispose();
-            };
+        };
 
-            // Verify that each allegedly legal key size actually works.
-            foreach (var item in result)
+        // Verify that each allegedly legal key size actually works.
+        foreach (var item in result)
+        {
+            this.logger.WriteLine($"{item.MinSize}-{item.MaxSize} ({item.StepSize})");
+            foreach (var keySize in item)
             {
-                this.logger.WriteLine($"{item.MinSize}-{item.MaxSize} ({item.StepSize})");
-                foreach (var keySize in item)
-                {
-                    attemptKeySize(keySize);
-                }
-
-                // Also check the cases just off the edges of the range to see that they actually fail.
-                // This ensures the returned values aren't too conservative.
-#if false // WinRT actually doesn't throw when given keys of inappropriate size. Go figure.
-                if (item.StepSize > 0)
-                {
-                    if (item.MinSize - item.StepSize > 0)
-                    {
-                        Assert.Throws<ArgumentException>(() => attemptKeySize(item.MinSize - item.StepSize));
-                    }
-
-                    if (item.MaxSize + item.StepSize > 0)
-                    {
-                        Assert.Throws<ArgumentException>(() => attemptKeySize(item.MaxSize + item.StepSize));
-                    }
-                }
-#endif
+                attemptKeySize(keySize);
             }
 
-            var range = result.Single();
-            Assert.Equal(minSize, range.MinSize);
-            Assert.Equal(maxSize, range.MaxSize);
-            Assert.Equal(stepSize, range.StepSize);
+            // Also check the cases just off the edges of the range to see that they actually fail.
+            // This ensures the returned values aren't too conservative.
+#if false // WinRT actually doesn't throw when given keys of inappropriate size. Go figure.
+            if (item.StepSize > 0)
+            {
+                if (item.MinSize - item.StepSize > 0)
+                {
+                    Assert.Throws<ArgumentException>(() => attemptKeySize(item.MinSize - item.StepSize));
+                }
+
+                if (item.MaxSize + item.StepSize > 0)
+                {
+                    Assert.Throws<ArgumentException>(() => attemptKeySize(item.MaxSize + item.StepSize));
+                }
+            }
+#endif
         }
+
+        var range = result.Single();
+        Assert.Equal(minSize, range.MinSize);
+        Assert.Equal(maxSize, range.MaxSize);
+        Assert.Equal(stepSize, range.StepSize);
     }
 
     [Fact]

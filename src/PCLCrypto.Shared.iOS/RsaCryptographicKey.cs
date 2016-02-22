@@ -131,15 +131,6 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Disposes of managed resources associated with this object.
-        /// </summary>
-        public void Dispose()
-        {
-            this.publicKey.Dispose();
-            this.privateKey.Dispose();
-        }
-
-        /// <summary>
         /// Returns a key identifier specifically for private keys.
         /// </summary>
         /// <param name="tag">The generic private/public key identifier.</param>
@@ -282,6 +273,18 @@ namespace PCLCrypto
                 cipherTextHandle.Free();
                 plainTextHandle.Free();
             }
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.publicKey?.Dispose();
+                this.privateKey?.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

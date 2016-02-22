@@ -21,11 +21,6 @@ namespace PCLCrypto.Formatters
         internal static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
 
         /// <summary>
-        /// The PKCS1 key formatter that prepends zeros to certain RSA parameters.
-        /// </summary>
-        internal static readonly KeyFormatter Pkcs1PrependZeros = new Pkcs1KeyFormatter(prependLeadingZeroOnCertainElements: true);
-
-        /// <summary>
         /// The PKCS8 key formatter.
         /// </summary>
         internal static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
@@ -39,6 +34,23 @@ namespace PCLCrypto.Formatters
         /// The CAPI key formatter.
         /// </summary>
         internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// The key formatter for BCrypt RSA private keys.
+        /// </summary>
+        internal static readonly KeyFormatter BCryptRsaPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
+
+        /// <summary>
+        /// The key formatter for BCrypt RSA full private keys.
+        /// </summary>
+        internal static readonly KeyFormatter BCryptRsaFullPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptFullPrivateKey);
+
+        /// <summary>
+        /// The key formatter for BCrypt RSA public keys.
+        /// </summary>
+        internal static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
+#endif
 
         /// <summary>
         /// The PKCS1 object identifier
@@ -62,9 +74,15 @@ namespace PCLCrypto.Formatters
                 case CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo:
                     return Pkcs8;
                 case CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey:
-                    return Pkcs1PrependZeros;
+                    return Pkcs1;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return Capi;
+#if !SILVERLIGHT
+                case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
+                    return BCryptRsaPrivateKey;
+                case CryptographicPrivateKeyBlobType.BCryptFullPrivateKey:
+                    return BCryptRsaFullPrivateKey;
+#endif
                 default:
                     throw new NotSupportedException();
             }
@@ -82,9 +100,13 @@ namespace PCLCrypto.Formatters
                 case CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo:
                     return X509SubjectPublicKeyInfo;
                 case CryptographicPublicKeyBlobType.Pkcs1RsaPublicKey:
-                    return Pkcs1PrependZeros;
+                    return Pkcs1;
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     return Capi;
+#if !SILVERLIGHT
+                case CryptographicPublicKeyBlobType.BCryptPublicKey:
+                    return BCryptRsaPublicKey;
+#endif
                 default:
                     throw new NotSupportedException();
             }
@@ -217,7 +239,7 @@ namespace PCLCrypto.Formatters
 
                 parameters.Modulus = TrimLeadingZero(parameters.Modulus);
                 parameters.D = TrimLeadingZero(parameters.D);
-                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D.Length);
+                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
                 parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
                 parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
 
@@ -328,7 +350,10 @@ namespace PCLCrypto.Formatters
         /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
         protected static byte[] TrimLeadingZero(byte[] buffer)
         {
-            Requires.NotNull(buffer, "buffer");
+            if (buffer == null)
+            {
+                return null;
+            }
 
             if (buffer.Length > 0 && buffer[0] == 0)
             {
@@ -351,21 +376,33 @@ namespace PCLCrypto.Formatters
         /// </returns>
         protected static byte[] TrimOrPadZeroToLength(byte[] buffer, int desiredLength)
         {
-            Requires.NotNull(buffer, "buffer");
             Requires.Range(desiredLength > 0, "desiredLength");
 
+            if (buffer == null)
+            {
+                return null;
+            }
+
+            byte[] result = buffer;
             if (buffer.Length > desiredLength)
             {
-                return TrimLeadingZero(buffer);
+                result = TrimLeadingZero(buffer);
             }
             else if (buffer.Length < desiredLength)
             {
-                return PrependLeadingZero(buffer);
+                result = PrependLeadingZero(buffer, alwaysPrependZero: true);
             }
-            else
+
+            try
             {
-                return buffer;
+                VerifyFormat(result.Length == desiredLength);
             }
+            catch (FormatException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -380,7 +417,7 @@ namespace PCLCrypto.Formatters
         {
             Requires.NotNull(buffer, "buffer");
 
-            if (buffer[0] != 0 || alwaysPrependZero)
+            if ((buffer[0] & 0x80) == 0x80 || alwaysPrependZero)
             {
                 byte[] modifiedBuffer = new byte[buffer.Length + 1];
                 Buffer.BlockCopy(buffer, 0, modifiedBuffer, 1, buffer.Length);
@@ -411,6 +448,19 @@ namespace PCLCrypto.Formatters
         protected static Exception FailFormat(string message = null)
         {
             throw new FormatException(message ?? "Unexpected format or unsupported key.");
+        }
+
+        /// <summary>
+        /// Returns a copy of the specified buffer where the copy has its byte order reversed.
+        /// </summary>
+        /// <param name="data">The buffer to copy and reverse.</param>
+        /// <returns>The new buffer with the contents of the original buffer reversed.</returns>
+        protected static byte[] CopyAndReverse(byte[] data)
+        {
+            byte[] reversed = new byte[data.Length];
+            Array.Copy(data, 0, reversed, 0, data.Length);
+            Array.Reverse(reversed);
+            return reversed;
         }
 
         /// <summary>

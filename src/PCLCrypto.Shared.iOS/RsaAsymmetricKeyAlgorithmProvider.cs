@@ -102,7 +102,9 @@ namespace PCLCrypto
         {
             Requires.NotNull(keyBlob, "keyBlob");
 
-            RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
+            RSAParameters parameters = KeyFormatter.GetFormatter(blobType)
+                .Read(keyBlob)
+                .ComputeFullPrivateKeyData();
 
             string keyIdentifier = Guid.NewGuid().ToString();
             SecKey privateKey = ImportKey(parameters, RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier));
@@ -121,7 +123,7 @@ namespace PCLCrypto
             string keyIdentifier = Guid.NewGuid().ToString();
             string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
             var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(publicKeyIdentifier);
-            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(KeyFormatter.Pkcs1PrependZeros.Write(parameters, includePrivateKey: false));
+            keyQueryDictionary[KSec.ValueData] = NSData.FromArray(KeyFormatter.Pkcs1.Write(parameters, includePrivateKey: false));
             keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
             keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
             IntPtr resultHandle;
@@ -147,7 +149,7 @@ namespace PCLCrypto
         {
             using (var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(tag))
             {
-                byte[] pkcs1Key = KeyFormatter.Pkcs1PrependZeros.Write(parameters, parameters.D != null);
+                byte[] pkcs1Key = KeyFormatter.Pkcs1.Write(parameters, parameters.D != null);
                 keyQueryDictionary[KSec.ValueData] = NSData.FromArray(pkcs1Key);
                 keyQueryDictionary[KSec.AttrKeyClass] = parameters.D != null ? KSec.AttrKeyClassPrivate : KSec.AttrKeyClassPublic;
                 keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
