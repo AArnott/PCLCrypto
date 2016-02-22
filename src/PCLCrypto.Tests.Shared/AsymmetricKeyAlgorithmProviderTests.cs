@@ -322,6 +322,7 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.Equal(Convert.ToBase64String(data), Convert.ToBase64String(myplaintext));
     }
 
+#if !SILVERLIGHT
     /// <summary>
     /// Verifies that BCryptPrivateKey (which lacks many of the optional private parameters)
     /// gets filled in with the optional parameters equivalent to what they were originally.
@@ -360,6 +361,7 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.Equal<byte>(pkcs1Parameters.DQ, bcryptParameters.DQ);
         Assert.Equal<byte>(pkcs1Parameters.InverseQ, bcryptParameters.InverseQ);
     }
+#endif
 
     [Fact(Skip = SkipIfLimitedToCapi)]
     public void KeyPairInterop_iOSGenerated()
