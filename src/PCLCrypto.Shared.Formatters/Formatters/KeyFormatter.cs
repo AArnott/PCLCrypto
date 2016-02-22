@@ -393,7 +393,15 @@ namespace PCLCrypto.Formatters
                 result = PrependLeadingZero(buffer, alwaysPrependZero: true);
             }
 
-            VerifyFormat(result.Length == desiredLength);
+            try
+            {
+                VerifyFormat(result.Length == desiredLength);
+            }
+            catch (FormatException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
+
             return result;
         }
 

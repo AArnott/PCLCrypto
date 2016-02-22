@@ -7,14 +7,18 @@ namespace PCLCrypto
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
     using Formatters;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class KeyFormatterTests
     {
         private static Lazy<RSAParameters> rsaParameters;
+
+        private readonly ITestOutputHelper logger;
 
         static KeyFormatterTests()
         {
@@ -31,12 +35,23 @@ namespace PCLCrypto
             });
         }
 
-        [Theory, CombinatorialData]
+        public KeyFormatterTests(ITestOutputHelper logger)
+        {
+            this.logger = logger;
+        }
+
+        [SkippableTheory(typeof(NotSupportedException)), CombinatorialData]
         public void KeyFormatters_PrivateKeyRoundTrip(CryptographicPrivateKeyBlobType format)
         {
+            this.logger.WriteLine("Generated RSA parameters:");
+            this.LogRSAParameters(rsaParameters.Value, "  ");
+
             var formatter = KeyFormatter.GetFormatter(format);
             byte[] custom = formatter.Write(rsaParameters.Value);
             var rsaParametersRead = formatter.Read(custom);
+
+            this.logger.WriteLine("Read RSA parameters:");
+            this.LogRSAParameters(rsaParametersRead, "  ");
 
             Assert.Equal<byte>(rsaParameters.Value.Exponent, rsaParametersRead.Exponent);
             Assert.Equal<byte>(rsaParameters.Value.Modulus, rsaParametersRead.Modulus);
@@ -77,6 +92,26 @@ namespace PCLCrypto
             Assert.Null(rsaParametersRead.DP);
             Assert.Null(rsaParametersRead.DQ);
             Assert.Null(rsaParametersRead.InverseQ);
+        }
+
+        private void LogRSAParameters(RSAParameters parameters, string indent = "")
+        {
+            Action<string> logValue = name =>
+            {
+                byte[] value = (byte[])typeof(RSAParameters).GetTypeInfo().GetDeclaredField(name).GetValue(parameters);
+                if (value != null)
+                {
+                    this.logger.WriteLine($"{indent}{name}: {WinRTCrypto.CryptographicBuffer.EncodeToHexString(value)}");
+                }
+            };
+            logValue(nameof(RSAParameters.Modulus));
+            logValue(nameof(RSAParameters.Exponent));
+            logValue(nameof(RSAParameters.P));
+            logValue(nameof(RSAParameters.D));
+            logValue(nameof(RSAParameters.Q));
+            logValue(nameof(RSAParameters.DP));
+            logValue(nameof(RSAParameters.DQ));
+            logValue(nameof(RSAParameters.InverseQ));
         }
     }
 }
