@@ -280,8 +280,8 @@ namespace PCLCrypto
         {
             if (disposing)
             {
-                this.publicKey.Dispose();
-                this.privateKey.Dispose();
+                this.publicKey?.Dispose();
+                this.privateKey?.Dispose();
             }
 
             base.Dispose(disposing);
