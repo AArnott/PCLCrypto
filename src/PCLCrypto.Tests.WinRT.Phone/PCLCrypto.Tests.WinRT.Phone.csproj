@@ -29,6 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>PCLCrypto.Tests.WinRT.Phone.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>;2008;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,12 +40,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>PCLCrypto.Tests.WinRT.Phone.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>;2008;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ARM\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_PHONE_APP;WinRT</DefineConstants>
-    <NoWarn>;2008</NoWarn>
+    <NoWarn>;2008;1591</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -56,7 +58,7 @@
     <OutputPath>bin\ARM\Release\</OutputPath>
     <DefineConstants>TRACE;NETFX_CORE;WINDOWS_PHONE_APP;WinRT</DefineConstants>
     <Optimize>true</Optimize>
-    <NoWarn>;2008</NoWarn>
+    <NoWarn>;2008;1591</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -80,7 +82,7 @@
     <OutputPath>bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE;NETFX_CORE;WINDOWS_PHONE_APP;WinRT</DefineConstants>
     <Optimize>true</Optimize>
-    <NoWarn>;2008</NoWarn>
+    <NoWarn>;2008;1591</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
