@@ -1,5 +1,6 @@
 ﻿{
   "dependencies": {
+    "Mono.Security": "3.2.3",
     "Nerdbank.GitVersioning": {
       "version": "1.3.8",
       "suppressParent": "none"
