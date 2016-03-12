@@ -4,8 +4,8 @@
       "version": "1.3.8",
       "suppressParent": "none"
     },
-    "PInvoke.BCrypt": "0.1.433-rc-gfce000155c",
-    "PInvoke.NCrypt": "0.1.433-rc-gfce000155c",
+    "PInvoke.BCrypt": "0.1.501",
+    "PInvoke.NCrypt": "0.1.501",
     "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },
