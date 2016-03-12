@@ -20,12 +20,15 @@ public class SymmetricKeyAlgorithmProviderTests
         this.logger = logger;
     }
 
-    [Fact]
-    public void BlockLength()
+    [Theory]
+    [InlineData(SymmetricAlgorithm.AesCbcPkcs7, 16)]
+    [InlineData(SymmetricAlgorithm.AesEcb, 16)]
+    public void BlockLength(SymmetricAlgorithm algorithm, int expectedBlockLength)
     {
-        ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
+        ISymmetricKeyAlgorithmProvider provider = WinRTCrypto.SymmetricKeyAlgorithmProvider
+            .OpenAlgorithm(algorithm);
         Assert.NotNull(provider);
-        Assert.Equal(16, provider.BlockLength);
+        Assert.Equal(expectedBlockLength, provider.BlockLength);
     }
 
     [SkippableTheory(typeof(NotSupportedException))]
