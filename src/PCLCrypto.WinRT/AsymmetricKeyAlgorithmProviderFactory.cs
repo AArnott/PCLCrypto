@@ -31,7 +31,7 @@ namespace PCLCrypto
                     return new ECDsaKeyProvider(algorithm);
                 case AsymmetricAlgorithmName.Rsa:
                 case AsymmetricAlgorithmName.RsaSign:
-                    return new RsaKeyProvider(algorithm);
+                    return new RsaAsymmetricKeyAlgorithmProvider(algorithm);
                 case AsymmetricAlgorithmName.Dsa:
                 default:
                     throw new NotSupportedException();

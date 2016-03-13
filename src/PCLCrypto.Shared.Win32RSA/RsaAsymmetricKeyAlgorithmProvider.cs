@@ -12,18 +12,17 @@ namespace PCLCrypto
     using PInvoke;
     using Validation;
     using static PInvoke.NCrypt;
-    using Platform = Windows.Security.Cryptography.Core;
 
     /// <summary>
     /// WinRT implementation of the <see cref="IAsymmetricKeyAlgorithmProvider"/> interface.
     /// </summary>
-    internal class RsaKeyProvider : NCryptAsymmetricKeyProviderBase
+    internal class RsaAsymmetricKeyAlgorithmProvider : NCryptAsymmetricKeyProviderBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RsaKeyProvider"/> class.
+        /// Initializes a new instance of the <see cref="RsaAsymmetricKeyAlgorithmProvider"/> class.
         /// </summary>
         /// <param name="algorithm">The algorithm.</param>
-        public RsaKeyProvider(AsymmetricAlgorithm algorithm)
+        public RsaAsymmetricKeyAlgorithmProvider(AsymmetricAlgorithm algorithm)
             : base(algorithm)
         {
             var algorithmName = algorithm.GetName();

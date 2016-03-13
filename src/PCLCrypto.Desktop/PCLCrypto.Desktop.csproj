@@ -63,5 +63,5 @@
   <Import Project="..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.PlatformCommon\PCLCrypto.Shared.PlatformCommon.projitems')" />
   <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems')" />
   <Import Project="..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxSymmetric\PCLCrypto.Shared.NetFxSymmetric.projitems')" />
-  <Import Project="..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Shared.NetFxRSA\PCLCrypto.Shared.NetFxRSA.projitems')" />
+  <Import Project="..\PCLCrypto.Shared.Win32RSA\PCLCrypto.Shared.Win32RSA.projitems" Label="Shared" />
 </Project>
