@@ -20,7 +20,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const string SkipIfECDsaNotSupported = "Not supported on this platform";
 #endif
 
-#if WP8 || DESKTOP // desktop relies on Mono.Security's RSAManaged, which is flakey. See https://bugzilla.xamarin.com/show_bug.cgi?id=35861
+#if WP8
     private const string SkipIfLimitedToCapi = "Not supported on WP8";
 #else
     private const string SkipIfLimitedToCapi = null;
@@ -31,7 +31,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const int MinDsaKeySize = 512;
     private const int MaxDsaKeySize = 3072;
 #elif DESKTOP
-    private const int MinRsaKeySize = 384;
+    private const int MinRsaKeySize = 512;
     private const int MinDsaKeySize = 512;
     private const int MaxDsaKeySize = 1024;
 #else

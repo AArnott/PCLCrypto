@@ -8,9 +8,6 @@ namespace PCLCrypto
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-#if DESKTOP
-    using Mono.Security.Cryptography;
-#endif
     using PCLCrypto.Formatters;
     using Validation;
     using Platform = System.Security.Cryptography;

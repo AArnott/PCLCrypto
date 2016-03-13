@@ -12,37 +12,33 @@ namespace PCLCrypto
     using System.Threading.Tasks;
     using PInvoke;
     using Validation;
-    using static PInvoke.NCrypt;
-    using Platform = Windows.Security.Cryptography.Core;
+    using static PInvoke.BCrypt;
 
     /// <summary>
-    /// The base class for NCrypt implementations of the <see cref="ICryptographicKey"/> interface.
+    /// The base class for BCrypt implementations of the <see cref="ICryptographicKey"/> interface.
     /// </summary>
-    internal abstract class NCryptKeyBase : CryptographicKey, ICryptographicKey
+    internal abstract class BCryptKeyBase : CryptographicKey, ICryptographicKey
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NCryptKeyBase" /> class.
+        /// Initializes a new instance of the <see cref="BCryptKeyBase" /> class.
         /// </summary>
-        /// <param name="key">The native NCrypt key that this instance represents.</param>
-        internal NCryptKeyBase(SafeKeyHandle key)
+        internal BCryptKeyBase()
         {
-            Requires.NotNull(key, nameof(key));
-            this.Key = key;
         }
 
         /// <inheritdoc />
-        public int KeySize => NCryptGetProperty<int>(this.Key, KeyStoragePropertyIdentifiers.NCRYPT_LENGTH_PROPERTY);
+        public int KeySize => BCryptGetProperty<int>(this.Key, PropertyNames.BCRYPT_KEY_LENGTH);
 
         /// <summary>
-        /// Gets the handle to the NCrypt cryptographic key for purposes of key export.
+        /// Gets the handle to the BCrypt cryptographic key for purposes of key export.
         /// </summary>
-        protected SafeKeyHandle Key { get; }
+        protected abstract SafeKeyHandle Key { get; }
 
         /// <inheritdoc />
-        public abstract byte[] Export(CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo);
+        public abstract byte[] Export(CryptographicPrivateKeyBlobType blobType);
 
         /// <inheritdoc />
-        public abstract byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType = CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo);
+        public abstract byte[] ExportPublicKey(CryptographicPublicKeyBlobType blobType);
 
         /// <summary>
         /// Disposes of managed and native resources of this object.

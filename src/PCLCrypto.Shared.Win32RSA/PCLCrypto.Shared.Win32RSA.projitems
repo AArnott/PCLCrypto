@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>aebd7d07-32c7-4813-84ba-5dc90e8c40b4</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PCLCrypto.Shared.Win32RSA</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BCryptKeyBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CngUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NCryptAsymmetricKey.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NCryptAsymmetricKeyProviderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NCryptKeyBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RsaAsymmetricKeyAlgorithmProvider.cs" />
+  </ItemGroup>
+</Project>
