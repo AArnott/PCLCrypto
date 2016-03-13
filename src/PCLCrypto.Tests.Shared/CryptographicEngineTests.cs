@@ -434,7 +434,22 @@ public class CryptographicEngineTests
     public void EncryptDecryptStreamChain(int dataLength)
     {
         byte[] data = Enumerable.Range(1, dataLength).Select(n => (byte)n).ToArray();
-        this.EncryptDecryptStreamChain(data);
+
+        var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey);
+        var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey);
+
+        var decryptedStream = new MemoryStream();
+        using (var decryptingStream = new CryptoStream(decryptedStream, decryptor, CryptoStreamMode.Write))
+        {
+            using (var encryptingStream = new CryptoStream(decryptingStream, encryptor, CryptoStreamMode.Write))
+            {
+                encryptingStream.Write(data, 0, data.Length);
+            }
+        }
+
+        Assert.Equal(
+            Convert.ToBase64String(data),
+            Convert.ToBase64String(decryptedStream.ToArray()));
     }
 
     private static int GetKeyLength(SymmetricAlgorithmName symmetricAlgorithm, ISymmetricKeyAlgorithmProvider algorithmProvider)
@@ -496,24 +511,5 @@ public class CryptographicEngineTests
 
         // Assert that both approaches produce the same result.
         Assert.Equal<byte>(cipherText1and2, cipherText1and2Stitched);
-    }
-
-    private void EncryptDecryptStreamChain(byte[] data)
-    {
-        var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(this.aesKey);
-        var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(this.aesKey);
-
-        var decryptedStream = new MemoryStream();
-        using (var decryptingStream = new CryptoStream(decryptedStream, decryptor, CryptoStreamMode.Write))
-        {
-            using (var encryptingStream = new CryptoStream(decryptingStream, encryptor, CryptoStreamMode.Write))
-            {
-                encryptingStream.Write(data, 0, data.Length);
-            }
-        }
-
-        Assert.Equal(
-            Convert.ToBase64String(data),
-            Convert.ToBase64String(decryptedStream.ToArray()));
     }
 }

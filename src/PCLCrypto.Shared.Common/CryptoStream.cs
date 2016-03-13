@@ -161,7 +161,13 @@ namespace PCLCrypto
         public void FlushFinalBlock()
         {
             byte[] final = this.transform.TransformFinalBlock(this.inputBuffer, 0, this.inputBufferSize);
-            this.chainedStream.Write(final, 0, final.Length);
+
+            // Android 6.0 may return a null value when inputBufferSize == 0.
+            if (final != null)
+            {
+                this.chainedStream.Write(final, 0, final.Length);
+            }
+
             this.HasFlushedFinalBlock = true;
 
             // Propagate to the inner stream, as appropriate.

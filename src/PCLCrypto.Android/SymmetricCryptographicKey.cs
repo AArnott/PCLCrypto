@@ -236,7 +236,7 @@ namespace PCLCrypto
                 bool newCipher = false;
                 if (cipher == null)
                 {
-                    cipher = Cipher.GetInstance(this.GetCipherAcquisitionName().ToString());
+                    cipher = Cipher.GetInstance(this.GetCipherAcquisitionName().ToString(), "BC");
                     newCipher = true;
                 }
 
