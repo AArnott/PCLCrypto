@@ -138,7 +138,7 @@ namespace PCLCrypto.Formatters
             int bitlen = reader.ReadInt32();
             int bytelen = bitlen / 8;
 
-            parameters.Exponent = TrimLeadingZero(ReadReversed(reader, 4));
+            parameters.Exponent = ReadReversed(reader, 4);
             parameters.Modulus = ReadReversed(reader, bytelen);
 
             if (hasPrivateKey)
