@@ -94,6 +94,24 @@ namespace PCLCrypto
             Assert.Null(rsaParametersRead.InverseQ);
         }
 
+/*
+          Modulus: a4d5f49f3298500af851b031d27754fd63b8df7f37508b2bea15794ae706abc4cc790d5c8f4bac7ac46ac770b53830a28e97fd3bd9d2afdd18b8db9266965413
+          Exponent: 010001
+          P: e6505d775acbc8077462f0cdbe22a59fc6c75758a9a097211bc4e071c963e415
+          D: 6b87270cb2f4a9427ebacb35b516235b28b271198bfbfecda6e65b39817bd8907b0e7051b74ddb728f1f29220cef00095d63c224d5a148e14e15a9cb4c6849
+          Q: b73823d2929601f4f95050e17de1587841cbdc4152444f2352d9f83f54d71987
+          DP: 200f81e352855994081499d6da27f28c5a5c77814523b0c6101a88efee0bf4bd
+          DQ: 1471d6457c07f325f3e00b766e068449bf05d1891475fce2b32f116d77b91ce7
+          InverseQ: c7e4c27f6596dec9f8d18eb3ccead992ca2ad7241a4abffdecaa5ad5bf965895
+*/
+        private static RSAParameters CreateRSAParametersWithShortD()
+        {
+            return new RSAParameters
+            {
+                // REPLACE THIS COMMENT WITH content of block comment above
+            };
+        }
+
         private void LogRSAParameters(RSAParameters parameters, string indent = "")
         {
             Action<string> logValue = name =>
