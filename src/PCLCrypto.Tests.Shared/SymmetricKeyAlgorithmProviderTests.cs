@@ -20,7 +20,7 @@ public class SymmetricKeyAlgorithmProviderTests
         this.logger = logger;
     }
 
-    [Theory]
+    [SkippableTheory(typeof(NotSupportedException))]
     [InlineData(SymmetricAlgorithm.AesCbcPkcs7, 16)]
     [InlineData(SymmetricAlgorithm.AesEcb, 16)]
     public void BlockLength(SymmetricAlgorithm algorithm, int expectedBlockLength)
