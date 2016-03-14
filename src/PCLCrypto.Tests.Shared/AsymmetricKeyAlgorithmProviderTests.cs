@@ -179,6 +179,21 @@ public class AsymmetricKeyAlgorithmProviderTests
         CollectionAssertEx.AreEqual(blob1, blob2);
     }
 
+    [Theory, CombinatorialData]
+    public void ExportParameters_DoesNotContainLeadingZeros(bool includePrivateData)
+    {
+        var provider = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaPkcs1);
+        var rsaKey = provider.CreateKeyPair(1024);
+        var parameters = rsaKey.ExportParameters(includePrivateData);
+        Assert.Equal(128, parameters.Modulus.Length);
+        if (includePrivateData)
+        {
+            Assert.Equal(64, parameters.P.Length);
+            Assert.Equal(64, parameters.Q.Length);
+            Assert.Equal(64, parameters.DQ.Length);
+        }
+    }
+
     [Fact]
     public void RSAParametersPublicKeyRoundtrip()
     {
