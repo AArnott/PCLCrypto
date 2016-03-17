@@ -188,9 +188,9 @@ public class AsymmetricKeyAlgorithmProviderTests
         Assert.Equal(128, parameters.Modulus.Length);
         if (includePrivateData)
         {
-            Assert.Equal(64, parameters.P.Length);
-            Assert.Equal(64, parameters.Q.Length);
-            Assert.Equal(64, parameters.DQ.Length);
+            Assert.NotEqual(0, parameters.P[0]);
+            Assert.NotEqual(0, parameters.Q[0]);
+            Assert.NotEqual(0, parameters.DQ[0]);
         }
     }
 
