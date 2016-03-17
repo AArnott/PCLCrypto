@@ -113,5 +113,5 @@
   </Target>
 
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))\EnlistmentInfo.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))' != '' " />
-  <Import Project="$(NuGetPackageRoot)\Nerdbank.GitVersioning\1.1.47-rc-g58708fcf8c\build\dotnet\Nerdbank.GitVersioning.targets" />
+  <Import Project="$(NuGetPackageRoot)\Nerdbank.GitVersioning\1.3.13\build\dotnet\Nerdbank.GitVersioning.targets" />
 </Project>
