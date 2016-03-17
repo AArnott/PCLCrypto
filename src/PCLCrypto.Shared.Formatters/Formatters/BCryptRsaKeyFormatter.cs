@@ -91,21 +91,21 @@ namespace PCLCrypto
             }
 
             VerifyFormat(this.keyType == header.Magic, "Unexpected key blob type.");
-            parameters.Exponent = TrimLeadingZero(reader.ReadBytes(header.cbPublicExp));
-            parameters.Modulus = TrimLeadingZero(reader.ReadBytes(header.cbModulus));
+            parameters.Exponent = reader.ReadBytes(header.cbPublicExp);
+            parameters.Modulus = reader.ReadBytes(header.cbModulus);
 
             if (header.Magic != BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPUBLIC_MAGIC)
             {
-                parameters.P = TrimLeadingZero(reader.ReadBytes(header.cbPrime1));
-                parameters.Q = TrimLeadingZero(reader.ReadBytes(header.cbPrime2));
+                parameters.P = reader.ReadBytes(header.cbPrime1);
+                parameters.Q = reader.ReadBytes(header.cbPrime2);
 
                 if (header.Magic != BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAPRIVATE_MAGIC)
                 {
                     VerifyFormat(header.Magic == BCRYPT_RSAKEY_BLOB.MagicNumber.BCRYPT_RSAFULLPRIVATE_MAGIC);
-                    parameters.DP = TrimLeadingZero(reader.ReadBytes(header.cbPrime1));
-                    parameters.DQ = TrimLeadingZero(reader.ReadBytes(header.cbPrime2));
-                    parameters.InverseQ = TrimLeadingZero(reader.ReadBytes(header.cbPrime1));
-                    parameters.D = TrimLeadingZero(reader.ReadBytes(header.cbModulus));
+                    parameters.DP = reader.ReadBytes(header.cbPrime1);
+                    parameters.DQ = reader.ReadBytes(header.cbPrime2);
+                    parameters.InverseQ = reader.ReadBytes(header.cbPrime1);
+                    parameters.D = reader.ReadBytes(header.cbModulus);
                 }
             }
 

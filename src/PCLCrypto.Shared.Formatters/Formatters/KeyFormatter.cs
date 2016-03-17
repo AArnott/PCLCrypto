@@ -172,7 +172,7 @@ namespace PCLCrypto.Formatters
         internal RSAParameters Read(Stream stream)
         {
             var parameters = this.ReadCore(stream);
-            return parameters;
+            return TrimLeadingZeros(parameters);
         }
 
         /// <summary>
@@ -344,6 +344,26 @@ namespace PCLCrypto.Formatters
             }
 
             return buffer;
+        }
+
+        /// <summary>
+        /// Trim all leading zeros from an <see cref="RSAParameters"/> struct.
+        /// </summary>
+        /// <param name="parameters">The struct from which to remove parameters.</param>
+        /// <returns>The trimmed version of the struct.</returns>
+        protected static RSAParameters TrimLeadingZeros(RSAParameters parameters)
+        {
+            return new RSAParameters
+            {
+                Modulus = TrimLeadingZero(parameters.Modulus),
+                Exponent = TrimLeadingZero(parameters.Exponent),
+                D = TrimLeadingZero(parameters.D),
+                P = TrimLeadingZero(parameters.P),
+                DP = TrimLeadingZero(parameters.DP),
+                Q = TrimLeadingZero(parameters.Q),
+                DQ = TrimLeadingZero(parameters.DQ),
+                InverseQ = TrimLeadingZero(parameters.InverseQ),
+            };
         }
 
         /// <summary>
