@@ -4,7 +4,7 @@ PCLCrypto
 PCLCrypto is an [open source library][7] that provides portable class library authors with cryptographic APIs that invoke platform-specific crypto automatically.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0xtawuc0qg50vf2p/branch/master?svg=true)](https://ci.appveyor.com/project/AArnott/pclcrypto/branch/master)
-[![NuGet package](https://buildstats.info/nuget/PCLCrypto)](https://nuget.org/packages/PCLCrypto)
+[![NuGet package](https://buildstats.info/nuget/PCLCrypto?includePreReleases=true)](https://nuget.org/packages/PCLCrypto)
 [![Join the chat at https://gitter.im/AArnott/PCLCrypto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AArnott/PCLCrypto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Issue Stats][pull-requests-img]][pull-requests-url] [![Issue Stats][issues-closed-img]][issues-closed-url]
