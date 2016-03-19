@@ -22,17 +22,6 @@
     <dependencies>
       <group>
         <dependency id="Validation" version="2.2.8"/>
-      </group>
-      <group targetFramework="net45">
-        <dependency id="Validation" version="2.2.8"/>
-      </group>
-      <group targetFramework="win81">
-        <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.501" />
-        <dependency id="PInvoke.NCrypt" version="0.1.501" />
-      </group>
-      <group targetFramework="wpa81">
-        <dependency id="Validation" version="2.2.8"/>
         <dependency id="PInvoke.BCrypt" version="0.1.501" />
         <dependency id="PInvoke.NCrypt" version="0.1.501" />
       </group>
