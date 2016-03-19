@@ -25,6 +25,9 @@
         <dependency id="PInvoke.BCrypt" version="0.1.501" />
         <dependency id="PInvoke.NCrypt" version="0.1.501" />
       </group>
+      <group targetFramework="wp80">
+        <dependency id="Validation" version="2.2.8"/>
+      </group>
     </dependencies>
   </metadata>
   <files>
