@@ -22,16 +22,18 @@
     <dependencies>
       <group>
         <dependency id="Validation" version="2.2.8"/>
-      </group>
-      <group targetFramework="net45">
-        <dependency id="Validation" version="2.2.8"/>
-      </group>
-      <group targetFramework="win81">
-        <dependency id="Validation" version="2.2.8"/>
         <dependency id="PInvoke.BCrypt" version="0.1.501" />
         <dependency id="PInvoke.NCrypt" version="0.1.501" />
       </group>
-      <group targetFramework="wpa81">
+      <group targetFramework="wp80">
+        <dependency id="Validation" version="2.2.8"/>
+      </group>
+      <group targetFramework="portable-net45+win+wpa81+wp80+uwp10+dnxcore50+MonoAndroid10+xamarinios10+MonoTouch10">
+        <!-- Profile259 targets should not try to use PInvoke, since it's not available on wp80. -->
+        <dependency id="Validation" version="2.2.8"/>
+      </group>
+      <group targetFramework="portable-net45+win+wpa81+uwp10+dnxcore50+MonoAndroid10+xamarinios10+MonoTouch10">
+        <!-- Profile111 -->
         <dependency id="Validation" version="2.2.8"/>
         <dependency id="PInvoke.BCrypt" version="0.1.501" />
         <dependency id="PInvoke.NCrypt" version="0.1.501" />
