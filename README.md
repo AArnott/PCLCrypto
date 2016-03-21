@@ -1,7 +1,8 @@
 PCLCrypto
 =========
 
-PCLCrypto is an [open source library][7] that provides portable class library authors with cryptographic APIs that invoke platform-specific crypto automatically.
+PCLCrypto provides cryptographic APIs over algorithms implemented by the platform, including exposing them to portable libraries.
+PCLCrypto does not implement any crypto directly, thus making this library a good choice for applications that require the assurance of high quality crypto implementations that can most reliably be found within the operating system itself or hardware.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0xtawuc0qg50vf2p/branch/master?svg=true)](https://ci.appveyor.com/project/AArnott/pclcrypto/branch/master)
 [![NuGet package](https://buildstats.info/nuget/PCLCrypto?includePreReleases=true)](https://nuget.org/packages/PCLCrypto)
@@ -14,7 +15,8 @@ PCLCrypto is an [open source library][7] that provides portable class library au
  * Cryptographically strong random number generator 
  * Symmetric and asymmetric encryption and signatures 
  * Key derivation 
- * Native crypto performance for each platform. This provides a 2-100X perf improvement for RSA on Android and iOS. 
+ * Native crypto performance for each platform. This provides a 2-100X perf improvement for RSA on Android and iOS.
+ * Streaming encryption on WinRT, which goes beyond what the WinRT API itself offers (while still relying on the OS for the crypto implementation).
  * Support for multiple key formats (PKCS#1, PKCS#8, CAPI) on all platforms. 
 
 The API is designed to be similar to that found on WinRT or the .NET Framework. However some code changes may be required if migrating to this library from platform-specific crypto.
