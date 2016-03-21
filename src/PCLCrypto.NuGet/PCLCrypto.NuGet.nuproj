@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|AnyCPU">
+      <Configuration>Debug</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|AnyCPU">
+      <Configuration>Release</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>9222b139-e4d4-436e-93b7-0cf8495ec38f</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NuSpecTemplate>PCLCrypto.nuspec</NuSpecTemplate>
+    <NuProjPath>$(UserProfile)\.nuget\packages\NuProj\0.10.40-beta-g6df38a957a\tools\</NuProjPath>
+    <VersionDependsOn>$(VersionDependsOn);GetNuPkgVersion</VersionDependsOn>
+  </PropertyGroup>
+  <Import Project="$(NuProjPath)\NuProj.props" Condition="Exists('$(NuProjPath)\NuProj.props')" />
+  <PropertyGroup Label="Configuration">
+    <Id>PCLCrypto</Id>
+    <Title>PCL Crypto - Portable Crypto APIs</Title>
+    <Authors>Andrew Arnott</Authors>
+    <Owners>Andrew Arnott</Owners>
+    <Summary>PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.</Summary>
+    <Description>PCL Crypto provides a consistent, portable set of crypto APIs for .NET 4.5, Windows Phone 8.0 SL &amp; 8.1 Xaml, Windows Store, Xamarin.iOS, Xamarin.Android. This makes it easier to create cross-platform .NET libraries and apps. Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation. PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.</Description>
+    <ReleaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</ReleaseNotes>
+    <ProjectUrl>https://github.com/aarnott/pclcrypto/</ProjectUrl>
+    <LicenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/LICENSE</LicenseUrl>
+    <Copyright>Copyright © Andrew Arnott</Copyright>
+    <Tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</Tags>
+    <EmbedSourceFiles>true</EmbedSourceFiles>
+    <IconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/icons/icon_64x64.png</IconUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="PCLCrypto.nuspec" />
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PCLCrypto.Android\PCLCrypto.Android.csproj" />
+    <ProjectReference Include="..\PCLCrypto.Desktop\PCLCrypto.Desktop.csproj" />
+    <ProjectReference Include="..\PCLCrypto.iOS-Unified\PCLCrypto.iOS-Unified.csproj" />
+    <ProjectReference Include="..\PCLCrypto.iOS\PCLCrypto.iOS.csproj" />
+    <ProjectReference Include="..\PCLCrypto.WindowsPhone\PCLCrypto.WindowsPhone.csproj" />
+    <ProjectReference Include="..\PCLCrypto.WinRT\PCLCrypto.WinRT.csproj" />
+    <ProjectReference Include="..\PCLCrypto\PCLCrypto.csproj" />
+  </ItemGroup>
+  <Import Project="$(NuProjPath)\NuProj.targets" />
+  <Target Name="GetNuPkgVersion" DependsOnTargets="GetBuildVersion">
+    <PropertyGroup>
+      <Version>$(NuGetPackageVersion)</Version>
+      <NuSpecProperties>$(NuGetProperties);CommitId=$(GitCommitIdShort)</NuSpecProperties>
+    </PropertyGroup>
+  </Target>
+</Project>
