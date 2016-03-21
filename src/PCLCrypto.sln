@@ -13,16 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Desktop", "PCLCry
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.Desktop", "PCLCrypto.Tests.Desktop\PCLCrypto.Tests.Desktop.csproj", "{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{AD0886C4-B3A3-4EB4-A401-3C1F72CC7B31}"
-	ProjectSection(SolutionItems) = preProject
-		..\build.proj = ..\build.proj
-		EnlistmentInfo.props = EnlistmentInfo.props
-		EnlistmentInfo.targets = EnlistmentInfo.targets
-		NuGet.config = NuGet.config
-		version.json = version.json
-		..\tools\Versioning.targets = ..\tools\Versioning.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Android", "PCLCrypto.Android\PCLCrypto.Android.csproj", "{338C45B2-B125-40B6-ADDA-754B20231CD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.iOS", "PCLCrypto.iOS\PCLCrypto.iOS.csproj", "{B244682C-9C7D-4A71-9C3B-E9C1CA1ED747}"
@@ -59,9 +49,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PCLCrypto.Shared.iOS", "PCL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.iOS-Unified", "PCLCrypto.Tests.iOS-Unified\PCLCrypto.Tests.iOS-Unified.csproj", "{ABE87D5E-AF6E-413C-8A06-DE9B2DA30EBA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{858B5C9E-DCC9-4260-A990-5F0B2FC111B1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{858B5C9E-DCC9-4260-A990-5F0B2FC111B1}"
 	ProjectSection(SolutionItems) = preProject
+		EnlistmentInfo.props = EnlistmentInfo.props
+		EnlistmentInfo.targets = EnlistmentInfo.targets
+		NuGet.config = NuGet.config
 		stylecop.json = stylecop.json
+		version.json = version.json
 	EndProjectSection
 	ProjectSection(FolderGlobals) = preProject
 		__JSONSchema = http://json.schemastore.org/resjson
