@@ -13,8 +13,8 @@
     <dependencies>
       <group>
         <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.501" />
-        <dependency id="PInvoke.NCrypt" version="0.1.501" />
+        <dependency id="PInvoke.BCrypt" version="0.2.1" />
+        <dependency id="PInvoke.NCrypt" version="0.2.1" />
       </group>
       <group targetFramework="wp80">
         <dependency id="Validation" version="2.2.8"/>
@@ -26,8 +26,8 @@
       <group targetFramework="portable-net45+win+wpa81+uwp10+dnxcore50+MonoAndroid10+xamarinios10+MonoTouch10">
         <!-- Profile111 -->
         <dependency id="Validation" version="2.2.8"/>
-        <dependency id="PInvoke.BCrypt" version="0.1.501" />
-        <dependency id="PInvoke.NCrypt" version="0.1.501" />
+        <dependency id="PInvoke.BCrypt" version="0.2.1" />
+        <dependency id="PInvoke.NCrypt" version="0.2.1" />
       </group>
     </dependencies>
   </metadata>
