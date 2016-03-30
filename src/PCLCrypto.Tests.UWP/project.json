@@ -6,7 +6,7 @@
       "version": "1.3.13",
       "suppressParent": "none"
     },
-    "PInvoke.NCrypt": "0.2.8",
+    "PInvoke.NCrypt": "0.2.10",
     "System.Runtime.Numerics": "4.0.0",
     "Validation": "2.2.8",
     "xunit": "2.1.0",
