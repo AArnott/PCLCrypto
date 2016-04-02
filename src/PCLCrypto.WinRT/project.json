@@ -5,7 +5,7 @@
       "suppressParent": "none"
     },
     "NuProj.Common": "0.10.40-beta-g6df38a957a",
-    "PInvoke.NCrypt": "0.2.10",
+    "PInvoke.NCrypt": "0.3.2",
     "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },
