@@ -19,7 +19,7 @@ namespace PCLCrypto
         X509SubjectPublicKeyInfo,
 
         /// <summary>
-        /// The key is an RSA public key defined in the PKCS #1 standard. For more information, see the RSA Cryptography Specification in RFC 3347.
+        /// The key is an RSA public key defined in the PKCS #1 standard. For more information, see the RSA Cryptography Specification in RFC 3447.
         /// </summary>
         Pkcs1RsaPublicKey,
 
