@@ -15,7 +15,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <NuSpecTemplate>PCLCrypto.nuspec</NuSpecTemplate>
-    <NuProjPath>$(UserProfile)\.nuget\packages\NuProj\0.10.40-beta-g6df38a957a\tools\</NuProjPath>
+    <NuProjPath>$(UserProfile)\.nuget\packages\NuProj\0.10.48-beta-gea4a31bbc5\tools\</NuProjPath>
     <VersionDependsOn>$(VersionDependsOn);GetNuPkgVersion</VersionDependsOn>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.props" Condition="Exists('$(NuProjPath)\NuProj.props')" />

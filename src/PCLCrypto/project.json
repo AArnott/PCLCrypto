@@ -2,11 +2,11 @@
   "supports": { },
   "dependencies": {
     "Nerdbank.GitVersioning": {
-      "version": "1.3.13",
+      "version": "1.4.19",
       "suppressParent": "none"
     },
     "NuGet.CommandLine": "2.8.3",
-    "NuProj.Common": "0.10.40-beta-g6df38a957a",
+    "NuProj.Common": "0.10.48-beta-gea4a31bbc5",
     "StyleCop.Analyzers": "1.0.0-beta015",
     "Validation": "2.2.8"
   },
