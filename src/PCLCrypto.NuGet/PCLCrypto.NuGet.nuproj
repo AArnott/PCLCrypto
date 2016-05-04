@@ -16,7 +16,6 @@
   <PropertyGroup>
     <NuSpecTemplate>PCLCrypto.nuspec</NuSpecTemplate>
     <NuProjPath>$(UserProfile)\.nuget\packages\NuProj\0.10.48-beta-gea4a31bbc5\tools\</NuProjPath>
-    <VersionDependsOn>$(VersionDependsOn);GetNuPkgVersion</VersionDependsOn>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.props" Condition="Exists('$(NuProjPath)\NuProj.props')" />
   <PropertyGroup Label="Configuration">
@@ -28,11 +27,11 @@
     <Description>PCL Crypto provides a consistent, portable set of crypto APIs for .NET 4.5, Windows Phone 8.0 SL &amp; 8.1 Xaml, Windows Store, Xamarin.iOS, Xamarin.Android. This makes it easier to create cross-platform .NET libraries and apps. Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation. PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.</Description>
     <ReleaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</ReleaseNotes>
     <ProjectUrl>https://github.com/aarnott/pclcrypto/</ProjectUrl>
-    <LicenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/LICENSE</LicenseUrl>
+    <LicenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$GitCommitIdShort$/LICENSE</LicenseUrl>
     <Copyright>Copyright © Andrew Arnott</Copyright>
     <Tags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</Tags>
     <EmbedSourceFiles>true</EmbedSourceFiles>
-    <IconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$CommitId$/icons/icon_64x64.png</IconUrl>
+    <IconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$GitCommitIdShort$/icons/icon_64x64.png</IconUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Include="PCLCrypto.nuspec" />
@@ -48,10 +47,4 @@
     <ProjectReference Include="..\PCLCrypto\PCLCrypto.csproj" />
   </ItemGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
-  <Target Name="GetNuPkgVersion" DependsOnTargets="GetBuildVersion">
-    <PropertyGroup>
-      <Version>$(NuGetPackageVersion)</Version>
-      <NuSpecProperties>$(NuGetProperties);CommitId=$(GitCommitIdShort)</NuSpecProperties>
-    </PropertyGroup>
-  </Target>
 </Project>
