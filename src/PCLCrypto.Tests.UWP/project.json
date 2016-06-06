@@ -3,7 +3,7 @@
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "Nerdbank.FullDuplexStream": "1.0.1",
     "Nerdbank.GitVersioning": {
-      "version": "1.4.19",
+      "version": "1.4.41",
       "suppressParent": "none"
     },
     "PInvoke.NCrypt": "0.3.2",
