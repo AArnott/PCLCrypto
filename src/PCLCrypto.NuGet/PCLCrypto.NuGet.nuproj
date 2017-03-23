@@ -39,7 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PCLCrypto.Android\PCLCrypto.Android.csproj" />
-    <ProjectReference Include="..\PCLCrypto.Desktop\PCLCrypto.Desktop.csproj" />
     <ProjectReference Include="..\PCLCrypto.iOS-Unified\PCLCrypto.iOS-Unified.csproj" />
     <ProjectReference Include="..\PCLCrypto.iOS\PCLCrypto.iOS.csproj" />
     <ProjectReference Include="..\PCLCrypto.WindowsPhone\PCLCrypto.WindowsPhone.csproj" />

@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="desktop\**" Condition=" '$(TargetsDesktop)' != 'true' " />
+    <Compile Remove="WinRT\**" Condition=" '$(TargetsWinRT)' != 'true' " />
+  </ItemGroup>
+
+</Project>

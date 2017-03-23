@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup>
+    <OutputPath>$(MSBuildThisFileDirectory)../bin/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)PCLCrypto.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition=" $(MSBuildProjectName.Contains('Tests')) ">$(MSBuildThisFileDirectory)PCLCrypto.Tests.ruleset</CodeAnalysisRuleSet>
+
+    <IsTestProject Condition=" $(MSBuildProjectName.Contains('Tests')) ">true</IsTestProject>
+    <TargetsDesktop Condition=" '$(TargetFramework)' == 'net45' ">true</TargetsDesktop>
+    <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' ">true</TargetsWinRT>
+    <DefineConstants Condition=" '$(TargetsDesktop)' == 'true' " >$(DefineConstants);DESKTOP</DefineConstants>
+    <DefineConstants Condition=" '$(TargetsWinRT)' == 'true' " >$(DefineConstants);WinRT</DefineConstants>
+
+    <SignAssembly Condition=" '$(IsTestProject)' != 'true' ">true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)opensource.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="1.6.25" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="Validation" Version="2.4.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
+
+</Project>

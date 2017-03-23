@@ -131,7 +131,7 @@ namespace PCLCrypto
         /// Gets the BCrypt chaining mode to pass to set as the <see cref="PropertyNames.BCRYPT_CHAINING_MODE"/> property.
         /// </summary>
         /// <param name="mode">The block chaining mode.</param>
-        /// <returns>The block chaining mode.</returns>
+        /// <returns>The string name for the block chaining mode.</returns>
         private static string GetChainingMode(SymmetricAlgorithmMode mode)
         {
             switch (mode)

@@ -60,12 +60,6 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.Desktop\PCLCrypto.Desktop.csproj">
-      <Project>{7c7e2d50-036f-4e08-b4e0-f09889501cfd}</Project>
-      <Name>PCLCrypto.Desktop</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
