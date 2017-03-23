@@ -42,8 +42,6 @@
 
   <ItemGroup>
     <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" Condition=" '$(TargetsSilverlight)' != 'true' and '$(IsRefAssembly)' != 'true' " />
-    <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" Condition=" '$(TargetsNetCore)' == 'true' " />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" Condition=" '$(TargetsNetCore)' == 'true' " />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.0" />
   </ItemGroup>
 
@@ -55,6 +53,11 @@
 
   <ItemGroup Condition=" '$(TargetsiOS)' == 'true' ">
     <Reference Include="System.Numerics" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetsNetCore)' == 'true' ">
+    <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
   </ItemGroup>
 
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
