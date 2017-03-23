@@ -9,8 +9,11 @@
     <IsTestProject Condition=" $(MSBuildProjectName.Contains('Tests')) ">true</IsTestProject>
     <TargetsDesktop Condition=" '$(TargetFramework)' == 'net45' ">true</TargetsDesktop>
     <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' ">true</TargetsWinRT>
+    <TargetsAndroid Condition=" '$(TargetFramework)' == 'MonoAndroid23' ">true</TargetsAndroid>
+
     <DefineConstants Condition=" '$(TargetsDesktop)' == 'true' " >$(DefineConstants);DESKTOP</DefineConstants>
     <DefineConstants Condition=" '$(TargetsWinRT)' == 'true' " >$(DefineConstants);WinRT</DefineConstants>
+    <DefineConstants Condition=" '$(TargetsAndroid)' == 'true' " >$(DefineConstants);Android</DefineConstants>
 
     <SignAssembly Condition=" '$(IsTestProject)' != 'true' ">true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)opensource.snk</AssemblyOriginatorKeyFile>
