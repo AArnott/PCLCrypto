@@ -139,12 +139,16 @@ namespace PCLCrypto
         /// </returns>
         private Platform.SymmetricAlgorithm GetAlgorithm()
         {
-#if SILVERLIGHT
+#if SILVERLIGHT || NETCOREAPP1_0
             if (this.Name == SymmetricAlgorithmName.Aes &&
                 this.Mode == SymmetricAlgorithmMode.Cbc &&
                 this.Padding == SymmetricAlgorithmPadding.PKCS7)
             {
+#if NETCOREAPP1_0
+                return Platform.Aes.Create();
+#else
                 return new Platform.AesManaged();
+#endif
             }
             else
             {

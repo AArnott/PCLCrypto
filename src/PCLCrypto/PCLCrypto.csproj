@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;portable-net45+win8+wpa81+wp8;net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;portable-net45+win8+wpa81+wp8;net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8;netcoreapp1.0</TargetFrameworks>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NetFxRSA\**" Condition=" '$(TargetsSilverlight)' != 'true' " />
+    <Compile Remove="NetFxRSA\**" Condition=" '$(TargetsSilverlight)' != 'true' and '$(TargetsNetCore)' != 'true' " />
     <Compile Remove="NetFx\**" Condition=" '$(IsRefAssembly)' == 'true' or '$(TargetsWinRT)' == 'true' "/>
     <Compile Remove="NetFxSymmetric\**" Condition=" '$(IsRefAssembly)' == 'true' or '$(TargetsWinRT)' == 'true' or '$(TargetsAndroid)' == 'true' "/>
     <Compile Remove="Win32RSA\**" Condition=" '$(HasWin32API)' != 'true' " />
@@ -42,6 +42,8 @@
 
   <ItemGroup>
     <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" Condition=" '$(TargetsSilverlight)' != 'true' and '$(IsRefAssembly)' != 'true' " />
+    <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" Condition=" '$(TargetsNetCore)' == 'true' " />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" Condition=" '$(TargetsNetCore)' == 'true' " />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.0" />
   </ItemGroup>
 

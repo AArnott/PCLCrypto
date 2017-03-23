@@ -88,7 +88,7 @@ namespace PCLCrypto
         {
             using (var hash = this.GetHashAlgorithm())
             {
-                AsymmetricSignatureFormatter formatter = this.GetSignatureFormatter();
+                var formatter = this.GetSignatureFormatter();
                 formatter.SetHashAlgorithm(hash.ToString());
                 return formatter.CreateSignature(hash.ComputeHash(data));
             }
@@ -137,6 +137,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
+#if NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
+#else
             AsymmetricKeyExchangeFormatter keyExchange;
             switch (this.Algorithm)
             {
@@ -154,11 +157,15 @@ namespace PCLCrypto
             }
 
             return keyExchange.CreateKeyExchange(data);
+#endif
         }
 
         /// <inheritdoc />
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
+#if NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
+#else
             AsymmetricKeyExchangeDeformatter keyExchange;
             switch (this.Algorithm)
             {
@@ -176,6 +183,7 @@ namespace PCLCrypto
             }
 
             return keyExchange.DecryptKeyExchange(data);
+#endif
         }
 
         /// <inheritdoc />
@@ -199,6 +207,27 @@ namespace PCLCrypto
             return HashAlgorithmProvider.CreateHashAlgorithm(hashAlgorithm);
         }
 
+#if NETCOREAPP1_0
+        /// <summary>
+        /// Gets the signature formatter for the selected algorithm.
+        /// </summary>
+        /// <returns>A signature formatter.</returns>
+        /// <exception cref="NotSupportedException">Thrown if the platform does not support the selected algorithm.</exception>
+        private dynamic GetSignatureFormatter()
+        {
+            throw new PlatformNotSupportedException();
+        }
+
+        /// <summary>
+        /// Gets the signature deformatter for the selected algorithm.
+        /// </summary>
+        /// <returns>A signature deformatter.</returns>
+        /// <exception cref="NotSupportedException">Thrown if the platform does not support the selected algorithm.</exception>
+        private dynamic GetSignatureDeformatter()
+        {
+            throw new PlatformNotSupportedException();
+        }
+#else
         /// <summary>
         /// Gets the signature formatter for the selected algorithm.
         /// </summary>
@@ -252,5 +281,6 @@ namespace PCLCrypto
 
             return formatter;
         }
+#endif
     }
 }

@@ -25,7 +25,7 @@ namespace PCLCrypto
         /// <summary>
         /// A value indicating whether <see cref="TransformFinalBlock"/> has been called.
         /// </summary>
-        private bool transformedFinalBlock;
+        private bool transformedFinalBlock = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NetFxCryptographicHash"/> class.
@@ -43,6 +43,7 @@ namespace PCLCrypto
         /// </summary>
         protected Platform.HashAlgorithm Algorithm { get; private set; }
 
+#if !NETCOREAPP1_0
         /// <inheritdoc />
         protected override bool CanReuseTransform
         {
@@ -66,6 +67,7 @@ namespace PCLCrypto
         {
             get { return this.Algorithm.OutputBlockSize; }
         }
+#endif
 
         /// <inheritdoc />
         public override void Append(byte[] data)
@@ -82,10 +84,14 @@ namespace PCLCrypto
                 this.TransformFinalBlock(EmptyBlock, 0, 0);
             }
 
+#if NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
+#else
             byte[] hash = this.Algorithm.Hash;
             this.Algorithm.Initialize();
             this.transformedFinalBlock = false;
             return hash;
+#endif
         }
 
         /// <summary>
@@ -104,15 +110,24 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected override int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
+#if NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
+#else
             return this.Algorithm.TransformBlock(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset);
+#endif
         }
 
         /// <inheritdoc />
         protected override byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
         {
             Verify.Operation(!this.transformedFinalBlock, "Already transformed the final block.");
+
+#if NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
+#else
             this.transformedFinalBlock = true;
             return this.Algorithm.TransformFinalBlock(inputBuffer, inputOffset, inputCount);
+#endif
         }
     }
 }

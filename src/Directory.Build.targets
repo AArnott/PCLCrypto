@@ -7,6 +7,7 @@
     <Compile Remove="WinRT\**" Condition=" '$(TargetsWinRT)' != 'true' " />
     <Compile Remove="Android\**" Condition=" '$(TargetsAndroid)' != 'true' " />
     <Compile Remove="iOS\**" Condition=" '$(TargetsiOS)' != 'true' " />
+    <Compile Remove="NetCore\**" Condition=" '$(TargetsNetCore)' != 'true' " />
   </ItemGroup>
 
 </Project>

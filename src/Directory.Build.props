@@ -13,7 +13,8 @@
     <TargetsAndroid Condition=" '$(TargetFramework)' == 'MonoAndroid23' ">true</TargetsAndroid>
     <TargetsiOS Condition=" '$(TargetFramework)' == 'Xamarin.iOS10' or '$(TargetFramework)' == 'monotouch' ">true</TargetsiOS>
     <TargetsSilverlight Condition=" '$(TargetFramework)' == 'wp8' ">true</TargetsSilverlight>
-    <HasWin32API Condition=" '$(IsRefAssembly)' != 'true' and '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' and '$(TargetsSilverlight)' != 'true' ">true</HasWin32API>
+    <TargetsNetCore Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">true</TargetsNetCore>
+    <HasWin32API Condition=" '$(IsRefAssembly)' != 'true' and '$(TargetsNetCore)' != 'true' and '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' and '$(TargetsSilverlight)' != 'true' ">true</HasWin32API>
 
     <DefineConstants Condition=" '$(TargetsDesktop)' == 'true' " >$(DefineConstants);DESKTOP</DefineConstants>
     <DefineConstants Condition=" '$(TargetsWinRT)' == 'true' " >$(DefineConstants);WinRT</DefineConstants>

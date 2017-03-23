@@ -133,6 +133,8 @@ namespace PCLCrypto
                 default:
                     throw new NotSupportedException();
            }
+#elif NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
 #else
             string algorithmName = HashAlgorithmProviderFactory.GetHashAlgorithmName(algorithm);
             return Platform.HashAlgorithm.Create(algorithmName);

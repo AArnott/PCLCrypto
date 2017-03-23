@@ -81,6 +81,8 @@ namespace PCLCrypto
                 default:
                     throw new NotSupportedException();
             }
+#elif NETCOREAPP1_0
+            throw new PlatformNotSupportedException();
 #else
             string algorithmName = MacAlgorithmProviderFactory.GetAlgorithmName(algorithm);
             var result = Platform.KeyedHashAlgorithm.Create(algorithmName);
