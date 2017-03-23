@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10</TargetFrameworks>
+    <TargetFrameworks>net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8</TargetFrameworks>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -12,15 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NetFxRSA\**" />
+    <Compile Remove="NetFxRSA\**" Condition=" '$(TargetsSilverlight)' != 'true' " />
     <Compile Remove="NetFx\**" Condition=" '$(TargetsWinRT)' == 'true' "/>
     <Compile Remove="NetFxSymmetric\**" Condition=" '$(TargetsWinRT)' == 'true' or '$(TargetsAndroid)' == 'true' "/>
-    <Compile Remove="Win32RSA\**" Condition=" '$(TargetsWindows)' != 'true' " />
+    <Compile Remove="Win32RSA\**" Condition=" '$(HasWin32API)' != 'true' " />
     <Compile Remove="Resources\**" Condition=" '$(TargetsAndroid)' != 'true' " />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" />
+    <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" Condition=" '$(TargetsSilverlight)' != 'true' " />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.0" />
   </ItemGroup>
 

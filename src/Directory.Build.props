@@ -11,7 +11,8 @@
     <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' ">true</TargetsWinRT>
     <TargetsAndroid Condition=" '$(TargetFramework)' == 'MonoAndroid23' ">true</TargetsAndroid>
     <TargetsiOS Condition=" '$(TargetFramework)' == 'Xamarin.iOS10' ">true</TargetsiOS>
-    <TargetsWindows Condition=" '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' ">true</TargetsWindows>
+    <TargetsSilverlight Condition=" '$(TargetFramework)' == 'wp8' ">true</TargetsSilverlight>
+    <HasWin32API Condition=" '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' and '$(TargetsSilverlight)' != 'true' ">true</HasWin32API>
 
     <DefineConstants Condition=" '$(TargetsDesktop)' == 'true' " >$(DefineConstants);DESKTOP</DefineConstants>
     <DefineConstants Condition=" '$(TargetsWinRT)' == 'true' " >$(DefineConstants);WinRT</DefineConstants>
