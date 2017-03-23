@@ -9,7 +9,7 @@
     <IsTestProject Condition=" $(MSBuildProjectName.Contains('Tests')) ">true</IsTestProject>
     <IsRefAssembly Condition=" '$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">true</IsRefAssembly>
     <TargetsDesktop Condition=" '$(TargetFramework)' == 'net45' ">true</TargetsDesktop>
-    <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' ">true</TargetsWinRT>
+    <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' or '$(TargetFramework)' == 'uap10.0' ">true</TargetsWinRT>
     <TargetsAndroid Condition=" '$(TargetFramework)' == 'MonoAndroid23' ">true</TargetsAndroid>
     <TargetsiOS Condition=" '$(TargetFramework)' == 'Xamarin.iOS10' ">true</TargetsiOS>
     <TargetsSilverlight Condition=" '$(TargetFramework)' == 'wp8' ">true</TargetsSilverlight>

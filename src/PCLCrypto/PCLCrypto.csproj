@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;portable-net45+win8+wpa81+wp8;net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8;netcoreapp1.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;portable-net45+win8+wpa81+wp8;net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8;netcoreapp1.0;uap10.0</TargetFrameworks>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -58,6 +58,10 @@
   <ItemGroup Condition=" '$(TargetsNetCore)' == 'true' ">
     <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="5.2.2" />
   </ItemGroup>
 
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
