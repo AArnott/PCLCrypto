@@ -10,6 +10,8 @@
     <TargetsDesktop Condition=" '$(TargetFramework)' == 'net45' ">true</TargetsDesktop>
     <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' ">true</TargetsWinRT>
     <TargetsAndroid Condition=" '$(TargetFramework)' == 'MonoAndroid23' ">true</TargetsAndroid>
+    <TargetsiOS Condition=" '$(TargetFramework)' == 'Xamarin.iOS10' ">true</TargetsiOS>
+    <TargetsWindows Condition=" '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' ">true</TargetsWindows>
 
     <DefineConstants Condition=" '$(TargetsDesktop)' == 'true' " >$(DefineConstants);DESKTOP</DefineConstants>
     <DefineConstants Condition=" '$(TargetsWinRT)' == 'true' " >$(DefineConstants);WinRT</DefineConstants>

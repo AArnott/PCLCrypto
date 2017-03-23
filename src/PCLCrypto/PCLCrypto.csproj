@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;portable-win81+wpa81;MonoAndroid23</TargetFrameworks>
+    <TargetFrameworks>net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10</TargetFrameworks>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -15,7 +15,7 @@
     <Compile Remove="NetFxRSA\**" />
     <Compile Remove="NetFx\**" Condition=" '$(TargetsWinRT)' == 'true' "/>
     <Compile Remove="NetFxSymmetric\**" Condition=" '$(TargetsWinRT)' == 'true' or '$(TargetsAndroid)' == 'true' "/>
-    <Compile Remove="Win32RSA\**" Condition=" '$(TargetsAndroid)' == 'true' " />
+    <Compile Remove="Win32RSA\**" Condition=" '$(TargetsWindows)' != 'true' " />
     <Compile Remove="Resources\**" Condition=" '$(TargetsAndroid)' != 'true' " />
   </ItemGroup>
 
@@ -27,6 +27,10 @@
   <ItemGroup Condition=" '$(TargetsAndroid)' == 'true' ">
     <AndroidResource Include="Resources\Values\Strings.xml" />
 
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetsiOS)' == 'true' ">
     <Reference Include="System.Numerics" />
   </ItemGroup>
 
