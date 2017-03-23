@@ -4,7 +4,26 @@
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+
+    <Title>PCL Crypto - Portable Crypto APIs</Title>
+    <Authors>Andrew Arnott</Authors>
+    <Owners>Andrew Arnott</Owners>
+    <Summary>PCL Crypto provides a consistent, portable set of crypto APIs across .NET platforms.</Summary>
+    <Description>PCL Crypto provides a consistent, portable set of crypto APIs for .NET 4.5, Windows Phone 8.0 SL &amp; 8.1 Xaml, Windows Store, Xamarin.iOS, Xamarin.Android. This makes it easier to create cross-platform .NET libraries and apps. Crypto functionality includes asymmetric and symmetric encryption and signatures, and key derivation. PCLCrypto calls into each native platform's crypto API for maximum performance. For RSA operations this produces a 2-100X improvement in performance on Android and iOS over using the standard RSACryptoServiceProvider API.</Description>
+    <PackageReleaseNotes>See https://github.com/AArnott/PCLCrypto/releases for release notes.</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/aarnott/pclcrypto/</PackageProjectUrl>
+    <Copyright>Copyright © Andrew Arnott</Copyright>
+    <PackageTags>crypto security cryptography portable pcl winrt android ios xamarin monoandroid monodroid monotouch</PackageTags>
+
+    <!-- Workaround https://github.com/NuGet/Home/issues/4587 -->
+    <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
+  <Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
+    <PropertyGroup>
+      <PackageLicenseUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$(GitCommitIdShort)/LICENSE</PackageLicenseUrl>
+      <PackageIconUrl>https://raw.githubusercontent.com/AArnott/PCLCrypto/$(GitCommitIdShort)/icons/icon_64x64.png</PackageIconUrl>
+    </PropertyGroup>
+  </Target>
 
   <PropertyGroup Condition=" '$(TargetsAndroid)' == 'true' ">
     <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
