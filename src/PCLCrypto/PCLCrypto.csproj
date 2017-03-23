@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;portable-net45+win8+wpa81+wp8;net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8</TargetFrameworks>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -32,14 +32,16 @@
 
   <ItemGroup>
     <Compile Remove="NetFxRSA\**" Condition=" '$(TargetsSilverlight)' != 'true' " />
-    <Compile Remove="NetFx\**" Condition=" '$(TargetsWinRT)' == 'true' "/>
-    <Compile Remove="NetFxSymmetric\**" Condition=" '$(TargetsWinRT)' == 'true' or '$(TargetsAndroid)' == 'true' "/>
+    <Compile Remove="NetFx\**" Condition=" '$(IsRefAssembly)' == 'true' or '$(TargetsWinRT)' == 'true' "/>
+    <Compile Remove="NetFxSymmetric\**" Condition=" '$(IsRefAssembly)' == 'true' or '$(TargetsWinRT)' == 'true' or '$(TargetsAndroid)' == 'true' "/>
     <Compile Remove="Win32RSA\**" Condition=" '$(HasWin32API)' != 'true' " />
     <Compile Remove="Resources\**" Condition=" '$(TargetsAndroid)' != 'true' " />
+    <Compile Remove="PlatformCommon\**" Condition=" '$(IsRefAssembly)' == 'true' " />
+    <Compile Remove="Formatters\**" Condition=" '$(IsRefAssembly)' == 'true' " />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" Condition=" '$(TargetsSilverlight)' != 'true' " />
+    <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" Condition=" '$(TargetsSilverlight)' != 'true' and '$(IsRefAssembly)' != 'true' " />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.0" />
   </ItemGroup>
 

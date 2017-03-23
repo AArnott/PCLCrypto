@@ -7,16 +7,18 @@
     <CodeAnalysisRuleSet Condition=" $(MSBuildProjectName.Contains('Tests')) ">$(MSBuildThisFileDirectory)PCLCrypto.Tests.ruleset</CodeAnalysisRuleSet>
 
     <IsTestProject Condition=" $(MSBuildProjectName.Contains('Tests')) ">true</IsTestProject>
+    <IsRefAssembly Condition=" '$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">true</IsRefAssembly>
     <TargetsDesktop Condition=" '$(TargetFramework)' == 'net45' ">true</TargetsDesktop>
     <TargetsWinRT Condition=" '$(TargetFramework)' == 'portable-win81+wpa81' ">true</TargetsWinRT>
     <TargetsAndroid Condition=" '$(TargetFramework)' == 'MonoAndroid23' ">true</TargetsAndroid>
-    <TargetsiOS Condition=" '$(TargetFramework)' == 'Xamarin.iOS10' ">true</TargetsiOS>
+    <TargetsiOS Condition=" '$(TargetFramework)' == 'Xamarin.iOS10' or '$(TargetFramework)' == 'monotouch' ">true</TargetsiOS>
     <TargetsSilverlight Condition=" '$(TargetFramework)' == 'wp8' ">true</TargetsSilverlight>
-    <HasWin32API Condition=" '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' and '$(TargetsSilverlight)' != 'true' ">true</HasWin32API>
+    <HasWin32API Condition=" '$(IsRefAssembly)' != 'true' and '$(TargetsiOS)' != 'true' and '$(TargetsAndroid)' != 'true' and '$(TargetsSilverlight)' != 'true' ">true</HasWin32API>
 
     <DefineConstants Condition=" '$(TargetsDesktop)' == 'true' " >$(DefineConstants);DESKTOP</DefineConstants>
     <DefineConstants Condition=" '$(TargetsWinRT)' == 'true' " >$(DefineConstants);WinRT</DefineConstants>
     <DefineConstants Condition=" '$(TargetsAndroid)' == 'true' " >$(DefineConstants);Android</DefineConstants>
+    <DefineConstants Condition=" '$(IsRefAssembly)' == 'true' " >$(DefineConstants);PCL</DefineConstants>
 
     <SignAssembly Condition=" '$(IsTestProject)' != 'true' ">true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)opensource.snk</AssemblyOriginatorKeyFile>
