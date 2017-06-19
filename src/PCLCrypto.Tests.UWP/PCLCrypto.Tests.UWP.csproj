@@ -89,6 +89,7 @@
     <SDKReference Include="TestPlatform.Universal, Version=$(UnitTestPlatformVersion)" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto\Formatters\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTestApp.xaml.cs">
       <DependentUpon>UnitTestApp.xaml</DependentUpon>
@@ -120,13 +121,12 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.WinRT\PCLCrypto.WinRT.csproj">
-      <Project>{4879ee8f-2740-498d-b401-560f4ee66167}</Project>
-      <Name>PCLCrypto.WinRT</Name>
+    <ProjectReference Include="..\PCLCrypto\PCLCrypto.csproj">
+      <Project>{63cec67d-3ba0-453b-99b5-07cc0ddc3e1e}</Project>
+      <Name>PCLCrypto</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems" Label="Shared" />
-  <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

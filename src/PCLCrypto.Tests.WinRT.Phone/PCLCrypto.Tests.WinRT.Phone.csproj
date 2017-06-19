@@ -91,6 +91,7 @@
     <CodeAnalysisRuleSet>PCLCrypto.Tests.WinRT.Phone.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\PCLCrypto\Formatters\*.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -118,9 +119,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.WinRT\PCLCrypto.WinRT.csproj">
-      <Project>{4879ee8f-2740-498d-b401-560f4ee66167}</Project>
-      <Name>PCLCrypto.WinRT</Name>
+    <ProjectReference Include="..\PCLCrypto\PCLCrypto.csproj">
+      <Project>{63cec67d-3ba0-453b-99b5-07cc0ddc3e1e}</Project>
+      <Name>PCLCrypto</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -131,7 +132,6 @@
     <None Include="project.json" />
   </ItemGroup>
   <Import Project="..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems" Label="Shared" />
-  <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

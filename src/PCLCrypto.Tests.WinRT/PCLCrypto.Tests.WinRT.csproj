@@ -59,9 +59,14 @@
     <AdditionalFiles Include="..\stylecop.json">
       <Link>stylecop.json</Link>
     </AdditionalFiles>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="app.config" />
     <None Include="PCLCrypto.Tests.WinRT_TemporaryKey.pfx" />
     <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\PCLCrypto\Formatters\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\UnitTestLogo.scale-100.png">
@@ -78,9 +83,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PCLCrypto.WinRT\PCLCrypto.WinRT.csproj">
-      <Project>{4879ee8f-2740-498d-b401-560f4ee66167}</Project>
-      <Name>PCLCrypto.WinRT</Name>
+    <ProjectReference Include="..\PCLCrypto\PCLCrypto.csproj">
+      <Project>{63cec67d-3ba0-453b-99b5-07cc0ddc3e1e}</Project>
+      <Name>PCLCrypto</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -92,5 +97,4 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))\EnlistmentInfo.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), EnlistmentInfo.targets))' != '' " />
   <Import Project="..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems" Label="Shared" Condition="Exists('..\PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems')" />
-  <Import Project="..\PCLCrypto.Shared.Formatters\PCLCrypto.Shared.Formatters.projitems" Label="Shared" />
 </Project>
