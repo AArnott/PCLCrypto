@@ -234,7 +234,7 @@ public class CryptographicEngineAsymmetricTests
         Assert.True(WinRTCrypto.CryptographicEngine.VerifySignatureWithHashInput(key, hash, signature));
     }
 
-    [SkippableFact(typeof(NotSupportedException))]
+    [SkippableFact(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     public void SignHashedData_VerifySignatureWithHashInput_WrongHashAlgorithm()
     {
         byte[] hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1)

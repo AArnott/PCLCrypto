@@ -33,11 +33,18 @@ public class SymmetricKeyAlgorithmProviderTests
 
     [SkippableTheory(typeof(NotSupportedException))]
     [InlineData(SymmetricAlgorithmName.Aes, 128, 256, 64)]
+#if NETCOREAPP1_0
+    [InlineData(SymmetricAlgorithmName.Des, 128, 256, 64)]
+#else
     [InlineData(SymmetricAlgorithmName.Des, 64, 64, 0)]
+#endif
     [InlineData(SymmetricAlgorithmName.Rc4, 8, 512, 8)]
 #if WinRT
     [InlineData(SymmetricAlgorithmName.Rc2, 16, 128, 8)]
     [InlineData(SymmetricAlgorithmName.TripleDes, 192, 192, 0)]
+#elif NETCOREAPP1_0
+    [InlineData(SymmetricAlgorithmName.Rc2, 128, 256, 64)]
+    [InlineData(SymmetricAlgorithmName.TripleDes, 128, 256, 64)]
 #else
     [InlineData(SymmetricAlgorithmName.Rc2, 40, 128, 8)]
     [InlineData(SymmetricAlgorithmName.TripleDes, 128, 192, 64)]
@@ -115,7 +122,7 @@ public class SymmetricKeyAlgorithmProviderTests
     }
 
 #if !(SILVERLIGHT || __IOS__)
-    [Fact]
+    [SkippableFact(typeof(PlatformNotSupportedException))]
     public void CreateSymmetricKey_AesEcbPkcs7()
     {
         this.CreateSymmetricKeyHelper(SymmetricAlgorithm.AesEcbPkcs7);

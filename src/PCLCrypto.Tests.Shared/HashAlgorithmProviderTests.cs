@@ -69,7 +69,7 @@ public class HashAlgorithmProviderTests
         Assert.NotNull(hasher);
     }
 
-    [Fact]
+    [SkippableFact(typeof(PlatformNotSupportedException))]
     public void AppendAndGetValueAndReset()
     {
         var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
@@ -84,7 +84,7 @@ public class HashAlgorithmProviderTests
         Assert.Equal(this.dataHash, Convert.ToBase64String(hash));
     }
 
-    [Fact]
+    [SkippableFact(typeof(PlatformNotSupportedException))]
     public void AppendTwice()
     {
         var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
@@ -95,7 +95,7 @@ public class HashAlgorithmProviderTests
         Assert.Equal(this.dataHashTwice, Convert.ToBase64String(hash));
     }
 
-    [Fact]
+    [SkippableFact(typeof(PlatformNotSupportedException))]
     public void HashByCryptoStream()
     {
         var provider = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);

@@ -82,7 +82,22 @@ namespace PCLCrypto
                     throw new NotSupportedException();
             }
 #elif NETCOREAPP1_0
-            throw new PlatformNotSupportedException();
+            switch (algorithm)
+            {
+                case MacAlgorithm.HmacMd5:
+                    return new Platform.HMACMD5();
+                case MacAlgorithm.HmacSha1:
+                    return new Platform.HMACSHA1();
+                case MacAlgorithm.HmacSha256:
+                    return new Platform.HMACSHA256();
+                case MacAlgorithm.HmacSha384:
+                    return new Platform.HMACSHA384();
+                case MacAlgorithm.HmacSha512:
+                    return new Platform.HMACSHA512();
+                case MacAlgorithm.AesCmac:
+                default:
+                    throw new PlatformNotSupportedException();
+            }
 #else
             string algorithmName = MacAlgorithmProviderFactory.GetAlgorithmName(algorithm);
             var result = Platform.KeyedHashAlgorithm.Create(algorithmName);

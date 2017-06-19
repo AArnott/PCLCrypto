@@ -106,7 +106,7 @@ public class PlatformSupport
         Assert.NotEmpty(serialized);
     }
 
-    [SkippableFact(typeof(NotSupportedException))]
+    [SkippableFact(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     public void KeyDerivation_Pbkdf2()
     {
         var provider = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Pbkdf2Sha256);
@@ -122,7 +122,7 @@ public class PlatformSupport
         this.logger.WriteLine("Derived key: {0}", Convert.ToBase64String(derivedKey));
     }
 
-    [SkippableFact(typeof(NotSupportedException))]
+    [SkippableFact(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     public void KeyDerivation_Sp800108()
     {
         var provider = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Sp800108CtrHmacSha1);
@@ -139,7 +139,7 @@ public class PlatformSupport
         this.logger.WriteLine("Derived key: {0}", Convert.ToBase64String(derivedKey));
     }
 
-    [SkippableFact(typeof(NotSupportedException))]
+    [SkippableFact(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     public void KeyDerivation_Sp80056a()
     {
         var provider = WinRTCrypto.KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithm.Sp80056aConcatMd5);
@@ -164,7 +164,7 @@ public class PlatformSupport
         this.logger.WriteLine("Derived key: {0}", Convert.ToBase64String(derivedKey));
     }
 
-    [SkippableTheory(typeof(NotSupportedException))]
+    [SkippableTheory(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     [CombinatorialData]
     public void Mac(MacAlgorithm algorithm)
     {

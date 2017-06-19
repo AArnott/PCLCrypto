@@ -52,7 +52,7 @@ public class MacAlgorithmProviderTests
             () => algorithm.CreateHash(null));
     }
 
-    [Fact]
+    [SkippableFact(typeof(PlatformNotSupportedException))]
     public void CreateHash()
     {
         var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);
@@ -98,7 +98,7 @@ public class MacAlgorithmProviderTests
         Assert.False(WinRTCrypto.CryptographicEngine.VerifySignature(key, this.data, mac));
     }
 
-    [Fact]
+    [SkippableFact(typeof(PlatformNotSupportedException))]
     public void HashByCryptoStream()
     {
         var algorithm = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1);

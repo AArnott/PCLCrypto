@@ -134,7 +134,21 @@ namespace PCLCrypto
                     throw new NotSupportedException();
            }
 #elif NETCOREAPP1_0
-            throw new PlatformNotSupportedException();
+            switch (algorithm)
+            {
+                case HashAlgorithm.Md5:
+                    return Platform.MD5.Create();
+                case HashAlgorithm.Sha1:
+                    return Platform.SHA1.Create();
+                case HashAlgorithm.Sha256:
+                    return Platform.SHA256.Create();
+                case HashAlgorithm.Sha384:
+                    return Platform.SHA384.Create();
+                case HashAlgorithm.Sha512:
+                    return Platform.SHA512.Create();
+                default:
+                    throw new NotSupportedException();
+            }
 #else
             string algorithmName = HashAlgorithmProviderFactory.GetHashAlgorithmName(algorithm);
             return Platform.HashAlgorithm.Create(algorithmName);
