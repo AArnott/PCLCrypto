@@ -30,14 +30,22 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const int MinRsaKeySize = 512;
     private const int MinDsaKeySize = 512;
     private const int MaxDsaKeySize = 3072;
+    private const int RsaStepSize = 8;
 #elif DESKTOP
     private const int MinRsaKeySize = 512;
     private const int MinDsaKeySize = 512;
     private const int MaxDsaKeySize = 1024;
+    private const int RsaStepSize = 8;
+#elif NETCOREAPP1_0
+    private const int MinRsaKeySize = 512;
+    private const int MinDsaKeySize = 512;
+    private const int MaxDsaKeySize = 1024;
+    private const int RsaStepSize = 64;
 #else
     private const int MinRsaKeySize = 384;
     private const int MinDsaKeySize = 1024;
     private const int MaxDsaKeySize = 1024;
+    private const int RsaStepSize = 8;
 #endif
 
     /// <summary>
@@ -91,19 +99,19 @@ public class AsymmetricKeyAlgorithmProviderTests
     [InlineData(AsymmetricAlgorithm.EcdsaP256Sha256, 256, 256, 0)]
     [InlineData(AsymmetricAlgorithm.EcdsaP384Sha384, 384, 384, 0)]
     [InlineData(AsymmetricAlgorithm.EcdsaP521Sha512, 521, 521, 0)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha1, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha256, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha384, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaOaepSha512, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaPkcs1, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha1, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha256, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha384, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha512, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha1, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha256, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha384, MinRsaKeySize, 16384, 8)]
-    [InlineData(AsymmetricAlgorithm.RsaSignPssSha512, MinRsaKeySize, 16384, 8)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha1, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha256, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha384, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaOaepSha512, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaPkcs1, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha1, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha256, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha384, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPkcs1Sha512, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha1, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha256, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha384, MinRsaKeySize, 16384, RsaStepSize)]
+    [InlineData(AsymmetricAlgorithm.RsaSignPssSha512, MinRsaKeySize, 16384, RsaStepSize)]
     public void LegalKeySizes(AsymmetricAlgorithm name, int minSize, int maxSize, int stepSize)
     {
         IAsymmetricKeyAlgorithmProvider provider = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(name);

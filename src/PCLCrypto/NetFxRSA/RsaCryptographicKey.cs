@@ -138,7 +138,21 @@ namespace PCLCrypto
         protected internal override byte[] Encrypt(byte[] data, byte[] iv)
         {
 #if NETCOREAPP1_0
-            throw new PlatformNotSupportedException();
+            switch (this.algorithm)
+            {
+                case AsymmetricAlgorithm.RsaPkcs1:
+                    return this.Rsa.Encrypt(data, RSAEncryptionPadding.Pkcs1);
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                    return this.Rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA1);
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                    return this.Rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA256);
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                    return this.Rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA384);
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                    return this.Rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA512);
+                default:
+                    throw new PlatformNotSupportedException();
+            }
 #else
             AsymmetricKeyExchangeFormatter keyExchange;
             switch (this.Algorithm)
@@ -164,7 +178,21 @@ namespace PCLCrypto
         protected internal override byte[] Decrypt(byte[] data, byte[] iv)
         {
 #if NETCOREAPP1_0
-            throw new PlatformNotSupportedException();
+            switch (this.algorithm)
+            {
+                case AsymmetricAlgorithm.RsaPkcs1:
+                    return this.Rsa.Decrypt(data, RSAEncryptionPadding.Pkcs1);
+                case AsymmetricAlgorithm.RsaOaepSha1:
+                    return this.Rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA1);
+                case AsymmetricAlgorithm.RsaOaepSha256:
+                    return this.Rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA256);
+                case AsymmetricAlgorithm.RsaOaepSha384:
+                    return this.Rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA384);
+                case AsymmetricAlgorithm.RsaOaepSha512:
+                    return this.Rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA512);
+                default:
+                    throw new PlatformNotSupportedException();
+            }
 #else
             AsymmetricKeyExchangeDeformatter keyExchange;
             switch (this.Algorithm)
