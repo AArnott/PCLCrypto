@@ -386,7 +386,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     }
 #endif
 
-    [Fact(Skip = SkipIfLimitedToCapi)]
+    [SkippableFact(typeof(NotSupportedException), Skip = SkipIfLimitedToCapi)]
     public void KeyPairInterop_iOSGenerated()
     {
         // Tests a key where P has more significant digits than Q.
