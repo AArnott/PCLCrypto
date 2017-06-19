@@ -9,15 +9,26 @@ install:
 
     .\Install-Dependencies.ps1
 before_build:
-- ps: msbuild src\pclcrypto\pclcrypto.csproj /t:restore /v:quiet
+- ps: msbuild src\PCLCrypto.Tests.NETCore\PCLCrypto.Tests.NETCore.csproj /t:restore /v:quiet
 build_script:
 - cmd: >-
     "%programfiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 
     msbuild src\pclcrypto\pclcrypto.csproj /nologo /m /fl /v:minimal /t:build,pack
-- ps: Push-AppveyorArtifact msbuild.log
+
+    msbuild src\PCLCrypto.Tests.NETCore\PCLCrypto.Tests.NETCore.csproj /nologo /m /fl /v:minimal
+#- ps: Push-AppveyorArtifact msbuild.log
+test_script:
+- >-
+    :: "%xunit20%\xunit.console.x86.exe"
+    bin\PCLCrypto.Tests.Desktop\%Configuration%\net452\PCLCrypto.Tests.Desktop.dll
+    -html "bin\%configuration%\testresults.html" -xml "bin\%configuration%\testresults.xml"
+    -appveyor
+    -notrait "TestCategory=FailsInCloudTest"
+    -nologo
+
+    dotnet test src\PCLCrypto.Tests.NETCore\PCLCrypto.Tests.NETCore.csproj
+    --no-build
 artifacts:
 - path: bin\**\*.nupkg
   name: NuGet Package
-#test:
-#  assemblies: 'bin\**\PCLCrypto.Tests.Desktop.dll'
