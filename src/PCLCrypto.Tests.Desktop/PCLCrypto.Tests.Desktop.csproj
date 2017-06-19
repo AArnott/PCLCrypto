@@ -5,6 +5,9 @@
     <NonShipping>true</NonShipping>
     <SignAssembly>false</SignAssembly>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>$(DefineConstants);DESKTOP</DefineConstants>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Numerics" />
@@ -21,7 +24,6 @@
     <AdditionalFiles Include="..\stylecop.json">
       <Link>stylecop.json</Link>
     </AdditionalFiles>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
