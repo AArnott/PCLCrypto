@@ -2,13 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26616.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{9701D978-72F1-4CF6-B695-2447651A6F96}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90F9B46D-96A3-4165-9513-89566E4C5682}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCLCrypto", "PCLCrypto\PCLCrypto.csproj", "{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.Desktop", "PCLCrypto.Tests.Desktop\PCLCrypto.Tests.Desktop.csproj", "{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCLCrypto.Tests.Desktop", "PCLCrypto.Tests.Desktop\PCLCrypto.Tests.Desktop.csproj", "{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.WinRT", "PCLCrypto.Tests.WinRT\PCLCrypto.Tests.WinRT.csproj", "{90A54774-0083-48B4-B8A1-2FCCC24CBE86}"
 EndProject
@@ -39,18 +37,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.UWP", "PCLC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.WinRT.Phone", "PCLCrypto.Tests.WinRT.Phone\PCLCrypto.Tests.WinRT.Phone.csproj", "{973EA80A-2B71-45C9-8998-99D702C58F36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCrypto.Tests.NETCore", "PCLCrypto.Tests.NETCore\PCLCrypto.Tests.NETCore.csproj", "{BDFD3506-97E7-4C7D-8124-41AADB17966C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCLCrypto.Tests.NETCore", "PCLCrypto.Tests.NETCore\PCLCrypto.Tests.NETCore.csproj", "{BDFD3506-97E7-4C7D-8124-41AADB17966C}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{1b396c98-0eb8-461c-8b00-0d52c262f377}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{3b79d2b0-680a-493d-80fd-ebd8b24432fa}*SharedItemsImports = 13
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{90a54774-0083-48b4-b8a1-2fccc24cbe86}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{973ea80a-2b71-45c9-8998-99d702c58f36}*SharedItemsImports = 4
-		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{a6080690-bd84-454f-b1ab-091f9d0e4dce}*SharedItemsImports = 4
-		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{abe87d5e-af6e-413c-8a06-de9b2da30eba}*SharedItemsImports = 4
 		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{d50a6ec5-b1f4-4352-bbc5-2a956a55f2ae}*SharedItemsImports = 4
-		PCLCrypto.Tests.Shared\PCLCrypto.Tests.Shared.projitems*{e673c03e-871c-4849-9ae3-15c8378658b5}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
@@ -692,8 +686,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{63CEC67D-3BA0-453B-99B5-07CC0DDC3E1E} = {9701D978-72F1-4CF6-B695-2447651A6F96}
-		{BDBCB22F-D740-4C54-9FE5-ABB6BAA92AA0} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{90A54774-0083-48B4-B8A1-2FCCC24CBE86} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{1B396C98-0EB8-461C-8B00-0D52C262F377} = {90F9B46D-96A3-4165-9513-89566E4C5682}
 		{A6080690-BD84-454F-B1AB-091F9D0E4DCE} = {90F9B46D-96A3-4165-9513-89566E4C5682}

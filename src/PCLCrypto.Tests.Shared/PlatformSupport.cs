@@ -44,7 +44,7 @@ public class PlatformSupport
         using (var key = algorithm.CreateSymmetricKey(keyMaterial))
         {
             var ciphertext = WinRTCrypto.CryptographicEngine.Encrypt(key, new byte[algorithm.BlockLength], null);
-            Assert.NotEqual(0, ciphertext.Length);
+            Assert.NotEmpty(ciphertext);
         }
     }
 
@@ -81,7 +81,7 @@ public class PlatformSupport
     {
         var result = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm).HashData(new byte[5]);
         Assert.NotNull(result);
-        Assert.NotEqual(0, result.Length);
+        Assert.NotEmpty(result);
     }
 
     [SkippableTheory(typeof(NotSupportedException))]

@@ -65,7 +65,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     }
 
     /// <summary>
-    /// A dictionary of key algorithms to test with key sizes (in bits).
+    /// Gets a dictionary of key algorithms to test with key sizes (in bits).
     /// </summary>
     public static object[][] PrivateKeyAlgorithmsAndBlobsToTest =>
         (from algorithmAndSize in KeyAlgorithmsAndSizesToTest
@@ -73,7 +73,7 @@ public class AsymmetricKeyAlgorithmProviderTests
          select new object[] { AsymmetricAlgorithm.RsaOaepSha1, 512, blobType }).ToArray();
 
     /// <summary>
-    /// A dictionary of key algorithms to test with key sizes (in bits).
+    /// Gets a dictionary of key algorithms to test with key sizes (in bits).
     /// </summary>
     public static object[][] PublicKeyAlgorithmsAndBlobsToTest =>
         (from algorithmAndSize in KeyAlgorithmsAndSizesToTest

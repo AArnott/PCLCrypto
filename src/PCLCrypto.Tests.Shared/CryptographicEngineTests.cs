@@ -247,10 +247,10 @@ public class CryptographicEngineTests
         var data = new byte[0];
         if (this.aesKeyNoPadding != null)
         {
-            Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv).Length);
+            Assert.Empty(WinRTCrypto.CryptographicEngine.Decrypt(this.aesKeyNoPadding, data, iv));
         }
 
-        Assert.Equal(0, WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, data, iv).Length);
+        Assert.Empty(WinRTCrypto.CryptographicEngine.Decrypt(this.aesKey, data, iv));
     }
 
     [Fact]
@@ -339,8 +339,8 @@ public class CryptographicEngineTests
     [Fact(Skip = SkipIfOnlyStandardAESSupported)]
     public void KeyStateResetIfAndOnlyIfInitVectorIsSupplied()
     {
-        this.KeyStateResetIfAndOnlyIfInitVectorIsSupplied(WinRTCrypto.CryptographicEngine.Encrypt);
-        this.KeyStateResetIfAndOnlyIfInitVectorIsSupplied(WinRTCrypto.CryptographicEngine.Decrypt);
+        this.KeyStateResetIfAndOnlyIfInitVectorIsSuppliedHelper(WinRTCrypto.CryptographicEngine.Encrypt);
+        this.KeyStateResetIfAndOnlyIfInitVectorIsSuppliedHelper(WinRTCrypto.CryptographicEngine.Decrypt);
     }
 
     [Fact]
@@ -487,7 +487,7 @@ public class CryptographicEngineTests
         }
     }
 
-    private void KeyStateResetIfAndOnlyIfInitVectorIsSupplied(Func<ICryptographicKey, byte[], byte[], byte[]> cipherFunc)
+    private void KeyStateResetIfAndOnlyIfInitVectorIsSuppliedHelper(Func<ICryptographicKey, byte[], byte[], byte[]> cipherFunc)
     {
         var algorithm = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbc);
         var data1 = WinRTCrypto.CryptographicBuffer.GenerateRandom(algorithm.BlockLength);

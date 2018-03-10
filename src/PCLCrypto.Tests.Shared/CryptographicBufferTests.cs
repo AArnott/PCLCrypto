@@ -41,7 +41,7 @@ public class CryptographicBufferTests
     public void GenerateRandom_ZeroLength()
     {
         byte[] buffer = WinRTCrypto.CryptographicBuffer.GenerateRandom(0);
-        Assert.Equal(0, buffer.Length);
+        Assert.Empty(buffer);
     }
 
     [Fact]
