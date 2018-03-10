@@ -41,8 +41,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PInvoke.NCrypt" Version="0.5.64" Condition=" '$(TargetsSilverlight)' != 'true' and '$(IsRefAssembly)' != 'true' " />
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.0" />
+    <PackageReference Include="PInvoke.NCrypt" Version="0.5.126" Condition=" '$(TargetsSilverlight)' != 'true' and '$(IsRefAssembly)' != 'true' " />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.2" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetsAndroid)' == 'true' ">
