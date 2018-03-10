@@ -48,6 +48,7 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="1.6.25" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
     <PackageReference Include="Validation" Version="2.4.15" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>

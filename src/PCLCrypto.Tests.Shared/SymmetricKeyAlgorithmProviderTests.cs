@@ -33,7 +33,7 @@ public class SymmetricKeyAlgorithmProviderTests
 
     [SkippableTheory(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     [InlineData(SymmetricAlgorithmName.Aes, 128, 256, 64)]
-#if NETCOREAPP1_0
+#if NETCOREAPP1_0 || NETCOREAPP2_0
     [InlineData(SymmetricAlgorithmName.Des, 128, 256, 64)]
 #else
     [InlineData(SymmetricAlgorithmName.Des, 64, 64, 0)]
@@ -42,7 +42,7 @@ public class SymmetricKeyAlgorithmProviderTests
 #if WinRT
     [InlineData(SymmetricAlgorithmName.Rc2, 16, 128, 8)]
     [InlineData(SymmetricAlgorithmName.TripleDes, 192, 192, 0)]
-#elif NETCOREAPP1_0
+#elif NETCOREAPP1_0 || NETCOREAPP2_0
     [InlineData(SymmetricAlgorithmName.Rc2, 128, 256, 64)]
     [InlineData(SymmetricAlgorithmName.TripleDes, 128, 256, 64)]
 #else

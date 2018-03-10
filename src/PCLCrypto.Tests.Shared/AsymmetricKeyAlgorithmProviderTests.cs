@@ -36,7 +36,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     private const int MinDsaKeySize = 512;
     private const int MaxDsaKeySize = 1024;
     private const int RsaStepSize = 8;
-#elif NETCOREAPP1_0
+#elif NETCOREAPP1_0 || NETCOREAPP2_0
     private const int MinRsaKeySize = 512;
     private const int MinDsaKeySize = 512;
     private const int MaxDsaKeySize = 1024;

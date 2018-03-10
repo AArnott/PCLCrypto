@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>PCLCrypto.Tests</RootNamespace>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp1.0;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics" Condition=" '$(TargetsDesktop)' == 'true' " />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Nerdbank.FullDuplexStream" Version="1.0.9" />
