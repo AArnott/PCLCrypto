@@ -276,7 +276,7 @@ public class CryptographicEngineTests
         Assert.Equal(DataAesCiphertextBase64, Convert.ToBase64String(cipherText));
     }
 
-    [SkippableFact(typeof(NotSupportedException))]
+    [SkippableFact(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     public void StreamingCipherKeyRetainsStateAcrossOperations_Encrypt()
     {
         // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
@@ -307,7 +307,7 @@ public class CryptographicEngineTests
             Convert.ToBase64String(incrementalResult));
     }
 
-    [SkippableFact(typeof(NotSupportedException))]
+    [SkippableFact(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     public void StreamingCipherKeyRetainsStateAcrossOperations_Decrypt()
     {
         // NetFX doesn't support RC4. If another streaming cipher is ever added to the suite,
@@ -360,7 +360,7 @@ public class CryptographicEngineTests
 
     // The InlineData attributes are designed to test block modes with IVs, without IVs, and streaming.
     // It cross-products this set with various padding modes.
-    [SkippableTheory(typeof(NotSupportedException))]
+    [SkippableTheory(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     [MemberData(nameof(BlockModesAndPadding))]
     public void CreateEncryptor_SymmetricEncryptionEquivalence(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
     {

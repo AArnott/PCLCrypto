@@ -31,7 +31,7 @@ public class SymmetricKeyAlgorithmProviderTests
         Assert.Equal(expectedBlockLength, provider.BlockLength);
     }
 
-    [SkippableTheory(typeof(NotSupportedException))]
+    [SkippableTheory(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     [InlineData(SymmetricAlgorithmName.Aes, 128, 256, 64)]
 #if NETCOREAPP1_0
     [InlineData(SymmetricAlgorithmName.Des, 128, 256, 64)]

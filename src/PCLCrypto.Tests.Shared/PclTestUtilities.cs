@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using PCLCrypto;
 
 public static class PclTestUtilities
 {
+    public static string Hex(byte[] buffer) => buffer != null ? WinRTCrypto.CryptographicBuffer.EncodeToHexString(buffer) : "<null>";
+
     public static byte[] Tamper(byte[] buffer)
     {
         int index = new Random().Next(buffer.Length);

@@ -21,7 +21,7 @@ public class PlatformSupport
         this.logger = logger;
     }
 
-    [SkippableTheory(typeof(NotSupportedException))]
+    [SkippableTheory(typeof(NotSupportedException), typeof(PlatformNotSupportedException))]
     [PairwiseData]
     public void SymmetricEncryption(SymmetricAlgorithmName name, SymmetricAlgorithmMode mode, SymmetricAlgorithmPadding padding)
     {
