@@ -1,37 +1,13 @@
-$AndroidToolPath = "${env:ProgramFiles(x86)}\Android\android-sdk\tools\android.bat"
+if (-not "$env:JAVA_HOME") {
+    Invoke-WebRequest -OutFile "$env:TEMP\jre.exe" http://download.oracle.com/otn-pub/java/jdk/10.0.1+10/fb4372174a714e6b8c52526dc134031e/jre-10.0.1_windows-x64_bin.exe
+    Start-Process "$env:TEMP\jre.exe" @('INSTALL_SILENT=Enable', 'INSTALL_DIR=C:\Program Files (x86)\Java') -Wait
+    $env:JAVA_HOME = "C:\Program Files (x86)\Java"
+}
+
+$AndroidToolPath = "${env:ProgramFiles(x86)}\Android\android-sdk\tools\bin\sdkmanager.bat"
 
 if (!(Test-Path $AndroidToolPath)) {
-    $AndroidToolPath = "$env:localappdata\Android\android-sdk\tools\android.bat"
-}
-
-Function Get-AndroidSDKs() {
-    $output = & $AndroidToolPath list sdk --all
-    $sdks = $output |% {
-        if ($_ -match '(?<index>\d+)- (?<sdk>.+), revision (?<revision>[\d\.]+)') {
-            $sdk = New-Object PSObject
-            Add-Member -InputObject $sdk -MemberType NoteProperty -Name Index -Value $Matches.index
-            Add-Member -InputObject $sdk -MemberType NoteProperty -Name Name -Value $Matches.sdk
-            Add-Member -InputObject $sdk -MemberType NoteProperty -Name Revision -Value $Matches.revision
-            $sdk
-        }
-    }
-    $sdks
-}
-
-Function Install-AndroidSDK() {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory=$true, Position=0)]
-        [PSObject[]]$sdks
-    )
-
-    $sdkIndexes = $sdks |% { $_.Index }
-    $sdkIndexArgument = [string]::Join(',',  $sdkIndexes)
-    Write-Output "Installing additional Android SDKs..."
-    $sdks | Format-Table Name
-
-    # Suppress the output to STDOUT
-    $null = Echo 'y' | & $AndroidToolPath update sdk -u -a -t $sdkIndexArgument
+    $AndroidToolPath = "$env:localappdata\Android\android-sdk\tools\bin\sdkmanager.bat"
 }
 
 Function Install-Win81SDK {
@@ -47,7 +23,5 @@ Function Install-Win81SDK {
     Start-Process $sdkSetupPath @('/features','+','/q','/l',$sdkLogFile)  -Wait
 }
 
-$sdks = Get-AndroidSDKs |? { $_.name -like 'sdk platform*API 10*' -or $_.name -like 'google apis*api 10' }
-
 Install-Win81SDK
-Install-AndroidSDK -sdks $sdks
+& $AndroidToolPath "platforms;android-10"
