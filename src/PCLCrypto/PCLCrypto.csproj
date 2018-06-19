@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;portable-net45+win8+wpa81+wp8;net45;portable-win81+wpa81;MonoAndroid23;Xamarin.iOS10;wp8;netcoreapp1.0</TargetFrameworks>
 
@@ -42,7 +42,6 @@
 
   <ItemGroup>
     <PackageReference Include="PInvoke.NCrypt" Version="0.5.126" Condition=" '$(TargetsSilverlight)' != 'true' and '$(IsRefAssembly)' != 'true' " />
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetsAndroid)' == 'true' ">
@@ -59,6 +58,4 @@
     <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
   </ItemGroup>
-
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
