@@ -1,37 +1,21 @@
-$AndroidToolPath = "${env:ProgramFiles(x86)}\Android\android-sdk\tools\android.bat"
+[CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='high')]
+Param(
+)
+
+if (-not "$env:JAVA_HOME") {
+ #   if ($PSCmdlet.ShouldProcess("Install JRE")) {
+        Write-Host "Downloading Java Runtime Environment" -ForegroundColor Yellow
+        Invoke-WebRequest -OutFile "$env:TEMP\jre.exe" http://download.oracle.com/otn-pub/java/jdk/10.0.1+10/fb4372174a714e6b8c52526dc134031e/jre-10.0.1_windows-x64_bin.exe
+        Write-Host "Installing Java Runtime Environment" -ForegroundColor Yellow
+        Start-Process "$env:TEMP\jre.exe" @('INSTALL_SILENT=Enable', 'INSTALL_DIR=C:\Program Files (x86)\Java') -Wait
+        $env:JAVA_HOME = "C:\Program Files (x86)\Java"
+#    }
+}
+
+$AndroidToolPath = "${env:ProgramFiles(x86)}\Android\android-sdk\tools\bin\sdkmanager.bat"
 
 if (!(Test-Path $AndroidToolPath)) {
-    $AndroidToolPath = "$env:localappdata\Android\android-sdk\tools\android.bat"
-}
-
-Function Get-AndroidSDKs() {
-    $output = & $AndroidToolPath list sdk --all
-    $sdks = $output |% {
-        if ($_ -match '(?<index>\d+)- (?<sdk>.+), revision (?<revision>[\d\.]+)') {
-            $sdk = New-Object PSObject
-            Add-Member -InputObject $sdk -MemberType NoteProperty -Name Index -Value $Matches.index
-            Add-Member -InputObject $sdk -MemberType NoteProperty -Name Name -Value $Matches.sdk
-            Add-Member -InputObject $sdk -MemberType NoteProperty -Name Revision -Value $Matches.revision
-            $sdk
-        }
-    }
-    $sdks
-}
-
-Function Install-AndroidSDK() {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory=$true, Position=0)]
-        [PSObject[]]$sdks
-    )
-
-    $sdkIndexes = $sdks |% { $_.Index }
-    $sdkIndexArgument = [string]::Join(',',  $sdkIndexes)
-    Write-Output "Installing additional Android SDKs..."
-    $sdks | Format-Table Name
-
-    # Suppress the output to STDOUT
-    $null = Echo 'y' | & $AndroidToolPath update sdk -u -a -t $sdkIndexArgument
+    $AndroidToolPath = "$env:localappdata\Android\android-sdk\tools\bin\sdkmanager.bat"
 }
 
 Function Install-Win81SDK {
@@ -39,15 +23,19 @@ Function Install-Win81SDK {
     $sdkSetupPath = "$PSScriptRoot\obj\Win8SDKSetup.exe"
     $sdkLogFile = "$PSScriptRoot\obj\win81sdk.log"
     if (!(Test-Path $sdkSetupPath)) {
-        Write-Output "Downloading the Windows 8.1 SDK..."
+        Write-Host "Downloading the Windows 8.1 SDK..." -ForegroundColor Yellow
         Invoke-WebRequest -Uri "http://go.microsoft.com/fwlink/p/?LinkId=323507" -OutFile $sdkSetupPath
     }
 
-    Write-Output "Installing the Windows 8.1 SDK..."
+    Write-Host "Installing the Windows 8.1 SDK..." -ForegroundColor Yellow
     Start-Process $sdkSetupPath @('/features','+','/q','/l',$sdkLogFile)  -Wait
 }
 
-$sdks = Get-AndroidSDKs |? { $_.name -like 'sdk platform*API 10*' -or $_.name -like 'google apis*api 10' }
+#if ($PSCmdlet.ShouldProcess("Install Windows 8.1 SDK")) {
+    Install-Win81SDK
+#}
 
-Install-Win81SDK
-Install-AndroidSDK -sdks $sdks
+#if ($PSCmdlet.ShouldProcess("Install Android SDK 10")) {
+    Write-Host "Installing Android SDK" -ForegroundColor Yellow
+    Write-Output "y" | & $AndroidToolPath "platforms;android-10"
+#}
