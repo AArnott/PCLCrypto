@@ -14,7 +14,7 @@ namespace PCLCrypto.Formatters
     /// Formats keys in the CAPI file format.
     /// This is the format used by RSACryptoServiceProvider.ExportCspBlob
     /// </summary>
-    internal class CapiKeyFormatter : KeyFormatter
+    public class CapiKeyFormatter : KeyFormatter
     {
         /// <summary>
         /// An identifier that the contents of this blob conform to the PUBLICKEYBLOB specification.
@@ -52,7 +52,7 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="parameters">The parameters.</param>
         /// <returns><c>true</c> if CAPI is compatible with these parameters; <c>false</c> otherwise.</returns>
-        internal static bool IsCapiCompatible(RSAParameters parameters)
+        public static bool IsCapiCompatible(RSAParameters parameters)
         {
             Requires.Argument(parameters.Modulus != null, nameof(parameters), "Modulus must not be null.");
 

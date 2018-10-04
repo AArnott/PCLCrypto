@@ -17,12 +17,12 @@ namespace PCLCrypto.Formatters
     /// <remarks>
     /// The format is described here: http://tools.ietf.org/html/rfc3447#page-46
     /// </remarks>
-    internal class Pkcs1KeyFormatter : KeyFormatter
+    public class Pkcs1KeyFormatter : KeyFormatter
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Pkcs1KeyFormatter"/> class.
         /// </summary>
-        internal Pkcs1KeyFormatter()
+        public Pkcs1KeyFormatter()
         {
         }
 

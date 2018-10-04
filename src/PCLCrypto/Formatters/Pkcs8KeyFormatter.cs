@@ -17,7 +17,7 @@ namespace PCLCrypto.Formatters
     /// <remarks>
     /// Spec found at: http://tools.ietf.org/html/rfc5208#page-3
     /// </remarks>
-    internal class Pkcs8KeyFormatter : KeyFormatter
+    public class Pkcs8KeyFormatter : KeyFormatter
     {
         /// <summary>
         /// Reads a key from the specified stream.

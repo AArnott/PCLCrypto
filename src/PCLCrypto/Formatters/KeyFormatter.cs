@@ -13,43 +13,43 @@ namespace PCLCrypto.Formatters
     /// <summary>
     /// A base class for encoding and decoding RSA keys in various formats.
     /// </summary>
-    internal abstract class KeyFormatter
+    public abstract class KeyFormatter
     {
         /// <summary>
         /// The PKCS1 key formatter.
         /// </summary>
-        internal static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
+        public static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
 
         /// <summary>
         /// The PKCS8 key formatter.
         /// </summary>
-        internal static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
+        public static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
 
         /// <summary>
         /// The X509 subject public key information formatter.
         /// </summary>
-        internal static readonly KeyFormatter X509SubjectPublicKeyInfo = new X509SubjectPublicKeyInfoFormatter();
+        public static readonly KeyFormatter X509SubjectPublicKeyInfo = new X509SubjectPublicKeyInfoFormatter();
 
         /// <summary>
         /// The CAPI key formatter.
         /// </summary>
-        internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
+        public static readonly KeyFormatter Capi = new CapiKeyFormatter();
 
 #if !SILVERLIGHT
         /// <summary>
         /// The key formatter for BCrypt RSA private keys.
         /// </summary>
-        internal static readonly KeyFormatter BCryptRsaPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
+        public static readonly KeyFormatter BCryptRsaPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
 
         /// <summary>
         /// The key formatter for BCrypt RSA full private keys.
         /// </summary>
-        internal static readonly KeyFormatter BCryptRsaFullPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptFullPrivateKey);
+        public static readonly KeyFormatter BCryptRsaFullPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptFullPrivateKey);
 
         /// <summary>
         /// The key formatter for BCrypt RSA public keys.
         /// </summary>
-        internal static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
+        public static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
 #endif
 
         /// <summary>
@@ -61,6 +61,67 @@ namespace PCLCrypto.Formatters
         /// The RSA encryption object identifier
         /// </summary>
         protected static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
+
+        /// <summary>
+        /// Tries to add/remove leading zeros as necessary in an attempt to make the parameters CAPI compatible.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The modified set of parameters.</returns>
+        /// <remarks>
+        /// The original parameters and their buffers are not modified.
+        /// </remarks>
+        public static RSAParameters NegotiateSizes(RSAParameters parameters)
+        {
+            if (HasPrivateKey(parameters))
+            {
+                if (CapiKeyFormatter.IsCapiCompatible(parameters))
+                {
+                    // Don't change a thing. Everything is perfect.
+                    return parameters;
+                }
+
+                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+                parameters.D = TrimLeadingZero(parameters.D);
+                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
+                parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
+                parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
+
+                int halfKeyLength = (keyLength + 1) / 2;
+                parameters.P = TrimOrPadZeroToLength(parameters.P, halfKeyLength);
+                parameters.Q = TrimOrPadZeroToLength(parameters.Q, halfKeyLength);
+                parameters.DP = TrimOrPadZeroToLength(parameters.DP, halfKeyLength);
+                parameters.DQ = TrimOrPadZeroToLength(parameters.DQ, halfKeyLength);
+                parameters.InverseQ = TrimOrPadZeroToLength(parameters.InverseQ, halfKeyLength);
+            }
+            else
+            {
+                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+            }
+
+            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
+            return parameters;
+        }
+
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The parameters.</param>
+        public void Write(Stream stream, RSAParameters parameters)
+        {
+            this.Write(stream, parameters, HasPrivateKey(parameters));
+        }
+
+        /// <summary>
+        /// Reads a key from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The RSA key parameters.</returns>
+        public RSAParameters Read(Stream stream)
+        {
+            var parameters = this.ReadCore(stream);
+            return TrimLeadingZeros(parameters);
+        }
 
         /// <summary>
         /// Gets the formatter to use for a given blob type.
@@ -117,16 +178,6 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="parameters">The parameters.</param>
-        internal void Write(Stream stream, RSAParameters parameters)
-        {
-            this.Write(stream, parameters, HasPrivateKey(parameters));
-        }
-
-        /// <summary>
-        /// Writes a key to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <param name="parameters">The parameters.</param>
         /// <param name="includePrivateKey">if set to <c>true</c> the private key will be written as well; otherwise just the public key will be written.</param>
         internal void Write(Stream stream, RSAParameters parameters, bool includePrivateKey)
         {
@@ -165,17 +216,6 @@ namespace PCLCrypto.Formatters
         }
 
         /// <summary>
-        /// Reads a key from the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <returns>The RSA key parameters.</returns>
-        internal RSAParameters Read(Stream stream)
-        {
-            var parameters = this.ReadCore(stream);
-            return TrimLeadingZeros(parameters);
-        }
-
-        /// <summary>
         /// Reads a key from the specified buffer.
         /// </summary>
         /// <param name="keyBlob">The buffer containing the key data.</param>
@@ -198,46 +238,6 @@ namespace PCLCrypto.Formatters
                 Modulus = value.Modulus,
                 Exponent = value.Exponent,
             };
-        }
-
-        /// <summary>
-        /// Tries to add/remove leading zeros as necessary in an attempt to make the parameters CAPI compatible.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>The modified set of parameters.</returns>
-        /// <remarks>
-        /// The original parameters and their buffers are not modified.
-        /// </remarks>
-        protected internal static RSAParameters NegotiateSizes(RSAParameters parameters)
-        {
-            if (HasPrivateKey(parameters))
-            {
-                if (CapiKeyFormatter.IsCapiCompatible(parameters))
-                {
-                    // Don't change a thing. Everything is perfect.
-                    return parameters;
-                }
-
-                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
-                parameters.D = TrimLeadingZero(parameters.D);
-                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
-                parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
-                parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
-
-                int halfKeyLength = (keyLength + 1) / 2;
-                parameters.P = TrimOrPadZeroToLength(parameters.P, halfKeyLength);
-                parameters.Q = TrimOrPadZeroToLength(parameters.Q, halfKeyLength);
-                parameters.DP = TrimOrPadZeroToLength(parameters.DP, halfKeyLength);
-                parameters.DQ = TrimOrPadZeroToLength(parameters.DQ, halfKeyLength);
-                parameters.InverseQ = TrimOrPadZeroToLength(parameters.InverseQ, halfKeyLength);
-            }
-            else
-            {
-                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
-            }
-
-            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
-            return parameters;
         }
 
         /// <summary>

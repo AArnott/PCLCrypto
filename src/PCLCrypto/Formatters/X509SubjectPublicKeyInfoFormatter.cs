@@ -16,7 +16,7 @@ namespace PCLCrypto.Formatters
     /// <summary>
     /// Encodes/decodes public keys in the X.509 subject public key info format.
     /// </summary>
-    internal class X509SubjectPublicKeyInfoFormatter : KeyFormatter
+    public class X509SubjectPublicKeyInfoFormatter : KeyFormatter
     {
         /// <summary>
         /// Reads a key from the specified stream.
