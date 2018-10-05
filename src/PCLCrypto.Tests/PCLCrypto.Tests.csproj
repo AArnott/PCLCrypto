@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\PCLCrypto\Formatters\*.cs" LinkBase="Formatters" />
+    <Compile Include="..\PCLCrypto\Formatters\Asn.cs" Link="Formatters\Asn.cs" />
     <Compile Include="..\PCLCrypto.Tests.Shared\**\*.cs" LinkBase="Shared" />
   </ItemGroup>
   <ItemGroup>
