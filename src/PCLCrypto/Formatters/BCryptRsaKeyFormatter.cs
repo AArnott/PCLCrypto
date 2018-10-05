@@ -26,7 +26,7 @@ namespace PCLCrypto
     /// <remarks>
     /// The key format is documented here: https://msdn.microsoft.com/en-us/library/windows/desktop/aa375531(v=vs.85).aspx
     /// </remarks>
-    public class BCryptRsaKeyFormatter : KeyFormatter
+    internal class BCryptRsaKeyFormatter : KeyFormatter
     {
         /// <summary>
         /// The magic number to use in the header, based on the desired private key type

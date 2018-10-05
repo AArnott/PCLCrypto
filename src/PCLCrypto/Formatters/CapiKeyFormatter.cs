@@ -80,6 +80,46 @@ namespace PCLCrypto.Formatters
         }
 
         /// <summary>
+        /// Tries to add/remove leading zeros as necessary in an attempt to make the parameters CAPI compatible.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The modified set of parameters.</returns>
+        /// <remarks>
+        /// The original parameters and their buffers are not modified.
+        /// </remarks>
+        public static RSAParameters NegotiateSizes(RSAParameters parameters)
+        {
+            if (HasPrivateKey(parameters))
+            {
+                if (IsCapiCompatible(parameters))
+                {
+                    // Don't change a thing. Everything is perfect.
+                    return parameters;
+                }
+
+                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+                parameters.D = TrimLeadingZero(parameters.D);
+                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
+                parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
+                parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
+
+                int halfKeyLength = (keyLength + 1) / 2;
+                parameters.P = TrimOrPadZeroToLength(parameters.P, halfKeyLength);
+                parameters.Q = TrimOrPadZeroToLength(parameters.Q, halfKeyLength);
+                parameters.DP = TrimOrPadZeroToLength(parameters.DP, halfKeyLength);
+                parameters.DQ = TrimOrPadZeroToLength(parameters.DQ, halfKeyLength);
+                parameters.InverseQ = TrimOrPadZeroToLength(parameters.InverseQ, halfKeyLength);
+            }
+            else
+            {
+                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
+            }
+
+            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
+            return parameters;
+        }
+
+        /// <summary>
         /// Throws an exception if the specified RSAParameters cannot be
         /// serialized in the CAPI format.
         /// </summary>

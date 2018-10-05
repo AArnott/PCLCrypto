@@ -72,7 +72,7 @@ namespace PCLCrypto
             {
                 // Try to make it CAPI compatible since it's faster on desktop,
                 // and the only thing that could possibly work on wp8.
-                RSAParameters adjustedParameters = KeyFormatter.NegotiateSizes(parameters);
+                RSAParameters adjustedParameters = CapiKeyFormatter.NegotiateSizes(parameters);
                 if (CapiKeyFormatter.IsCapiCompatible(adjustedParameters))
                 {
                     parameters = adjustedParameters;

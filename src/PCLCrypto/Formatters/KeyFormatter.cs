@@ -18,38 +18,38 @@ namespace PCLCrypto.Formatters
         /// <summary>
         /// The PKCS1 key formatter.
         /// </summary>
-        public static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
+        internal static readonly KeyFormatter Pkcs1 = new Pkcs1KeyFormatter();
 
         /// <summary>
         /// The PKCS8 key formatter.
         /// </summary>
-        public static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
+        internal static readonly KeyFormatter Pkcs8 = new Pkcs8KeyFormatter();
 
         /// <summary>
         /// The X509 subject public key information formatter.
         /// </summary>
-        public static readonly KeyFormatter X509SubjectPublicKeyInfo = new X509SubjectPublicKeyInfoFormatter();
+        internal static readonly KeyFormatter X509SubjectPublicKeyInfo = new X509SubjectPublicKeyInfoFormatter();
 
         /// <summary>
         /// The CAPI key formatter.
         /// </summary>
-        public static readonly KeyFormatter Capi = new CapiKeyFormatter();
+        internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
 
 #if !SILVERLIGHT
         /// <summary>
         /// The key formatter for BCrypt RSA private keys.
         /// </summary>
-        public static readonly KeyFormatter BCryptRsaPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
+        internal static readonly KeyFormatter BCryptRsaPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptPrivateKey);
 
         /// <summary>
         /// The key formatter for BCrypt RSA full private keys.
         /// </summary>
-        public static readonly KeyFormatter BCryptRsaFullPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptFullPrivateKey);
+        internal static readonly KeyFormatter BCryptRsaFullPrivateKey = new BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType.BCryptFullPrivateKey);
 
         /// <summary>
         /// The key formatter for BCrypt RSA public keys.
         /// </summary>
-        public static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
+        internal static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
 #endif
 
         /// <summary>
@@ -63,72 +63,11 @@ namespace PCLCrypto.Formatters
         protected static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
 
         /// <summary>
-        /// Tries to add/remove leading zeros as necessary in an attempt to make the parameters CAPI compatible.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>The modified set of parameters.</returns>
-        /// <remarks>
-        /// The original parameters and their buffers are not modified.
-        /// </remarks>
-        public static RSAParameters NegotiateSizes(RSAParameters parameters)
-        {
-            if (HasPrivateKey(parameters))
-            {
-                if (CapiKeyFormatter.IsCapiCompatible(parameters))
-                {
-                    // Don't change a thing. Everything is perfect.
-                    return parameters;
-                }
-
-                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
-                parameters.D = TrimLeadingZero(parameters.D);
-                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
-                parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
-                parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
-
-                int halfKeyLength = (keyLength + 1) / 2;
-                parameters.P = TrimOrPadZeroToLength(parameters.P, halfKeyLength);
-                parameters.Q = TrimOrPadZeroToLength(parameters.Q, halfKeyLength);
-                parameters.DP = TrimOrPadZeroToLength(parameters.DP, halfKeyLength);
-                parameters.DQ = TrimOrPadZeroToLength(parameters.DQ, halfKeyLength);
-                parameters.InverseQ = TrimOrPadZeroToLength(parameters.InverseQ, halfKeyLength);
-            }
-            else
-            {
-                parameters.Modulus = TrimLeadingZero(parameters.Modulus);
-            }
-
-            parameters.Exponent = TrimLeadingZero(parameters.Exponent);
-            return parameters;
-        }
-
-        /// <summary>
-        /// Writes a key to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <param name="parameters">The parameters.</param>
-        public void Write(Stream stream, RSAParameters parameters)
-        {
-            this.Write(stream, parameters, HasPrivateKey(parameters));
-        }
-
-        /// <summary>
-        /// Reads a key from the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <returns>The RSA key parameters.</returns>
-        public RSAParameters Read(Stream stream)
-        {
-            var parameters = this.ReadCore(stream);
-            return TrimLeadingZeros(parameters);
-        }
-
-        /// <summary>
         /// Gets the formatter to use for a given blob type.
         /// </summary>
         /// <param name="blobType">Type of the key blob.</param>
         /// <returns>An instance of <see cref="KeyFormatter"/></returns>
-        internal static KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
+        public static KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)
             {
@@ -154,7 +93,7 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="blobType">Type of the key blob.</param>
         /// <returns>An instance of <see cref="KeyFormatter"/></returns>
-        internal static KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
+        public static KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
         {
             switch (blobType)
             {
@@ -173,13 +112,69 @@ namespace PCLCrypto.Formatters
             }
         }
 
+#if !WinRT && (!SILVERLIGHT || WINDOWS_PHONE) // we just want SL5 excluded
+
+        /// <summary>
+        /// Converts the PCLCrypto <see cref="RSAParameters"/> struct to the type
+        /// offered by the .NET Framework.
+        /// </summary>
+        /// <param name="value">The PCLCrypto parameters.</param>
+        /// <returns>The .NET Framework parameters.</returns>
+        public static System.Security.Cryptography.RSAParameters ToPlatformParameters(RSAParameters value)
+        {
+            return new System.Security.Cryptography.RSAParameters
+            {
+                D = value.D,
+                Q = value.Q,
+                P = value.P,
+                DP = value.DP,
+                DQ = value.DQ,
+                Exponent = value.Exponent,
+                InverseQ = value.InverseQ,
+                Modulus = value.Modulus,
+            };
+        }
+
+        /// <summary>
+        /// Converts the .NET Framework <see cref="RSAParameters"/> struct to the type
+        /// offered by the PCLCrypto library.
+        /// </summary>
+        /// <param name="value">The .NET Framework parameters.</param>
+        /// <returns>The PCLCrypto parameters.</returns>
+        public static RSAParameters ToPCLParameters(System.Security.Cryptography.RSAParameters value)
+        {
+            return new RSAParameters
+            {
+                D = value.D,
+                Q = value.Q,
+                P = value.P,
+                DP = value.DP,
+                DQ = value.DQ,
+                Exponent = value.Exponent,
+                InverseQ = value.InverseQ,
+                Modulus = value.Modulus,
+            };
+        }
+
+#endif
+
+        /// <summary>
+        /// Writes a key to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="parameters">The parameters.</param>
+        public void Write(Stream stream, RSAParameters parameters)
+        {
+            this.Write(stream, parameters, HasPrivateKey(parameters));
+        }
+
         /// <summary>
         /// Writes a key to the specified stream.
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="includePrivateKey">if set to <c>true</c> the private key will be written as well; otherwise just the public key will be written.</param>
-        internal void Write(Stream stream, RSAParameters parameters, bool includePrivateKey)
+        public void Write(Stream stream, RSAParameters parameters, bool includePrivateKey)
         {
             Requires.NotNull(stream, "stream");
             Requires.Argument(HasPrivateKey(parameters) || !includePrivateKey, "parameters", "No private key data included.");
@@ -197,7 +192,7 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="parameters">The parameters.</param>
         /// <returns>The buffer with the serialized key.</returns>
-        internal byte[] Write(RSAParameters parameters)
+        public byte[] Write(RSAParameters parameters)
         {
             return this.Write(parameters, HasPrivateKey(parameters));
         }
@@ -208,7 +203,7 @@ namespace PCLCrypto.Formatters
         /// <param name="parameters">The parameters.</param>
         /// <param name="includePrivateKey">if set to <c>true</c> the private key will be written as well; otherwise just the public key will be written.</param>
         /// <returns>The buffer with the serialized key.</returns>
-        internal byte[] Write(RSAParameters parameters, bool includePrivateKey)
+        public byte[] Write(RSAParameters parameters, bool includePrivateKey)
         {
             var ms = new MemoryStream();
             this.Write(ms, parameters, includePrivateKey);
@@ -216,11 +211,22 @@ namespace PCLCrypto.Formatters
         }
 
         /// <summary>
+        /// Reads a key from the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The RSA key parameters.</returns>
+        public RSAParameters Read(Stream stream)
+        {
+            var parameters = this.ReadCore(stream);
+            return TrimLeadingZeros(parameters);
+        }
+
+        /// <summary>
         /// Reads a key from the specified buffer.
         /// </summary>
         /// <param name="keyBlob">The buffer containing the key data.</param>
         /// <returns>The RSA key parameters.</returns>
-        internal RSAParameters Read(byte[] keyBlob)
+        public RSAParameters Read(byte[] keyBlob)
         {
             var ms = new MemoryStream(keyBlob);
             return this.Read(ms);
@@ -249,52 +255,6 @@ namespace PCLCrypto.Formatters
         {
             return parameters.P != null;
         }
-
-#if !WinRT && (!SILVERLIGHT || WINDOWS_PHONE) // we just want SL5 excluded
-
-        /// <summary>
-        /// Converts the PCLCrypto <see cref="RSAParameters"/> struct to the type
-        /// offered by the .NET Framework.
-        /// </summary>
-        /// <param name="value">The PCLCrypto parameters.</param>
-        /// <returns>The .NET Framework parameters.</returns>
-        protected internal static System.Security.Cryptography.RSAParameters ToPlatformParameters(RSAParameters value)
-        {
-            return new System.Security.Cryptography.RSAParameters
-            {
-                D = value.D,
-                Q = value.Q,
-                P = value.P,
-                DP = value.DP,
-                DQ = value.DQ,
-                Exponent = value.Exponent,
-                InverseQ = value.InverseQ,
-                Modulus = value.Modulus,
-            };
-        }
-
-        /// <summary>
-        /// Converts the .NET Framework <see cref="RSAParameters"/> struct to the type
-        /// offered by the PCLCrypto library.
-        /// </summary>
-        /// <param name="value">The .NET Framework parameters.</param>
-        /// <returns>The PCLCrypto parameters.</returns>
-        protected internal static RSAParameters ToPCLParameters(System.Security.Cryptography.RSAParameters value)
-        {
-            return new RSAParameters
-            {
-                D = value.D,
-                Q = value.Q,
-                P = value.P,
-                DP = value.DP,
-                DQ = value.DQ,
-                Exponent = value.Exponent,
-                InverseQ = value.InverseQ,
-                Modulus = value.Modulus,
-            };
-        }
-
-#endif
 
         /// <summary>
         /// Checks whether two buffers have equal contents.
