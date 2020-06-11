@@ -36,7 +36,7 @@ Online documentation is available on our [project wiki site][6].
 ### Donations
 
 If you appreciate this library and/or find it useful, please consider becoming a [GitHub sponsor for its author](https://github.com/sponsors/AArnott)
-or donating bitcoins to `1NC4k82nNev5Cz7ESBfaohbGsC6TKyjKvX` or any other mechanism shown on [my Keybase profile][Keybase] to its author.
+or donating bitcoins to `1NC4k82nNev5Cz7ESBfaohbGsC6TKyjKvX` or any other mechanism shown on [their Keybase profile][Keybase].
 
 ### FAQ
 
