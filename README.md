@@ -8,16 +8,14 @@ PCLCrypto does not implement any crypto directly, thus making this library a goo
 [![NuGet package](https://buildstats.info/nuget/PCLCrypto?includePreReleases=true)](https://nuget.org/packages/PCLCrypto)
 [![Join the chat at https://gitter.im/AArnott/PCLCrypto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AArnott/PCLCrypto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Issue Stats][pull-requests-img]][pull-requests-url] [![Issue Stats][issues-closed-img]][issues-closed-url]
-
 ### Features
 
- * Cryptographically strong random number generator 
- * Symmetric and asymmetric encryption and signatures 
- * Key derivation 
+ * Cryptographically strong random number generator
+ * Symmetric and asymmetric encryption and signatures
+ * Key derivation
  * Native crypto performance for each platform. This provides a 2-100X perf improvement for RSA on Android and iOS.
  * Streaming encryption on WinRT, which goes beyond what the WinRT API itself offers (while still relying on the OS for the crypto implementation).
- * Support for multiple key formats (PKCS#1, PKCS#8, CAPI) on all platforms. 
+ * Support for multiple key formats (PKCS#1, PKCS#8, CAPI) on all platforms.
 
 The API is designed to be similar to that found on WinRT or the .NET Framework. However some code changes may be required if migrating to this library from platform-specific crypto.
 
@@ -29,7 +27,7 @@ Add a dependency to this library into your project via the pre-built NuGet packa
 
 Be sure to install the NuGet package into your Portable library as well as each platform-specific app that uses your portable library. If you're shipping your portable library on NuGet, be sure to specify PclCrypto as a NuGet package dependency of your own NuGet package and you're set.
 
-Installing via NuGet is important because we use facade assemblies and platform-specific assemblies to allow your PCLs to access crypto that is normally available only to platform-specific libraries using a technique Paul Betts calls [Bait and switch PCLs][5]. NuGet handles all the magic for you. 
+Installing via NuGet is important because we use facade assemblies and platform-specific assemblies to allow your PCLs to access crypto that is normally available only to platform-specific libraries using a technique Paul Betts calls [Bait and switch PCLs][5]. NuGet handles all the magic for you.
 
 ### Documentation
 
@@ -61,7 +59,7 @@ Before:
 ...
 using PCLCrypto;
 
-class TwitterClient 
+class TwitterClient
 {
     private static string GenerateHash(string input, string key)
     {
@@ -81,7 +79,7 @@ After:
 using PCLCrypto;
 using static PCLCrypto.WinRTCrypto;
 
-class TwitterClient 
+class TwitterClient
 {
   private static string GenerateHash(string input, string key)
   {
@@ -104,8 +102,3 @@ class TwitterClient
  [8]: https://www.coinbase.com/checkouts/b3affe1c4e7b7b60028c3efcce2b1931
  [9]: http://intellitect.com/static-using-statement-in-c-6-0/
 
-[pull-requests-img]: http://www.issuestats.com/github/aarnott/pclcrypto/badge/pr
-[pull-requests-url]: http://www.issuestats.com/github/aarnott/pclcrypto
-
-[issues-closed-img]: http://www.issuestats.com/github/aarnott/pclcrypto/badge/issue
-[issues-closed-url]: http://www.issuestats.com/github/aarnott/pclcrypto
