@@ -35,7 +35,8 @@ Online documentation is available on our [project wiki site][6].
 
 ### Donations
 
-If you appreciate this library and/or find it useful, please consider [donating cash or bitcoins][8] to its author.
+If you appreciate this library and/or find it useful, please consider becoming a [GitHub sponsor for its author](https://github.com/sponsors/AArnott)
+or donating bitcoins to `1NC4k82nNev5Cz7ESBfaohbGsC6TKyjKvX` or any other mechanism shown on [my Keybase profile][Keybase] to its author.
 
 ### FAQ
 
@@ -99,6 +100,6 @@ class TwitterClient
  [5]: http://log.paulbetts.org/the-bait-and-switch-pcl-trick/
  [6]: https://github.com/aarnott/pclcrypto/wiki
  [7]: http://github.com/aarnott/pclcrypto
- [8]: https://www.coinbase.com/checkouts/b3affe1c4e7b7b60028c3efcce2b1931
+ [8]: https://github.com/sponsors/AArnott
  [9]: http://intellitect.com/static-using-statement-in-c-6-0/
-
+ [Keybase]: https://keybase.io/aarnott
