@@ -95,7 +95,7 @@ public class ECDiffieHellmanTests
     private static async Task WriteAsync(Stream stream, byte[] buffer, CancellationToken cancellationToken)
     {
         using Substream s = stream.WriteSubstream();
-        await s.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+        await s.WriteAsync(buffer, cancellationToken);
         await s.FlushAsync(cancellationToken);
     }
 
@@ -107,7 +107,7 @@ public class ECDiffieHellmanTests
         int totalBytesRead = 0;
         while (true)
         {
-            int bytesRead = await s.ReadAsync(buffer, totalBytesRead, buffer.Length - totalBytesRead, cancellationToken);
+            int bytesRead = await s.ReadAsync(buffer.AsMemory(totalBytesRead, buffer.Length - totalBytesRead), cancellationToken);
             if (bytesRead == 0)
             {
                 break;

@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PclCryptoStreamTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PclTestUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformSupport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PolyfillExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RandomNumberGeneratorTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Strings.Designer.cs">
       <DependentUpon>Strings.resx</DependentUpon>

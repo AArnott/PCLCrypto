@@ -27,7 +27,7 @@ namespace PCLCrypto
         /// <summary>
         /// A value indicating whether <see cref="TransformFinalBlock"/> has been called.
         /// </summary>
-        private bool transformedFinalBlock = false;
+        private bool transformedFinalBlock;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NetFxCryptographicHash"/> class.
