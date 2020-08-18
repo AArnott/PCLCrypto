@@ -18,7 +18,7 @@
     <Copyright>© Andrew Arnott. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/aarnott/pclcrypto/</PackageProjectUrl>
     <PackageIcon>icon_64x64.png</PackageIcon>
-    <PackageLicenseExpression>Ms-PL</PackageLicenseExpression>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
