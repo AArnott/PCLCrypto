@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24711.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30414.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCryptoSample", "PCLCryptoSample\PCLCryptoSample.csproj", "{9AD36E69-B580-4939-BE5C-ED6076363DBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCLCryptoSample", "PCLCryptoSample\PCLCryptoSample.csproj", "{9AD36E69-B580-4939-BE5C-ED6076363DBE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCryptoSample.iOS", "PCLCryptoSample.iOS\PCLCryptoSample.iOS.csproj", "{426C5BA6-4A27-4310-8C98-F250C63A3CA0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCryptoSample.Droid", "PCLCryptoSample.Droid\PCLCryptoSample.Droid.csproj", "{FA54C0CA-4163-4C53-BF7D-CABAC80C9BC3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLCryptoSample.WinPhone", "PCLCryptoSample.WinPhone\PCLCryptoSample.WinPhone.csproj", "{C9604408-04F2-47D4-9913-180F0256A36F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA71255E-E60A-436F-81DD-3DF5E0C9DCB7}"
 	ProjectSection(SolutionItems) = preProject
@@ -68,26 +66,11 @@ Global
 		{FA54C0CA-4163-4C53-BF7D-CABAC80C9BC3}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{FA54C0CA-4163-4C53-BF7D-CABAC80C9BC3}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{FA54C0CA-4163-4C53-BF7D-CABAC80C9BC3}.Release|iPhoneSimulator.Deploy.0 = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|iPhone.Deploy.0 = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Debug|iPhoneSimulator.Deploy.0 = Debug|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|iPhone.Build.0 = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|iPhone.Deploy.0 = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{C9604408-04F2-47D4-9913-180F0256A36F}.Release|iPhoneSimulator.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22AC418B-3C58-4A02-98B1-66A362B53BF5}
 	EndGlobalSection
 EndGlobal

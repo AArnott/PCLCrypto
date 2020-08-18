@@ -1,123 +1,151 @@
-﻿using System;
-using System.Text;
-using Xamarin.Forms;
-
-using PCLCrypto;
-using static PCLCrypto.WinRTCrypto;
+﻿// Copyright (c) Andrew Arnott. All rights reserved.
+// Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
 namespace PCLCryptoSample
 {
+    using System;
+    using System.Text;
+    using PCLCrypto;
+    using Xamarin.Forms;
+    using static PCLCrypto.WinRTCrypto;
+
     public class App : Application
     {
-        private Button createKeyButton = null;
-        private Label publicKeyLabel = null;
-        private Entry valueText = null;
-        private Button encryptButton = null;
-        private Label encryptLabel = null;
-        private Button decryptButton = null;
-        private Label decryptLabel = null;
-        private Button hashButton = null;
-        private Label hashLabel = null;
+        private Button? createKeyButton = null;
+        private Label? publicKeyLabel = null;
+        private Entry? valueText = null;
+        private Button? encryptButton = null;
+        private Label? encryptLabel = null;
+        private Button? decryptButton = null;
+        private Label? decryptLabel = null;
+        private Button? hashButton = null;
+        private Label? hashLabel = null;
 
         private ICryptographicKey key = null;
 
         public App()
         {
             // create the key we are going to use
-            var asym = AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaPkcs1);
-            var hash = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
+            IAsymmetricKeyAlgorithmProvider? asym = AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaPkcs1);
+            IHashAlgorithmProvider? hash = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha1);
 
             // The root page of your application
-            MainPage = new ContentPage
+            this.MainPage = new ContentPage
             {
                 Content = new StackLayout
                 {
                     VerticalOptions = LayoutOptions.Center,
-                    Children = {
+                    Children =
+                    {
                         // create a key
-                        (createKeyButton = new Button {
+                        (this.createKeyButton = new Button
+                        {
                             Text = "Create Key",
-                            Command = new Command(() => {
-                                key = asym.CreateKeyPair(512);
-                                var publicKey = key.ExportPublicKey();
+                            Command = new Command(() =>
+                            {
+                                this.key = asym.CreateKeyPair(512);
+                                var publicKey = this.key.ExportPublicKey();
                                 var publicKeyString = Convert.ToBase64String(publicKey);
-                                
-                                publicKeyLabel.Text = publicKeyString;
-                            })
+
+                                this.publicKeyLabel.Text = publicKeyString;
+                            }),
                         }),
-                        (publicKeyLabel = new Label {
-                            Text = "..."
+                        (this.publicKeyLabel = new Label
+                        {
+                            Text = "...",
                         }),
+
                         // enter plain text
-                        (valueText = new Entry {
-                            Text = "Hello World!"
+                        (this.valueText = new Entry
+                        {
+                            Text = "Hello World!",
                         }),
+
                         // start encryption
-                        (encryptButton = new Button {
+                        (this.encryptButton = new Button
+                        {
                             Text = "Encrypt",
-                            Command = new Command(() => {
-                                try {
-                                    var plainString = valueText.Text;
+                            Command = new Command(() =>
+                            {
+                                try
+                                {
+                                    var plainString = this.valueText.Text;
                                     var plain = Encoding.UTF8.GetBytes(plainString);
-                                    var encrypted = CryptographicEngine.Encrypt(key, plain);
+                                    var encrypted = CryptographicEngine.Encrypt(this.key, plain);
                                     var encryptedString = Convert.ToBase64String(encrypted);
 
-                                    encryptLabel.Text = encryptedString;
-                                } catch (Exception ex) {
-                                    encryptLabel.Text = "Error encrypting: " + ex.Message;
+                                    this.encryptLabel.Text = encryptedString;
                                 }
-                            })
+                                catch (Exception ex)
+                                {
+                                    this.encryptLabel.Text = "Error encrypting: " + ex.Message;
+                                }
+                            }),
                         }),
-                        (encryptLabel = new Label {
+                        (this.encryptLabel = new Label
+                        {
                             Text = "..."
                         }),
+
                         // and now decrypt
-                        (decryptButton = new Button {
+                        (this.decryptButton = new Button
+                        {
                             Text = "Decrypt",
-                            Command = new Command(() => {
-                                try {
-                                    var encryptedString = encryptLabel.Text;
+                            Command = new Command(() =>
+                            {
+                                try
+                                {
+                                    var encryptedString = this.encryptLabel.Text;
                                     var encrypted = Convert.FromBase64String(encryptedString);
-                                    var decrypted = CryptographicEngine.Decrypt(key, encrypted);
+                                    var decrypted = CryptographicEngine.Decrypt(this.key, encrypted);
                                     var decryptedString = Encoding.UTF8.GetString(decrypted, 0, decrypted.Length);
 
-                                    decryptLabel.Text = decryptedString;
-                                } catch (Exception ex) {
-                                    decryptLabel.Text = "Error decrypting: " + ex.Message;
+                                    this.decryptLabel.Text = decryptedString;
                                 }
-                            })
+                                catch (Exception ex)
+                                {
+                                    this.decryptLabel.Text = "Error decrypting: " + ex.Message;
+                                }
+                            }),
                         }),
-                        (decryptLabel = new Label {
-                            Text = "..."
+                        (this.decryptLabel = new Label
+                        {
+                            Text = "...",
                         }),
                         // and hash
-                        (hashButton = new Button {
+                        (this.hashButton = new Button
+                        {
                             Text = "hash",
-                            Command = new Command(() => {
-                                try {
-                                    var plainString = valueText.Text;
+                            Command = new Command(() =>
+                            {
+                                try
+                                {
+                                    var plainString = this.valueText.Text;
                                     var plain = Encoding.UTF8.GetBytes(plainString);
                                     var hashed = hash.HashData(plain);
                                     var hashedString = Convert.ToBase64String(hashed);
 
-                                    hashLabel.Text = hashedString;
-                                } catch (Exception ex) {
-                                    hashLabel.Text = "Error hashing: " + ex.Message;
+                                    this.hashLabel.Text = hashedString;
                                 }
-                            })
+                                catch (Exception ex)
+                                {
+                                    this.hashLabel.Text = "Error hashing: " + ex.Message;
+                                }
+                            }),
                         }),
-                        (hashLabel = new Label {
-                            Text = "..."
-                        })
-                    }
-                }
+                        (this.hashLabel = new Label
+                        {
+                            Text = "...",
+                        }),
+                    },
+                },
             };
 
             // set initial data
-            createKeyButton.Command.Execute(null);
-            encryptButton.Command.Execute(null);
-            decryptButton.Command.Execute(null);
-            hashButton.Command.Execute(null);
+            this.createKeyButton.Command.Execute(null);
+            this.encryptButton.Command.Execute(null);
+            this.decryptButton.Command.Execute(null);
+            this.hashButton.Command.Execute(null);
         }
     }
 }
