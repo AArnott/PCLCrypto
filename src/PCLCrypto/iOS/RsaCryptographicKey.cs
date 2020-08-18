@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
+#if __IOS__
+
 namespace PCLCrypto
 {
     using System;
@@ -27,13 +29,15 @@ namespace PCLCrypto
     using MonoTouch.Security;
     using PCLCrypto.Formatters;
 #endif
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// The iOS implementation of the <see cref="ICryptographicKey"/> interface
     /// for RSA keys.
     /// </summary>
+#pragma warning disable CA1060 // Move pinvokes to native methods class
     internal class RsaCryptographicKey : CryptographicKey, ICryptographicKey
+#pragma warning restore CA1060 // Move pinvokes to native methods class
     {
         /// <summary>
         /// The platform public key.
@@ -43,7 +47,7 @@ namespace PCLCrypto
         /// <summary>
         /// The platform private key.
         /// </summary>
-        private readonly SecKey privateKey;
+        private readonly SecKey? privateKey;
 
         /// <summary>
         /// The tag that may be used to query the keychain for the key.
@@ -63,7 +67,7 @@ namespace PCLCrypto
         /// <param name="algorithm">The algorithm.</param>
         internal RsaCryptographicKey(SecKey publicKey, string keyIdentifier, AsymmetricAlgorithm algorithm)
         {
-            Requires.NotNull(publicKey, "publicKey");
+            Requires.NotNull(publicKey, nameof(publicKey));
 
             this.publicKey = publicKey;
             this.keyIdentifier = keyIdentifier;
@@ -79,8 +83,8 @@ namespace PCLCrypto
         /// <param name="algorithm">The algorithm.</param>
         internal RsaCryptographicKey(SecKey publicKey, SecKey privateKey, string keyIdentifier, AsymmetricAlgorithm algorithm)
         {
-            Requires.NotNull(publicKey, "publicKey");
-            Requires.NotNull(privateKey, "privateKey");
+            Requires.NotNull(publicKey, nameof(publicKey));
+            Requires.NotNull(privateKey, nameof(privateKey));
 
             this.publicKey = publicKey;
             this.privateKey = privateKey;
@@ -106,7 +110,7 @@ namespace PCLCrypto
         public byte[] Export(CryptographicPrivateKeyBlobType blobType)
         {
             NSData data = KeyDataWithTag(GetPrivateKeyIdentifierWithTag(this.keyIdentifier));
-            Verify.Operation(data != null, "Private key not available.");
+            Verify.Operation(data != null, Strings.PrivateKeyNotAvailable);
             byte[] keyData;
             try
             {
@@ -197,6 +201,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] SignHash(byte[] data)
         {
+            Verify.Operation(this.privateKey is object, Strings.PrivateKeyNotAvailable);
             byte[] signature = new byte[this.privateKey.BlockSize];
 
             GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -235,7 +240,7 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        protected internal override byte[] Encrypt(byte[] data, byte[] iv)
+        protected internal override byte[] Encrypt(byte[] data, byte[]? iv)
         {
             byte[] cipherText;
             var code = this.publicKey.Encrypt(GetPadding(this.Algorithm), data, out cipherText);
@@ -244,8 +249,10 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        protected internal override byte[] Decrypt(byte[] data, byte[] iv)
+        protected internal override byte[] Decrypt(byte[] data, byte[]? iv)
         {
+            Verify.Operation(this.privateKey is object, Strings.PrivateKeyNotAvailable);
+
             // Initialize a plaintext buffer that is at least as large
             // as the plaintext could possibly be, which is as large as the
             // ciphertext is. Note the resulting plaintext could be smaller
@@ -295,7 +302,7 @@ namespace PCLCrypto
         /// <param name="secureClearOldBuffer">if set to <c>true</c>, the old buffer is cleared of its contents in the event that it is discarded.</param>
         private static void TrimBuffer(ref byte[] buffer, int bufferLength, bool secureClearOldBuffer)
         {
-            Requires.NotNull(buffer, "buffer");
+            Requires.NotNull(buffer, nameof(buffer));
 
             if (bufferLength < buffer.Length)
             {
@@ -368,7 +375,7 @@ namespace PCLCrypto
         /// <returns>The raw key data.</returns>
         private static NSData KeyDataWithTag(string tag)
         {
-            NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
+            using NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
             queryKey[KSec.ReturnData] = NSNumber.FromBoolean(true);
 
             IntPtr typeRef;
@@ -386,7 +393,7 @@ namespace PCLCrypto
         /// <returns>The security key.</returns>
         private static SecKey KeyRefWithTag(string tag)
         {
-            NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
+            using NSMutableDictionary queryKey = CreateKeyQueryDictionary(tag);
             queryKey[KSec.ReturnRef] = NSNumber.FromBoolean(true);
 
             IntPtr typeRef;
@@ -396,7 +403,7 @@ namespace PCLCrypto
         }
 
         /// <summary>
-        /// Creates a hash algorithm instance that is appropriate for the given algorithm.T
+        /// Creates a hash algorithm instance that is appropriate for the given algorithm.
         /// </summary>
         /// <returns>The hash algorithm.</returns>
         private System.Security.Cryptography.HashAlgorithm GetHashAlgorithm()
@@ -406,3 +413,5 @@ namespace PCLCrypto
         }
     }
 }
+
+#endif

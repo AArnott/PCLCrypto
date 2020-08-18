@@ -3,12 +3,13 @@
 
 namespace PCLCrypto
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
     /// Describes a range of valid key sizes.
     /// </summary>
-    public struct KeySizes : IEnumerable<int>
+    public struct KeySizes : IEnumerable<int>, IEquatable<KeySizes>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySizes"/> struct.
@@ -39,6 +40,22 @@ namespace PCLCrypto
         /// </summary>
         public int StepSize { get; }
 
+        /// <summary>
+        /// Checks value equality between two <see cref="KeySizes"/> values.
+        /// </summary>
+        /// <param name="first">One value to compare.</param>
+        /// <param name="second">Another value to compare.</param>
+        /// <returns><c>true</c> if the values are equal; <c>false</c> otherwise.</returns>
+        public static bool operator ==(KeySizes first, KeySizes second) => first.Equals(second);
+
+        /// <summary>
+        /// Checks value inequality between two <see cref="KeySizes"/> values.
+        /// </summary>
+        /// <param name="first">One value to compare.</param>
+        /// <param name="second">Another value to compare.</param>
+        /// <returns><c>false</c> if the values are equal; <c>true</c> otherwise.</returns>
+        public static bool operator !=(KeySizes first, KeySizes second) => !first.Equals(second);
+
         /// <inheritdoc />
         public IEnumerator<int> GetEnumerator()
         {
@@ -59,5 +76,14 @@ namespace PCLCrypto
 
         /// <inheritdoc />
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        /// <inheritdoc/>
+        public bool Equals(KeySizes other) => this.MaxSize == other.MaxSize && this.MinSize == other.MinSize && this.StepSize == other.StepSize;
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj) => obj is KeySizes other && this.Equals(other);
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => unchecked(this.MinSize + this.MaxSize + this.StepSize);
     }
 }

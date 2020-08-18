@@ -32,7 +32,7 @@ namespace PCLCrypto
         /// more information, see Remarks.
         /// </param>
         /// <returns>Encrypted data.</returns>
-        byte[] Encrypt(ICryptographicKey key, byte[] data, byte[] iv = null);
+        byte[] Encrypt(ICryptographicKey key, byte[] data, byte[]? iv = null);
 
         /// <summary>
         /// Creates a cryptographic transform for use in a CryptoStream
@@ -41,7 +41,7 @@ namespace PCLCrypto
         /// <param name="key">The encryption key to use.</param>
         /// <param name="iv">The initialization vector, if applicable and nonzero.</param>
         /// <returns>The transform.</returns>
-        ICryptoTransform CreateEncryptor(ICryptographicKey key, byte[] iv = null);
+        ICryptoTransform CreateEncryptor(ICryptographicKey key, byte[]? iv = null);
 
         /// <summary>
         /// Decrypts content that was previously encrypted by using a symmetric or asymmetric
@@ -60,7 +60,7 @@ namespace PCLCrypto
         /// data. For more information, see Encrypt.
         /// </param>
         /// <returns>Decrypted data.</returns>
-        byte[] Decrypt(ICryptographicKey key, byte[] data, byte[] iv = null);
+        byte[] Decrypt(ICryptographicKey key, byte[] data, byte[]? iv = null);
 
         /// <summary>
         /// Creates a cryptographic transform for use in a CryptoStream
@@ -69,7 +69,7 @@ namespace PCLCrypto
         /// <param name="key">The decryption key to use.</param>
         /// <param name="iv">The initialization vector, if applicable and nonzero.</param>
         /// <returns>The transform.</returns>
-        ICryptoTransform CreateDecryptor(ICryptographicKey key, byte[] iv = null);
+        ICryptoTransform CreateDecryptor(ICryptographicKey key, byte[]? iv = null);
 
         /// <summary>
         /// Signs digital content.

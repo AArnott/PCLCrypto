@@ -8,14 +8,13 @@ namespace PCLCrypto.Formatters
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// Encodes/decodes ASN.1 messages.
     /// </summary>
     /// <remarks>
-    /// The ASN.1 format is documented here:
-    /// http://en.wikipedia.org/wiki/X.690
+    /// The ASN.1 format is <see href="http://en.wikipedia.org/wiki/X.690">documented here</see>.
     /// </remarks>
     internal static class Asn
     {
@@ -38,11 +37,6 @@ namespace PCLCrypto.Formatters
             /// Meaning of this type depends on the context (such as within a sequence, set or choice)
             /// </summary>
             ContextSpecific = 0x80,
-
-            /// <summary>
-            /// Defined in private specifications
-            /// </summary>
-            Private = 0xC0,
 
             /// <summary>
             /// The set of bits that describe the class.
@@ -68,7 +62,9 @@ namespace PCLCrypto.Formatters
             /// <summary>
             /// The set of bits that describe the PC.
             /// </summary>
+#pragma warning disable CA1069 // Enums values should not be duplicated
             Mask = 0x20,
+#pragma warning restore CA1069 // Enums values should not be duplicated
         }
 
         /// <summary>
@@ -136,7 +132,7 @@ namespace PCLCrypto.Formatters
         /// </remarks>
         internal static IEnumerable<DataElement> ReadAsn1Elements(this Stream stream)
         {
-            Requires.NotNull(stream, "stream");
+            Requires.NotNull(stream, nameof(stream));
 
             do
             {
@@ -172,14 +168,14 @@ namespace PCLCrypto.Formatters
 
                 if (length > 8 * 1024)
                 {
-                    throw new FormatException("Invalid format or length too large.");
+                    throw new FormatException(Strings.InvalidFormatOrTooLong);
                 }
 
                 byte[] content = new byte[length];
                 int bytesRead = stream.Read(content, 0, (int)length);
                 if (bytesRead != length)
                 {
-                    throw new ArgumentException("Unexpected end of stream.");
+                    throw new EndOfStreamException();
                 }
 
                 yield return new DataElement(clazz, pc, tag, content);
@@ -201,7 +197,10 @@ namespace PCLCrypto.Formatters
         /// </remarks>
         internal static IEnumerable<DataElement> ReadAsn1Elements(byte[] value)
         {
-            return ReadAsn1Elements(new MemoryStream(value));
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            MemoryStream? stream = new MemoryStream(value);
+#pragma warning restore CA2000 // Dispose objects before losing scope
+            return ReadAsn1Elements(stream);
         }
 
         /// <summary>
@@ -211,7 +210,7 @@ namespace PCLCrypto.Formatters
         /// <param name="element">The data element.</param>
         internal static void WriteAsn1Element(this Stream stream, DataElement element)
         {
-            Requires.NotNull(stream, "stream");
+            Requires.NotNull(stream, nameof(stream));
 
             byte identifier = (byte)((byte)element.Class | (byte)element.PC | (byte)element.Tag);
             stream.WriteByte(identifier);
@@ -245,7 +244,7 @@ namespace PCLCrypto.Formatters
         /// <returns>The encoded ASN.1 element.</returns>
         internal static byte[] WriteAsn1Element(DataElement element)
         {
-            var ms = new MemoryStream();
+            using MemoryStream? ms = new MemoryStream();
             ms.WriteAsn1Element(element);
             return ms.ToArray();
         }
@@ -257,8 +256,8 @@ namespace PCLCrypto.Formatters
         /// <returns>The encoded ASN.1 elements.</returns>
         internal static byte[] WriteAsn1Elements(params DataElement[] elements)
         {
-            var nestedStream = new MemoryStream();
-            foreach (var element in elements)
+            using MemoryStream? nestedStream = new MemoryStream();
+            foreach (DataElement element in elements)
             {
                 nestedStream.WriteAsn1Element(element);
             }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
+#if __ANDROID__
+
 namespace PCLCrypto
 {
     using System;
@@ -11,7 +13,7 @@ namespace PCLCrypto
     using System.Threading.Tasks;
     using Java.Security;
     using Javax.Crypto;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// A .NET Framework implementation of the <see cref="ISymmetricKeyAlgorithmProvider"/> interface.
@@ -21,7 +23,7 @@ namespace PCLCrypto
         /// <summary>
         /// A lazy-initialized cache for the <see cref="LegalKeySizes"/> property.
         /// </summary>
-        private IReadOnlyList<KeySizes> legalKeySizes;
+        private IReadOnlyList<KeySizes>? legalKeySizes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymmetricKeyAlgorithmProvider"/> class.
@@ -48,12 +50,17 @@ namespace PCLCrypto
                 {
                     using (var platform = Cipher.GetInstance(this.Name.GetString()))
                     {
+                        if (platform is null)
+                        {
+                            throw new InvalidOperationException($"Cipher.GetInstance(\"{this.Name.GetString()}\") returned null.");
+                        }
+
                         return GetBlockSize(this.Mode, platform);
                     }
                 }
                 catch (NoSuchAlgorithmException ex)
                 {
-                    throw new NotSupportedException("Algorithm not supported.", ex);
+                    throw new NotSupportedException(Strings.UnsupportedAlgorithm, ex);
                 }
             }
         }
@@ -96,7 +103,7 @@ namespace PCLCrypto
                     }
                     catch (NoSuchAlgorithmException ex)
                     {
-                        throw new NotSupportedException("Algorithm not supported.", ex);
+                        throw new NotSupportedException(Strings.UnsupportedAlgorithm, ex);
                     }
                 }
 
@@ -120,7 +127,7 @@ namespace PCLCrypto
         /// <returns>The block size (in bytes).</returns>
         internal static int GetBlockSize(SymmetricAlgorithmMode mode, Cipher algorithm)
         {
-            Requires.NotNull(algorithm, "algorithm");
+            Requires.NotNull(algorithm, nameof(algorithm));
 
             if (algorithm.BlockSize == 0 && mode == SymmetricAlgorithmMode.Streaming)
             {
@@ -132,3 +139,5 @@ namespace PCLCrypto
         }
     }
 }
+
+#endif

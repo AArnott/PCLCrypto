@@ -1,6 +1,8 @@
 // Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
+#if __IOS__
+
 namespace PCLCrypto
 {
     using System;
@@ -16,7 +18,7 @@ namespace PCLCrypto
     using MonoTouch.ObjCRuntime;
     using MonoTouch.UIKit;
 #endif
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// Constants for iOS Security APIs.
@@ -54,7 +56,7 @@ namespace PCLCrypto
             }
             finally
             {
-                Dlfcn.dlclose(handle);
+                _ = Dlfcn.dlclose(handle);
             }
         }
 
@@ -149,3 +151,5 @@ namespace PCLCrypto
         public static NSString AttrKeyClassPrivate { get; private set; }
     }
 }
+
+#endif

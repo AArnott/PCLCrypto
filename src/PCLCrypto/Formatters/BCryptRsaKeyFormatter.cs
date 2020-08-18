@@ -1,22 +1,13 @@
 ﻿// Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
-#if !SILVERLIGHT
-
 namespace PCLCrypto
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Numerics;
     using System.Runtime.InteropServices;
-    using System.Text;
-    using System.Threading.Tasks;
+    using Microsoft;
     using PCLCrypto.Formatters;
-    using PInvoke;
-    using Validation;
     using static PInvoke.BCrypt;
 
     /// <summary>
@@ -24,7 +15,7 @@ namespace PCLCrypto
     /// Known as an "RSA Public Key Blob", "RSA Private Key Blob", or "Full RSA Private Key Blob".
     /// </summary>
     /// <remarks>
-    /// The key format is documented here: https://msdn.microsoft.com/en-us/library/windows/desktop/aa375531(v=vs.85).aspx
+    /// The key format is <see href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa375531(v=vs.85).aspx">documented here</see>.
     /// </remarks>
     internal class BCryptRsaKeyFormatter : KeyFormatter
     {
@@ -38,7 +29,7 @@ namespace PCLCrypto
         /// Initializes a new instance of the <see cref="BCryptRsaKeyFormatter"/> class.
         /// </summary>
         /// <param name="privateKeyType">
-        /// Either <see cref="CryptographicPrivateKeyBlobType.BCryptFullPrivateKey"/> or <see cref="CryptographicPrivateKeyBlobType.BCryptPrivateKey"/>
+        /// Either <see cref="CryptographicPrivateKeyBlobType.BCryptFullPrivateKey"/> or <see cref="CryptographicPrivateKeyBlobType.BCryptPrivateKey"/>.
         /// </param>
         public BCryptRsaKeyFormatter(CryptographicPrivateKeyBlobType privateKeyType)
         {
@@ -51,7 +42,7 @@ namespace PCLCrypto
         /// <summary>
         /// Initializes a new instance of the <see cref="BCryptRsaKeyFormatter"/> class.
         /// </summary>
-        /// <param name="publicKeyType">Must always be <see cref="CryptographicPublicKeyBlobType.BCryptPublicKey"/></param>
+        /// <param name="publicKeyType">Must always be <see cref="CryptographicPublicKeyBlobType.BCryptPublicKey"/>.</param>
         public BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType publicKeyType)
         {
             Requires.Argument(publicKeyType == CryptographicPublicKeyBlobType.BCryptPublicKey, nameof(publicKeyType), "Not a BCrypt key blob format.");
@@ -74,7 +65,7 @@ namespace PCLCrypto
             var parameters = default(RSAParameters);
             var reader = new BinaryReader(stream);
 
-#if DESKTOP
+#if NETFRAMEWORK
             int headerSize = Marshal.SizeOf(typeof(BCRYPT_RSAKEY_BLOB));
 #else
             int headerSize = Marshal.SizeOf<BCRYPT_RSAKEY_BLOB>();
@@ -83,7 +74,7 @@ namespace PCLCrypto
             BCRYPT_RSAKEY_BLOB header;
             fixed (byte* pHeaderBytes = headerBytes)
             {
-#if DESKTOP
+#if NETFRAMEWORK
                 header = (BCRYPT_RSAKEY_BLOB)Marshal.PtrToStructure(new IntPtr(pHeaderBytes), typeof(BCRYPT_RSAKEY_BLOB));
 #else
                 header = Marshal.PtrToStructure<BCRYPT_RSAKEY_BLOB>(new IntPtr(pHeaderBytes));
@@ -115,6 +106,10 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected override unsafe void WriteCore(Stream stream, RSAParameters parameters)
         {
+            Requires.NotNull(stream, nameof(stream));
+            Requires.Argument(parameters.Modulus is object, "{0}.{1}", nameof(parameters), nameof(parameters.Modulus));
+            Requires.Argument(parameters.Exponent is object, "{0}.{1}", nameof(parameters), nameof(parameters.Exponent));
+
             var writer = new BinaryWriter(stream);
             var header = default(BCRYPT_RSAKEY_BLOB);
 
@@ -133,7 +128,7 @@ namespace PCLCrypto
             header.cbPrime2 = q?.Length ?? 0;
             header.BitLength = modulus.Length * 8;
 
-#if DESKTOP
+#if NETFRAMEWORK
             int headerSize = Marshal.SizeOf(typeof(BCRYPT_RSAKEY_BLOB));
 #else
             int headerSize = Marshal.SizeOf<BCRYPT_RSAKEY_BLOB>();
@@ -141,7 +136,7 @@ namespace PCLCrypto
             byte[] headerBytes = new byte[headerSize];
             fixed (byte* pHeaderBytes = headerBytes)
             {
-#if DESKTOP
+#if NETFRAMEWORK
                 Marshal.StructureToPtr(header, new IntPtr(pHeaderBytes), false);
 #else
                 Marshal.StructureToPtr(header, new IntPtr(pHeaderBytes), false);
@@ -168,4 +163,3 @@ namespace PCLCrypto
         }
     }
 }
-#endif

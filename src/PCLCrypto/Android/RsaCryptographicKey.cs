@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
+#if __ANDROID__
+
 namespace PCLCrypto
 {
     using System;
@@ -13,8 +15,8 @@ namespace PCLCrypto
     using Java.Security;
     using Java.Security.Interfaces;
     using Javax.Crypto;
+    using Microsoft;
     using PCLCrypto.Formatters;
-    using Validation;
 
     /// <summary>
     /// The .NET Framework implementation of the <see cref="ICryptographicKey"/> interface
@@ -30,7 +32,7 @@ namespace PCLCrypto
         /// <summary>
         /// The platform private key.
         /// </summary>
-        private readonly IRSAPrivateKey privateKey;
+        private readonly IRSAPrivateKey? privateKey;
 
         /// <summary>
         /// The algorithm to use when performing cryptography.
@@ -50,9 +52,9 @@ namespace PCLCrypto
         /// <param name="algorithm">The algorithm.</param>
         internal RsaCryptographicKey(IPublicKey publicKey, RSAParameters parameters, AsymmetricAlgorithm algorithm)
         {
-            Requires.NotNull(publicKey, "publicKey");
+            Requires.NotNull(publicKey, nameof(publicKey));
 
-            this.publicKey = publicKey.JavaCast<IRSAPublicKey>();
+            this.publicKey = publicKey.JavaCast<IRSAPublicKey>()!;
             this.parameters = parameters;
             this.algorithm = algorithm;
         }
@@ -66,11 +68,11 @@ namespace PCLCrypto
         /// <param name="algorithm">The algorithm.</param>
         internal RsaCryptographicKey(IPublicKey publicKey, IPrivateKey privateKey, RSAParameters parameters, AsymmetricAlgorithm algorithm)
         {
-            Requires.NotNull(publicKey, "publicKey");
-            Requires.NotNull(privateKey, "privateKey");
+            Requires.NotNull(publicKey, nameof(publicKey));
+            Requires.NotNull(privateKey, nameof(privateKey));
 
-            this.publicKey = publicKey.JavaCast<IRSAPublicKey>();
-            this.privateKey = privateKey.JavaCast<IRSAPrivateKey>();
+            this.publicKey = publicKey.JavaCast<IRSAPublicKey>()!;
+            this.privateKey = privateKey.JavaCast<IRSAPrivateKey>()!;
             this.parameters = parameters;
             this.algorithm = algorithm;
         }
@@ -78,7 +80,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public int KeySize
         {
-            get { return this.publicKey.Modulus.BitLength(); }
+            get { return this.publicKey.Modulus!.BitLength(); }
         }
 
         /// <summary>
@@ -105,8 +107,9 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override bool VerifySignature(byte[] data, byte[] signature)
         {
-            using (Signature instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
+            using (Signature? instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
             {
+                Verify.Operation(instance is object, "Unable to get signature for algorithm: {0}", this.Algorithm);
                 instance.InitVerify(this.publicKey);
                 instance.Update(data);
                 return instance.Verify(signature);
@@ -143,24 +146,26 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
-        protected internal override byte[] Encrypt(byte[] data, byte[] iv)
+        protected internal override byte[] Encrypt(byte[] data, byte[]? iv)
         {
-            using (Cipher cipher = Cipher.GetInstance(GetCipherName(this.Algorithm)))
+            using (Cipher? cipher = Cipher.GetInstance(GetCipherName(this.Algorithm)))
             {
+                Verify.Operation(cipher is object, "Unable to get cipher for algorithm: {0}", this.Algorithm);
                 cipher.Init(Javax.Crypto.CipherMode.EncryptMode, this.publicKey);
-                byte[] cipherText = cipher.DoFinal(data);
+                byte[] cipherText = cipher.DoFinal(data)!;
                 return cipherText;
             }
         }
 
         /// <inheritdoc />
-        protected internal override byte[] Decrypt(byte[] data, byte[] iv)
+        protected internal override byte[] Decrypt(byte[] data, byte[]? iv)
         {
             Verify.Operation(this.privateKey != null, "Private key missing.");
-            using (Cipher cipher = Cipher.GetInstance(GetCipherName(this.Algorithm)))
+            using (Cipher? cipher = Cipher.GetInstance(GetCipherName(this.Algorithm)))
             {
+                Verify.Operation(cipher is object, "Unable to get cipher for algorithm: {0}", this.Algorithm);
                 cipher.Init(Javax.Crypto.CipherMode.DecryptMode, this.privateKey);
-                byte[] plainText = cipher.DoFinal(data);
+                byte[]? plainText = cipher.DoFinal(data)!;
                 return plainText;
             }
         }
@@ -168,11 +173,13 @@ namespace PCLCrypto
         /// <inheritdoc />
         protected internal override byte[] Sign(byte[] data)
         {
-            using (Signature instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
+            using (Signature? instance = Signature.GetInstance(GetSignatureName(this.Algorithm)))
             {
+                Verify.Operation(instance is object, "Unable to get signature for algorithm: {0}", this.Algorithm);
                 instance.InitSign(this.privateKey);
                 instance.Update(data);
-                byte[] signature = instance.Sign();
+                byte[]? signature = instance.Sign();
+                Assumes.NotNull(signature);
                 return signature;
             }
         }
@@ -238,3 +245,5 @@ namespace PCLCrypto
         }
     }
 }
+
+#endif

@@ -1,13 +1,3 @@
 <Project>
-  <PropertyGroup>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="desktop\**" Condition=" '$(TargetsDesktop)' != 'true' " />
-    <Compile Remove="WinRT\**" Condition=" '$(TargetsWinRT)' != 'true' " />
-    <Compile Remove="Android\**" Condition=" '$(TargetsAndroid)' != 'true' " />
-    <Compile Remove="iOS\**" Condition=" '$(TargetsiOS)' != 'true' " />
-    <Compile Remove="NetCore\**" Condition=" '$(TargetsNetCore)' != 'true' " />
-  </ItemGroup>
-
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)../, Directory.Build.targets))\Directory.Build.targets" Condition=" '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)../, Directory.Build.targets))' != '' " />
 </Project>

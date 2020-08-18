@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "components": [
+    "Microsoft.VisualStudio.Workload.ManagedDesktop",
+    "Microsoft.VisualStudio.Workload.Universal",
+    "Microsoft.VisualStudio.Workload.NetCrossPlat",
+    "Microsoft.VisualStudio.Workload.NetCoreTools",
+    "Microsoft.VisualStudio.Component.Windows10SDK.17763"
+  ]
+}

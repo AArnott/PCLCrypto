@@ -11,7 +11,7 @@ namespace PCLCrypto.Formatters
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// Encodes/decodes public keys in the X.509 subject public key info format.
@@ -39,24 +39,24 @@ namespace PCLCrypto.Formatters
             var sequence = stream.ReadAsn1Elements().First();
             if (sequence.Class != Asn.BerClass.Universal || sequence.PC != Asn.BerPC.Constructed || sequence.Tag != Asn.BerTag.Sequence)
             {
-                throw new ArgumentException("Unexpected format.");
+                throw new ArgumentException(Strings.UnexpectedFormat);
             }
 
             var elements = Asn.ReadAsn1Elements(sequence.Content).ToList();
             if (elements.Count != 2 || elements[0].Class != Asn.BerClass.Universal || elements[0].PC != Asn.BerPC.Constructed || elements[0].Tag != Asn.BerTag.Sequence)
             {
-                throw new ArgumentException("Unexpected format.");
+                throw new ArgumentException(Strings.UnexpectedFormat);
             }
 
             var oid = Asn.ReadAsn1Elements(elements[0].Content).First();
             if (!KeyFormatter.BufferEqual(Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier, oid.Content))
             {
-                throw new ArgumentException("Unexpected algorithm.");
+                throw new ArgumentException(Strings.UnexpectedAlgorithm);
             }
 
             if (elements[1].Class != Asn.BerClass.Universal || elements[1].PC != Asn.BerPC.Primitive || elements[1].Tag != Asn.BerTag.BitString || elements[1].Content[0] != 0)
             {
-                throw new ArgumentException("Unexpected format.");
+                throw new ArgumentException(Strings.UnexpectedFormat);
             }
 
             byte[] rsaPublicKey = TrimLeadingZero(elements[1].Content);
@@ -70,7 +70,7 @@ namespace PCLCrypto.Formatters
         /// <param name="parameters">The RSA parameters of the key.</param>
         protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
-            Requires.NotNull(stream, "stream");
+            Requires.NotNull(stream, nameof(stream));
 
             var rootElement = new Asn.DataElement(
                 Asn.BerClass.Universal,
@@ -89,7 +89,7 @@ namespace PCLCrypto.Formatters
                         Asn.BerClass.Universal,
                         Asn.BerPC.Primitive,
                         Asn.BerTag.Null,
-                        new byte[0])),
+                        Array.Empty<byte>())),
                 new Asn.DataElement(
                         Asn.BerClass.Universal,
                         Asn.BerPC.Primitive,

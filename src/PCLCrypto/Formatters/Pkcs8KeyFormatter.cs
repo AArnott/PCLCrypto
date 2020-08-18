@@ -14,9 +14,7 @@ namespace PCLCrypto.Formatters
     /// <summary>
     /// Serializes RSA keys in the PKCS8 PrivateKeyInfo format.
     /// </summary>
-    /// <remarks>
-    /// Spec found at: http://tools.ietf.org/html/rfc5208#page-3
-    /// </remarks>
+    /// <seealso href="http://tools.ietf.org/html/rfc5208#page-3"/>
     internal class Pkcs8KeyFormatter : KeyFormatter
     {
         /// <summary>
@@ -30,9 +28,9 @@ namespace PCLCrypto.Formatters
         {
             var universalConstructedSequence = stream.ReadAsn1Elements().Single();
             var sequence = Asn.ReadAsn1Elements(universalConstructedSequence.Content).ToList();
-            KeyFormatter.VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0x00, "Unrecognized version.");
+            KeyFormatter.VerifyFormat(sequence[0].Content.Length == 1 && sequence[0].Content[0] == 0x00, Strings.UnrecognizedVersion);
             Asn.DataElement oid = Asn.ReadAsn1Elements(sequence[1].Content).First();
-            KeyFormatter.VerifyFormat(X509SubjectPublicKeyInfoFormatter.BufferEqual(oid.Content, Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier), "Unrecognized object identifier.");
+            KeyFormatter.VerifyFormat(X509SubjectPublicKeyInfoFormatter.BufferEqual(oid.Content, Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier), Strings.UnrecognizedObjectIdentifier);
             return KeyFormatter.Pkcs1.Read(sequence[2].Content);
         }
 
@@ -43,34 +41,26 @@ namespace PCLCrypto.Formatters
         /// <param name="parameters">The RSA parameters of the key.</param>
         protected override void WriteCore(Stream stream, RSAParameters parameters)
         {
+            var version0 = new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.Integer, new byte[] { 0x00 });
+            var privateKeyAlgorithm = new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.ObjectIdentifier, RsaEncryptionObjectIdentifier);
+            var rsaPrivateKey = new Asn.DataElement(Asn.BerClass.Universal, Asn.BerPC.Primitive, Asn.BerTag.OctetString, Pkcs1.Write(parameters, HasPrivateKey(parameters)));
+
             var rootElement = new Asn.DataElement(
                 Asn.BerClass.Universal,
                 Asn.BerPC.Constructed,
                 Asn.BerTag.Sequence,
-                new Asn.DataElement( // Version 0
-                    Asn.BerClass.Universal,
-                    Asn.BerPC.Primitive,
-                    Asn.BerTag.Integer,
-                    new byte[] { 0x00 }),
+                version0,
                 new Asn.DataElement(
                     Asn.BerClass.Universal,
                     Asn.BerPC.Constructed,
                     Asn.BerTag.Sequence,
-                    new Asn.DataElement( // privateKeyAlgorithm
-                        Asn.BerClass.Universal,
-                        Asn.BerPC.Primitive,
-                        Asn.BerTag.ObjectIdentifier,
-                        Pkcs1KeyFormatter.RsaEncryptionObjectIdentifier),
+                    privateKeyAlgorithm,
                     new Asn.DataElement(
                         Asn.BerClass.Universal,
                         Asn.BerPC.Primitive,
                         Asn.BerTag.Null,
-                        new byte[0])),
-                new Asn.DataElement( // rsaPrivateKey
-                    Asn.BerClass.Universal,
-                    Asn.BerPC.Primitive,
-                    Asn.BerTag.OctetString,
-                    KeyFormatter.Pkcs1.Write(parameters, HasPrivateKey(parameters))),
+                        Array.Empty<byte>())),
+                rsaPrivateKey,
                 new Asn.DataElement(
                     Asn.BerClass.ContextSpecific,
                     Asn.BerPC.Constructed,

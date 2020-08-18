@@ -8,11 +8,11 @@ namespace PCLCrypto.Formatters
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// Formats keys in the CAPI file format.
-    /// This is the format used by RSACryptoServiceProvider.ExportCspBlob
+    /// This is the format used by RSACryptoServiceProvider.ExportCspBlob.
     /// </summary>
     public class CapiKeyFormatter : KeyFormatter
     {
@@ -32,12 +32,12 @@ namespace PCLCrypto.Formatters
         private const byte CurrentBlobVersion = 0x02;
 
         /// <summary>
-        /// A magic string: "RSA1"
+        /// A magic string: "RSA1".
         /// </summary>
         private const string PublicKeyMagicHeader = "RSA1"; // 0x31415352
 
         /// <summary>
-        /// A magic string: "RSA2"
+        /// A magic string: "RSA2".
         /// </summary>
         private const string PrivateKeyMagicHeader = "RSA2"; // 0x32415352
 
@@ -54,7 +54,7 @@ namespace PCLCrypto.Formatters
         /// <returns><c>true</c> if CAPI is compatible with these parameters; <c>false</c> otherwise.</returns>
         public static bool IsCapiCompatible(RSAParameters parameters)
         {
-            Requires.Argument(parameters.Modulus != null, nameof(parameters), "Modulus must not be null.");
+            Requires.Argument(parameters.Modulus != null, nameof(parameters), Strings.PropertyXMustBeNonEmpty, nameof(RSAParameters.Modulus));
 
             // Only private keys have this restriction.
             if (!KeyFormatter.HasPrivateKey(parameters))
@@ -99,7 +99,7 @@ namespace PCLCrypto.Formatters
 
                 parameters.Modulus = TrimLeadingZero(parameters.Modulus);
                 parameters.D = TrimLeadingZero(parameters.D);
-                int keyLength = Math.Max(parameters.Modulus.Length, parameters.D?.Length ?? 0);
+                int keyLength = Math.Max(parameters.Modulus!.Length, parameters.D?.Length ?? 0);
                 parameters.Modulus = TrimOrPadZeroToLength(parameters.Modulus, keyLength);
                 parameters.D = TrimOrPadZeroToLength(parameters.D, keyLength);
 
@@ -147,7 +147,7 @@ namespace PCLCrypto.Formatters
         {
             var parameters = default(RSAParameters);
 
-            var reader = new BinaryReader(stream);
+            using var reader = new BinaryReader(stream);
 
             bool hasPrivateKey;
             byte keyBlobHeader = reader.ReadByte();
@@ -211,7 +211,7 @@ namespace PCLCrypto.Formatters
 
             var writer = new BinaryWriter(stream);
 
-            int bytelen = parameters.Modulus[0] == 0 // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
+            int bytelen = parameters.Modulus![0] == 0 // if high-order byte is zero, it's for sign bit; don't count in bit-size calculation
                 ? parameters.Modulus.Length - 1
                 : parameters.Modulus.Length;
             int bitlen = 8 * bytelen;
@@ -229,7 +229,7 @@ namespace PCLCrypto.Formatters
             // its behavior varies based on the endianness of the platform,
             // yet RSAParameters is defined to always be Big Endian, and the
             // key blob format is defined to always be Little Endian, so we have to be careful.
-            byte[] exponentPadding = new byte[4 - parameters.Exponent.Length];
+            byte[] exponentPadding = new byte[4 - parameters.Exponent!.Length];
             WriteReversed(writer, parameters.Exponent);
             writer.Write(exponentPadding);
 
@@ -238,12 +238,12 @@ namespace PCLCrypto.Formatters
 
             if (KeyFormatter.HasPrivateKey(parameters))
             {
-                WriteReversed(writer, parameters.P, bytelen / 2);
-                WriteReversed(writer, parameters.Q, bytelen / 2);
-                WriteReversed(writer, parameters.DP, bytelen / 2);
-                WriteReversed(writer, parameters.DQ, bytelen / 2);
-                WriteReversed(writer, parameters.InverseQ, bytelen / 2);
-                WriteReversed(writer, parameters.D, bytelen);
+                WriteReversed(writer, parameters.P!, bytelen / 2);
+                WriteReversed(writer, parameters.Q!, bytelen / 2);
+                WriteReversed(writer, parameters.DP!, bytelen / 2);
+                WriteReversed(writer, parameters.DQ!, bytelen / 2);
+                WriteReversed(writer, parameters.InverseQ!, bytelen / 2);
+                WriteReversed(writer, parameters.D!, bytelen);
             }
 
             writer.Flush();

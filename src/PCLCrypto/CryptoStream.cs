@@ -8,7 +8,7 @@ namespace PCLCrypto
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// Defines a stream that links data streams to cryptographic transformations.
@@ -23,7 +23,9 @@ namespace PCLCrypto
         /// <summary>
         /// The crypto transform to use for each block.
         /// </summary>
+#pragma warning disable CA2213 // Disposable fields should be disposed
         private readonly ICryptoTransform transform;
+#pragma warning restore CA2213 // Disposable fields should be disposed
 
         /// <summary>
         /// The read/write mode of this stream.
@@ -64,20 +66,20 @@ namespace PCLCrypto
         /// <param name="mode">The mode of operation.</param>
         public CryptoStream(Stream stream, ICryptoTransform transform, CryptoStreamMode mode)
         {
-            Requires.NotNull(stream, "stream");
-            Requires.NotNull(transform, "transform");
+            Requires.NotNull(stream, nameof(stream));
+            Requires.NotNull(transform, nameof(transform));
 
             if (mode == CryptoStreamMode.Read)
             {
-                Requires.Argument(stream.CanRead, "stream", "Stream is not readable.");
+                Requires.Argument(stream.CanRead, nameof(stream), Strings.StreamMustBeReadable);
             }
             else if (mode == CryptoStreamMode.Write)
             {
-                Requires.Argument(stream.CanWrite, "stream", "Stream is not writeable.");
+                Requires.Argument(stream.CanWrite, nameof(stream), Strings.StreamMustBeWritable);
             }
             else
             {
-                Requires.That(false, "mode", "Unsupported mode.");
+                Requires.Argument(false, "mode", Strings.UnsupportedMode);
             }
 
             this.chainedStream = stream;
@@ -91,8 +93,6 @@ namespace PCLCrypto
         /// Gets a value indicating whether the final buffer block has been written to the underlying stream.
         /// </summary>
         public bool HasFlushedFinalBlock { get; private set; }
-
-        #region Stream Properties
 
         /// <inheritdoc />
         public override bool CanRead
@@ -124,8 +124,6 @@ namespace PCLCrypto
             get { throw new NotSupportedException(); }
             set { throw new NotSupportedException(); }
         }
-
-        #endregion
 
         /// <summary>
         /// Creates a CryptoStream that can be used to write to the specified stream
@@ -189,8 +187,6 @@ namespace PCLCrypto
             Array.Clear(this.outputBuffer, 0, this.outputBuffer.Length);
         }
 
-        #region Stream methods
-
         /// <inheritdoc />
         public override void Flush()
         {
@@ -200,7 +196,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
-            Requires.NotNull(buffer, "buffer");
+            Requires.NotNull(buffer, nameof(buffer));
             Requires.Range(offset >= 0, "offset");
             Requires.Range(count >= 0, "count");
             if (!this.CanRead)
@@ -309,7 +305,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Requires.NotNull(buffer, "buffer");
+            Requires.NotNull(buffer, nameof(buffer));
             Requires.Range(offset >= 0, "offset");
             Requires.Range(count >= 0, "count");
             if (!this.CanWrite)
@@ -348,8 +344,6 @@ namespace PCLCrypto
             }
         }
 
-        #endregion
-
         /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
@@ -384,7 +378,7 @@ namespace PCLCrypto
         /// <returns>The start of the chain of CryptoStreams.</returns>
         private static CryptoStream Chain(Stream stream, CryptoStreamMode cryptoStreamMode, params ICryptoTransform[] transforms)
         {
-            Requires.NotNull(stream, "stream");
+            Requires.NotNull(stream, nameof(stream));
             Requires.NotNullOrEmpty(transforms, "transforms");
 
             if (cryptoStreamMode == CryptoStreamMode.Write)
@@ -423,8 +417,8 @@ namespace PCLCrypto
         /// </returns>
         private static Stream ChainWrite(Stream stream, IEnumerator<ICryptoTransform> transforms)
         {
-            Requires.NotNull(stream, "stream");
-            Requires.NotNull(transforms, "transforms");
+            Requires.NotNull(stream, nameof(stream));
+            Requires.NotNull(transforms, nameof(transforms));
 
             // Creating a chain of streams is a fun business. We use recursion to keep things sane.
             if (transforms.MoveNext())

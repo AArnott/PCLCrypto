@@ -4,7 +4,7 @@
 namespace PCLCrypto
 {
     using System;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// Extension methods for the <see cref="SymmetricAlgorithm"/> enum and related types.
@@ -93,7 +93,7 @@ namespace PCLCrypto
                 case SymmetricAlgorithm.TripleDesEcbPkcs7:
                     return SymmetricAlgorithmName.TripleDes;
                 default:
-                    throw new ArgumentException();
+                    throw new ArgumentOutOfRangeException(nameof(algorithm));
             }
         }
 
@@ -166,7 +166,7 @@ namespace PCLCrypto
                 case SymmetricAlgorithm.TripleDesEcbPkcs7:
                     return SymmetricAlgorithmPadding.PKCS7;
                 default:
-                    throw new ArgumentException();
+                    throw new ArgumentOutOfRangeException(nameof(algorithm));
             }
         }
 
@@ -211,7 +211,7 @@ namespace PCLCrypto
                 case SymmetricAlgorithmMode.Streaming:
                     return false;
                 default:
-                    throw new ArgumentException();
+                    throw new ArgumentOutOfRangeException(nameof(mode));
             }
         }
 
@@ -242,7 +242,7 @@ namespace PCLCrypto
                 case SymmetricAlgorithmName.TripleDes:
                     return "TRIPLEDES";
                 default:
-                    throw new ArgumentException();
+                    throw new ArgumentOutOfRangeException(nameof(algorithm));
             }
         }
     }

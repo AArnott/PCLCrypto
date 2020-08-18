@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
+#if __IOS__
+
 namespace PCLCrypto
 {
     using System;
@@ -23,7 +25,7 @@ namespace PCLCrypto
     using MonoTouch.Security;
     using PCLCrypto.Formatters;
 #endif
-    using Validation;
+    using Microsoft;
     using Platform = System.Security.Cryptography;
 
     /// <summary>
@@ -64,17 +66,17 @@ namespace PCLCrypto
             string privateKeyIdentifier = RsaCryptographicKey.GetPrivateKeyIdentifierWithTag(keyIdentifier);
 
             // Configure parameters for the joint keypair.
-            var keyPairAttr = new NSMutableDictionary();
+            using var keyPairAttr = new NSMutableDictionary();
             keyPairAttr[KSec.AttrKeyType] = KSec.AttrKeyTypeRSA;
             keyPairAttr[KSec.AttrKeySizeInBits] = NSNumber.FromInt32(keySize);
 
             // Configure parameters for the private key
-            var privateKeyAttr = new NSMutableDictionary();
+            using var privateKeyAttr = new NSMutableDictionary();
             privateKeyAttr[KSec.AttrIsPermanent] = NSNumber.FromBoolean(true);
             privateKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(privateKeyIdentifier, NSStringEncoding.UTF8);
 
             // Configure parameters for the public key
-            var publicKeyAttr = new NSMutableDictionary();
+            using var publicKeyAttr = new NSMutableDictionary();
             publicKeyAttr[KSec.AttrIsPermanent] = NSNumber.FromBoolean(true);
             publicKeyAttr[KSec.AttrApplicationTag] = NSData.FromString(publicKeyIdentifier, NSStringEncoding.UTF8);
 
@@ -83,7 +85,7 @@ namespace PCLCrypto
             keyPairAttr[KSec.PrivateKeyAttrs] = privateKeyAttr;
 
             // Generate the RSA key.
-            SecKey publicKey, privateKey;
+            SecKey? publicKey = null, privateKey = null;
             try
             {
                 SecStatusCode code = SecKey.GenerateKeyPair(keyPairAttr, out publicKey, out privateKey);
@@ -91,7 +93,15 @@ namespace PCLCrypto
             }
             catch (InvalidOperationException ex)
             {
+                publicKey?.Dispose();
+                privateKey?.Dispose();
                 throw new ArgumentException(ex.Message, ex);
+            }
+            catch
+            {
+                publicKey?.Dispose();
+                privateKey?.Dispose();
+                throw;
             }
 
             return new RsaCryptographicKey(publicKey, privateKey, keyIdentifier, this.algorithm);
@@ -100,7 +110,7 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public ICryptographicKey ImportKeyPair(byte[] keyBlob, CryptographicPrivateKeyBlobType blobType = CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo)
         {
-            Requires.NotNull(keyBlob, "keyBlob");
+            Requires.NotNull(keyBlob, nameof(keyBlob));
 
             RSAParameters parameters = KeyFormatter.GetFormatter(blobType)
                 .Read(keyBlob)
@@ -115,14 +125,14 @@ namespace PCLCrypto
         /// <inheritdoc/>
         public ICryptographicKey ImportPublicKey(byte[] keyBlob, CryptographicPublicKeyBlobType blobType = CryptographicPublicKeyBlobType.X509SubjectPublicKeyInfo)
         {
-            Requires.NotNull(keyBlob, "keyBlob");
+            Requires.NotNull(keyBlob, nameof(keyBlob));
 
             RSAParameters parameters = KeyFormatter.GetFormatter(blobType).Read(keyBlob);
 
             // Inject the PKCS#1 public key into the KeyChain.
             string keyIdentifier = Guid.NewGuid().ToString();
             string publicKeyIdentifier = RsaCryptographicKey.GetPublicKeyIdentifierWithTag(keyIdentifier);
-            var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(publicKeyIdentifier);
+            using var keyQueryDictionary = RsaCryptographicKey.CreateKeyQueryDictionary(publicKeyIdentifier);
             keyQueryDictionary[KSec.ValueData] = NSData.FromArray(KeyFormatter.Pkcs1.Write(parameters, includePrivateKey: false));
             keyQueryDictionary[KSec.AttrKeyClass] = KSec.AttrKeyClassPublic;
             keyQueryDictionary[KSec.ReturnRef] = NSNumber.FromBoolean(true);
@@ -161,3 +171,5 @@ namespace PCLCrypto
         }
     }
 }
+
+#endif

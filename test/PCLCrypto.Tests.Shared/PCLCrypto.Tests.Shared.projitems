@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>3b79d2b0-680a-493d-80fd-ebd8b24432fa</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PCLCrypto.Tests.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsymmetricKeyAlgorithmProviderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionAssertEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CryptographicBufferTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngineAsymmetricTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CryptographicEngineTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CryptoStreamTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeriveBytesTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ECDiffieHellmanTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HashAlgorithmProviderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KeyDerivationAlgorithmProviderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KeyFormatterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MacAlgorithmProviderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PclCryptoStreamTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PclTestUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformSupport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RandomNumberGeneratorTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Strings.Designer.cs">
+      <DependentUpon>Strings.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)SymmetricKeyAlgorithmProviderTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PCLCrypto\PCLCrypto.csproj">
+      <Project>{63cec67d-3ba0-453b-99b5-07cc0ddc3e1e}</Project>
+      <Name>PCLCrypto</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.Streams" Version="2.5.76" />
+    <PackageReference Include="xunit.combinatorial" Version="1.4.1" />
+    <PackageReference Include="xunit.skippablefact" Version="1.4.13" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.7.54" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Strings.resx">
+      <CustomToolNamespace>PCLCrypto</CustomToolNamespace>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

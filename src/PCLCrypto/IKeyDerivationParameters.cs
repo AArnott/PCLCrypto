@@ -3,11 +3,6 @@
 
 namespace PCLCrypto
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
     /// Represents parameters used when deriving a key.
     /// </summary>
@@ -23,6 +18,8 @@ namespace PCLCrypto
         /// Gets or sets the parameters used by the key derivation algorithm.
         /// </summary>
         /// <value>Buffer that contains the parameters.</value>
+#pragma warning disable CA1819 // Properties should not return arrays
         byte[] KdfGenericBinary { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 }

@@ -13,53 +13,51 @@ namespace PCLCrypto
     /// </summary>
     public static class WinRTCrypto
     {
-#if !PCL
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="IAsymmetricKeyAlgorithmProvider"/>.
         /// </summary>
-        private static IAsymmetricKeyAlgorithmProviderFactory asymmetricKeyAlgorithmProvider;
+        private static IAsymmetricKeyAlgorithmProviderFactory? asymmetricKeyAlgorithmProvider;
 
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="ISymmetricKeyAlgorithmProvider"/>.
         /// </summary>
-        private static ISymmetricKeyAlgorithmProviderFactory symmetricKeyAlgorithmProvider;
+        private static ISymmetricKeyAlgorithmProviderFactory? symmetricKeyAlgorithmProvider;
 
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="IHashAlgorithmProviderFactory"/>.
         /// </summary>
-        private static IHashAlgorithmProviderFactory hashAlgorithmProvider;
+        private static IHashAlgorithmProviderFactory? hashAlgorithmProvider;
 
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="IMacAlgorithmProviderFactory"/>.
         /// </summary>
-        private static IMacAlgorithmProviderFactory macAlgorithmProvider;
+        private static IMacAlgorithmProviderFactory? macAlgorithmProvider;
 
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="IKeyDerivationAlgorithmProviderFactory"/>.
         /// </summary>
-        private static IKeyDerivationAlgorithmProviderFactory keyDerivationAlgorithmProvider;
+        private static IKeyDerivationAlgorithmProviderFactory? keyDerivationAlgorithmProvider;
 
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="IKeyDerivationParametersFactory"/>.
         /// </summary>
-        private static IKeyDerivationParametersFactory keyDerivationParametersFactory;
+        private static IKeyDerivationParametersFactory? keyDerivationParametersFactory;
 
         /// <summary>
         /// Backing field for the CryptographicEngine property.
         /// </summary>
-        private static ICryptographicEngine cryptographicEngine;
+        private static ICryptographicEngine? cryptographicEngine;
 
         /// <summary>
         /// Backing field for the CryptographicBuffer property.
         /// </summary>
-        private static ICryptographicBuffer cryptographicBuffer;
-#endif
+        private static ICryptographicBuffer? cryptographicBuffer;
 
         /// <summary>
         /// Gets the asymmetric key algorithm provider factory.
@@ -68,16 +66,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (asymmetricKeyAlgorithmProvider == null)
                 {
                     asymmetricKeyAlgorithmProvider = new AsymmetricKeyAlgorithmProviderFactory();
                 }
 
                 return asymmetricKeyAlgorithmProvider;
-#endif
             }
         }
 
@@ -88,16 +82,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (symmetricKeyAlgorithmProvider == null)
                 {
                     symmetricKeyAlgorithmProvider = new SymmetricKeyAlgorithmProviderFactory();
                 }
 
                 return symmetricKeyAlgorithmProvider;
-#endif
             }
         }
 
@@ -108,16 +98,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (hashAlgorithmProvider == null)
                 {
                     hashAlgorithmProvider = new HashAlgorithmProviderFactory();
                 }
 
                 return hashAlgorithmProvider;
-#endif
             }
         }
 
@@ -128,16 +114,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (macAlgorithmProvider == null)
                 {
                     macAlgorithmProvider = new MacAlgorithmProviderFactory();
                 }
 
                 return macAlgorithmProvider;
-#endif
             }
         }
 
@@ -148,16 +130,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (keyDerivationAlgorithmProvider == null)
                 {
                     keyDerivationAlgorithmProvider = new KeyDerivationAlgorithmProviderFactory();
                 }
 
                 return keyDerivationAlgorithmProvider;
-#endif
             }
         }
 
@@ -168,16 +146,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (keyDerivationParametersFactory == null)
                 {
                     keyDerivationParametersFactory = new KeyDerivationParametersFactory();
                 }
 
                 return keyDerivationParametersFactory;
-#endif
             }
         }
 
@@ -188,16 +162,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (cryptographicEngine == null)
                 {
                     cryptographicEngine = new CryptographicEngine();
                 }
 
                 return cryptographicEngine;
-#endif
             }
         }
 
@@ -208,16 +178,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (cryptographicBuffer == null)
                 {
                     cryptographicBuffer = new CryptographicBuffer();
                 }
 
                 return cryptographicBuffer;
-#endif
             }
         }
     }

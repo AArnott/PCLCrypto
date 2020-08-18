@@ -1,6 +1,8 @@
 // Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Microsoft Public License (Ms-PL) license. See LICENSE file in the project root for full license information.
 
+#if __ANDROID__
+
 namespace PCLCrypto
 {
     using System;
@@ -14,7 +16,7 @@ namespace PCLCrypto
     using Android.Views;
     using Android.Widget;
     using Java.Security;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// A Java MessageDigest implementation of the <see cref="CryptographicHash"/> interface.
@@ -27,7 +29,7 @@ namespace PCLCrypto
         /// <param name="algorithm">The algorithm.</param>
         internal JavaCryptographicHash(MessageDigest algorithm)
         {
-            Requires.NotNull(algorithm, "algorithm");
+            Requires.NotNull(algorithm, nameof(algorithm));
 
             this.Algorithm = algorithm;
         }
@@ -46,7 +48,7 @@ namespace PCLCrypto
         /// <inheritdoc />
         public override byte[] GetValueAndReset()
         {
-            byte[] result = this.Algorithm.Digest();
+            byte[] result = this.Algorithm.Digest()!;
             this.Algorithm.Reset();
             return result;
         }
@@ -80,3 +82,5 @@ namespace PCLCrypto
         }
     }
 }
+
+#endif

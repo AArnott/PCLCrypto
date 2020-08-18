@@ -5,10 +5,11 @@ namespace PCLCrypto.Formatters
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Validation;
+    using Microsoft;
 
     /// <summary>
     /// A base class for encoding and decoding RSA keys in various formats.
@@ -35,7 +36,6 @@ namespace PCLCrypto.Formatters
         /// </summary>
         internal static readonly KeyFormatter Capi = new CapiKeyFormatter();
 
-#if !SILVERLIGHT
         /// <summary>
         /// The key formatter for BCrypt RSA private keys.
         /// </summary>
@@ -50,15 +50,14 @@ namespace PCLCrypto.Formatters
         /// The key formatter for BCrypt RSA public keys.
         /// </summary>
         internal static readonly KeyFormatter BCryptRsaPublicKey = new BCryptRsaKeyFormatter(CryptographicPublicKeyBlobType.BCryptPublicKey);
-#endif
 
         /// <summary>
-        /// The PKCS1 object identifier
+        /// The PKCS1 object identifier.
         /// </summary>
         protected static readonly byte[] Pkcs1ObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01 };
 
         /// <summary>
-        /// The RSA encryption object identifier
+        /// The RSA encryption object identifier.
         /// </summary>
         protected static readonly byte[] RsaEncryptionObjectIdentifier = new byte[] { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
 
@@ -66,7 +65,7 @@ namespace PCLCrypto.Formatters
         /// Gets the formatter to use for a given blob type.
         /// </summary>
         /// <param name="blobType">Type of the key blob.</param>
-        /// <returns>An instance of <see cref="KeyFormatter"/></returns>
+        /// <returns>An instance of <see cref="KeyFormatter"/>.</returns>
         public static KeyFormatter GetFormatter(CryptographicPrivateKeyBlobType blobType)
         {
             switch (blobType)
@@ -77,12 +76,10 @@ namespace PCLCrypto.Formatters
                     return Pkcs1;
                 case CryptographicPrivateKeyBlobType.Capi1PrivateKey:
                     return Capi;
-#if !SILVERLIGHT
                 case CryptographicPrivateKeyBlobType.BCryptPrivateKey:
                     return BCryptRsaPrivateKey;
                 case CryptographicPrivateKeyBlobType.BCryptFullPrivateKey:
                     return BCryptRsaFullPrivateKey;
-#endif
                 default:
                     throw new NotSupportedException();
             }
@@ -92,7 +89,7 @@ namespace PCLCrypto.Formatters
         /// Gets the formatter to use for a given blob type.
         /// </summary>
         /// <param name="blobType">Type of the key blob.</param>
-        /// <returns>An instance of <see cref="KeyFormatter"/></returns>
+        /// <returns>An instance of <see cref="KeyFormatter"/>.</returns>
         public static KeyFormatter GetFormatter(CryptographicPublicKeyBlobType blobType)
         {
             switch (blobType)
@@ -103,16 +100,14 @@ namespace PCLCrypto.Formatters
                     return Pkcs1;
                 case CryptographicPublicKeyBlobType.Capi1PublicKey:
                     return Capi;
-#if !SILVERLIGHT
                 case CryptographicPublicKeyBlobType.BCryptPublicKey:
                     return BCryptRsaPublicKey;
-#endif
                 default:
                     throw new NotSupportedException();
             }
         }
 
-#if !WinRT && (!SILVERLIGHT || WINDOWS_PHONE) // we just want SL5 excluded
+#if !WinRT
 
         /// <summary>
         /// Converts the PCLCrypto <see cref="RSAParameters"/> struct to the type
@@ -176,7 +171,7 @@ namespace PCLCrypto.Formatters
         /// <param name="includePrivateKey">if set to <c>true</c> the private key will be written as well; otherwise just the public key will be written.</param>
         public void Write(Stream stream, RSAParameters parameters, bool includePrivateKey)
         {
-            Requires.NotNull(stream, "stream");
+            Requires.NotNull(stream, nameof(stream));
             Requires.Argument(HasPrivateKey(parameters) || !includePrivateKey, "parameters", "No private key data included.");
 
             if (!includePrivateKey)
@@ -205,7 +200,7 @@ namespace PCLCrypto.Formatters
         /// <returns>The buffer with the serialized key.</returns>
         public byte[] Write(RSAParameters parameters, bool includePrivateKey)
         {
-            var ms = new MemoryStream();
+            using var ms = new MemoryStream();
             this.Write(ms, parameters, includePrivateKey);
             return ms.ToArray();
         }
@@ -228,7 +223,7 @@ namespace PCLCrypto.Formatters
         /// <returns>The RSA key parameters.</returns>
         public RSAParameters Read(byte[] keyBlob)
         {
-            var ms = new MemoryStream(keyBlob);
+            using var ms = new MemoryStream(keyBlob);
             return this.Read(ms);
         }
 
@@ -264,8 +259,8 @@ namespace PCLCrypto.Formatters
         /// <returns><c>true</c> if the buffers contain equal contents.</returns>
         protected static bool BufferEqual(byte[] buffer1, byte[] buffer2)
         {
-            Requires.NotNull(buffer1, "buffer1");
-            Requires.NotNull(buffer2, "buffer2");
+            Requires.NotNull(buffer1, nameof(buffer1));
+            Requires.NotNull(buffer2, nameof(buffer2));
 
             if (buffer1.Length != buffer2.Length)
             {
@@ -289,7 +284,8 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <returns>A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.</returns>
-        protected static byte[] TrimLeadingZero(byte[] buffer)
+        [return: NotNullIfNotNull("buffer")]
+        protected static byte[]? TrimLeadingZero(byte[]? buffer)
         {
             if (buffer == null)
             {
@@ -335,7 +331,8 @@ namespace PCLCrypto.Formatters
         /// <returns>
         /// A buffer without a leading zero. It may be the same buffer as was provided if no leading zero was found.
         /// </returns>
-        protected static byte[] TrimOrPadZeroToLength(byte[] buffer, int desiredLength)
+        [return: NotNullIfNotNull("buffer")]
+        protected static byte[]? TrimOrPadZeroToLength(byte[]? buffer, int desiredLength)
         {
             Requires.Range(desiredLength > 0, "desiredLength");
 
@@ -376,7 +373,7 @@ namespace PCLCrypto.Formatters
         /// </returns>
         protected static byte[] PrependLeadingZero(byte[] buffer, bool alwaysPrependZero = false)
         {
-            Requires.NotNull(buffer, "buffer");
+            Requires.NotNull(buffer, nameof(buffer));
 
             if ((buffer[0] & 0x80) == 0x80 || alwaysPrependZero)
             {
@@ -393,7 +390,7 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="condition">if set to <c>false</c> an exception will be thrown.</param>
         /// <param name="message">An optional message describing the failure.</param>
-        protected static void VerifyFormat(bool condition, string message = null)
+        protected static void VerifyFormat(bool condition, string? message = null)
         {
             if (!condition)
             {
@@ -406,7 +403,7 @@ namespace PCLCrypto.Formatters
         /// </summary>
         /// <param name="message">An optional message describing the failure.</param>
         /// <returns>Nothing. This method always throws.</returns>
-        protected static Exception FailFormat(string message = null)
+        protected static Exception FailFormat(string? message = null)
         {
             throw new FormatException(message ?? "Unexpected format or unsupported key.");
         }
@@ -418,6 +415,8 @@ namespace PCLCrypto.Formatters
         /// <returns>The new buffer with the contents of the original buffer reversed.</returns>
         protected static byte[] CopyAndReverse(byte[] data)
         {
+            Requires.NotNull(data, nameof(data));
+
             byte[] reversed = new byte[data.Length];
             Array.Copy(data, 0, reversed, 0, data.Length);
             Array.Reverse(reversed);

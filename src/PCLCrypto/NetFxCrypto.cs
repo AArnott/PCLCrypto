@@ -13,14 +13,11 @@ namespace PCLCrypto
     /// </summary>
     public static class NetFxCrypto
     {
-#if !PCL
-
         /// <summary>
         /// Backing field storing a shareable, thread-safe implementation
         /// of <see cref="IRandomNumberGenerator"/>.
         /// </summary>
-        private static IRandomNumberGenerator randomNumberGenerator;
-#endif
+        private static IRandomNumberGenerator? randomNumberGenerator;
 
         /// <summary>
         /// Gets a cryptographically strong random number generator.
@@ -29,16 +26,12 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 if (randomNumberGenerator == null)
                 {
                     randomNumberGenerator = new RandomNumberGenerator();
                 }
 
                 return randomNumberGenerator;
-#endif
             }
         }
 
@@ -49,11 +42,7 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#else
                 return new DeriveBytes();
-#endif
             }
         }
 
@@ -64,13 +53,7 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#elif !SILVERLIGHT
                 return new ECDiffieHellmanFactory();
-#else
-                throw new NotSupportedException();
-#endif
             }
         }
 
@@ -81,13 +64,7 @@ namespace PCLCrypto
         {
             get
             {
-#if PCL
-                throw new NotImplementedByReferenceAssemblyException();
-#elif !SILVERLIGHT
                 return new ECDiffieHellmanCngPublicKeyFactory();
-#else
-                throw new NotSupportedException();
-#endif
             }
         }
     }
