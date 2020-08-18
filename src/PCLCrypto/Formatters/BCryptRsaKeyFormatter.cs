@@ -6,6 +6,7 @@ namespace PCLCrypto
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Text;
     using Microsoft;
     using PCLCrypto.Formatters;
     using static PInvoke.BCrypt;
@@ -63,7 +64,7 @@ namespace PCLCrypto
         protected override unsafe RSAParameters ReadCore(Stream stream)
         {
             var parameters = default(RSAParameters);
-            var reader = new BinaryReader(stream);
+            using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
 
 #if NETFRAMEWORK
             int headerSize = Marshal.SizeOf(typeof(BCRYPT_RSAKEY_BLOB));
@@ -110,7 +111,7 @@ namespace PCLCrypto
             Requires.Argument(parameters.Modulus is object, "{0}.{1}", nameof(parameters), nameof(parameters.Modulus));
             Requires.Argument(parameters.Exponent is object, "{0}.{1}", nameof(parameters), nameof(parameters.Exponent));
 
-            var writer = new BinaryWriter(stream);
+            using var writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true);
             var header = default(BCRYPT_RSAKEY_BLOB);
 
             header.Magic = this.keyType;

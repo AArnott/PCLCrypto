@@ -281,9 +281,9 @@ namespace PCLCrypto
             var cipherName = new StringBuilder(this.Name.GetString());
             if (this.Mode.IsBlockCipher())
             {
-                cipherName.Append("/");
+                cipherName.Append('/');
                 cipherName.Append(this.Mode);
-                cipherName.Append("/");
+                cipherName.Append('/');
                 cipherName.Append(GetPaddingName(this.Padding));
             }
 
