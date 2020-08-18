@@ -3,7 +3,7 @@
 PCLCrypto provides cryptographic APIs over algorithms implemented by the platform, including exposing them to portable libraries.
 PCLCrypto does not implement any crypto directly, thus making this library a good choice for applications that require the assurance of high quality crypto implementations that can most reliably be found within the operating system itself or hardware.
 
-[![Build Status](https://dev.azure.com/andrewarnott/OSS/_apis/build/status/PCLCrypto?branchName=master)](https://dev.azure.com/andrewarnott/OSS/_build/latest?definitionId=45&branchName=master)
+[![Build Status](https://dev.azure.com/andrewarnott/OSS/_apis/build/status/PCLCrypto?branchName=main)](https://dev.azure.com/andrewarnott/OSS/_build/latest?definitionId=45&branchName=main)
 [![NuGet package](https://buildstats.info/nuget/PCLCrypto?includePreReleases=true)](https://nuget.org/packages/PCLCrypto)
 [![Join the chat at https://gitter.im/AArnott/PCLCrypto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AArnott/PCLCrypto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
