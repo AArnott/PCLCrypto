@@ -18,9 +18,9 @@ using Xunit;
 public class DesktopCryptoStreamTests : CryptoStreamTests
 #pragma warning restore 0436
 {
-    protected override Stream CreateCryptoStream(Stream target, PCLCrypto.ICryptoTransform transform, PCLCrypto.CryptoStreamMode mode)
+    protected override Stream CreateCryptoStream(Stream target, PCLCrypto.ICryptoTransform transform, PCLCrypto.CryptoStreamMode mode, bool leaveOpen = false)
     {
-        return new CryptoStream(target, CryptoTransformAdapter.Adapt(transform), ModeAdapter(mode));
+        return new CryptoStream(target, CryptoTransformAdapter.Adapt(transform), ModeAdapter(mode), leaveOpen);
     }
 
     protected override void FlushFinalBlock(Stream stream)

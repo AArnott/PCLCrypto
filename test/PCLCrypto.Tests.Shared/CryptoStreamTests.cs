@@ -53,6 +53,15 @@ public abstract class CryptoStreamTests
     }
 
     [Fact]
+    public void LeaveOpen_DoesNotDisposeTargetStream()
+    {
+        var transform = new MockCryptoTransform(5);
+        var targetStream = new MemoryStream();
+        this.CreateCryptoStream(targetStream, transform, CryptoStreamMode.Write, leaveOpen: true).Dispose();
+        _ = targetStream.Length;
+    }
+
+    [Fact]
     public void DisposeDoesNotDisposeTransform()
     {
         var hasher = new MockCryptoTransform(5);
@@ -275,7 +284,7 @@ public abstract class CryptoStreamTests
         }
     }
 
-    protected abstract Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode);
+    protected abstract Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode, bool leaveOpen = false);
 
     protected abstract void FlushFinalBlock(Stream stream);
 

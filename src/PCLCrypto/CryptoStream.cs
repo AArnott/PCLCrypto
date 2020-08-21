@@ -21,6 +21,11 @@ namespace PCLCrypto
         private readonly Stream chainedStream;
 
         /// <summary>
+        /// A value indicating whether to leave the <see cref="chainedStream"/> undisposed when this <see cref="CryptoStream"/> is disposed.
+        /// </summary>
+        private readonly bool leaveOpen;
+
+        /// <summary>
         /// The crypto transform to use for each block.
         /// </summary>
 #pragma warning disable CA2213 // Disposable fields should be disposed
@@ -58,13 +63,23 @@ namespace PCLCrypto
         /// </summary>
         private int outputBufferIndex;
 
+        /// <inheritdoc cref="CryptoStream(Stream, ICryptoTransform, CryptoStreamMode, bool)" />
+        /// <remarks>
+        /// Instances created with this constructor will dispose of the <paramref name="stream"/> when the instance is disposed.
+        /// </remarks>
+        public CryptoStream(Stream stream, ICryptoTransform transform, CryptoStreamMode mode)
+            : this(stream, transform, mode, leaveOpen: false)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CryptoStream"/> class.
         /// </summary>
         /// <param name="stream">The stream to write to or read from.</param>
         /// <param name="transform">The cryptographic operation to use for transforming data.</param>
         /// <param name="mode">The mode of operation.</param>
-        public CryptoStream(Stream stream, ICryptoTransform transform, CryptoStreamMode mode)
+        /// <param name="leaveOpen"><c>true</c> to leave the <paramref name="stream"/> open when this instance is disposed of; <c>false</c> to dispose them together.</param>
+        public CryptoStream(Stream stream, ICryptoTransform transform, CryptoStreamMode mode, bool leaveOpen)
         {
             Requires.NotNull(stream, nameof(stream));
             Requires.NotNull(transform, nameof(transform));
@@ -83,6 +98,7 @@ namespace PCLCrypto
             }
 
             this.chainedStream = stream;
+            this.leaveOpen = leaveOpen;
             this.transform = transform;
             this.mode = mode;
             this.inputBuffer = new byte[transform.InputBlockSize];
@@ -356,7 +372,10 @@ namespace PCLCrypto
                         this.FlushFinalBlock();
                     }
 
-                    this.chainedStream.Dispose();
+                    if (!this.leaveOpen)
+                    {
+                        this.chainedStream.Dispose();
+                    }
 
                     // Clear all buffers since they could contain security data.
                     Array.Clear(this.inputBuffer, 0, this.inputBuffer.Length);

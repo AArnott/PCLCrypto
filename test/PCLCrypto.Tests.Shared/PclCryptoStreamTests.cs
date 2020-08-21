@@ -93,9 +93,9 @@ public class PclCryptoStreamTests : CryptoStreamTests
         }
     }
 
-    protected override Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode)
+    protected override Stream CreateCryptoStream(Stream target, ICryptoTransform transform, CryptoStreamMode mode, bool leaveOpen = false)
     {
-        return new CryptoStream(target, transform, mode);
+        return new CryptoStream(target, transform, mode, leaveOpen);
     }
 
     protected override void FlushFinalBlock(Stream stream)
