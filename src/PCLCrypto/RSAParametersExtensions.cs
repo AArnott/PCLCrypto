@@ -6,6 +6,7 @@ namespace PCLCrypto
     using System;
     using System.Diagnostics;
     using System.Numerics;
+    using System.Security.Cryptography;
     using Microsoft;
 
     /// <summary>

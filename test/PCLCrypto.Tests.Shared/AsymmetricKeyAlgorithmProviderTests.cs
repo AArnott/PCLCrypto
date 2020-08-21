@@ -12,6 +12,7 @@ using PCLCrypto;
 using PCLCrypto.Formatters;
 using Xunit;
 using Xunit.Abstractions;
+using Platform = System.Security.Cryptography;
 
 public class AsymmetricKeyAlgorithmProviderTests
 {
@@ -165,7 +166,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     {
         IAsymmetricKeyAlgorithmProvider? rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
         ICryptographicKey? keyPair = rsa.CreateKeyPair(512);
-        RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: true);
+        Platform.RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: true);
         ICryptographicKey keyPair2 = rsa.ImportParameters(parameters);
 
         var blob1 = keyPair.Export();
@@ -178,7 +179,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     {
         IAsymmetricKeyAlgorithmProvider? provider = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaPkcs1);
         ICryptographicKey? rsaKey = provider.CreateKeyPair(1024);
-        RSAParameters parameters = rsaKey.ExportParameters(includePrivateData);
+        Platform.RSAParameters parameters = rsaKey.ExportParameters(includePrivateData);
         Assert.Equal(128, parameters.Modulus!.Length);
         if (includePrivateData)
         {
@@ -193,7 +194,7 @@ public class AsymmetricKeyAlgorithmProviderTests
     {
         IAsymmetricKeyAlgorithmProvider? rsa = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
         ICryptographicKey? keyPair = rsa.CreateKeyPair(512);
-        RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: false);
+        Platform.RSAParameters parameters = keyPair.ExportParameters(includePrivateParameters: false);
         Assert.Null(parameters.P);
         Assert.Null(parameters.InverseQ);
         Assert.Null(parameters.D);
@@ -282,9 +283,9 @@ public class AsymmetricKeyAlgorithmProviderTests
     {
         IAsymmetricKeyAlgorithmProvider? algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(algorithmName);
         ICryptographicKey? key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Key), blobType);
-        RSAParameters p1 = KeyFormatter.GetFormatter(blobType).Read(Convert.FromBase64String(base64Key));
+        Platform.RSAParameters p1 = KeyFormatter.GetFormatter(blobType).Read(Convert.FromBase64String(base64Key));
         string exported = Convert.ToBase64String(key.Export(blobType));
-        RSAParameters p2 = KeyFormatter.GetFormatter(blobType).Read(Convert.FromBase64String(exported));
+        Platform.RSAParameters p2 = KeyFormatter.GetFormatter(blobType).Read(Convert.FromBase64String(exported));
         this.LogRSAParameterComparison("Original", p1, "Re-exported", p2);
         if (blobType == CryptographicPrivateKeyBlobType.Pkcs8RawPrivateKeyInfo && exported.Length == base64Key.Length - 20)
         {
@@ -355,8 +356,8 @@ public class AsymmetricKeyAlgorithmProviderTests
         ICryptographicKey bcryptKey = algorithm.ImportKeyPair(Convert.FromBase64String(base64BCrypt), CryptographicPrivateKeyBlobType.BCryptPrivateKey);
         ICryptographicKey pkcs1Key = algorithm.ImportKeyPair(Convert.FromBase64String(base64Pkcs1), CryptographicPrivateKeyBlobType.Pkcs1RsaPrivateKey);
 
-        RSAParameters bcryptParameters = bcryptKey.ExportParameters(true);
-        RSAParameters pkcs1Parameters = pkcs1Key.ExportParameters(true);
+        Platform.RSAParameters bcryptParameters = bcryptKey.ExportParameters(true);
+        Platform.RSAParameters pkcs1Parameters = pkcs1Key.ExportParameters(true);
 
         this.LogRSAParameterComparison("BCrypt", bcryptParameters, "PKCS1", pkcs1Parameters);
 
@@ -413,7 +414,7 @@ public class AsymmetricKeyAlgorithmProviderTests
 
     ////}
 
-    private void LogRSAParameterComparison(string p1Name, RSAParameters p1, string p2Name, RSAParameters p2)
+    private void LogRSAParameterComparison(string p1Name, Platform.RSAParameters p1, string p2Name, Platform.RSAParameters p2)
     {
         int alignment = Math.Max(p1Name.Length, p2Name.Length) + 1;
         string prefix = "{0,-" + alignment + "}";

@@ -3,6 +3,7 @@
 
 namespace PCLCrypto
 {
+    using System.Security.Cryptography;
     using Microsoft;
     using PCLCrypto.Formatters;
 

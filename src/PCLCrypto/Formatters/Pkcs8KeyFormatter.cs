@@ -6,10 +6,9 @@
 namespace PCLCrypto.Formatters
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
+    using System.Security.Cryptography;
 
     /// <summary>
     /// Serializes RSA keys in the PKCS8 PrivateKeyInfo format.

@@ -7,6 +7,7 @@ namespace PCLCrypto
 {
     using System;
     using System.Collections.Generic;
+    using System.Security.Cryptography;
     using Android.Runtime;
     using Java.Math;
     using Java.Security;

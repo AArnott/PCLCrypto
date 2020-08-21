@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using PCLCrypto;
@@ -18,7 +19,7 @@ public class KeyFormatterTests
 {
     private static Lazy<RSAParameters> rsaParameters = new Lazy<RSAParameters>(() =>
     {
-        IAsymmetricKeyAlgorithmProvider? algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(AsymmetricAlgorithm.RsaOaepSha1);
+        IAsymmetricKeyAlgorithmProvider? algorithm = WinRTCrypto.AsymmetricKeyAlgorithmProvider.OpenAlgorithm(PCLCrypto.AsymmetricAlgorithm.RsaOaepSha1);
         using (ICryptographicKey? key = algorithm.CreateKeyPair(512))
         {
             const CryptographicPrivateKeyBlobType keyBlobFormat = CryptographicPrivateKeyBlobType.BCryptFullPrivateKey;
