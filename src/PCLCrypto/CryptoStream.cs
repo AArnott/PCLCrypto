@@ -8,6 +8,8 @@ namespace PCLCrypto
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft;
 
     /// <summary>
@@ -41,6 +43,11 @@ namespace PCLCrypto
         /// Data that has not yet been transformed.
         /// </summary>
         private readonly byte[] inputBuffer;
+
+        /// <summary>
+        /// A reusable result from the (synchronously implemented) <see cref="ReadAsync(byte[], int, int, CancellationToken)"/> method.
+        /// </summary>
+        private Task<int>? lastReadResultTask;
 
         /// <summary>
         /// Data that has been transformed but not flushed.
@@ -307,6 +314,23 @@ namespace PCLCrypto
         }
 
         /// <inheritdoc />
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                int result = this.Read(buffer, offset, count);
+                return this.lastReadResultTask?.Result == result ? this.lastReadResultTask : (this.lastReadResultTask = Task.FromResult(result));
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
+            {
+                return Task.FromException<int>(ex);
+            }
+        }
+
+        /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotImplementedException();
@@ -357,6 +381,23 @@ namespace PCLCrypto
                     this.inputBufferSize = 0;
                     this.chainedStream.Write(this.outputBuffer, 0, transformedBytes);
                 }
+            }
+        }
+
+        /// <inheritdoc />
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                this.Write(buffer, offset, count);
+                return Task.CompletedTask;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
+            {
+                return Task.FromException(ex);
             }
         }
 
