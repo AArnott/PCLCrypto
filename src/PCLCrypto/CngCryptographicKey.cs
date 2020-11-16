@@ -144,7 +144,14 @@ namespace PCLCrypto
             // .NET Core 2.1 / UAP has a bug where it throws NullReferenceException from SignHash because it didn't set this property.
             if (cng.HashAlgorithm is null)
             {
-                cng.HashAlgorithm = CngAsymmetricKeyAlgorithmProvider.GetHashCngAlgorithm(this.algorithm);
+                if (CngAsymmetricKeyAlgorithmProvider.GetHashCngAlgorithm(this.algorithm) is { } algorithm)
+                {
+                    cng.HashAlgorithm = algorithm;
+                }
+                else
+                {
+                    throw new NotSupportedException("Hash algorithm " + this.algorithm + " could not be obtained.");
+                }
             }
 
             return cng;
