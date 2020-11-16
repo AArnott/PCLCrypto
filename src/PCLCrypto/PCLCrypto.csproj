@@ -24,7 +24,7 @@
     <PackageReference Include="PInvoke.NCrypt" Version="0.7.78" />
     <PackageReference Include="System.Memory" Version="4.5.4" Condition=" !$(TargetFramework.StartsWith('XamariniOS')) " />
     <PackageReference Include="System.Memory" Version="4.5.4" Condition=" $(TargetFramework.StartsWith('XamariniOS')) " IncludeAssets="none" />
-    <PackageReference Include="System.Security.Cryptography.Cng" Version="4.7.0" />
+    <PackageReference Include="System.Security.Cryptography.Cng" Version="5.0.0" />
     <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
