@@ -21,7 +21,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="PInvoke.NCrypt" Version="0.7.78" />
+    <PackageReference Include="PInvoke.NCrypt" Version="0.7.104" />
     <PackageReference Include="System.Memory" Version="4.5.4" Condition=" !$(TargetFramework.StartsWith('XamariniOS')) " />
     <PackageReference Include="System.Memory" Version="4.5.4" Condition=" $(TargetFramework.StartsWith('XamariniOS')) " IncludeAssets="none" />
     <PackageReference Include="System.Security.Cryptography.Cng" Version="5.0.0" />
