@@ -44,7 +44,7 @@
     <PackageReference Include="Nerdbank.Streams" Version="2.6.81" />
     <PackageReference Include="xunit.combinatorial" Version="1.4.1" />
     <PackageReference Include="xunit.skippablefact" Version="1.4.13" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.8.55" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.1.46" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Strings.resx">
