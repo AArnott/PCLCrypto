@@ -1,5 +1,15 @@
 # PCLCrypto
 
+## ⚠️ Archive notice ⚠️
+
+PCLCrypto hasn't been developed for years.
+It was written when the .NET runtime that shipped across mobile platforms lacked the crypto that .NET Framework had.
+That hole has long since been filled.
+.NET has evolved to include scenarios (e.g. trimming) that this library hasn't been tested with nor supports.
+I suggest you switch from PCLCrypto to the standard .NET APIs.
+
+## Summary
+
 PCLCrypto provides cryptographic APIs over algorithms implemented by the platform, including exposing them to portable libraries.
 PCLCrypto does not implement any crypto directly, thus making this library a good choice for applications that require the assurance of high quality crypto implementations that can most reliably be found within the operating system itself or hardware.
 
